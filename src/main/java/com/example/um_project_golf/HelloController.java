@@ -9,6 +9,6 @@ public class HelloController {
 
     @FXML
     protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to project 1_2 golf, and bots are allowed, but be careful of AI!");
+        welcomeText.setText("Welcome to project 1_2 golf, and bots are allowed, but be careful of some AI!");
     }
 }
