@@ -8,6 +8,30 @@ public class InputManagement {
 
     private final List<String> equations = List.of("21x + 3y", "3x+4y");
 
+    enum Type
+    {
+        NUMBER,
+        VARIABLE,
+        OPERATOR
+    }
+
+    static class Token
+    {
+        private final Type type;
+        private final String value;
+
+        public Token(Type type, String value)
+        {
+            this.type = type;
+            this.value = value;
+        }
+
+        @Override
+        public String toString()
+        {
+            return type + ": " + value;
+        }
+    }
     private List<Function<Double, Double>> constructFunctions(List<String> equations)
     {
         List<Function<Double, Double>> functions = new ArrayList<>();
@@ -20,39 +44,53 @@ public class InputManagement {
 
     private Function<Double, Double> functionRecognition(String equation)
     {
-        List<Character> equationChars = equation
-                .chars()
-                .mapToObj(c -> (char) c)
-                .filter(c -> c != ' ')
-                .toList();
+        List<Token> tokens = tokenize(equation);
 
-        List<String> fixedList = new ArrayList<>();
+        // Here, you would parse the tokens and build an expression tree or similar structure
+        // For simplicity, this example will not include the full parsing logic
+
+        // Example evaluation, to be replaced with actual logic based on parsing
+        return (x) -> 3 * x; // Placeholder
+    }
+
+    private List<Token> tokenize(String equation)
+    {
+        List<Token> tokens = new ArrayList<>();
         StringBuilder currentNumber = new StringBuilder();
 
-        for (Character c : equationChars)
+        for (char c : equation.toCharArray())
         {
-            if (Character.isDigit(c))
+            if (c != ' ')
             {
-                currentNumber.append(c);
-            } else
-            {
-                if (!currentNumber.isEmpty())
+                if (Character.isDigit(c) || c == '.')
                 {
-                    fixedList.add(currentNumber.toString());
-                    currentNumber = new StringBuilder();
+                    currentNumber.append(c);
                 }
-                fixedList.add(c.toString());
+                else
+                {
+                    if (!currentNumber.isEmpty())
+                    {
+                        tokens.add(new Token(Type.NUMBER, currentNumber.toString()));
+                        currentNumber = new StringBuilder();
+                    }
+                    if (c == '+' || c == '-' || c == '*' || c == '/')
+                    {
+                        tokens.add(new Token(Type.OPERATOR, String.valueOf(c)));
+                    }
+                    else if (Character.isLetter(c))
+                    {
+                        tokens.add(new Token(Type.VARIABLE, String.valueOf(c)));
+                    }
+                }
             }
         }
 
         if (!currentNumber.isEmpty())
         {
-            fixedList.add(currentNumber.toString());
+            tokens.add(new Token(Type.NUMBER, currentNumber.toString()));
         }
 
-        System.out.println(fixedList);
-
-        return (x) -> 3 * x;
+        return tokens;
     }
 
     public static void main(String[] args)
