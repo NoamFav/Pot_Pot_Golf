@@ -6,6 +6,8 @@ import java.util.List;
 public class InputManagement {
 
     private final List<String> equations = List.of("21x^2 + 3y", "3x + 4y - (8 + 9x)");
+    private final List<String> variables = List.of("x", "y");
+    private final List<String> startedValues = List.of("3", "4");
 
     enum Type //defines the type of token
     {
@@ -116,6 +118,77 @@ public class InputManagement {
         {
             tokens.add(new Token(Type.OPERATOR, "*"));
         }
+    }
+
+    private double doPEMDAS(List<Token> tokens)
+    {
+        double result = 0;
+
+        Token previousToken = null;
+        Token nextToken = null;
+
+        for(int order = 0; order < 4; order++) // 0 = parentheses, 1 = exponents, 2 = multiplication and division, 3 = addition and subtraction
+        {
+            for (Token currentToken : tokens)
+            {
+                nextToken = tokens.get(tokens.indexOf(currentToken) + 1);
+                switch (order)
+                {
+                    case 0:
+                        if (currentToken.type == Type.PARENTHESIS && currentToken.value.equals("("))
+                        {
+                            List<Token> subTokens = new ArrayList<>();
+
+                            for (int i = tokens.indexOf(currentToken) + 1; i < tokens.size(); i++)
+                            {
+                                Token subToken = tokens.get(i);
+                                if (subToken.type == Type.PARENTHESIS && subToken.value.equals(")"))
+                                {
+                                    break;
+                                }
+                                subTokens.add(subToken);
+                            }
+                            result = doPEMDAS(subTokens);
+                        }
+                        break;
+                    case 1:
+                        if (currentToken.type == Type.POWER)
+                        {
+
+                        }
+                        break;
+                    case 2:
+                        if (currentToken.type == Type.OPERATOR)
+                        {
+                            if (currentToken.value.equals("*"))
+                            {
+
+                            }
+                            else if (currentToken.value.equals("/"))
+                            {
+
+                            }
+                        }
+                        break;
+                    case 3:
+                        if (currentToken.type == Type.OPERATOR)
+                        {
+                            if (currentToken.value.equals("+"))
+                            {
+
+                            }
+                            else if (currentToken.value.equals("-"))
+                            {
+
+                            }
+                        }
+                        break;
+                }
+
+                previousToken = currentToken;
+            }
+        }
+        return result;
     }
 
     public static void main(String[] args)
