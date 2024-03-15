@@ -55,7 +55,6 @@ public class InputManagement {
                     }
                 }
             }
-            System.out.println(tokens);
             functions.add(tokens);
         }
         return functions;
@@ -134,124 +133,64 @@ public class InputManagement {
         }
     }
 
-    private double doPEMDAS(List<Token> tokens)
-    {
-        Token previousToken = null;
-        Token nextToken = null;
-        double nextTokenValue3; //addition and subtraction
-        double nextTokenValue12; //multiplication and division and exponents
-        List<Token> copyTokens = new ArrayList<>(tokens);
-
-        for(int order = 0; order < 4; order++) // 0 = parentheses, 1 = exponents, 2 = multiplication and division, 3 = addition and subtraction
-        {
-            for (int index = 0; index < tokens.size(); index++)
-            {
-                Token currentToken = tokens.get(index);
-                if (tokens.indexOf(currentToken) == tokens.size() - 1)
-                {
-                    nextToken = null;
+    private double doPEMDAS(List<Token> tokens) {
+        for (int i = 0; i < tokens.size(); i++) {
+            if (tokens.get(i).type == Type.PARENTHESIS && tokens.get(i).value.equals("(")) {
+                int start = i;
+                int depth = 1;
+                while (i + 1 < tokens.size() && depth > 0) {
+                    i++;
+                    if (tokens.get(i).value.equals("(")) depth++;
+                    else if (tokens.get(i).value.equals(")")) depth--;
                 }
-                else
-                {
-                    nextToken = tokens.get(tokens.indexOf(currentToken) + 1);
+                int end = i;
+                List<Token> subExpression = tokens.subList(start + 1, end);
+                double result = doPEMDAS(new ArrayList<>(subExpression));
+                if (end >= start) {
+                    tokens.subList(start, end + 1).clear();
                 }
-                if ((nextToken != null ? nextToken.type : null) == Type.NUMBER)
-                {
-                    nextTokenValue3 = Double.parseDouble(nextToken.value);
-                    nextTokenValue12 = Double.parseDouble(nextToken.value);
-                }
-                else
-                {
-                    nextTokenValue3 = 0;
-                    nextTokenValue12 = 0;
-                }
-
-                switch (order)
-                {
-                    case 0:
-                        if (currentToken.type == Type.PARENTHESIS && currentToken.value.equals("("))
-                        {
-
-                            List<Token> subTokens = new ArrayList<>();
-
-                            for (int i = tokens.indexOf(currentToken) + 1; i < tokens.size(); i++)
-                            {
-                                Token subToken = tokens.get(i);
-                                if (subToken.type == Type.PARENTHESIS && subToken.value.equals(")"))
-                                {
-                                    break;
-                                }
-                                subTokens.add(subToken);
-                            }
-                            Double result = doPEMDAS(subTokens);
-                            copyTokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(result)));
-                            copyTokens.remove(tokens.indexOf(subTokens.get(0))-1);
-                            copyTokens.remove(tokens.get(subTokens.size()));
-                            copyTokens.removeAll(subTokens);
-
-                        }
-                        break;
-                    case 1:
-                        if (currentToken.type == Type.POWER)
-                        {
-                            double powerResult = Math.pow(Double.parseDouble(previousToken.value), nextTokenValue12);
-                            copyTokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(powerResult)));
-                            copyTokens.remove(previousToken);
-                            copyTokens.remove(currentToken);
-                            copyTokens.remove(nextToken);
-
-                        }
-                        break;
-                    case 2:
-                        if (currentToken.type == Type.OPERATOR)
-                        {
-                            if (currentToken.value.equals("*"))
-                            {
-                                double multiplicationResult = Double.parseDouble(previousToken.value) * nextTokenValue12;
-                                copyTokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(multiplicationResult)));
-                                copyTokens.remove(previousToken);
-                                copyTokens.remove(currentToken);
-                                copyTokens.remove(nextToken);
-                            }
-                            else if (currentToken.value.equals("/"))
-                            {
-                                double divisionResult = Double.parseDouble(previousToken.value) / nextTokenValue12;
-                                copyTokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(divisionResult)));
-                                copyTokens.remove(previousToken);
-                                copyTokens.remove(currentToken);
-                                copyTokens.remove(nextToken);
-
-                            }
-                        }
-                        break;
-                    case 3:
-                        if (currentToken.type == Type.OPERATOR)
-                        {
-                            if (currentToken.value.equals("+"))
-                            {
-                                double additionResult = Double.parseDouble(previousToken.value) + nextTokenValue3;
-                                copyTokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(additionResult)));
-                                copyTokens.remove(previousToken);
-                                copyTokens.remove(currentToken);
-                                copyTokens.remove(nextToken);
-                            }
-                            else if (currentToken.value.equals("-"))
-                            {
-                                double subtractionResult = Double.parseDouble(previousToken.value) - nextTokenValue3;
-                                copyTokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(subtractionResult)));
-                                copyTokens.remove(previousToken);
-                                copyTokens.remove(currentToken);
-                                copyTokens.remove(nextToken);
-                            }
-                        }
-                        break;
-                }
-
-                previousToken = currentToken;
+                tokens.add(start, new Token(Type.NUMBER, String.valueOf(result)));
+                i = start;
             }
-            tokens = new ArrayList<>(copyTokens);
+        }
+
+        for (int order = 1; order <= 3; order++) {
+            for (int i = 1; i < tokens.size() - 1; i++) {
+                Token currentToken = tokens.get(i);
+                if (isCurrentOperation(currentToken, order)) {
+                    Token leftToken = tokens.get(i - 1);
+                    Token rightToken = tokens.get(i + 1);
+                    double result = calculate(leftToken, rightToken, currentToken.value);
+                    tokens.set(i - 1, new Token(Type.NUMBER, String.valueOf(result)));
+                    tokens.remove(i);
+                    tokens.remove(i);
+                    i--;
+                }
+            }
         }
         return Double.parseDouble(tokens.get(0).value);
+    }
+
+    private boolean isCurrentOperation(Token token, int order) {
+        return switch (order) {
+            case 1 -> token.type == Type.POWER;
+            case 2 -> token.type == Type.OPERATOR && (token.value.equals("*") || token.value.equals("/"));
+            case 3 -> token.type == Type.OPERATOR && (token.value.equals("+") || token.value.equals("-"));
+            default -> false;
+        };
+    }
+
+    private double calculate(Token left, Token right, String operator) {
+        double leftVal = Double.parseDouble(left.value);
+        double rightVal = Double.parseDouble(right.value);
+        return switch (operator) {
+            case "^" -> Math.pow(leftVal, rightVal);
+            case "*" -> leftVal * rightVal;
+            case "/" -> leftVal / rightVal;
+            case "+" -> leftVal + rightVal;
+            case "-" -> leftVal - rightVal;
+            default -> throw new IllegalArgumentException("Unsupported operator: " + operator);
+        };
     }
 
     public static void main(String[] args)
