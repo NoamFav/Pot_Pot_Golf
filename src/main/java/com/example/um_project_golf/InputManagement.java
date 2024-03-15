@@ -51,13 +51,13 @@ public class InputManagement {
         StringBuilder currentNumber = new StringBuilder();
         Token previousToken = null;
 
-        for (char c : equation.toCharArray())
+        for (char currentChar : equation.toCharArray())
         {
-            if (c != ' ')
+            if (currentChar != ' ')
             {
-                if (Character.isDigit(c) || c == '.')
+                if (Character.isDigit(currentChar) || currentChar == '.')
                 {
-                    currentNumber.append(c);
+                    currentNumber.append(currentChar);
                 }
                 else
                 {
@@ -70,26 +70,26 @@ public class InputManagement {
                         currentNumber = new StringBuilder();
                     }
                     Token newToken;
-                    if (c == '+' || c == '-' || c == '*' || c == '/')
+                    if (currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/')
                     {
-                        newToken = new Token(Type.OPERATOR, String.valueOf(c));
+                        newToken = new Token(Type.OPERATOR, String.valueOf(currentChar));
                     }
-                    else if (Character.isLetter(c))
+                    else if (Character.isLetter(currentChar))
                     {
-                        newToken = new Token(Type.VARIABLE, String.valueOf(c));
+                        newToken = new Token(Type.VARIABLE, String.valueOf(currentChar));
                         checkAndAddImpliedMultiplication(tokens, newToken, previousToken);
                     }
-                    else if (c == '(' || c == ')')
+                    else if (currentChar == '(' || currentChar == ')')
                     {
-                        newToken = new Token(Type.PARENTHESIS, String.valueOf(c));
+                        newToken = new Token(Type.PARENTHESIS, String.valueOf(currentChar));
 
-                    } else if (c == '^')
+                    } else if (currentChar == '^')
                     {
-                        newToken = new Token(Type.POWER, String.valueOf(c));
+                        newToken = new Token(Type.POWER, String.valueOf(currentChar));
                     }
                     else
                     {
-                        throw new IllegalArgumentException("Invalid character: " + c);
+                        throw new IllegalArgumentException("Invalid character: " + currentChar);
                     }
                     tokens.add(newToken);
                     previousToken = newToken;
