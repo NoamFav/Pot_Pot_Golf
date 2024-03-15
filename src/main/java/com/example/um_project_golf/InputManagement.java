@@ -6,9 +6,6 @@ import java.util.List;
 
 public class InputManagement {
 
-    private final List<String> equations = List.of("21x^2 + 3y", "3x + 4y - (8 + 9x)");
-    private final HashMap<String, Double> variables = new HashMap<>();
-
     enum Type //defines the type of token
     {
         NUMBER,
@@ -35,19 +32,21 @@ public class InputManagement {
             return type + ": " + value;
         }
     }
+
+    //constructs the functions and replaces the variables with their values
     private List<List<Token>> constructFunctions(List<String> equations, HashMap<String, Double> variables)
     {
         List<List<Token>> functions = new ArrayList<>();
         for (String equation : equations)
         {
-            List<Token> tokens = tokenize(equation);
+            List<Token> tokens = tokenize(equation); //tokenizes the equation (converts the equation into tokens)
             for (Token token : tokens)
             {
                 if (token.type == Type.VARIABLE)
                 {
                     if (variables.containsKey(token.value))
                     {
-                        token.value = String.valueOf(variables.get(token.value));
+                        token.value = String.valueOf(variables.get(token.value)); //replaces the variable with its based value
                     }
                     else
                     {
@@ -60,66 +59,67 @@ public class InputManagement {
         return functions;
     }
 
+    //tokenizes the equation by grouping the characters into types
     private List<Token> tokenize(String equation)
     {
-        List<Token> tokens = new ArrayList<>();
-        StringBuilder currentNumber = new StringBuilder();
-        Token previousToken = null;
+        List<Token> tokens = new ArrayList<>(); //initializes the list of tokens
+        StringBuilder currentNumber = new StringBuilder(); //initializes the current number as an enhanced string (StringBuilder)
+        Token previousToken = null; //initializes the previous token
 
         for (char currentChar : equation.toCharArray())
         {
-            if (currentChar != ' ')
+            if (currentChar != ' ') //ignores the spaces
             {
-                if (Character.isDigit(currentChar) || currentChar == '.')
+                if (Character.isDigit(currentChar))
                 {
-                    currentNumber.append(currentChar);
+                    currentNumber.append(currentChar); //appends the current character to the current number
                 }
                 else
                 {
                     if (!currentNumber.isEmpty())
                     {
-                        Token numberToken = new Token(Type.NUMBER, currentNumber.toString());
-                        checkAndAddImpliedMultiplication(tokens, numberToken, previousToken);
+                        Token numberToken = new Token(Type.NUMBER, currentNumber.toString()); //creates a new token for the current number
+                        checkAndAddImpliedMultiplication(tokens, numberToken, previousToken); //check and add the implied multiplication between the current number and the previous token
                         tokens.add(numberToken);
-                        previousToken = numberToken;
-                        currentNumber = new StringBuilder();
+                        previousToken = numberToken; //updates the previous token
+                        currentNumber = new StringBuilder(); //updates the current number
                     }
                     Token newToken;
-                    if (currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/')
+                    if (currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/') //checks if the current character is an operator
                     {
                         newToken = new Token(Type.OPERATOR, String.valueOf(currentChar));
                     }
-                    else if (Character.isLetter(currentChar))
+                    else if (Character.isLetter(currentChar)) //checks if the current character is a letter and therefore a variable
                     {
                         newToken = new Token(Type.VARIABLE, String.valueOf(currentChar));
                         checkAndAddImpliedMultiplication(tokens, newToken, previousToken);
                     }
-                    else if (currentChar == '(' || currentChar == ')')
+                    else if (currentChar == '(' || currentChar == ')') //checks if the current character is a parenthesis open or close
                     {
                         newToken = new Token(Type.PARENTHESIS, String.valueOf(currentChar));
 
-                    } else if (currentChar == '^')
+                    } else if (currentChar == '^') //checks if the current character is a power
                     {
                         newToken = new Token(Type.POWER, String.valueOf(currentChar));
                     }
-                    else
+                    else //throws an exception if the current character is invalid
                     {
                         throw new IllegalArgumentException("Invalid character: " + currentChar);
                     }
-                    tokens.add(newToken);
-                    previousToken = newToken;
+                    tokens.add(newToken); //adds the new token to the list of tokens
+                    previousToken = newToken; //updates the previous token
                 }
             }
         }
 
-        if (!currentNumber.isEmpty())
+        if (!currentNumber.isEmpty()) //adds the current number to the list of tokens if it is not empty (safety check)
         {
             Token numberToken = new Token(Type.NUMBER, currentNumber.toString());
             checkAndAddImpliedMultiplication(tokens, numberToken, previousToken);
             tokens.add(numberToken);
         }
 
-        return tokens;
+        return tokens; //returns the list of tokens
     }
 
     private void checkAndAddImpliedMultiplication(List<Token> tokens, Token currentToken, Token previousToken)
@@ -127,59 +127,59 @@ public class InputManagement {
         if (previousToken != null &&
                 ((previousToken.type == Type.NUMBER && currentToken.type == Type.VARIABLE) ||
                         (previousToken.type == Type.VARIABLE && currentToken.type == Type.VARIABLE) ||
-                                (previousToken.type == Type.VARIABLE && currentToken.type == Type.NUMBER)))
+                                (previousToken.type == Type.VARIABLE && currentToken.type == Type.NUMBER))) //determines if there is an implied multiplication between the previous token and the current token
         {
-            tokens.add(new Token(Type.OPERATOR, "*"));
+            tokens.add(new Token(Type.OPERATOR, "*")); //adds the implied multiplication to the list of tokens
         }
     }
 
-    private double doPEMDAS(List<Token> tokens)
+    private double doPEMDAS(List<Token> tokens) //does the PEMDAS (Parentheses, Exponents, Multiplication and Division, Addition and Subtraction) operations in order
     {
-        for (int i = 0; i < tokens.size(); i++)
+        for (int i = 0; i < tokens.size(); i++) //iterates through the list of tokens to find parentheses
         {
-            if (tokens.get(i).type == Type.PARENTHESIS && tokens.get(i).value.equals("("))
+            if (tokens.get(i).type == Type.PARENTHESIS && tokens.get(i).value.equals("(")) //checks if the current token is an open parenthesis
             {
-                int start = i;
-                int depth = 1;
-                while (i + 1 < tokens.size() && depth > 0)
+                int start = i; //initializes the start of the parentheses
+                int depth = 1; //initializes the depth of the parentheses
+                while (i + 1 < tokens.size() && depth > 0) //iterates through the remaining list of tokens to find the end of the parentheses
                 {
                     i++;
                     if (tokens.get(i).value.equals("(")) depth++;
                     else if (tokens.get(i).value.equals(")")) depth--;
                 }
-                int end = i;
+                int end = i; //initializes the end of the parentheses
                 List<Token> subExpression = tokens.subList(start + 1, end);
-                double result = doPEMDAS(new ArrayList<>(subExpression));
+                double result = doPEMDAS(new ArrayList<>(subExpression)); //recursively does the PEMDAS operations on the sub-expression
                 if (end >= start)
                 {
-                    tokens.subList(start, end + 1).clear();
+                    tokens.subList(start, end + 1).clear(); //removes the parentheses and the sub-expression from the list of tokens
                 }
-                tokens.add(start, new Token(Type.NUMBER, String.valueOf(result)));
-                i = start;
+                tokens.add(start, new Token(Type.NUMBER, String.valueOf(result))); //adds the result of the sub-expression to the list of tokens
+                i = start; //updates the current index
             }
         }
 
-        for (int order = 1; order <= 3; order++)
+        for (int order = 1; order <= 3; order++) //iterates through the orders of operations (1: power, 2: multiplication and division, 3: addition and subtraction)
         {
-            for (int i = 1; i < tokens.size() - 1; i++)
+            for (int i = 1; i < tokens.size() - 1; i++) //iterates through the list of tokens to find the current operation
             {
-                Token currentToken = tokens.get(i);
-                if (isCurrentOperation(currentToken, order))
+                Token currentToken = tokens.get(i); //initializes the current token
+                if (isCurrentOperation(currentToken, order)) //checks if the current token is the current operation
                 {
-                    Token leftToken = tokens.get(i - 1);
-                    Token rightToken = tokens.get(i + 1);
-                    double result = calculate(leftToken, rightToken, currentToken.value);
-                    tokens.set(i - 1, new Token(Type.NUMBER, String.valueOf(result)));
-                    tokens.remove(i);
-                    tokens.remove(i);
+                    Token previousToken = tokens.get(i - 1);
+                    Token nextToken = tokens.get(i + 1);
+                    double result = calculate(previousToken, nextToken, currentToken.value); //calculates the result of the current operation
+                    tokens.set(i - 1, new Token(Type.NUMBER, String.valueOf(result))); //updates the previous token with the result of the current operation
+                    tokens.remove(i); //removes the current token
+                    tokens.remove(i); //removes the next token (because i is now the next token)
                     i--;
                 }
             }
         }
-        return Double.parseDouble(tokens.get(0).value);
+        return Double.parseDouble(tokens.get(0).value); //returns the result of the PEMDAS operations
     }
 
-    private boolean isCurrentOperation(Token token, int order)
+    private boolean isCurrentOperation(Token token, int order) //checks if the current token is the current operation based on the order of operations
     {
         return switch (order)
         {
@@ -190,32 +190,35 @@ public class InputManagement {
         };
     }
 
-    private double calculate(Token left, Token right, String operator)
+    private double calculate(Token previousToken, Token nextToken, String operator) //calculates the result of the operation based on the operator
     {
-        double leftVal = Double.parseDouble(left.value);
-        double rightVal = Double.parseDouble(right.value);
-        return switch (operator)
+        double previousValue = Double.parseDouble(previousToken.value);
+        double nextValue = Double.parseDouble(nextToken.value);
+        return switch (operator) //calculates the result of the operation based on the operator
         {
-            case "^" -> Math.pow(leftVal, rightVal);
-            case "*" -> leftVal * rightVal;
-            case "/" -> leftVal / rightVal;
-            case "+" -> leftVal + rightVal;
-            case "-" -> leftVal - rightVal;
+            case "^" -> Math.pow(previousValue, nextValue);
+            case "*" -> previousValue * nextValue;
+            case "/" -> previousValue / nextValue;
+            case "+" -> previousValue + nextValue;
+            case "-" -> previousValue - nextValue;
             default -> throw new IllegalArgumentException("Unsupported operator: " + operator);
         };
     }
 
     public static void main(String[] args)
     {
-        InputManagement inputManagement = new InputManagement();
+        InputManagement inputManagement = new InputManagement(); //initializes the input management
 
-        inputManagement.variables.put("x", 3.0);
-        inputManagement.variables.put("y", 4.0);
+        List<String> equations = List.of("21x^2 + 3y", "3x + 4y - (8 + 9x)"); //initializes the equations
+        HashMap<String, Double> variables = new HashMap<>(); //initializes the variables
 
-        List<List<Token>> functions = inputManagement.constructFunctions(inputManagement.equations, inputManagement.variables);
+        variables.put("x", 3.0); //placeholders for the variable x
+        variables.put("y", 4.0); //placeholders for the variable y
+
+        List<List<Token>> functions = inputManagement.constructFunctions(equations, variables); //constructs the functions
         for (List<Token> function : functions)
         {
-            System.out.println(inputManagement.doPEMDAS(function));
+            System.out.println(inputManagement.doPEMDAS(function)); //does the PEMDAS operations on the function and prints the result
         }
     }
 }
