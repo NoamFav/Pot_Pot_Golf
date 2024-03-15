@@ -6,13 +6,14 @@ import java.util.function.Function;
 
 public class InputManagement {
 
-    private final List<String> equations = List.of("21x + 3y", "3x+4y");
+    private final List<String> equations = List.of("21x + 3y", "3x + 4y - (8 + 9x)");
 
     enum Type
     {
         NUMBER,
         VARIABLE,
-        OPERATOR
+        OPERATOR,
+        PARENTHESIS
     }
 
     static class Token
@@ -47,10 +48,8 @@ public class InputManagement {
         List<Token> tokens = tokenize(equation);
         System.out.println(tokens);
 
-        // Here, you would parse the tokens and build an expression tree or similar structure
-        // For simplicity, this example will not include the full parsing logic
 
-        // Example evaluation, to be replaced with actual logic based on parsing
+
         return (x) -> 3 * x; // Placeholder
     }
 
@@ -60,12 +59,18 @@ public class InputManagement {
         StringBuilder currentNumber = new StringBuilder();
         Token previousToken = null;
 
-        for (char c : equation.toCharArray()) {
-            if (c != ' ') {
-                if (Character.isDigit(c) || c == '.') {
+        for (char c : equation.toCharArray())
+        {
+            if (c != ' ')
+            {
+                if (Character.isDigit(c) || c == '.')
+                {
                     currentNumber.append(c);
-                } else {
-                    if (!currentNumber.isEmpty()) {
+                }
+                else
+                {
+                    if (!currentNumber.isEmpty())
+                    {
                         Token numberToken = new Token(Type.NUMBER, currentNumber.toString());
                         checkAndAddImpliedMultiplication(tokens, numberToken, previousToken);
                         tokens.add(numberToken);
@@ -73,14 +78,23 @@ public class InputManagement {
                         currentNumber = new StringBuilder();
                     }
                     Token newToken;
-                    if (c == '+' || c == '-' || c == '*' || c == '/') {
+                    if (c == '+' || c == '-' || c == '*' || c == '/')
+                    {
                         newToken = new Token(Type.OPERATOR, String.valueOf(c));
-                    } else if (Character.isLetter(c)) {
+                    }
+                    else if (Character.isLetter(c))
+                    {
                         newToken = new Token(Type.VARIABLE, String.valueOf(c));
                         checkAndAddImpliedMultiplication(tokens, newToken, previousToken);
-                    } else {
-                        // Handle other cases or throw an error
-                        continue;
+                    }
+                    else if (c == '(' || c == ')')
+                    {
+                        newToken = new Token(Type.PARENTHESIS, String.valueOf(c));
+
+                    }
+                    else
+                    {
+                        throw new IllegalArgumentException("Invalid character: " + c);
                     }
                     tokens.add(newToken);
                     previousToken = newToken;
