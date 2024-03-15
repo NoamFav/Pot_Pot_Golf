@@ -2,13 +2,12 @@ package com.example.um_project_golf;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 public class InputManagement {
 
     private final List<String> equations = List.of("21x + 3y", "3x + 4y - (8 + 9x)");
 
-    enum Type
+    enum Type //defines the type of token
     {
         NUMBER,
         VARIABLE,
@@ -16,10 +15,10 @@ public class InputManagement {
         PARENTHESIS
     }
 
-    static class Token
+    static class Token //defines the token into a type and a value
     {
-        private final Type type;
-        private final String value;
+        private final Type type; //type of token
+        private final String value; //value of token
 
         public Token(Type type, String value)
         {
@@ -33,24 +32,16 @@ public class InputManagement {
             return type + ": " + value;
         }
     }
-    private List<Function<Double, Double>> constructFunctions(List<String> equations)
+    private List<List<Token>> constructFunctions(List<String> equations)
     {
-        List<Function<Double, Double>> functions = new ArrayList<>();
+        List<List<Token>> functions = new ArrayList<>();
         for (String equation : equations)
         {
-            functions.add(functionRecognition(equation));
+            List<Token> tokens = tokenize(equation);
+            System.out.println(tokens);
+            functions.add(tokens);
         }
         return functions;
-    }
-
-    private Function<Double, Double> functionRecognition(String equation)
-    {
-        List<Token> tokens = tokenize(equation);
-        System.out.println(tokens);
-
-
-
-        return (x) -> 3 * x; // Placeholder
     }
 
     private List<Token> tokenize(String equation)
@@ -126,7 +117,6 @@ public class InputManagement {
     public static void main(String[] args)
     {
         InputManagement inputManagement = new InputManagement();
-        List<Function<Double, Double>> functions = inputManagement.constructFunctions(inputManagement.equations);
-        System.out.println(functions);
+        List<List<Token>> functions = inputManagement.constructFunctions(inputManagement.equations);
     }
 }
