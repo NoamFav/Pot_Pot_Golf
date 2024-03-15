@@ -140,7 +140,7 @@ public class InputManagement {
         Token nextToken = null;
         double nextTokenValue3; //addition and subtraction
         double nextTokenValue12; //multiplication and division and exponents
-        List<Token> secondToken = new ArrayList<>(); // repeat result recursively
+        List<Token> copyTokens = new ArrayList<>(tokens);
 
         for(int order = 0; order < 4; order++) // 0 = parentheses, 1 = exponents, 2 = multiplication and division, 3 = addition and subtraction
         {
@@ -184,6 +184,10 @@ public class InputManagement {
                                 subTokens.add(subToken);
                             }
                             Double result = doPEMDAS(subTokens);
+                            copyTokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(result)));
+                            copyTokens.remove(tokens.indexOf(subTokens.get(0))-1);
+                            copyTokens.remove(tokens.get(subTokens.size()));
+                            copyTokens.removeAll(subTokens);
 
                         }
                         break;
@@ -191,6 +195,11 @@ public class InputManagement {
                         if (currentToken.type == Type.POWER)
                         {
                             double powerResult = Math.pow(Double.parseDouble(previousToken.value), nextTokenValue12);
+                            copyTokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(powerResult)));
+                            copyTokens.remove(previousToken);
+                            copyTokens.remove(currentToken);
+                            copyTokens.remove(nextToken);
+
                         }
                         break;
                     case 2:
@@ -199,10 +208,19 @@ public class InputManagement {
                             if (currentToken.value.equals("*"))
                             {
                                 double multiplicationResult = Double.parseDouble(previousToken.value) * nextTokenValue12;
+                                copyTokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(multiplicationResult)));
+                                copyTokens.remove(previousToken);
+                                copyTokens.remove(currentToken);
+                                copyTokens.remove(nextToken);
                             }
                             else if (currentToken.value.equals("/"))
                             {
                                 double divisionResult = Double.parseDouble(previousToken.value) / nextTokenValue12;
+                                copyTokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(divisionResult)));
+                                copyTokens.remove(previousToken);
+                                copyTokens.remove(currentToken);
+                                copyTokens.remove(nextToken);
+
                             }
                         }
                         break;
@@ -212,19 +230,26 @@ public class InputManagement {
                             if (currentToken.value.equals("+"))
                             {
                                 double additionResult = Double.parseDouble(previousToken.value) + nextTokenValue3;
+                                copyTokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(additionResult)));
+                                copyTokens.remove(previousToken);
+                                copyTokens.remove(currentToken);
+                                copyTokens.remove(nextToken);
                             }
                             else if (currentToken.value.equals("-"))
                             {
                                 double subtractionResult = Double.parseDouble(previousToken.value) - nextTokenValue3;
+                                copyTokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(subtractionResult)));
+                                copyTokens.remove(previousToken);
+                                copyTokens.remove(currentToken);
+                                copyTokens.remove(nextToken);
                             }
                         }
                         break;
-                    default:
-
                 }
 
                 previousToken = currentToken;
             }
+            tokens = new ArrayList<>(copyTokens);
         }
         return Double.parseDouble(tokens.get(0).value);
     }
