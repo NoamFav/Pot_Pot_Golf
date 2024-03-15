@@ -45,6 +45,7 @@ public class InputManagement {
     private Function<Double, Double> functionRecognition(String equation)
     {
         List<Token> tokens = tokenize(equation);
+        System.out.println(tokens);
 
         // Here, you would parse the tokens and build an expression tree or similar structure
         // For simplicity, this example will not include the full parsing logic
@@ -57,40 +58,55 @@ public class InputManagement {
     {
         List<Token> tokens = new ArrayList<>();
         StringBuilder currentNumber = new StringBuilder();
+        Token previousToken = null;
 
-        for (char c : equation.toCharArray())
-        {
-            if (c != ' ')
-            {
-                if (Character.isDigit(c) || c == '.')
-                {
+        for (char c : equation.toCharArray()) {
+            if (c != ' ') {
+                if (Character.isDigit(c) || c == '.') {
                     currentNumber.append(c);
-                }
-                else
-                {
-                    if (!currentNumber.isEmpty())
-                    {
-                        tokens.add(new Token(Type.NUMBER, currentNumber.toString()));
+                } else {
+                    if (!currentNumber.isEmpty()) {
+                        Token numberToken = new Token(Type.NUMBER, currentNumber.toString());
+                        checkAndAddImpliedMultiplication(tokens, numberToken, previousToken);
+                        tokens.add(numberToken);
+                        previousToken = numberToken;
                         currentNumber = new StringBuilder();
                     }
-                    if (c == '+' || c == '-' || c == '*' || c == '/')
-                    {
-                        tokens.add(new Token(Type.OPERATOR, String.valueOf(c)));
+                    Token newToken;
+                    if (c == '+' || c == '-' || c == '*' || c == '/') {
+                        newToken = new Token(Type.OPERATOR, String.valueOf(c));
+                    } else if (Character.isLetter(c)) {
+                        newToken = new Token(Type.VARIABLE, String.valueOf(c));
+                        checkAndAddImpliedMultiplication(tokens, newToken, previousToken);
+                    } else {
+                        // Handle other cases or throw an error
+                        continue;
                     }
-                    else if (Character.isLetter(c))
-                    {
-                        tokens.add(new Token(Type.VARIABLE, String.valueOf(c)));
-                    }
+                    tokens.add(newToken);
+                    previousToken = newToken;
                 }
             }
         }
 
         if (!currentNumber.isEmpty())
         {
-            tokens.add(new Token(Type.NUMBER, currentNumber.toString()));
+            Token numberToken = new Token(Type.NUMBER, currentNumber.toString());
+            checkAndAddImpliedMultiplication(tokens, numberToken, previousToken);
+            tokens.add(numberToken);
         }
 
         return tokens;
+    }
+
+    private void checkAndAddImpliedMultiplication(List<Token> tokens, Token currentToken, Token previousToken)
+    {
+        if (previousToken != null &&
+                ((previousToken.type == Type.NUMBER && currentToken.type == Type.VARIABLE) ||
+                        (previousToken.type == Type.VARIABLE && currentToken.type == Type.VARIABLE) ||
+                                (previousToken.type == Type.VARIABLE && currentToken.type == Type.NUMBER)))
+        {
+            tokens.add(new Token(Type.OPERATOR, "*"));
+        }
     }
 
     public static void main(String[] args)
