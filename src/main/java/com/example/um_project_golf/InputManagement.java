@@ -133,16 +133,12 @@ public class InputManagement {
         }
     }
 
-    private double doPEMDAS(List<Token> tokens)
-    {
-        for (int i = 0; i < tokens.size(); i++)
-        {
-            if (tokens.get(i).type == Type.PARENTHESIS && tokens.get(i).value.equals("("))
-            {
+    private double doPEMDAS(List<Token> tokens) {
+        for (int i = 0; i < tokens.size(); i++) {
+            if (tokens.get(i).type == Type.PARENTHESIS && tokens.get(i).value.equals("(")) {
                 int start = i;
                 int depth = 1;
-                while (i + 1 < tokens.size() && depth > 0)
-                {
+                while (i + 1 < tokens.size() && depth > 0) {
                     i++;
                     if (tokens.get(i).value.equals("(")) depth++;
                     else if (tokens.get(i).value.equals(")")) depth--;
@@ -150,8 +146,7 @@ public class InputManagement {
                 int end = i;
                 List<Token> subExpression = tokens.subList(start + 1, end);
                 double result = doPEMDAS(new ArrayList<>(subExpression));
-                if (end >= start)
-                {
+                if (end >= start) {
                     tokens.subList(start, end + 1).clear();
                 }
                 tokens.add(start, new Token(Type.NUMBER, String.valueOf(result)));
@@ -159,13 +154,10 @@ public class InputManagement {
             }
         }
 
-        for (int order = 1; order <= 3; order++)
-        {
-            for (int i = 1; i < tokens.size() - 1; i++)
-            {
+        for (int order = 1; order <= 3; order++) {
+            for (int i = 1; i < tokens.size() - 1; i++) {
                 Token currentToken = tokens.get(i);
-                if (isCurrentOperation(currentToken, order))
-                {
+                if (isCurrentOperation(currentToken, order)) {
                     Token leftToken = tokens.get(i - 1);
                     Token rightToken = tokens.get(i + 1);
                     double result = calculate(leftToken, rightToken, currentToken.value);
@@ -179,10 +171,8 @@ public class InputManagement {
         return Double.parseDouble(tokens.get(0).value);
     }
 
-    private boolean isCurrentOperation(Token token, int order)
-    {
-        return switch (order)
-        {
+    private boolean isCurrentOperation(Token token, int order) {
+        return switch (order) {
             case 1 -> token.type == Type.POWER;
             case 2 -> token.type == Type.OPERATOR && (token.value.equals("*") || token.value.equals("/"));
             case 3 -> token.type == Type.OPERATOR && (token.value.equals("+") || token.value.equals("-"));
@@ -190,17 +180,15 @@ public class InputManagement {
         };
     }
 
-    private double calculate(Token previous, Token next, String operator)
-    {
-        double previousValue = Double.parseDouble(previous.value);
-        double nextValue = Double.parseDouble(next.value);
-        return switch (operator)
-        {
-            case "^" -> Math.pow(previousValue, nextValue);
-            case "*" -> previousValue * nextValue;
-            case "/" -> previousValue / nextValue;
-            case "+" -> previousValue + nextValue;
-            case "-" -> previousValue - nextValue;
+    private double calculate(Token left, Token right, String operator) {
+        double leftVal = Double.parseDouble(left.value);
+        double rightVal = Double.parseDouble(right.value);
+        return switch (operator) {
+            case "^" -> Math.pow(leftVal, rightVal);
+            case "*" -> leftVal * rightVal;
+            case "/" -> leftVal / rightVal;
+            case "+" -> leftVal + rightVal;
+            case "-" -> leftVal - rightVal;
             default -> throw new IllegalArgumentException("Unsupported operator: " + operator);
         };
     }
