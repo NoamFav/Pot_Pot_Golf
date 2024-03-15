@@ -5,13 +5,14 @@ import java.util.List;
 
 public class InputManagement {
 
-    private final List<String> equations = List.of("21x + 3y", "3x + 4y - (8 + 9x)");
+    private final List<String> equations = List.of("21x^2 + 3y", "3x + 4y - (8 + 9x)");
 
     enum Type //defines the type of token
     {
         NUMBER,
         VARIABLE,
         OPERATOR,
+        POWER,
         PARENTHESIS
     }
 
@@ -82,6 +83,9 @@ public class InputManagement {
                     {
                         newToken = new Token(Type.PARENTHESIS, String.valueOf(c));
 
+                    } else if (c == '^')
+                    {
+                        newToken = new Token(Type.POWER, String.valueOf(c));
                     }
                     else
                     {
