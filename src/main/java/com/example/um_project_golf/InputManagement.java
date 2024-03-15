@@ -122,21 +122,40 @@ public class InputManagement {
 
     private double doPEMDAS(List<Token> tokens)
     {
-        double result = 0;
-
         Token previousToken = null;
         Token nextToken = null;
+        double nextTokenValue3; //addition and subtraction
+        double nextTokenValue12; //multiplication and division and exponents
 
         for(int order = 0; order < 4; order++) // 0 = parentheses, 1 = exponents, 2 = multiplication and division, 3 = addition and subtraction
         {
             for (Token currentToken : tokens)
             {
-                nextToken = tokens.get(tokens.indexOf(currentToken) + 1);
+                if (tokens.indexOf(currentToken) == tokens.size() - 1)
+                {
+                    nextToken = null;
+                }
+                else
+                {
+                    nextToken = tokens.get(tokens.indexOf(currentToken) + 1);
+                }
+                if ((nextToken != null ? nextToken.type : null) == Type.NUMBER)
+                {
+                    nextTokenValue3 = Double.parseDouble(nextToken.value);
+                    nextTokenValue12 = Double.parseDouble(nextToken.value);
+                }
+                else
+                {
+                    nextTokenValue3 = 0;
+                    nextTokenValue12 = 0;
+                }
+
                 switch (order)
                 {
                     case 0:
                         if (currentToken.type == Type.PARENTHESIS && currentToken.value.equals("("))
                         {
+
                             List<Token> subTokens = new ArrayList<>();
 
                             for (int i = tokens.indexOf(currentToken) + 1; i < tokens.size(); i++)
@@ -148,13 +167,20 @@ public class InputManagement {
                                 }
                                 subTokens.add(subToken);
                             }
-                            result = doPEMDAS(subTokens);
+                            Double result = doPEMDAS(subTokens);
+                            tokens.remove(tokens.indexOf(subTokens.get(0))-1);
+                            tokens.remove(tokens.get(subTokens.size()));
+                            tokens.removeAll(subTokens);
                         }
                         break;
                     case 1:
                         if (currentToken.type == Type.POWER)
                         {
-
+                            double powerResult = Math.pow(Double.parseDouble(previousToken.value), nextTokenValue12);
+                            tokens.remove(previousToken);
+                            tokens.remove(currentToken);
+                            tokens.remove(nextToken);
+                            tokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(powerResult)));
                         }
                         break;
                     case 2:
@@ -162,11 +188,19 @@ public class InputManagement {
                         {
                             if (currentToken.value.equals("*"))
                             {
-
+                                double multiplicationResult = Double.parseDouble(previousToken.value) * nextTokenValue12;
+                                tokens.remove(previousToken);
+                                tokens.remove(currentToken);
+                                tokens.remove(nextToken);
+                                tokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(multiplicationResult)));
                             }
                             else if (currentToken.value.equals("/"))
                             {
-
+                                double divisionResult = Double.parseDouble(previousToken.value) / nextTokenValue12;
+                                tokens.remove(previousToken);
+                                tokens.remove(currentToken);
+                                tokens.remove(nextToken);
+                                tokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(divisionResult)));
                             }
                         }
                         break;
@@ -175,11 +209,19 @@ public class InputManagement {
                         {
                             if (currentToken.value.equals("+"))
                             {
-
+                                double additionResult = Double.parseDouble(previousToken.value) + nextTokenValue3;
+                                tokens.remove(previousToken);
+                                tokens.remove(currentToken);
+                                tokens.remove(nextToken);
+                                tokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(additionResult)));
                             }
                             else if (currentToken.value.equals("-"))
                             {
-
+                                double subtractionResult = Double.parseDouble(previousToken.value) - nextTokenValue3;
+                                tokens.remove(previousToken);
+                                tokens.remove(currentToken);
+                                tokens.remove(nextToken);
+                                tokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(subtractionResult)));
                             }
                         }
                         break;
@@ -188,12 +230,16 @@ public class InputManagement {
                 previousToken = currentToken;
             }
         }
-        return result;
+        return Double.parseDouble(tokens.get(0).value);
     }
 
     public static void main(String[] args)
     {
         InputManagement inputManagement = new InputManagement();
         List<List<Token>> functions = inputManagement.constructFunctions(inputManagement.equations);
+        for (List<Token> function : functions)
+        {
+            System.out.println(inputManagement.doPEMDAS(function));
+        }
     }
 }
