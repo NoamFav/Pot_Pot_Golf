@@ -1,13 +1,13 @@
 package com.example.um_project_golf;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class InputManagement {
 
     private final List<String> equations = List.of("21x^2 + 3y", "3x + 4y - (8 + 9x)");
-    private final List<String> variables = List.of("x", "y");
-    private final List<String> startedValues = List.of("3", "4");
+    private final HashMap<String, Double> variables = new HashMap<>();
 
     enum Type //defines the type of token
     {
@@ -21,7 +21,7 @@ public class InputManagement {
     static class Token //defines the token into a type and a value
     {
         private final Type type; //type of token
-        private final String value; //value of token
+        private String value; //value of token
 
         public Token(Type type, String value)
         {
@@ -35,12 +35,26 @@ public class InputManagement {
             return type + ": " + value;
         }
     }
-    private List<List<Token>> constructFunctions(List<String> equations)
+    private List<List<Token>> constructFunctions(List<String> equations, HashMap<String, Double> variables)
     {
         List<List<Token>> functions = new ArrayList<>();
         for (String equation : equations)
         {
             List<Token> tokens = tokenize(equation);
+            for (Token token : tokens)
+            {
+                if (token.type == Type.VARIABLE)
+                {
+                    if (variables.containsKey(token.value))
+                    {
+                        token.value = String.valueOf(variables.get(token.value));
+                    }
+                    else
+                    {
+                        throw new IllegalArgumentException("Variable not found: " + token.value);
+                    }
+                }
+            }
             System.out.println(tokens);
             functions.add(tokens);
         }
@@ -126,11 +140,13 @@ public class InputManagement {
         Token nextToken = null;
         double nextTokenValue3; //addition and subtraction
         double nextTokenValue12; //multiplication and division and exponents
+        List<Token> secondToken = new ArrayList<>(); // repeat result recursively
 
         for(int order = 0; order < 4; order++) // 0 = parentheses, 1 = exponents, 2 = multiplication and division, 3 = addition and subtraction
         {
-            for (Token currentToken : tokens)
+            for (int index = 0; index < tokens.size(); index++)
             {
+                Token currentToken = tokens.get(index);
                 if (tokens.indexOf(currentToken) == tokens.size() - 1)
                 {
                     nextToken = null;
@@ -168,19 +184,13 @@ public class InputManagement {
                                 subTokens.add(subToken);
                             }
                             Double result = doPEMDAS(subTokens);
-                            tokens.remove(tokens.indexOf(subTokens.get(0))-1);
-                            tokens.remove(tokens.get(subTokens.size()));
-                            tokens.removeAll(subTokens);
+
                         }
                         break;
                     case 1:
                         if (currentToken.type == Type.POWER)
                         {
                             double powerResult = Math.pow(Double.parseDouble(previousToken.value), nextTokenValue12);
-                            tokens.remove(previousToken);
-                            tokens.remove(currentToken);
-                            tokens.remove(nextToken);
-                            tokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(powerResult)));
                         }
                         break;
                     case 2:
@@ -189,18 +199,10 @@ public class InputManagement {
                             if (currentToken.value.equals("*"))
                             {
                                 double multiplicationResult = Double.parseDouble(previousToken.value) * nextTokenValue12;
-                                tokens.remove(previousToken);
-                                tokens.remove(currentToken);
-                                tokens.remove(nextToken);
-                                tokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(multiplicationResult)));
                             }
                             else if (currentToken.value.equals("/"))
                             {
                                 double divisionResult = Double.parseDouble(previousToken.value) / nextTokenValue12;
-                                tokens.remove(previousToken);
-                                tokens.remove(currentToken);
-                                tokens.remove(nextToken);
-                                tokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(divisionResult)));
                             }
                         }
                         break;
@@ -210,21 +212,15 @@ public class InputManagement {
                             if (currentToken.value.equals("+"))
                             {
                                 double additionResult = Double.parseDouble(previousToken.value) + nextTokenValue3;
-                                tokens.remove(previousToken);
-                                tokens.remove(currentToken);
-                                tokens.remove(nextToken);
-                                tokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(additionResult)));
                             }
                             else if (currentToken.value.equals("-"))
                             {
                                 double subtractionResult = Double.parseDouble(previousToken.value) - nextTokenValue3;
-                                tokens.remove(previousToken);
-                                tokens.remove(currentToken);
-                                tokens.remove(nextToken);
-                                tokens.add(tokens.indexOf(currentToken),new Token(Type.NUMBER, String.valueOf(subtractionResult)));
                             }
                         }
                         break;
+                    default:
+
                 }
 
                 previousToken = currentToken;
@@ -236,7 +232,11 @@ public class InputManagement {
     public static void main(String[] args)
     {
         InputManagement inputManagement = new InputManagement();
-        List<List<Token>> functions = inputManagement.constructFunctions(inputManagement.equations);
+
+        inputManagement.variables.put("x", 3.0);
+        inputManagement.variables.put("y", 4.0);
+
+        List<List<Token>> functions = inputManagement.constructFunctions(inputManagement.equations, inputManagement.variables);
         for (List<Token> function : functions)
         {
             System.out.println(inputManagement.doPEMDAS(function));
