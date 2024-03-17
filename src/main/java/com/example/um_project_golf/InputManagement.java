@@ -3,6 +3,7 @@ package com.example.um_project_golf;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class InputManagement {
 
@@ -18,7 +19,7 @@ public class InputManagement {
     static class Token //defines the token into a type and a value
     {
         private final Type type; //type of token
-        private String value; //value of token
+        private final String value; //value of token
 
         public Token(Type type, String value)
         {
@@ -36,31 +37,21 @@ public class InputManagement {
     //constructs the functions and replaces the variables with their values
     private List<List<Token>> constructFunctions(List<String> equations, HashMap<String, Double> variables)
     {
-        List<List<Token>> functions = new ArrayList<>();
-        for (String equation : equations)
-        {
-            List<Token> tokens = tokenize(equation); //tokenizes the equation (converts the equation into tokens)
-            changeVar(variables, tokens);
-            functions.add(tokens);
-        }
-        return functions;
+        return equations.stream()
+                .map(this::tokenize) //convert each equation to a list of tokens
+                .map(tokens -> changeVar(variables, tokens)) //apply variable changes to each list of tokens
+                .collect(Collectors.toList());
     }
 
-    private void changeVar(HashMap<String, Double> variables, List<Token> tokens) {
-        for (Token token : tokens)
-        {
-            if (token.type == Type.VARIABLE)
-            {
-                if (variables.containsKey(token.value))
-                {
-                    token.value = String.valueOf(variables.get(token.value)); //replaces the variable with its based value
-                }
-                else
-                {
-                    throw new IllegalArgumentException("Variable not found: " + token.value);
-                }
-            }
-        }
+    private List<Token> changeVar(HashMap<String, Double> variables, List<Token> tokens) {
+        return tokens.stream()
+                .map(token -> {
+                    if (token.type == Type.VARIABLE && variables.containsKey(token.value)) { //replace variable with its value
+                        return new Token(Type.NUMBER, variables.get(token.value).toString());
+                    }
+                    return token; //return the token unchanged if it's not a variable or the variable isn't in the map
+                })
+                .collect(Collectors.toList());
     }
 
     //tokenizes the equation by grouping the characters into types
