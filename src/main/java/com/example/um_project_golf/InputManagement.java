@@ -40,23 +40,27 @@ public class InputManagement {
         for (String equation : equations)
         {
             List<Token> tokens = tokenize(equation); //tokenizes the equation (converts the equation into tokens)
-            for (Token token : tokens)
-            {
-                if (token.type == Type.VARIABLE)
-                {
-                    if (variables.containsKey(token.value))
-                    {
-                        token.value = String.valueOf(variables.get(token.value)); //replaces the variable with its based value
-                    }
-                    else
-                    {
-                        throw new IllegalArgumentException("Variable not found: " + token.value);
-                    }
-                }
-            }
+            changeVar(variables, tokens);
             functions.add(tokens);
         }
         return functions;
+    }
+
+    private void changeVar(HashMap<String, Double> variables, List<Token> tokens) {
+        for (Token token : tokens)
+        {
+            if (token.type == Type.VARIABLE)
+            {
+                if (variables.containsKey(token.value))
+                {
+                    token.value = String.valueOf(variables.get(token.value)); //replaces the variable with its based value
+                }
+                else
+                {
+                    throw new IllegalArgumentException("Variable not found: " + token.value);
+                }
+            }
+        }
     }
 
     //tokenizes the equation by grouping the characters into types
