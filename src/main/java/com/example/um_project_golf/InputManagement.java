@@ -93,7 +93,8 @@ public class InputManagement {
                     {
                         newToken = new Token(Type.PARENTHESIS, String.valueOf(currentChar));
 
-                    } else if (currentChar == '^') //checks if the current character is a power
+                    }
+                    else if (currentChar == '^') //checks if the current character is a power
                     {
                         newToken = new Token(Type.POWER, String.valueOf(currentChar));
                     }
