@@ -16,31 +16,37 @@ public class InputManagement {
         PARENTHESIS
     }
 
-    public static class Token //defines the token into a type and a value
+    /**
+     * @param type  type of token
+     * @param value value of token
+     */
+    public record Token(Type type, String value) //defines the token into a type and a value
+        {
+            @Override
+            public String toString() {
+                return type + ": " + value;
+            }
+        }
+
+    public List<Double> solve(List<List<Token>> equations, HashMap<String, Double> variables)
     {
-        private final Type type; //type of token
-        private final String value; //value of token
-
-        public Token(Type type, String value)
-        {
-            this.type = type;
-            this.value = value;
-        }
-
-        @Override
-        public String toString()
-        {
-            return type + ": " + value;
-        }
+        equations = replaceVar(equations, variables); //replaces the variables with their values
+        return equations.stream()
+                .map(this::doPEMDAS) //does the PEMDAS operations on each function
+                .collect(Collectors.toList());
     }
 
-    public InputManagement(List<String> equations, HashMap<String, Double> variables)
+    public List<List<Token>> getFunctions(List<String> equations)
     {
-        List<List<Token>> functions = constructFunctions(equations, variables); //constructs the functions
-        for (List<Token> function : functions)
-        {
-            System.out.println(doPEMDAS(function)); //does the PEMDAS operations on the function and prints the result
-        }
+        return equations.stream()
+                .map(this::tokenize) //convert each equation to a list of tokens
+                .collect(Collectors.toList());
+    }
+    private List<List<Token>> replaceVar(List<List<Token>> equations, HashMap<String, Double> variables)
+    {
+        return equations.stream()
+                .map(tokens -> changeVar(variables, tokens)) //apply variable changes to each list of tokens
+                .collect(Collectors.toList());
     }
 
     //constructs the functions and replaces the variables with their values
@@ -64,68 +70,60 @@ public class InputManagement {
     }
 
     //tokenizes the equation by grouping the characters into types
-    private List<Token> tokenize(String equation)
-    {
-        List<Token> tokens = new ArrayList<>(); //initializes the list of tokens
-        StringBuilder currentNumber = new StringBuilder(); //initializes the current number as an enhanced string (StringBuilder)
-        Token previousToken = null; //initializes the previous token
+    private List<Token> tokenize(String equation) {
+        List<Token> tokens = new ArrayList<>();
+        StringBuilder currentNumber = new StringBuilder();
+        Token previousToken = null;
 
-        for (char currentChar : equation.toCharArray())
-        {
-            if (currentChar != ' ') //ignores the spaces
-            {
-                if (Character.isDigit(currentChar))
-                {
-                    currentNumber.append(currentChar); //appends the current character to the current number
-                }
-                else
-                {
-                    if (!currentNumber.isEmpty())
-                    {
-                        Token numberToken = new Token(Type.NUMBER, currentNumber.toString()); //creates a new token for the current number
-                        checkAndAddImpliedMultiplication(tokens, numberToken, previousToken); //check and add the implied multiplication between the current number and the previous token
+        for (char currentChar : equation.toCharArray()) {
+            if (currentChar != ' ') {
+                if (Character.isDigit(currentChar)) {
+                    currentNumber.append(currentChar);
+                } else if (currentChar == '-' && (previousToken == null || previousToken.type() == Type.OPERATOR || previousToken.type() == Type.PARENTHESIS && previousToken.value().equals("("))) {
+                    // Directly append '-' if it's likely indicating a negative number
+                    currentNumber.append(currentChar);
+                } else {
+                    if (!currentNumber.isEmpty()) {
+                        Token numberToken = new Token(Type.NUMBER, currentNumber.toString());
+                        checkAndAddImpliedMultiplication(tokens, numberToken, previousToken);
                         tokens.add(numberToken);
-                        previousToken = numberToken; //updates the previous token
-                        currentNumber = new StringBuilder(); //updates the current number
+                        previousToken = numberToken;
+                        currentNumber = new StringBuilder();
                     }
-                    Token newToken;
-                    if (currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/') //checks if the current character is an operator
-                    {
-                        newToken = new Token(Type.OPERATOR, String.valueOf(currentChar));
-                    }
-                    else if (Character.isLetter(currentChar)) //checks if the current character is a letter and therefore a variable
-                    {
-                        newToken = new Token(Type.VARIABLE, String.valueOf(currentChar));
-                        checkAndAddImpliedMultiplication(tokens, newToken, previousToken);
-                    }
-                    else if (currentChar == '(' || currentChar == ')') //checks if the current character is a parenthesis open or close
-                    {
-                        newToken = new Token(Type.PARENTHESIS, String.valueOf(currentChar));
 
-                    }
-                    else if (currentChar == '^') //checks if the current character is a power
-                    {
-                        newToken = new Token(Type.POWER, String.valueOf(currentChar));
-                    }
-                    else //throws an exception if the current character is invalid
-                    {
+                    // Handle non-digit, non-'-' characters
+                    if (currentChar == '+' || currentChar == '*' || currentChar == '/') {
+                        tokens.add(new Token(Type.OPERATOR, String.valueOf(currentChar)));
+                    } else if (Character.isLetter(currentChar)) {
+                        Token variableToken = new Token(Type.VARIABLE, String.valueOf(currentChar));
+                        checkAndAddImpliedMultiplication(tokens, variableToken, previousToken);
+                        tokens.add(variableToken);
+                    } else if (currentChar == '(' || currentChar == ')') {
+                        tokens.add(new Token(Type.PARENTHESIS, String.valueOf(currentChar)));
+                    } else if (currentChar == '^') {
+                        tokens.add(new Token(Type.POWER, String.valueOf(currentChar)));
+                    } else if (currentChar == '-') {
+                        // Explicitly handle '-' here to avoid it being considered invalid.
+                        tokens.add(new Token(Type.OPERATOR, String.valueOf(currentChar)));
+                    } else {
                         throw new IllegalArgumentException("Invalid character: " + currentChar);
                     }
-                    tokens.add(newToken); //adds the new token to the list of tokens
-                    previousToken = newToken; //updates the previous token
+                    previousToken = tokens.get(tokens.size() - 1);
                 }
             }
         }
 
-        if (!currentNumber.isEmpty()) //adds the current number to the list of tokens if it is not empty (safety check)
-        {
+        // Check and add any remaining number after looping
+        if (!currentNumber.isEmpty()) {
             Token numberToken = new Token(Type.NUMBER, currentNumber.toString());
             checkAndAddImpliedMultiplication(tokens, numberToken, previousToken);
             tokens.add(numberToken);
         }
 
-        return tokens; //returns the list of tokens
+        return tokens;
     }
+
+
 
     private void checkAndAddImpliedMultiplication(List<Token> tokens, Token currentToken, Token previousToken)
     {
@@ -218,6 +216,10 @@ public class InputManagement {
         variables.put("x", 3.0); //placeholders for the variable x
         variables.put("y", 4.0); //placeholders for the variable y
 
-        new InputManagement(equations, variables); //initializes the input management
+        InputManagement inputManagement = new InputManagement(); //initializes the input management
+
+        List<List<Token>> tokens = inputManagement.constructFunctions(equations, variables); //constructs the functions
+        List<Double> results = inputManagement.solve(tokens, variables); //solves the equations
+        System.out.println(results); //prints the results
     }
 }
