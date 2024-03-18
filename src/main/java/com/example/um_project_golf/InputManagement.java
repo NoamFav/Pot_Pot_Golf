@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class InputManagement {
+public class InputManagement
+{
 
     public enum Type //defines the type of token
     {
@@ -21,12 +22,12 @@ public class InputManagement {
      * @param value value of token
      */
     public record Token(Type type, String value) //defines the token into a type and a value
-        {
-            @Override
-            public String toString() {
-                return type + ": " + value;
-            }
+    {
+        @Override
+        public String toString() {
+            return type + ": " + value;
         }
+    }
 
     public List<Double> solve(List<List<Token>> equations, HashMap<String, Double> variables)
     {
@@ -58,7 +59,8 @@ public class InputManagement {
                 .collect(Collectors.toList());
     }
 
-    private List<Token> changeVar(HashMap<String, Double> variables, List<Token> tokens) {
+    private List<Token> changeVar(HashMap<String, Double> variables, List<Token> tokens)
+    {
         return tokens.stream()
                 .map(token -> {
                     if (token.type == Type.VARIABLE && variables.containsKey(token.value)) { //replace variable with its value
@@ -70,51 +72,78 @@ public class InputManagement {
     }
 
     //tokenizes the equation by grouping the characters into types
-    private List<Token> tokenize(String equation) {
+    private List<Token> tokenize(String equation)
+    {
         List<Token> tokens = new ArrayList<>();
         StringBuilder currentNumber = new StringBuilder();
+        boolean decimalPointSeen = false; //flag to track if we've seen a decimal point in the current number
         Token previousToken = null;
 
-        for (char currentChar : equation.toCharArray()) {
-            if (currentChar != ' ') {
-                if (Character.isDigit(currentChar)) {
+        for (char currentChar : equation.toCharArray())
+        {
+            if (currentChar != ' ')
+            {
+                if (Character.isDigit(currentChar) || (currentChar == '-' && (previousToken == null || previousToken.type() == Type.OPERATOR || previousToken.type() == Type.PARENTHESIS && previousToken.value().equals("("))) || (currentChar == '.' && !decimalPointSeen))
+                {
+                    if (currentChar == '.')
+                    {
+                        decimalPointSeen = true; //fet flag to true when decimal point is encountered
+                    }
                     currentNumber.append(currentChar);
-                } else if (currentChar == '-' && (previousToken == null || previousToken.type() == Type.OPERATOR || previousToken.type() == Type.PARENTHESIS && previousToken.value().equals("("))) {
-                    // Directly append '-' if it's likely indicating a negative number
-                    currentNumber.append(currentChar);
-                } else {
-                    if (!currentNumber.isEmpty()) {
+                }
+                else
+                {
+                    if (!currentNumber.isEmpty())
+                    {
                         Token numberToken = new Token(Type.NUMBER, currentNumber.toString());
                         checkAndAddImpliedMultiplication(tokens, numberToken, previousToken);
                         tokens.add(numberToken);
                         previousToken = numberToken;
                         currentNumber = new StringBuilder();
+                        decimalPointSeen = false; //reset the decimal point seen flag
                     }
 
-                    // Handle non-digit, non-'-' characters
-                    if (currentChar == '+' || currentChar == '*' || currentChar == '/') {
-                        tokens.add(new Token(Type.OPERATOR, String.valueOf(currentChar)));
-                    } else if (Character.isLetter(currentChar)) {
-                        Token variableToken = new Token(Type.VARIABLE, String.valueOf(currentChar));
-                        checkAndAddImpliedMultiplication(tokens, variableToken, previousToken);
-                        tokens.add(variableToken);
-                    } else if (currentChar == '(' || currentChar == ')') {
-                        tokens.add(new Token(Type.PARENTHESIS, String.valueOf(currentChar)));
-                    } else if (currentChar == '^') {
-                        tokens.add(new Token(Type.POWER, String.valueOf(currentChar)));
-                    } else if (currentChar == '-') {
-                        // Explicitly handle '-' here to avoid it being considered invalid.
-                        tokens.add(new Token(Type.OPERATOR, String.valueOf(currentChar)));
-                    } else {
+                    Token newToken;
+                    if (currentChar == '+' || currentChar == '*' || currentChar == '/')
+                    {
+                        newToken = new Token(Type.OPERATOR, String.valueOf(currentChar));
+                    }
+                    else if (Character.isLetter(currentChar))
+                    {
+                        newToken = new Token(Type.VARIABLE, String.valueOf(currentChar));
+                        checkAndAddImpliedMultiplication(tokens, newToken, previousToken);
+                    }
+                    else if (currentChar == '(' || currentChar == ')')
+                    {
+                        newToken = new Token(Type.PARENTHESIS, String.valueOf(currentChar));
+                        if (currentChar == '(')
+                        {
+                            checkAndAddImpliedMultiplication(tokens, newToken, previousToken);
+                        }
+                    }
+                    else if (currentChar == '^')
+                    {
+                        newToken = new Token(Type.POWER, String.valueOf(currentChar));
+                    }
+                    else if (currentChar == '-')
+                    {
+                        // This case is already handled with negative numbers; might be subtraction
+                        newToken = new Token(Type.OPERATOR, String.valueOf(currentChar));
+                    }
+                    else
+                    {
                         throw new IllegalArgumentException("Invalid character: " + currentChar);
                     }
-                    previousToken = tokens.get(tokens.size() - 1);
+
+                    tokens.add(newToken);
+                    previousToken = newToken;
                 }
             }
         }
 
-        // Check and add any remaining number after looping
-        if (!currentNumber.isEmpty()) {
+        // Check and add the last number if there is one
+        if (!currentNumber.isEmpty())
+        {
             Token numberToken = new Token(Type.NUMBER, currentNumber.toString());
             checkAndAddImpliedMultiplication(tokens, numberToken, previousToken);
             tokens.add(numberToken);
@@ -210,7 +239,7 @@ public class InputManagement {
 
     public static void main(String[] args)
     {
-        List<String> equations = List.of("21x^2 + 3y", "3x + 4y - (8 + 9x)"); //initializes the equations
+        List<String> equations = List.of("21.2x^2 + 3y", "-3x + 4y - (8 + 9x)"); //initializes the equations
         HashMap<String, Double> variables = new HashMap<>(); //initializes the variables
 
         variables.put("x", 3.0); //placeholders for the variable x
@@ -218,7 +247,7 @@ public class InputManagement {
 
         InputManagement inputManagement = new InputManagement(); //initializes the input management
 
-        List<List<Token>> tokens = inputManagement.constructFunctions(equations, variables); //constructs the functions
+        List<List<Token>> tokens = inputManagement.getFunctions(equations); //constructs the functions
         List<Double> results = inputManagement.solve(tokens, variables); //solves the equations
         System.out.println(results); //prints the results
     }
