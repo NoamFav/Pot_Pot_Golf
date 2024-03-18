@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 public class InputManagement {
 
-    enum Type //defines the type of token
+    public enum Type //defines the type of token
     {
         NUMBER,
         VARIABLE,
@@ -16,7 +16,7 @@ public class InputManagement {
         PARENTHESIS
     }
 
-    static class Token //defines the token into a type and a value
+    public static class Token //defines the token into a type and a value
     {
         private final Type type; //type of token
         private final String value; //value of token
@@ -31,6 +31,15 @@ public class InputManagement {
         public String toString()
         {
             return type + ": " + value;
+        }
+    }
+
+    public InputManagement(List<String> equations, HashMap<String, Double> variables)
+    {
+        List<List<Token>> functions = constructFunctions(equations, variables); //constructs the functions
+        for (List<Token> function : functions)
+        {
+            System.out.println(doPEMDAS(function)); //does the PEMDAS operations on the function and prints the result
         }
     }
 
@@ -129,7 +138,7 @@ public class InputManagement {
         }
     }
 
-    private double doPEMDAS(List<Token> tokens) //does the PEMDAS (Parentheses, Exponents, Multiplication and Division, Addition and Subtraction) operations in order
+    public double doPEMDAS(List<Token> tokens) //does the PEMDAS (Parentheses, Exponents, Multiplication and Division, Addition and Subtraction) operations in order
     {
         for (int i = 0; i < tokens.size(); i++) //iterates through the list of tokens to find parentheses
         {
@@ -203,18 +212,12 @@ public class InputManagement {
 
     public static void main(String[] args)
     {
-        InputManagement inputManagement = new InputManagement(); //initializes the input management
-
         List<String> equations = List.of("21x^2 + 3y", "3x + 4y - (8 + 9x)"); //initializes the equations
         HashMap<String, Double> variables = new HashMap<>(); //initializes the variables
 
         variables.put("x", 3.0); //placeholders for the variable x
         variables.put("y", 4.0); //placeholders for the variable y
 
-        List<List<Token>> functions = inputManagement.constructFunctions(equations, variables); //constructs the functions
-        for (List<Token> function : functions)
-        {
-            System.out.println(inputManagement.doPEMDAS(function)); //does the PEMDAS operations on the function and prints the result
-        }
+        new InputManagement(equations, variables); //initializes the input management
     }
 }
