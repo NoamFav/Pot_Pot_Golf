@@ -41,6 +41,7 @@ public class InputManagement
     {
         return equations.stream()
                 .map(this::tokenize) //convert each equation to a list of tokens
+                .map(InputManagement::insertImplicitOnes) //inserts implicit ones where necessary
                 .collect(Collectors.toList());
     }
     private List<List<Token>> replaceVar(List<List<Token>> equations, HashMap<String, Double> variables)
@@ -55,6 +56,7 @@ public class InputManagement
     {
         return equations.stream()
                 .map(this::tokenize) //convert each equation to a list of tokens
+                .map(InputManagement::insertImplicitOnes) //inserts implicit ones where necessary
                 .map(tokens -> changeVar(variables, tokens)) //apply variable changes to each list of tokens
                 .collect(Collectors.toList());
     }
@@ -165,6 +167,24 @@ public class InputManagement
         }
     }
 
+    public static List<Token> insertImplicitOnes(List<Token> tokens)
+    {
+        List<Token> modifiedTokens = new ArrayList<>();
+        for (Token currentToken : tokens)
+        {
+            //check for unitary minus without a number
+            if (currentToken.type() == Type.NUMBER && currentToken.value().equals("-"))
+            {
+                modifiedTokens.add(new Token(Type.NUMBER, "-1"));
+                continue;
+            }
+
+            //add current token if not part of unary minus handling
+            modifiedTokens.add(currentToken);
+        }
+        return modifiedTokens;
+    }
+
     public double doPEMDAS(List<Token> tokens) //does the PEMDAS (Parentheses, Exponents, Multiplication and Division, Addition and Subtraction) operations in order
     {
         for (int i = 0; i < tokens.size(); i++) //iterates through the list of tokens to find parentheses
@@ -239,7 +259,7 @@ public class InputManagement
 
     public static void main(String[] args)
     {
-        List<String> equations = List.of("21.2x^2 + 3y", "-3x + 4y - (8 + 9x) * -1x"); //initializes the equations
+        List<String> equations = List.of("21.2x^2 + 3y", "-3x + 4y - (8 + 9x) * -x"); //initializes the equations
         HashMap<String, Double> variables = new HashMap<>(); //initializes the variables
 
         variables.put("x", 3.0); //placeholders for the variable x
