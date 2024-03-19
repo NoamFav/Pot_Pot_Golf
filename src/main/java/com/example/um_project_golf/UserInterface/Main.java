@@ -1,4 +1,4 @@
-package UserInterface;
+package com.example.um_project_golf.UserInterface;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
