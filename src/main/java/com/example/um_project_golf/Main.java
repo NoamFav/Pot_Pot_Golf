@@ -88,12 +88,6 @@ public class Main extends Application {
 
         inputField.textProperty().addListener((observable, oldValue, newValue) -> handleInput(newValue));
 
-        // Create empty VBox
-        VBox emptyVBox = new VBox();
-        emptyVBox.setLayoutX(411);
-        emptyVBox.setLayoutY(16);
-        emptyVBox.setPrefWidth(74);
-        emptyVBox.setPrefHeight(39);
 
         //ex graph to change
         NumberAxis timeAxis = new NumberAxis();
@@ -130,7 +124,7 @@ public class Main extends Application {
         // Create AnchorPane and add children
         root.getChildren().addAll(
                 leftAnchorPane,
-                inputVBox, emptyVBox, lineChart, equationNumSlider
+                inputVBox, lineChart, equationNumSlider
         );
 
         runButton.setOnAction(event -> {
