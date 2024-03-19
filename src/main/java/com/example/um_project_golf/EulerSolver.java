@@ -1,29 +1,44 @@
 package com.example.um_project_golf;
 
-import java.util.function.BiFunction;
+import java.util.HashMap;
+import java.util.List;
 
 public class EulerSolver {
 
     // Euler's method for solving systems of first-order differential equations
-    public static double[] eulerMethod(BiFunction<Double, double[], Double>[] derivatives, double[] initialValues, double stepSize, double tInitial, double tFinal)
+    public static HashMap<String, Double> eulerMethod(List<List<InputManagement.Token>> derivatives, HashMap<String, Double> initialValues, double stepSize, double tInitial, double tFinal)
     {
-        int numVariables = initialValues.length; // Number of variables that we want a result for
-        int numSteps = (int) Math.ceil((tFinal-tInitial) / stepSize); // Number of steps necessary to get to the final time (Math.ceil just rounds up the number to an integer)
-        double[] values = initialValues.clone();
+        int numSteps = (int) Math.ceil((tFinal-tInitial) / stepSize);// Number of steps necessary to get to the final time (Math.ceil just rounds up the number to an integer)
 
-        double t = tInitial;
-        double[] temporaryValues = new double[numVariables]; // Stores the results of each step
+        HashMap<String, Double> values = new HashMap<>(initialValues);// HashMap with all the values
+        HashMap<String, Double> valuesNoTime = new HashMap<>(initialValues);// HashMap with the values except time "t"
+        valuesNoTime.remove("t" , tInitial);
 
+        double t = tInitial;// Variable for time
+        HashMap<String, Double> temporaryValues = new HashMap<>(); // Stores the results of each step
+
+        // Iterate through the times necessary to get to the final time
         for (int i = 0; i < numSteps; i++) {
             // Compute derivatives at current time
-            for (int j = 0; j < numVariables; j++) {
-                temporaryValues[j] = derivatives[j].apply(t, values);
+            int j=0; // Counter for position of variable name
+            // Iterate through the functions
+            for (List<InputManagement.Token> function : derivatives)
+            {
+                String variableName = valuesNoTime.keySet().toArray(new String[0])[j];
+                temporaryValues.put(variableName, inputManagement.doPEMDAS(function)); // Calculate the derivatives for current time for each variable
+                j++;
             }
 
             // Update values using Euler method
-            for (int j = 0; j < numVariables; j++) {
-                values[j] += temporaryValues[j] * stepSize;
+            for (String variableName : values.keySet()) {
+                if (variableName.equals("t")) {
+                    values.put(variableName, t); // Makes sure the time is updated in each iteration
+                } else {
+                    values.put(variableName, values.get(variableName) + temporaryValues.get(variableName) * stepSize); // Updates the variables
+                }
             }
+
+            derivatives = inputManagement.constructFunctions(equations, values); // Update functions with the updated values
 
             // Update time
             t += stepSize;
@@ -32,29 +47,38 @@ public class EulerSolver {
         return values;
     }
 
+    static InputManagement inputManagement = new InputManagement(); // Initializes the input management
+    static List<String> equations = List.of("2t","t + 2y"); // Initializes the equations
+    static HashMap<String, Double> variables = new HashMap<>(); // Initializes the variables
+
     public static void main(String[] args)
     {
-        // Define the system of differential equations
-        BiFunction<Double, double[], Double>[] derivatives = new BiFunction[2];
-        derivatives[0] = (t, values) -> t + 2 * values[0];  // dy/dt = t + 2y
-        derivatives[1] = (t, values) -> -2 * values[1];     // dx/dt = -2x
-
-        // Initial values
-        double[] initialValues = {3.0, 2.0}; // y(0) = 3, x(0) = 2
-        String[] variables = {"y","x"};
-
-        // step size, initial time and final time
+        // Step size, initial time and final time
         double stepSize = 0.1;
-        double tInitial = 0;
+        double tInitial = 2.0;
         double tFinal = 2.5;
 
+        // Placeholders for each variable
+        variables.put("t", tInitial);
+        //variables.put("a", 1.0);
+        //variables.put("b", 3.0);
+        variables.put("x", 1.0);
+        variables.put("y", 3.0);
+        //variables.put("x", 0.0);
+        //variables.put("x", 0.0);
+        //variables.put("x", 0.0);
+
+        // Initialize functions with variables
+        List<List<InputManagement.Token>> functions = inputManagement.constructFunctions(equations, variables);
+
         // Solve using Euler method
-        double[] solution = eulerMethod(derivatives, initialValues, stepSize, tInitial, tFinal);
+        HashMap<String, Double> solutions = eulerMethod(functions, variables, stepSize, tInitial, tFinal);
+        solutions.remove("t",solutions.get("t"));
 
         // Print the solution
-        for (int i = 0 ; i < solution.length ; i++) {
-            double value = solution[i];
-            System.out.println("The value of " + variables[i] + " at t = " + tFinal + " is: " + value);
+        for (String solution : solutions.keySet()) {
+            Double value = solutions.get(solution);
+            System.out.println("The value of " + solution + " at t = " + tFinal + " is: " + value);
         }
     }
 }
