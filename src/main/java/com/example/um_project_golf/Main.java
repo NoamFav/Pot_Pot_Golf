@@ -4,8 +4,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.scene.control.Slider;
@@ -24,6 +23,7 @@ public class Main extends Application {
     private TextField inputField;
     private final List<TextField> variableValueFields = new ArrayList<>();
     private final  List<Label> variableLabels = new ArrayList<>();
+    private ScrollPane scrollPane;
 
     public static void main(String[] args) {
         launch(args);
@@ -33,8 +33,9 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
 
         AnchorPane root = new AnchorPane();
-        root.setPrefWidth(800);
+        root.setPrefWidth(900);
         root.setPrefHeight(600);
+        primaryStage.setResizable(false);
 
         Scene scene = new Scene(root);
         URL cssUrl =  getClass().getResource("Style.css");
@@ -51,6 +52,7 @@ public class Main extends Application {
         solverChoiceBox.setLayoutY(52);
         solverChoiceBox.setPrefWidth(136);
         solverChoiceBox.setPrefHeight(18);
+        solverChoiceBox.valueProperty().setValue("Euler solver");
 
 
         Label titleLabel = new Label("Group 14");
@@ -93,35 +95,6 @@ public class Main extends Application {
         emptyVBox.setPrefWidth(74);
         emptyVBox.setPrefHeight(39);
 
-        runButton.setOnAction(event -> {
-            String equation = inputField.getText();
-            HashMap<String, Double> variables = new HashMap<>();
-            for (int i = 0; i < variableLabels.size(); i++)
-            {
-                String variable = variableLabels.get(i).getText().split(":")[1].trim();
-                String value = variableValueFields.get(i).getText();
-                if (!value.isEmpty())
-                {
-                    variables.put(variable, Double.parseDouble(value));
-                }
-            }
-            System.out.println(variables);
-            System.out.println(equation);
-            InputManagement inputManagement = new InputManagement();
-            List<List<InputManagement.Token>> functions = inputManagement.getFunctions(List.of(equation));
-            List<Double> results = inputManagement.solve(functions, variables);
-            System.out.println(functions);
-            System.out.println(results);
-
-            StringBuilder output = new StringBuilder();
-            for (var e : variables.entrySet())
-            {
-                output.append(e.getKey()).append(": ").append(e.getValue()).append("\n");
-            }
-            output.append(equation).append("\n").append(functions).append("\n").append(results).append("\n");
-            outputTextArea.setText(output.toString());
-        });
-
         //ex graph to change
         NumberAxis timeAxis = new NumberAxis();
         NumberAxis variableAxis = new NumberAxis();
@@ -160,54 +133,95 @@ public class Main extends Application {
                 inputVBox, emptyVBox, lineChart, equationNumSlider
         );
 
+        runButton.setOnAction(event -> {
+            String equation = inputField.getText();
+            HashMap<String, Double> variables = new HashMap<>();
+            for (int i = 0; i < variableLabels.size(); i++)
+            {
+                String variable = variableLabels.get(i).getText().split(":")[1].trim();
+                String value = variableValueFields.get(i).getText();
+                if (!value.isEmpty())
+                {
+                    variables.put(variable, Double.parseDouble(value));
+                }
+            }
+            System.out.println(variables);
+            System.out.println(equation);
+            InputManagement inputManagement = new InputManagement();
+            List<List<InputManagement.Token>> functions = inputManagement.getFunctions(List.of(equation));
+            List<Double> results = inputManagement.solve(functions, variables);
+            System.out.println(functions);
+            System.out.println(results);
+
+            StringBuilder output = new StringBuilder();
+            for (var e : variables.entrySet())
+            {
+                output.append(e.getKey()).append(": ").append(e.getValue()).append("\n");
+            }
+            output.append(equation).append("\n").append(functions).append("\n").append(results).append("\n");
+            outputTextArea.setText(output.toString());
+        });
+
         primaryStage.setScene(scene);
         primaryStage.setTitle("Group 14 - phase 1");
         primaryStage.show();
     }
 
-    private void handleInput(String equation)
-    {
-        variableLabels.forEach(label -> label.setText(""));
-        variableValueFields.forEach(field -> field.setText(""));
+    private void handleInput(String equation) {
+        // Clearing previous content
+        ((AnchorPane) inputField.getParent().getParent()).getChildren().remove(scrollPane);
+
+        // Creating a single GridPane for all variables
+        GridPane grid = new GridPane();
+        grid.setVgap(10); // Vertical spacing between rows
+        grid.setHgap(10); // Horizontal spacing between columns
+        ColumnConstraints column1 = new ColumnConstraints();
+        column1.setHgrow(Priority.SOMETIMES); // Allows the column to grow if necessary
+        ColumnConstraints column2 = new ColumnConstraints(50); // Sets the preferred width for the text fields
+        grid.getColumnConstraints().addAll(column1, column2);
+        grid.getStyleClass().add("grid-pane");
 
         Pattern pattern = Pattern.compile("[a-zA-Z]");
         Matcher matcher = pattern.matcher(equation);
         List<String> variables = new ArrayList<>();
-        while (matcher.find())
-        {
+        while (matcher.find()) {
             String variable = matcher.group();
-            if (!variables.contains(variable))
-            {
+            if (!variables.contains(variable)) {
                 variables.add(variable);
             }
         }
-        //to make both the label and textField go away when you delete a variable
-        AnchorPane parent = (AnchorPane) inputField.getParent().getParent();
-        parent.getChildren().removeAll(variableLabels);
-        parent.getChildren().removeAll(variableValueFields);
-        variableLabels.clear();
-        variableValueFields.clear();
 
-        for (int i = 0; i < variables.size(); i++)
-        {
+        // Adding variable labels and text fields to the grid
+        for (int i = 0; i < variables.size(); i++) {
             String variable = variables.get(i);
             Label label = new Label("Variable " + (i + 1) + ": " + variable);
             TextField textField = new TextField();
             textField.setPromptText("value");
-            label.setLayoutX(600);
-            label.setLayoutY(50 + i * 30);
-            textField.setLayoutX(700);
-            textField.setLayoutY(50 + i * 30);
             textField.setPrefWidth(50);
 
+            grid.add(label, 0, i); // Column 0, row i
+            grid.add(textField, 1, i); // Column 1, row i
 
             variableLabels.add(label);
             variableValueFields.add(textField);
+        }
 
-            ((AnchorPane) inputField.getParent().getParent()).getChildren().addAll(label, textField);
+        scrollPane = new ScrollPane();
+        scrollPane.setContent(grid);
+        scrollPane.setLayoutX(700);
+        scrollPane.setLayoutY(50);
+        scrollPane.setPrefHeight(500); // Set preferred height, adjust as needed
+        scrollPane.setPrefWidth(180); // Set preferred width, adjust as needed
+        scrollPane.getStyleClass().add("scroll-pane");
 
+        AnchorPane.setTopAnchor(scrollPane, 50.0); // Adjust layout anchors as needed
+        AnchorPane.setLeftAnchor(scrollPane, 700.0); // Adjust layout anchors as needed
+
+        // Adding the scrollPane to the parent only if there are variables to show
+        if (!variables.isEmpty()) {
+            ((AnchorPane) inputField.getParent().getParent()).getChildren().add(scrollPane);
         }
     }
-    }
+}
 
 

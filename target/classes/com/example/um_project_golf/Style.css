@@ -81,3 +81,21 @@
     -fx-border-color: #64B5F6; /* Brighter border color on focus */
     -fx-border-width: 2px;
 }
+
+.grid-pane {
+    -fx-background-color: #CFD8DC;
+    -fx-background-radius: 15px;
+    -fx-padding: 10px;
+    -fx-border-color: #BDBDBD;
+    -fx-border-width: 2;
+    -fx-border-radius: 15px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0);
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
