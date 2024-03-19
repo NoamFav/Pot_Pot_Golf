@@ -75,6 +75,7 @@ public class Main extends Application {
         outputTextArea.setPrefWidth(153);
         outputTextArea.setPrefHeight(200);
         outputTextArea.setEditable(false);
+        outputTextArea.getStyleClass().add("text-area");
 
         // Create Label and TextField
         Label inputLabel = new Label("Input a differential equation:");

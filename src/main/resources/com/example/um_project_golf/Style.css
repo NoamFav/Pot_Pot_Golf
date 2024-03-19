@@ -46,6 +46,28 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 2, 0, 0, 2); /* Subtle shadow for depth */
 }
 
+.text-area .content { /* Targeting the content area of the TextArea */
+    -fx-background-color: transparent;
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+}
+
+.text-area .scroll-pane { /* Targeting the ScrollPane within the TextArea */
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.text-area .scroll-pane .viewport { /* Targeting the viewport within the ScrollPane */
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.text-area .scroll-pane .content { /* Further targeting the content within the ScrollPane */
+    -fx-background-color: #ffffff; /* Match the TextArea background */
+    -fx-background-radius: 13px; /* Slightly smaller to fit within the border */
+}
+
 .line-chart {
     -fx-background-color: #ffffff;
     -fx-border-color: #BDBDBD;
