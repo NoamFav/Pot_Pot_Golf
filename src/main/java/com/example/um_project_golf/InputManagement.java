@@ -52,7 +52,7 @@ public class InputManagement
     }
 
     //constructs the functions and replaces the variables with their values
-    private List<List<Token>> constructCompleteFunctions(List<String> equations, HashMap<String, Double> variables)
+    public List<List<Token>> constructCompleteFunctions(List<String> equations, HashMap<String, Double> variables)
     {
         return equations.stream()
                 .map(this::tokenize) //convert each equation to a list of tokens

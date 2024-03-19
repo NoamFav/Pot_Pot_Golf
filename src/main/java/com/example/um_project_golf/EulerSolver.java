@@ -38,7 +38,7 @@ public class EulerSolver {
                 }
             }
 
-            derivatives = inputManagement.constructFunctions(equations, values); // Update functions with the updated values
+            derivatives = inputManagement.constructCompleteFunctions(equations, values); // Update functions with the updated values
 
             // Update time
             t += stepSize;
@@ -69,7 +69,7 @@ public class EulerSolver {
         //variables.put("x", 0.0);
 
         // Initialize functions with variables
-        List<List<InputManagement.Token>> functions = inputManagement.constructFunctions(equations, variables);
+        List<List<InputManagement.Token>> functions = inputManagement.constructCompleteFunctions(equations, variables);
 
         // Solve using Euler method
         HashMap<String, Double> solutions = eulerMethod(functions, variables, stepSize, tInitial, tFinal);
