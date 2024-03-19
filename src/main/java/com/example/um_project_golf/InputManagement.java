@@ -154,8 +154,6 @@ public class InputManagement
         return tokens;
     }
 
-
-
     private void checkAndAddImpliedMultiplication(List<Token> tokens, Token currentToken, Token previousToken)
     {
         if (previousToken != null &&
