@@ -12,5 +12,5 @@ module com.example.um_project_golf {
     requires com.almasb.fxgl.all;
 
     opens com.example.um_project_golf to javafx.fxml;
-    exports com.example.um_project_golf;
+    exports UserInterface;
 }
