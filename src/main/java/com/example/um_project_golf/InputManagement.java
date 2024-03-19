@@ -106,33 +106,33 @@ public class InputManagement
                     Token newToken;
                     if (currentChar == '+' || currentChar == '*' || currentChar == '/')
                     {
-                        newToken = new Token(Type.OPERATOR, String.valueOf(currentChar));
+                        newToken = new Token(Type.OPERATOR, String.valueOf(currentChar)); //creates a new token for the operator
                     }
                     else if (Character.isLetter(currentChar))
                     {
-                        newToken = new Token(Type.VARIABLE, String.valueOf(currentChar));
+                        newToken = new Token(Type.VARIABLE, String.valueOf(currentChar)); //creates a new token for the variable
                         checkAndAddImpliedMultiplication(tokens, newToken, previousToken);
                     }
                     else if (currentChar == '(' || currentChar == ')')
                     {
-                        newToken = new Token(Type.PARENTHESIS, String.valueOf(currentChar));
+                        newToken = new Token(Type.PARENTHESIS, String.valueOf(currentChar)); //creates a new token for the parenthesis
                         if (currentChar == '(')
                         {
-                            checkAndAddImpliedMultiplication(tokens, newToken, previousToken);
+                            checkAndAddImpliedMultiplication(tokens, newToken, previousToken);  //adds implied multiplication if the previous token is a number or a variable
                         }
                     }
                     else if (currentChar == '^')
                     {
-                        newToken = new Token(Type.POWER, String.valueOf(currentChar));
+                        newToken = new Token(Type.POWER, String.valueOf(currentChar)); //creates a new token for the power
                     }
                     else if (currentChar == '-')
                     {
                         // This case is already handled with negative numbers; might be subtraction
-                        newToken = new Token(Type.OPERATOR, String.valueOf(currentChar));
+                        newToken = new Token(Type.OPERATOR, String.valueOf(currentChar)); //creates a new token for the operator
                     }
                     else
                     {
-                        throw new IllegalArgumentException("Invalid character: " + currentChar);
+                        throw new IllegalArgumentException("Invalid character: " + currentChar); //throws an exception if the character is invalid
                     }
 
                     tokens.add(newToken);
@@ -239,7 +239,7 @@ public class InputManagement
 
     public static void main(String[] args)
     {
-        List<String> equations = List.of("21.2x^2 + 3y", "-3x + 4y - (8 + 9x)"); //initializes the equations
+        List<String> equations = List.of("21.2x^2 + 3y", "-3x + 4y - (8 + 9x) * -1x"); //initializes the equations
         HashMap<String, Double> variables = new HashMap<>(); //initializes the variables
 
         variables.put("x", 3.0); //placeholders for the variable x
@@ -248,6 +248,7 @@ public class InputManagement
         InputManagement inputManagement = new InputManagement(); //initializes the input management
 
         List<List<Token>> tokens = inputManagement.getFunctions(equations); //constructs the functions
+        System.out.println(tokens); //prints the functions
         List<Double> results = inputManagement.solve(tokens, variables); //solves the equations
         System.out.println(results); //prints the results
     }
