@@ -9,6 +9,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.scene.control.Slider;
+
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -19,15 +21,28 @@ import javafx.scene.control.*;
 public class Main extends Application {
 
     private TextField inputField;
-    private List<TextField> variableValueFields = new ArrayList<>();
-    private List<Label> variableLabels = new ArrayList<>();
+    private final List<TextField> variableValueFields = new ArrayList<>();
+    private final  List<Label> variableLabels = new ArrayList<>();
 
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) {
+
+        AnchorPane root = new AnchorPane();
+        root.setPrefWidth(800);
+        root.setPrefHeight(600);
+
+        Scene scene = new Scene(root);
+        URL cssUrl =  getClass().getResource("Style.css");
+        if (cssUrl != null) {
+            scene.getStylesheets().add(cssUrl.toExternalForm());
+        } else {
+            System.err.println("Styling.css not found");
+        }
+
         // ChoiceBox to select a solver
         ChoiceBox<String> solverChoiceBox = new ChoiceBox<>();
         solverChoiceBox.getItems().addAll("Euler solver", "Other solver");
@@ -48,7 +63,6 @@ public class Main extends Application {
         runButton.setLayoutY(104);
         runButton.setPrefWidth(78);
         runButton.setPrefHeight(52);
-        runButton.setStyle("-fx-background-color: #486E3F; -fx-border-color: #FFFFFF;");
         runButton.setFont(new Font("Calisto MT", 23));
 
         // TextArea for the output
@@ -63,16 +77,13 @@ public class Main extends Application {
         Label inputLabel = new Label("Input a differential equation:");
         inputLabel.setFont(new Font("Calisto MT", 13));
         inputField = new TextField();
-        inputField.setStyle("-fx-background-color: #FFFFFF;");
         VBox inputVBox = new VBox(inputLabel, inputField);
         inputVBox.setLayoutX(245);
         inputVBox.setLayoutY(36);
         inputVBox.setPrefWidth(202);
         inputVBox.setPrefHeight(86);
 
-        inputField.textProperty().addListener((observable, oldValue, newValue) -> {
-            handleInput(newValue);
-        });
+        inputField.textProperty().addListener((observable, oldValue, newValue) -> handleInput(newValue));
 
         // Create empty VBox
         VBox emptyVBox = new VBox();
@@ -97,34 +108,28 @@ public class Main extends Application {
         equationNumSlider.setLayoutY(88);
         equationNumSlider.setPrefWidth(283);
         equationNumSlider.setPrefHeight(39);
-        equationNumSlider.setStyle("-fx-text-fill: black;");
         equationNumSlider.setShowTickLabels(true);
         equationNumSlider.setShowTickMarks(true);
         equationNumSlider.setBlockIncrement(1);
         equationNumSlider.setMajorTickUnit(1);
         equationNumSlider.setMinorTickCount(0);
+        equationNumSlider.setSnapToTicks(true);
 
         AnchorPane leftAnchorPane = new AnchorPane();
         leftAnchorPane.setLayoutX(0);
         leftAnchorPane.setPrefWidth(200);
         leftAnchorPane.setPrefHeight(600);
-        leftAnchorPane.setStyle("-fx-background-color: #5d9448;");
+        leftAnchorPane.getStyleClass().add("pane");
 
         // Add children to the left AnchorPane
         leftAnchorPane.getChildren().addAll(titleLabel, solverChoiceBox, runButton, outputTextArea);
 
         // Create AnchorPane and add children
-        AnchorPane root = new AnchorPane();
-        root.setPrefWidth(800);
-        root.setPrefHeight(600);
-        root.setStyle("-fx-background-color: #98de7e;");
         root.getChildren().addAll(
                 leftAnchorPane,
                 inputVBox, emptyVBox, lineChart, equationNumSlider
         );
 
-
-        Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Group 14 - phase 1");
         primaryStage.show();
