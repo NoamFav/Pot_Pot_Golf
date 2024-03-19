@@ -6,23 +6,11 @@ import java.util.List;
 
 public class Solver {
     static InputManagement inputManagement = new InputManagement(); // Initializes the input management
-    static HashMap<String, Double> variables = new HashMap<>(); // Initializes the variables
     static EulerSolver eulerSolver = new EulerSolver();
     static ImprovedEuler improvedEuler = new ImprovedEuler();
-    static List<String> equations = List.of("2t","t + 2y"); // Initializes the equations
 
-    public static void main(String[] args)
-    {
-        // Step size, initial time and final time
-        double stepSize = 0.1;
-        double tInitial = 2.0;
-        double tFinal = 2.5;
 
-        // Placeholders for each variable
-        variables.put("t", tInitial);
-        variables.put("x", 1.0);
-        variables.put("y", 2.0);
-
+    public void solve(double stepSize, double tInitial, double tFinal, HashMap<String, Double> variables, List<String> equations){
         // Initialize functions with variables
         List<List<InputManagement.Token>> functions = inputManagement.constructCompleteFunctions(equations, variables);
 
@@ -46,5 +34,24 @@ public class Solver {
             System.out.println("Improved Euler's method:");
             System.out.println("The value of " + solution + " at t = " + tFinal + " is: " + df.format(valueIE));
         }
+    }
+
+    public static void main(String[] args)
+    {
+        // Step size, initial time and final time
+        double stepSize = 0.1;
+        double tInitial = 2.0;
+        double tFinal = 2.5;
+
+        HashMap<String, Double> variables = new HashMap<>();
+        // Placeholders for each variable
+        variables.put("t", tInitial);
+        variables.put("x", 1.0);
+        variables.put("y", 2.0);
+
+        List<String> equations = List.of("2t","t + 2y");
+
+        Solver solver = new Solver();
+        solver.solve(stepSize,tInitial,tFinal,variables,equations);
     }
 }

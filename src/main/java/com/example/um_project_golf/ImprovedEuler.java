@@ -1,4 +1,5 @@
 package com.example.um_project_golf;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class ImprovedEuler {
             }
             System.out.println("k1:"+k1);
 
-            // Compute derivatives at the midpoint of the step
+            // Compute normal Euler
             HashMap<String, Double> valuesMid = new HashMap<>(valuesNoTime);
             for (String variableName : valuesMid.keySet()) {
                 valuesMid.put(variableName, values.get(variableName) + k1.get(variableName) * stepSize);
@@ -57,7 +58,7 @@ public class ImprovedEuler {
             }
             System.out.println("values:"+values);
 
-            derivatives = inputManagement.constructCompleteFunctions(equations, values);
+            derivatives = inputManagement.constructCompleteFunctions(equations, values); // Update functions with the updated values
 
             // Update time
             t += stepSize;
