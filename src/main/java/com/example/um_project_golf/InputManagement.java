@@ -87,7 +87,7 @@ public class InputManagement
                 {
                     if (currentChar == '.')
                     {
-                        decimalPointSeen = true; //fet flag to true when decimal point is encountered
+                        decimalPointSeen = true; //set flag to true when decimal point is encountered
                     }
                     currentNumber.append(currentChar);
                 }
