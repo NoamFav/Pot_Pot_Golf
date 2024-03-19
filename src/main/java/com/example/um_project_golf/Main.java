@@ -12,6 +12,7 @@ import javafx.scene.control.Slider;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -91,6 +92,35 @@ public class Main extends Application {
         emptyVBox.setLayoutY(16);
         emptyVBox.setPrefWidth(74);
         emptyVBox.setPrefHeight(39);
+
+        runButton.setOnAction(event -> {
+            String equation = inputField.getText();
+            HashMap<String, Double> variables = new HashMap<>();
+            for (int i = 0; i < variableLabels.size(); i++)
+            {
+                String variable = variableLabels.get(i).getText().split(":")[1].trim();
+                String value = variableValueFields.get(i).getText();
+                if (!value.isEmpty())
+                {
+                    variables.put(variable, Double.parseDouble(value));
+                }
+            }
+            System.out.println(variables);
+            System.out.println(equation);
+            InputManagement inputManagement = new InputManagement();
+            List<List<InputManagement.Token>> functions = inputManagement.getFunctions(List.of(equation));
+            List<Double> results = inputManagement.solve(functions, variables);
+            System.out.println(functions);
+            System.out.println(results);
+
+            StringBuilder output = new StringBuilder();
+            for (var e : variables.entrySet())
+            {
+                output.append(e.getKey()).append(": ").append(e.getValue()).append("\n");
+            }
+            output.append(equation).append("\n").append(functions).append("\n").append(results).append("\n");
+            outputTextArea.setText(output.toString());
+        });
 
         //ex graph to change
         NumberAxis timeAxis = new NumberAxis();
