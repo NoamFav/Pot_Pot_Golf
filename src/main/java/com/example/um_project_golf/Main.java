@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.scene.control.*;
+import net.objecthunter.exp4j.Expression;
 
 
 public class Main extends Application {
@@ -129,7 +130,7 @@ public class Main extends Application {
         );
 
         runButton.setOnAction(event -> {
-            String equation = inputField.getText();
+            List<String> equations = List.of(inputField.getText());
             HashMap<String, Double> variables = new HashMap<>();
             for (int i = 0; i < variableLabels.size(); i++)
             {
@@ -141,19 +142,34 @@ public class Main extends Application {
                 }
             }
             System.out.println(variables);
-            System.out.println(equation);
-            InputManagement inputManagement = new InputManagement();
-            List<List<InputManagement.Token>> functions = inputManagement.getFunctions(List.of(equation));
-            List<Double> results = inputManagement.solve(functions, variables);
-            System.out.println(functions);
-            System.out.println(results);
+            System.out.println(equations);
 
+            InputManagement inputManagement = new InputManagement();
             StringBuilder output = new StringBuilder();
-            for (var e : variables.entrySet())
+            for (String equation : equations)
             {
-                output.append(e.getKey()).append(": ").append(e.getValue()).append("\n");
+                if (equation.contains("cos") || equation.contains("sin") || equation.contains("tan") || equation.contains("log") || equation.contains("sqrt"))
+                {
+                    System.out.println("The equation contains a function that is not supported by the simple solver. Using the hard solver instead.");
+                    List<Expression> list = inputManagement.constructExpression(List.of(equation), variables); //constructs the expression
+                    List<Double> results2 = inputManagement.solveHard(list, variables); //solves the equations
+                    System.out.println(results2); //prints the results
+                    output.append("The equation contains a function that is not supported by the simple solver. Using the hard solver instead.").append("\n");
+                    output.append(equation).append("\n");
+                    output.append(results2).append("\n");
+                }
+                else
+                {
+                    System.out.println("Equation is supported by the simple solver. Using the simple solver.");
+                    List<List<InputManagement.Token>> tokens = inputManagement.getFunctions(List.of(equation)); //constructs the functions
+                    System.out.println(tokens); //prints the functions
+                    List<Double> results = inputManagement.solve(tokens, variables); //solves the equations
+                    System.out.println(results); //prints the results
+                    output.append("Equation is supported by the simple solver. Using the simple solver.").append("\n");
+                    output.append(equation).append("\n");
+                    output.append(results).append("\n");
+                }
             }
-            output.append(equation).append("\n").append(functions).append("\n").append(results).append("\n");
             outputTextArea.setText(output.toString());
         });
 
