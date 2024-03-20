@@ -23,7 +23,6 @@ public class RK4 {
                 List<List<InputManagement.Token>> updatedFunctions = inputManagement.constructCompleteFunctions(equations, values);
                 function = updatedFunctions.get(j);
                 k1 = inputManagement.doPEMDAS(function); // Compute k1
-                System.out.println("k1"+k1);
 
                 // Compute k2
                 valuesK.put(variableName, values.get(variableName) + k1 * stepSize / 2);
@@ -31,14 +30,12 @@ public class RK4 {
                 updatedFunctions = inputManagement.constructCompleteFunctions(equations, valuesK);
                 function = updatedFunctions.get(j);
                 k2 = inputManagement.doPEMDAS(function);
-                System.out.println("k2"+k2);
 
                 // Compute k3
                 valuesK.put(variableName, values.get(variableName) + k2 * stepSize / 2);
                 updatedFunctions = inputManagement.constructCompleteFunctions(equations, valuesK);
                 function = updatedFunctions.get(j);
                 k3 = inputManagement.doPEMDAS(function);
-                System.out.println("k3"+k3);
 
                 // Compute k4
                 valuesK.put(variableName, values.get(variableName) + stepSize * k3);
@@ -46,12 +43,10 @@ public class RK4 {
                 updatedFunctions = inputManagement.constructCompleteFunctions(equations, valuesK);
                 function = updatedFunctions.get(j);
                 k4 = inputManagement.doPEMDAS(function);
-                System.out.println("k4"+k4);
 
                 // Update the variables
                 values.put(variableName, values.get(variableName) + stepSize * (k1 + 2 * k2 + 2 * k3 + k4) / 6);
 
-                System.out.println("values "+values);
                 j++;
             }
             t += stepSize;

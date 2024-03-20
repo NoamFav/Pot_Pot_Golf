@@ -48,16 +48,15 @@ public class Solver {
         // Step size, initial time and final time
         double stepSize = 0.1;
         double tInitial = 0.0;
-        double tFinal = 2.5;
+        double tFinal = 10.0;
 
         HashMap<String, Double> variables = new HashMap<>();
         // Placeholders for each variable
         variables.put("t", tInitial);
-        variables.put("s", 1.0);
-        variables.put("i", 0.00000127);
-        variables.put("r", 0.0);
+        variables.put("y", 1.0);
 
-        List<String> equations = List.of("-0.5s * i","t + 2y");
+
+        List<String> equations = List.of("y^2*t^4");
 
         Solver solver = new Solver();
         solver.solve(stepSize,tInitial,tFinal,variables,equations);
