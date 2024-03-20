@@ -162,7 +162,8 @@ public class InputManagement
         if (previousToken != null &&
                 ((previousToken.type == Type.NUMBER && currentToken.type == Type.VARIABLE) ||
                         (previousToken.type == Type.VARIABLE && currentToken.type == Type.VARIABLE) ||
-                        (previousToken.type == Type.VARIABLE && currentToken.type == Type.NUMBER))) //determines if there is an implied multiplication between the previous token and the current token
+                        (previousToken.type == Type.VARIABLE && currentToken.type == Type.NUMBER) ||
+                        ((previousToken.type == Type.VARIABLE || previousToken.type == Type.NUMBER) && currentToken.type == Type.PARENTHESIS && currentToken.value.equals("("))))//determines if there is an implied multiplication between the previous token and the current token
         {
             tokens.add(new Token(Type.OPERATOR, "*")); //adds the implied multiplication to the list of tokens
         }
@@ -287,7 +288,7 @@ public class InputManagement
 
     public static void main(String[] args)
     {
-        List<String> equations = List.of("21.2x^2 + 3y", "-3x + 4y - (8 + 9x) * -x", "cos(x)+2x-2", "e^x"); //initializes the equations
+        List<String> equations = List.of("21.2x^2 + 3y", "-3x + 4y - (8 + 9x) * -x", "2(x)"); //initializes the equations
         HashMap<String, Double> variables = new HashMap<>(); //initializes the variables
 
         variables.put("x", 3.0); //placeholders for the variable x
@@ -303,7 +304,6 @@ public class InputManagement
                 break;
             }
         }
-
 
         for (String equation : equations)
         {
