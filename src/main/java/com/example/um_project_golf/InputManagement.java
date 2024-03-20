@@ -162,7 +162,7 @@ public class InputManagement
         if (previousToken != null &&
                 ((previousToken.type == Type.NUMBER && currentToken.type == Type.VARIABLE) ||
                         (previousToken.type == Type.VARIABLE && currentToken.type == Type.VARIABLE) ||
-                                (previousToken.type == Type.VARIABLE && currentToken.type == Type.NUMBER))) //determines if there is an implied multiplication between the previous token and the current token
+                        (previousToken.type == Type.VARIABLE && currentToken.type == Type.NUMBER))) //determines if there is an implied multiplication between the previous token and the current token
         {
             tokens.add(new Token(Type.OPERATOR, "*")); //adds the implied multiplication to the list of tokens
         }
