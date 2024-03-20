@@ -22,7 +22,6 @@ public class ImprovedEuler {
             HashMap<String, Double> k1 = new HashMap<>();
             int l = 0;
             for (List<InputManagement.Token> function : derivatives) {
-                System.out.println(function);
                 String variableName = valuesNoTime.keySet().toArray(new String[0])[l];
                 k1.put(variableName, inputManagement.doPEMDAS(function));
                 l++;
@@ -41,7 +40,6 @@ public class ImprovedEuler {
             int j = 0;
             for (List<InputManagement.Token> function : derivativesMid) {
                 String variableName = valuesNoTime.keySet().toArray(new String[0])[j];
-                System.out.println(variableName);
                 k2.put(variableName, inputManagement.doPEMDAS(function));
                 j++;
             }
