@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.scene.control.*;
 import javafx.util.converter.DoubleStringConverter;
+import net.objecthunter.exp4j.Expression;
 
 
 public class Main extends Application {
@@ -86,6 +87,7 @@ public class Main extends Application {
         outputTextArea.setPrefWidth(153);
         outputTextArea.setPrefHeight(200);
         outputTextArea.setEditable(false);
+        outputTextArea.getStyleClass().add("text-area");
 
         // Create Label and TextField
         Label inputLabel = new Label("Input a differential equation:");
@@ -254,11 +256,11 @@ public class Main extends Application {
         // Create AnchorPane and add children
         root.getChildren().addAll(
                 leftAnchorPane,
-                inputVBox, emptyVBox, lineChart, equationNumSlider, warningLabel
+                inputVBox, lineChart, equationNumSlider, warningLabel
         );
 
         runButton.setOnAction(event -> {
-            String equation = inputField.getText();
+            List<String> equations = List.of(inputField.getText());
             HashMap<String, Double> variables = new HashMap<>();
             for (int i = 0; i < variableLabels.size(); i++)
             {
@@ -270,19 +272,34 @@ public class Main extends Application {
                 }
             }
             System.out.println(variables);
-            System.out.println(equation);
-            InputManagement inputManagement = new InputManagement();
-            List<List<InputManagement.Token>> functions = inputManagement.getFunctions(List.of(equation));
-            List<Double> results = inputManagement.solve(functions, variables);
-            System.out.println(functions);
-            System.out.println(results);
+            System.out.println(equations);
 
+            InputManagement inputManagement = new InputManagement();
             StringBuilder output = new StringBuilder();
-            for (var e : variables.entrySet())
+            for (String equation : equations)
             {
-                output.append(e.getKey()).append(": ").append(e.getValue()).append("\n");
+                if (equation.contains("cos") || equation.contains("sin") || equation.contains("tan") || equation.contains("log") || equation.contains("sqrt") || equation.contains("!") || equation.contains("%") || equation.contains("abs") || equation.contains("e") || equation.contains("pi"))
+                {
+                    System.out.println("The equation contains a function that is not supported by the simple solver. Using the hard solver instead.");
+                    List<Expression> list = inputManagement.constructExpression(List.of(equation), variables); //constructs the expression
+                    List<Double> results2 = inputManagement.solveHard(list, variables); //solves the equations
+                    System.out.println(results2); //prints the results
+                    output.append("The equation contains a function that is not supported by the simple solver. Using the hard solver instead.").append("\n");
+                    output.append(equation).append("\n");
+                    output.append(results2).append("\n");
+                }
+                else
+                {
+                    System.out.println("Equation is supported by the simple solver. Using the simple solver.");
+                    List<List<InputManagement.Token>> tokens = inputManagement.getFunctions(List.of(equation)); //constructs the functions
+                    System.out.println(tokens); //prints the functions
+                    List<Double> results = inputManagement.solve(tokens, variables); //solves the equations
+                    System.out.println(results); //prints the results
+                    output.append("Equation is supported by the simple solver. Using the simple solver.").append("\n");
+                    output.append(equation).append("\n");
+                    output.append(results).append("\n");
+                }
             }
-            output.append(equation).append("\n").append(functions).append("\n").append(results).append("\n");
             outputTextArea.setText(output.toString());
         });
 
@@ -295,6 +312,22 @@ public class Main extends Application {
         // Clearing previous content
 
         ((AnchorPane) inputField.getParent().getParent()).getChildren().remove(scrollPane);
+        boolean isPi = false;
+        boolean isE = false;
+
+        List<String> nonVariables = List.of("cos", "sin", "tan", "log", "sqrt", "abs");
+        for (String nonVariable : nonVariables) {
+            if (equation.contains(nonVariable)) {
+                equation = equation.replace(nonVariable, "");
+            }
+        }
+        if (equation.contains("pi") || equation.contains("e")) {
+            isPi = equation.contains("pi");
+            isE = equation.contains("e");
+
+            equation = equation.replace("pi", "");
+            equation = equation.replace("e", "");
+        }
 
         // Creating a single GridPane for all variables
         GridPane grid = new GridPane();
@@ -316,56 +349,39 @@ public class Main extends Application {
             }
         }
 
-        // Ensure variable labels and text fields are not removed if the number of variables exceeds the limit
-        AnchorPane parent = (AnchorPane) inputField.getParent().getParent();
-        for (int i = variableLabels.size(); i < variables.size(); i++) {
-            String variable = variables.get(i);
-            Label label = new Label("Variable " + (i + 1) + ": " + variable);
+        int basedIndex = 0;
+        // Adding variable labels and text fields to the grid
+        if (isE) {
+            Label label = new Label("Euler's number: ");
             TextField textField = new TextField();
-            textField.setPromptText("value");
-            label.setLayoutX(600);
-            label.setLayoutY(50 + i * 30);
-            textField.setLayoutX(700);
-            textField.setLayoutY(50 + i * 30);
+            textField.setPromptText("2.71828");
             textField.setPrefWidth(50);
-
-            variableLabels.add(label);
-            variableValueFields.add(textField);
-            parent.getChildren().addAll(label, textField);
+            textField.setEditable(false);
+            grid.add(label, 0, basedIndex); // Column 0, row 0
+            grid.add(textField, 1, basedIndex); // Column 1, row 0
+            basedIndex++;
+        }
+        if (isPi) {
+            Label label = new Label("Pi: ");
+            TextField textField = new TextField();
+            textField.setPromptText("3.14159");
+            textField.setPrefWidth(50);
+            textField.setEditable(false);
+            grid.add(label, 0, basedIndex); // Column 0, row 1
+            grid.add(textField, 1, basedIndex); // Column 1, row 1
+            basedIndex++;
         }
 
-        inputField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.isEmpty()) {
-                saveEquationDetails(newValue);
-            }
-        });
-        inputField.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER)
-            {
-
-                // Save the equation details and increment the counter
-                saveEquationDetails(inputField.getText());
-                inputField.clear();
-                numEquationsEntered++;
-
-                if (numEquationsEntered == maxEquations)
-                {
-                    warningLabel.setText("You can't input any more equations");
-                    inputField.setDisable(true); // Disable input field if limit is reached
-                }
-            }
-        });
-
-        // Adding variable labels and text fields to the grid
         for (int i = 0; i < variables.size(); i++) {
             String variable = variables.get(i);
+
             Label label = new Label("Variable " + (i + 1) + ": " + variable);
             TextField textField = new TextField();
             textField.setPromptText("value");
             textField.setPrefWidth(50);
 
-            grid.add(label, 0, i); // Column 0, row i
-            grid.add(textField, 1, i); // Column 1, row i
+            grid.add(label, 0, i + basedIndex); // Column 0, row i
+            grid.add(textField, 1, i + basedIndex); // Column 1, row i
 
             variableLabels.add(label);
             variableValueFields.add(textField);
@@ -383,7 +399,7 @@ public class Main extends Application {
         AnchorPane.setLeftAnchor(scrollPane, 700.0); // Adjust layout anchors as needed
 
         // Adding the scrollPane to the parent only if there are variables to show
-        if (!variables.isEmpty()) {
+        if (!variables.isEmpty() || isPi || isE) {
             ((AnchorPane) inputField.getParent().getParent()).getChildren().add(scrollPane);
         }
 
