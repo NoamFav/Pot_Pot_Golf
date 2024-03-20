@@ -3,6 +3,7 @@ package com.example.um_project_golf;
 import net.objecthunter.exp4j.Expression;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class ImprovedEuler {
@@ -63,7 +64,7 @@ public class ImprovedEuler {
         return values;
     }
 
-    public static HashMap<String, Double> improvedEulerMethodHard(List<Expression> derivatives, HashMap<String, Double> initialValues, double stepSize, double tInitial, double tFinal, List<String> equations)
+    public static LinkedHashMap<Double, LinkedHashMap<String, Double>> improvedEulerMethodHard(List<Expression> derivatives, HashMap<String, Double> initialValues, double stepSize, double tInitial, double tFinal, List<String> equations)
     {
         int numSteps = (int) Math.ceil((tFinal - tInitial) / stepSize);
 
@@ -72,6 +73,8 @@ public class ImprovedEuler {
         valuesNoTime.remove("t");
 
         double t = tInitial;
+
+        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutions = new LinkedHashMap<>();
 
         for (int i = 0; i < numSteps; i++) {
             HashMap<String, Double> k1 = new HashMap<>();
@@ -108,9 +111,11 @@ public class ImprovedEuler {
             derivatives = inputManagement.constructCompleteExpression(equations, values);
 
             t += stepSize;
+
+            solutions.put(t, new LinkedHashMap<>(values));
         }
 
-        return values;
+        return solutions;
     }
 
     static InputManagement inputManagement = new InputManagement(); // Initializes the input management

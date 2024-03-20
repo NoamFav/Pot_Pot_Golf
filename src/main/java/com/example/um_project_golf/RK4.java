@@ -2,6 +2,7 @@ package com.example.um_project_golf;
 import net.objecthunter.exp4j.Expression;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class RK4 {
@@ -57,7 +58,7 @@ public class RK4 {
         return values;
     }
 
-    public static HashMap<String, Double> RK4MethodHard(double tInitial, HashMap<String, Double> values, double tFinal, List<Expression> derivatives, double stepSize, List<String> equations)
+    public static LinkedHashMap<Double, LinkedHashMap<String, Double>> RK4MethodHard(double tInitial, HashMap<String, Double> values, double tFinal, List<Expression> derivatives, double stepSize, List<String> equations)
     {
         int numSteps = (int) Math.ceil((tFinal - tInitial) / stepSize); // Number of steps necessary to get to the final time
 
@@ -68,6 +69,8 @@ public class RK4 {
         double t = tInitial;
 
         double k1, k2, k3, k4; // Variables for mid-way derivative calculation
+
+        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutions = new LinkedHashMap<>();
 
         for (int i = 0; i < numSteps; i++) {
             int j = 0;
@@ -104,8 +107,10 @@ public class RK4 {
             }
             t += stepSize;
             values.put("t",t);
+
+            solutions.put(t, new LinkedHashMap<>(values));
         }
-        return values;
+        return solutions;
     }
 
 
