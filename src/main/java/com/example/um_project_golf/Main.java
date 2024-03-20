@@ -26,9 +26,6 @@ public class Main extends Application {
     private final  List<Label> variableLabels = new ArrayList<>();
     private ScrollPane scrollPane;
 
-    private boolean isPi = false;
-    private boolean isE = false;
-
     public static void main(String[] args) {
         launch(args);
     }
@@ -184,8 +181,8 @@ public class Main extends Application {
     private void handleInput(String equation) {
         // Clearing previous content
         ((AnchorPane) inputField.getParent().getParent()).getChildren().remove(scrollPane);
-        isPi = false;
-        isE = false;
+        boolean isPi = false;
+        boolean isE = false;
 
         List<String> nonVariables = List.of("cos", "sin", "tan", "log", "sqrt", "abs");
         for (String nonVariable : nonVariables) {
@@ -251,7 +248,6 @@ public class Main extends Application {
             TextField textField = new TextField();
             textField.setPromptText("value");
             textField.setPrefWidth(50);
-            int counter = 0;
 
             grid.add(label, 0, i + basedIndex); // Column 0, row i
             grid.add(textField, 1, i + basedIndex); // Column 1, row i
