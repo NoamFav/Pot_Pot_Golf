@@ -1,33 +1,62 @@
 package com.example.um_project_golf;
-import java.util.function.BiFunction;
+import java.util.HashMap;
+import java.util.List;
 
 public class RK4 {
-    public static double RK4Method(double x0, double y0, double x, BiFunction<Double, Double, Double> function, double stepSize)
+
+    public static HashMap<String, Double> RK4Method(double tInitial, HashMap<String, Double> values, double tFinal, List<List<InputManagement.Token>> derivatives, double stepSize, List<String> equations)
     {
-        double xi = x0;
-        double y = y0;
-        double k1, k2, k3, k4;
+        HashMap<String, Double> valuesNoTime = new HashMap<>(values); // Values without the time
+        valuesNoTime.remove("t");
+        HashMap<String, Double> valuesK = new HashMap<>(values); // Values for calculation of the k's
 
-        while (xi <= x) {
-            k1 = stepSize * function.apply(x, y);
-            k2 = stepSize * function.apply(x + stepSize / 2, y + k1 / 2);
-            k3 = stepSize * function.apply(x + stepSize / 2, y + k2 / 2);
-            k4 = stepSize * function.apply(x + stepSize, y + k3);
+        double t = tInitial;
 
-            y = y + k1/6 + k2/3 + k3/3 + k4/6;
-            xi += stepSize;
+        double k1, k2, k3, k4; // Variables for mid-way derivative calculation
+
+        while (t < tFinal) {
+            int j = 0;
+            for (List<InputManagement.Token> function : derivatives) {
+                String variableName = valuesNoTime.keySet().toArray(new String[0])[j];
+                List<List<InputManagement.Token>> updatedFunctions = inputManagement.constructCompleteFunctions(equations, values);
+                function = updatedFunctions.get(j);
+                k1 = inputManagement.doPEMDAS(function); // Compute k1
+                System.out.println("k1"+k1);
+
+                // Compute k2
+                valuesK.put(variableName, values.get(variableName) + k1 * stepSize / 2);
+                valuesK.put("t", t + stepSize / 2);
+                updatedFunctions = inputManagement.constructCompleteFunctions(equations, valuesK);
+                function = updatedFunctions.get(j);
+                k2 = inputManagement.doPEMDAS(function);
+                System.out.println("k2"+k2);
+
+                // Compute k3
+                valuesK.put(variableName, values.get(variableName) + k2 * stepSize / 2);
+                updatedFunctions = inputManagement.constructCompleteFunctions(equations, valuesK);
+                function = updatedFunctions.get(j);
+                k3 = inputManagement.doPEMDAS(function);
+                System.out.println("k3"+k3);
+
+                // Compute k4
+                valuesK.put(variableName, values.get(variableName) + stepSize * k3);
+                valuesK.put("t", t + stepSize);
+                updatedFunctions = inputManagement.constructCompleteFunctions(equations, valuesK);
+                function = updatedFunctions.get(j);
+                k4 = inputManagement.doPEMDAS(function);
+                System.out.println("k4"+k4);
+
+                // Update the variables
+                values.put(variableName, values.get(variableName) + stepSize * (k1 + 2 * k2 + 2 * k3 + k4) / 6);
+
+                System.out.println("values "+values);
+                j++;
+            }
+            t += stepSize;
+            values.put("t",t);
         }
-
-        return y;
+        return values;
     }
-    public static void main(String[] args)
-    {
-        BiFunction<Double, Double, Double> g = (x, y) -> -3.0 * y;
-        double x0 = 0;
-        double y0 = 1;
-        double x = 3;
-        double h = 0.1;
-        System.out.println(RK4Method(x0, y0, x, g, h));
-
-    }
+    static InputManagement inputManagement = new InputManagement(); // Initializes the input management
 }
+

@@ -8,6 +8,7 @@ public class Solver {
     static InputManagement inputManagement = new InputManagement(); // Initializes the input management
     static EulerSolver eulerSolver = new EulerSolver();
     static ImprovedEuler improvedEuler = new ImprovedEuler();
+    static RK4 rk4Solver = new RK4();
 
 
     public void solve(double stepSize, double tInitial, double tFinal, HashMap<String, Double> variables, List<String> equations){
@@ -22,6 +23,9 @@ public class Solver {
         HashMap<String, Double> solutionsImprovedEuler = improvedEuler.improvedEulerMethod(functions, variables, stepSize, tInitial, tFinal, equations);
         solutionsImprovedEuler.remove("t",solutionsImprovedEuler.get("t"));
 
+        // Solve using RK4 method
+        HashMap<String, Double> solutionsRK4 = rk4Solver.RK4Method(tInitial, variables, tFinal, functions, stepSize, equations);
+
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(7);
 
@@ -29,10 +33,13 @@ public class Solver {
         for (String solution : solutionsEuler.keySet()) {
             Double valueE = solutionsEuler.get(solution);
             Double valueIE = solutionsImprovedEuler.get(solution);
+            Double valueRK4 = solutionsRK4.get(solution);
             System.out.println("Euler's method:");
             System.out.println("The value of " + solution + " at t = " + tFinal + " is: " + df.format(valueE));
             System.out.println("Improved Euler's method:");
             System.out.println("The value of " + solution + " at t = " + tFinal + " is: " + df.format(valueIE));
+            System.out.println("Runge-Kutta 4th order method:");
+            System.out.println("The value of " + solution + " at t = " + tFinal + " is: " + df.format(valueRK4));
         }
     }
 
