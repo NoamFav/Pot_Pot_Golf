@@ -11,7 +11,8 @@ public class Solver {
     static RK4 rk4Solver = new RK4();
 
 
-    public void solve(double stepSize, double tInitial, double tFinal, HashMap<String, Double> variables, List<String> equations){
+    public void solve(double stepSize, double tInitial, double tFinal, HashMap<String, Double> variables, List<String> equations)
+    {
         // Initialize functions with variables
         List<List<InputManagement.Token>> functions = inputManagement.constructCompleteFunctions(equations, variables);
 
@@ -48,15 +49,14 @@ public class Solver {
         // Step size, initial time and final time
         double stepSize = 0.1;
         double tInitial = 0.0;
-        double tFinal = 10.0;
+        double tFinal = 1.0;
 
         HashMap<String, Double> variables = new HashMap<>();
         // Placeholders for each variable
         variables.put("t", tInitial);
         variables.put("y", 1.0);
 
-
-        List<String> equations = List.of("y^2*t^4");
+        List<String> equations = List.of("y");
 
         Solver solver = new Solver();
         solver.solve(stepSize,tInitial,tFinal,variables,equations);
