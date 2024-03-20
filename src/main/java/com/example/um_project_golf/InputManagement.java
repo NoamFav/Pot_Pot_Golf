@@ -287,7 +287,7 @@ public class InputManagement
 
     public static void main(String[] args)
     {
-        List<String> equations = List.of("21.2x^2 + 3y", "-3x + 4y - (8 + 9x) * -x", "cos(x)+2x-2"); //initializes the equations
+        List<String> equations = List.of("21.2x^2 + 3y", "-3x + 4y - (8 + 9x) * -x", "cos(x)+2x-2", "e^x"); //initializes the equations
         HashMap<String, Double> variables = new HashMap<>(); //initializes the variables
 
         variables.put("x", 3.0); //placeholders for the variable x
@@ -297,7 +297,7 @@ public class InputManagement
 
         for (String equation : equations)
         {
-            if (equation.contains("cos") || equation.contains("sin") || equation.contains("tan") || equation.contains("log") || equation.contains("sqrt"))
+            if (equation.contains("cos") || equation.contains("sin") || equation.contains("tan") || equation.contains("log") || equation.contains("sqrt") || equation.contains("!") || equation.contains("%") || equation.contains("abs") || equation.contains("e"))
             {
                 System.out.println("The equation contains a function that is not supported by the simple solver. Using the hard solver instead.");
                 List<Expression> list = inputManagement.constructExpression(List.of(equation), variables); //constructs the expression
