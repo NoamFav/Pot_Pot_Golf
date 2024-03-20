@@ -14,7 +14,11 @@ import java.util.Map;
 
 public class GraphSolver extends Application {
     public LineChart<Number,Number> createGraph(LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4, DecimalFormat df, double tInitial, double tFinal, double StepSize, boolean hard) {
-        LineChart<Number, Number> lineChart = new LineChart<>(new NumberAxis(), new NumberAxis());
+        NumberAxis xAxis = new NumberAxis();
+        xAxis.setLabel("Time");
+        NumberAxis yAxis = new NumberAxis();
+        yAxis.setLabel("Value");
+        LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
 
         XYChart.Data<Number, Number> dataEuler;
         XYChart.Data<Number, Number> dataImprovedEuler;
@@ -27,9 +31,9 @@ public class GraphSolver extends Application {
             seriesEuler = new XYChart.Series<>();
             seriesImprovedEuler = new XYChart.Series<>();
             seriesRK4 = new XYChart.Series<>();
-            seriesEuler.setName(variable);
-            seriesImprovedEuler.setName(variable);
-            seriesRK4.setName(variable);
+            seriesEuler.setName(variable + " Euler");
+            seriesImprovedEuler.setName(variable + " Improved Euler");
+            seriesRK4.setName(variable + " RK4");
 
             for (Map.Entry<Double, LinkedHashMap<String, Double>> entry : solutionsEuler.entrySet()) {
                 double t = entry.getKey();
@@ -50,7 +54,8 @@ public class GraphSolver extends Application {
             }
             lineChart.getData().add(seriesEuler);
             lineChart.getData().add(seriesImprovedEuler);
-            lineChart.getData().add(seriesRK4);
+            //lineChart.getData().add(seriesRK4);
+            lineChart.setCreateSymbols(false);
         }
 
         return lineChart;
@@ -74,7 +79,7 @@ public class GraphSolver extends Application {
         variables.put("y", 1.0);
         variables.put("x", 2.5);
 
-        List<String> equations = List.of("yx", "x");
+        List<String> equations = List.of("x","yx");
 
         List<LinkedHashMap<Double, LinkedHashMap<String, Double>>> plot = solver.solve(stepSize, tInitial, tFinal, variables, equations);
         solutionsEuler = plot.get(0);

@@ -71,8 +71,9 @@ public class RK4 {
         double k1, k2, k3, k4; // Variables for mid-way derivative calculation
 
         LinkedHashMap<Double, LinkedHashMap<String, Double>> solutions = new LinkedHashMap<>();
+        solutions.put(t, new LinkedHashMap<>(values));
 
-        for (int i = 0; i < numSteps; i++) {
+        for (int i = 0; i <= numSteps; i++) {
             int j = 0;
             for (Expression function : derivatives) {
                 String variableName = valuesNoTime.keySet().toArray(new String[0])[j];

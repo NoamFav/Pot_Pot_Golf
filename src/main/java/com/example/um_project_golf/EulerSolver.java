@@ -21,7 +21,7 @@ public class EulerSolver {
         HashMap<String, Double> temporaryValues = new HashMap<>(); // Stores the results of each step
 
         // Iterate through the times necessary to get to the final time
-        for (int i = 0; i < numSteps; i++) {
+        for (int i = 0; i <= numSteps; i++) {
             // Compute derivatives at current time
             int j=0; // Counter for position of variable name
             // Iterate through the functions
@@ -61,8 +61,9 @@ public class EulerSolver {
         double t = tInitial;
         HashMap<String, Double> temporaryValues = new HashMap<>();
         LinkedHashMap<Double, LinkedHashMap<String, Double>> solutions = new LinkedHashMap<>();
+        solutions.put(t, new LinkedHashMap<>(values));
 
-        for (int i = 0; i < numSteps; i++) {
+        for (int i = 0; i <= numSteps; i++) {
             int j=0;
             for (Expression function : derivatives)
             {

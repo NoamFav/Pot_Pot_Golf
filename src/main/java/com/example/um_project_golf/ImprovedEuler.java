@@ -75,8 +75,9 @@ public class ImprovedEuler {
         double t = tInitial;
 
         LinkedHashMap<Double, LinkedHashMap<String, Double>> solutions = new LinkedHashMap<>();
+        solutions.put(t, new LinkedHashMap<>(values));
 
-        for (int i = 0; i < numSteps; i++) {
+        for (int i = 0; i <= numSteps; i++) {
             HashMap<String, Double> k1 = new HashMap<>();
             int l = 0;
             for (Expression function : derivatives) {
