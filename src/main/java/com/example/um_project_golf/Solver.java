@@ -6,10 +6,6 @@ import java.util.List;
 
 public class Solver {
     static InputManagement inputManagement = new InputManagement(); // Initializes the input management
-    static EulerSolver eulerSolver = new EulerSolver();
-    static ImprovedEuler improvedEuler = new ImprovedEuler();
-    static RK4 rk4Solver = new RK4();
-
 
     public void solve(double stepSize, double tInitial, double tFinal, HashMap<String, Double> variables, List<String> equations)
     {
@@ -17,15 +13,15 @@ public class Solver {
         List<List<InputManagement.Token>> functions = inputManagement.constructCompleteFunctions(equations, variables);
 
         // Solve using Euler's method
-        HashMap<String, Double> solutionsEuler = eulerSolver.eulerMethod(functions, variables, stepSize, tInitial, tFinal, equations);
+        HashMap<String, Double> solutionsEuler = EulerSolver.eulerMethod(functions, variables, stepSize, tInitial, tFinal, equations);
         solutionsEuler.remove("t",solutionsEuler.get("t"));
 
         // Solve using Improved Euler's method
-        HashMap<String, Double> solutionsImprovedEuler = improvedEuler.improvedEulerMethod(functions, variables, stepSize, tInitial, tFinal, equations);
+        HashMap<String, Double> solutionsImprovedEuler = ImprovedEuler.improvedEulerMethod(functions, variables, stepSize, tInitial, tFinal, equations);
         solutionsImprovedEuler.remove("t",solutionsImprovedEuler.get("t"));
 
         // Solve using RK4 method
-        HashMap<String, Double> solutionsRK4 = rk4Solver.RK4Method(tInitial, variables, tFinal, functions, stepSize, equations);
+        HashMap<String, Double> solutionsRK4 = RK4.RK4Method(tInitial, variables, tFinal, functions, stepSize, equations);
 
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(7);
