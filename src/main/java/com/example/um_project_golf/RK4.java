@@ -6,6 +6,8 @@ public class RK4 {
 
     public static HashMap<String, Double> RK4Method(double tInitial, HashMap<String, Double> values, double tFinal, List<List<InputManagement.Token>> derivatives, double stepSize, List<String> equations)
     {
+        int numSteps = (int) Math.ceil((tFinal - tInitial) / stepSize); // Number of steps necessary to get to the final time
+
         HashMap<String, Double> valuesNoTime = new HashMap<>(values); // Values without the time
         valuesNoTime.remove("t");
         HashMap<String, Double> valuesK = new HashMap<>(values); // Values for calculation of the k's
@@ -14,7 +16,7 @@ public class RK4 {
 
         double k1, k2, k3, k4; // Variables for mid-way derivative calculation
 
-        while (t < tFinal) {
+        for (int i = 0; i < numSteps; i++) {
             int j = 0;
             for (List<InputManagement.Token> function : derivatives) {
                 String variableName = valuesNoTime.keySet().toArray(new String[0])[j];
