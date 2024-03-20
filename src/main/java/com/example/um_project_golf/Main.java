@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -13,9 +14,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.scene.control.*;
+import javafx.util.converter.DoubleStringConverter;
 
 
 public class Main extends Application {
@@ -24,6 +28,13 @@ public class Main extends Application {
     private final List<TextField> variableValueFields = new ArrayList<>();
     private final  List<Label> variableLabels = new ArrayList<>();
     private ScrollPane scrollPane;
+
+    private final Map<String, Object> equationDetails = new HashMap<>();
+
+    private Slider equationNumSlider;
+    private int numEquationsEntered = 0;
+    private int maxEquations = 1;
+    private Label warningLabel;
 
     public static void main(String[] args) {
         launch(args);
@@ -88,6 +99,50 @@ public class Main extends Application {
 
         inputField.textProperty().addListener((observable, oldValue, newValue) -> handleInput(newValue));
 
+        //warning if you don't input the correct value
+        warningLabel = new Label();
+        warningLabel.setLayoutX(220);
+        warningLabel.setLayoutY(130);
+        warningLabel.setPrefWidth(283);
+        warningLabel.setPrefHeight(20);
+        warningLabel.setStyle("-fx-text-fill: #2196F3;");
+        warningLabel.setText("");
+
+
+        inputField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                // Check if the number of equations entered exceeds the limit
+                int maxEquations = (int) equationNumSlider.getValue();
+                if (numEquationsEntered >= maxEquations) {
+                    warningLabel.setText("Number of equations exceeds the limit!");
+                    return;
+                }
+
+                // Save the equation details and increment the counter
+                saveEquationDetails(inputField.getText());
+                inputField.clear();
+                numEquationsEntered++;
+
+                if (numEquationsEntered == maxEquations) {
+                    warningLabel.setText("Number of equations reached the limit!");
+
+                }
+            }
+        });
+
+        // Create Label and TextField
+        inputLabel = new Label("Input a differential equation:");
+        inputLabel.setFont(new Font("Calisto MT", 13));
+        inputField = new TextField();
+        inputVBox = new VBox(inputLabel, inputField);
+        inputVBox.setLayoutX(245);
+        inputVBox.setLayoutY(36);
+        inputVBox.setPrefWidth(202);
+        inputVBox.setPrefHeight(86);
+
+        inputField.textProperty().addListener((observable, oldValue, newValue) -> handleInput(newValue));
+
+
         // Create empty VBox
         VBox emptyVBox = new VBox();
         emptyVBox.setLayoutX(411);
@@ -105,6 +160,63 @@ public class Main extends Application {
         lineChart.setPrefWidth(500);
         lineChart.setPrefHeight(400);
 
+        // Label for step size input
+        Label stepSizeLabel = new Label("Input Step Size:");
+        stepSizeLabel.setLayoutX(20);
+        stepSizeLabel.setLayoutY(390);
+        stepSizeLabel.setFont(Font.font("Calisto MT", 12));
+
+        // TextField to input step size
+        TextField stepSizeTextField = new TextField();
+        stepSizeTextField.setLayoutX(20);
+        stepSizeTextField.setLayoutY(410);
+        stepSizeTextField.setPrefWidth(100);
+        stepSizeTextField.setPromptText("Step size");
+
+        Pattern validDoubleText = Pattern.compile("-?(([1-9][0-9]*)|0)?(\\.[0-9]*)?");
+        UnaryOperator<TextFormatter.Change> doubleFilter = change -> {
+            if (validDoubleText.matcher(change.getControlNewText()).matches()) {
+                return change;
+            } else {
+                return null;
+            }
+        };
+        TextFormatter<Double> doubleFormatter = new TextFormatter<>(new DoubleStringConverter(), 0.0, doubleFilter);
+        stepSizeTextField.setTextFormatter(doubleFormatter);
+
+        // Label for start value input
+        Label startLabel = new Label("Input Start Value:");
+        startLabel.setLayoutX(20);
+        startLabel.setLayoutY(460);
+        startLabel.setFont(Font.font("Calisto MT", 12));
+
+        // TextField for start value input
+        TextField startTextField = new TextField();
+        startTextField.setLayoutX(20);
+        startTextField.setLayoutY(480);
+        startTextField.setPrefWidth(100);
+        startTextField.setPromptText("Start value");
+
+        TextFormatter<Double> startDoubleFormatter = new TextFormatter<>(new DoubleStringConverter(), 0.0, doubleFilter);
+        startTextField.setTextFormatter(startDoubleFormatter);
+
+        // Label for end value input
+        Label endLabel = new Label("Input End Value:");
+        endLabel.setLayoutX(20);
+        endLabel.setLayoutY(530);
+        endLabel.setFont(Font.font("Calisto MT", 12));
+
+        // TextField for end value input
+        TextField endTextField = new TextField();
+        endTextField.setLayoutX(20);
+        endTextField.setLayoutY(550);
+        endTextField.setPrefWidth(100);
+        endTextField.setPromptText("End value");
+
+        TextFormatter<Double> endDoubleFormatter = new TextFormatter<>(new DoubleStringConverter(), 0.0, doubleFilter);
+        endTextField.setTextFormatter(endDoubleFormatter);
+
+
         //slider to select the num of equations
         Slider equationNumSlider = new Slider(1, 10, 1);
         equationNumSlider.setLayoutX(220);
@@ -118,19 +230,31 @@ public class Main extends Application {
         equationNumSlider.setMinorTickCount(0);
         equationNumSlider.setSnapToTicks(true);
 
+        equationNumSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            numEquationsEntered = 0; // Reset the counter when slider value changes
+            maxEquations = newVal.intValue(); // Update the maximum number of equations allowed
+            warningLabel.setText(""); // Clear any previous warnings
+            if (numEquationsEntered >= maxEquations) {
+                inputField.setDisable(true); // Disable input field if limit is reached
+            } else {
+                inputField.setDisable(false); // Enable input field if below the limit
+            }
+        });
+
         AnchorPane leftAnchorPane = new AnchorPane();
         leftAnchorPane.setLayoutX(0);
         leftAnchorPane.setPrefWidth(200);
         leftAnchorPane.setPrefHeight(600);
         leftAnchorPane.getStyleClass().add("pane");
 
+
         // Add children to the left AnchorPane
-        leftAnchorPane.getChildren().addAll(titleLabel, solverChoiceBox, runButton, outputTextArea);
+        leftAnchorPane.getChildren().addAll(titleLabel, solverChoiceBox, runButton, outputTextArea, stepSizeTextField, stepSizeLabel, startLabel, startTextField, endLabel, endTextField);
 
         // Create AnchorPane and add children
         root.getChildren().addAll(
                 leftAnchorPane,
-                inputVBox, emptyVBox, lineChart, equationNumSlider
+                inputVBox, emptyVBox, lineChart, equationNumSlider, warningLabel
         );
 
         runButton.setOnAction(event -> {
@@ -169,6 +293,7 @@ public class Main extends Application {
 
     private void handleInput(String equation) {
         // Clearing previous content
+
         ((AnchorPane) inputField.getParent().getParent()).getChildren().remove(scrollPane);
 
         // Creating a single GridPane for all variables
@@ -190,6 +315,46 @@ public class Main extends Application {
                 variables.add(variable);
             }
         }
+
+        // Ensure variable labels and text fields are not removed if the number of variables exceeds the limit
+        AnchorPane parent = (AnchorPane) inputField.getParent().getParent();
+        for (int i = variableLabels.size(); i < variables.size(); i++) {
+            String variable = variables.get(i);
+            Label label = new Label("Variable " + (i + 1) + ": " + variable);
+            TextField textField = new TextField();
+            textField.setPromptText("value");
+            label.setLayoutX(600);
+            label.setLayoutY(50 + i * 30);
+            textField.setLayoutX(700);
+            textField.setLayoutY(50 + i * 30);
+            textField.setPrefWidth(50);
+
+            variableLabels.add(label);
+            variableValueFields.add(textField);
+            parent.getChildren().addAll(label, textField);
+        }
+
+        inputField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.isEmpty()) {
+                saveEquationDetails(newValue);
+            }
+        });
+        inputField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER)
+            {
+
+                // Save the equation details and increment the counter
+                saveEquationDetails(inputField.getText());
+                inputField.clear();
+                numEquationsEntered++;
+
+                if (numEquationsEntered == maxEquations)
+                {
+                    warningLabel.setText("You can't input any more equations");
+                    inputField.setDisable(true); // Disable input field if limit is reached
+                }
+            }
+        });
 
         // Adding variable labels and text fields to the grid
         for (int i = 0; i < variables.size(); i++) {
@@ -221,6 +386,49 @@ public class Main extends Application {
         if (!variables.isEmpty()) {
             ((AnchorPane) inputField.getParent().getParent()).getChildren().add(scrollPane);
         }
+
+
+    }
+
+    private void saveEquationDetails(String equation) {
+
+        List<String> variables = extractVariables(equation);
+
+        // Extract variable values from text fields
+        Map<String, Double> variableValues = new HashMap<>();
+        for (int i = 0; i < variables.size(); i++) {
+            String variable = variables.get(i);
+            String value = variableValueFields.get(i).getText();
+            try {
+                double doubleValue = Double.parseDouble(value);
+                variableValues.put(variable, doubleValue);
+            } catch (NumberFormatException e) {
+                // Handle invalid input
+                System.err.println("Invalid value for variable: " + variable);
+            }
+        }
+
+
+        equationDetails.put("Equation", equation);
+        equationDetails.put("Variables", variables);
+        equationDetails.put("VariableValues", variableValues);
+
+        System.out.println("Equation: " + equation);
+        System.out.println("Variables: " + variables);
+        System.out.println("VariableValues: " + variableValues);
+    }
+
+    private List<String> extractVariables(String equation) {
+        List<String> variables = new ArrayList<>();
+        Pattern pattern = Pattern.compile("[a-zA-Z]");
+        Matcher matcher = pattern.matcher(equation);
+        while (matcher.find()) {
+            String variable = matcher.group();
+            if (!variables.contains(variable)) {
+                variables.add(variable);
+            }
+        }
+        return variables;
     }
 }
 
