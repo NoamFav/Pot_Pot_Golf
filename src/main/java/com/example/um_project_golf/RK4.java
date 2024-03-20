@@ -1,4 +1,6 @@
 package com.example.um_project_golf;
+import net.objecthunter.exp4j.Expression;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -54,6 +56,59 @@ public class RK4 {
         }
         return values;
     }
+
+    public static HashMap<String, Double> RK4MethodHard(double tInitial, HashMap<String, Double> values, double tFinal, List<Expression> derivatives, double stepSize, List<String> equations)
+    {
+        int numSteps = (int) Math.ceil((tFinal - tInitial) / stepSize); // Number of steps necessary to get to the final time
+
+        HashMap<String, Double> valuesNoTime = new HashMap<>(values); // Values without the time
+        valuesNoTime.remove("t");
+        HashMap<String, Double> valuesK = new HashMap<>(values); // Values for calculation of the k's
+
+        double t = tInitial;
+
+        double k1, k2, k3, k4; // Variables for mid-way derivative calculation
+
+        for (int i = 0; i < numSteps; i++) {
+            int j = 0;
+            for (Expression function : derivatives) {
+                String variableName = valuesNoTime.keySet().toArray(new String[0])[j];
+                List<Expression> updatedFunctions = inputManagement.constructExpression(equations, values);
+                function = updatedFunctions.get(j);
+                k1 = function.evaluate(); // Compute k1
+
+                // Compute k2
+                valuesK.put(variableName, values.get(variableName) + k1 * stepSize / 2);
+                valuesK.put("t", t + stepSize / 2);
+                updatedFunctions = inputManagement.constructExpression(equations, valuesK);
+                function = updatedFunctions.get(j);
+                k2 = function.evaluate();
+
+                // Compute k3
+                valuesK.put(variableName, values.get(variableName) + k2 * stepSize / 2);
+                updatedFunctions = inputManagement.constructExpression(equations, valuesK);
+                function = updatedFunctions.get(j);
+                k3 = function.evaluate();
+
+                // Compute k4
+                valuesK.put(variableName, values.get(variableName) + stepSize * k3);
+                valuesK.put("t", t + stepSize);
+                updatedFunctions = inputManagement.constructExpression(equations, valuesK);
+                function = updatedFunctions.get(j);
+                k4 = function.evaluate();
+
+                // Update the variables
+                values.put(variableName, values.get(variableName) + stepSize * (k1 + 2 * k2 + 2 * k3 + k4) / 6);
+
+                j++;
+            }
+            t += stepSize;
+            values.put("t",t);
+        }
+        return values;
+    }
+
+
     static InputManagement inputManagement = new InputManagement(); // Initializes the input management
 }
 

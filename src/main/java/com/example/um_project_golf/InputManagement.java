@@ -273,6 +273,18 @@ public class InputManagement
                 .collect(Collectors.toList());
     }
 
+    public List<Expression> addVariables(List<Expression> equations, HashMap<String, Double> variables) //adds the variables to the expression
+    {
+        for (var e : variables.entrySet()) //iterates through the variables
+        {
+            for (Expression equation : equations) //iterates through the equations
+            {
+                equation.setVariable(e.getKey(), e.getValue()); //sets the variable in the equation
+            }
+        }
+        return equations; //returns the equations with the variables
+    }
+
     public List<Double> solveHard(List<Expression> equations, HashMap<String, Double> variables) //solves the equations
     {
         return equations.stream()

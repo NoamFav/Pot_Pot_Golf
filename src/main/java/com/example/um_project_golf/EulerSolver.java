@@ -1,5 +1,7 @@
 package com.example.um_project_golf;
 
+import net.objecthunter.exp4j.Expression;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,6 +43,42 @@ public class EulerSolver {
             derivatives = inputManagement.constructCompleteFunctions(equations, values); // Update functions with the updated values
 
             // Update time
+            t += stepSize;
+        }
+
+        return values;
+    }
+
+    public static HashMap<String, Double> eulerMethodHard(List<Expression> derivatives, HashMap<String, Double> initialValues, double stepSize, double tInitial, double tFinal, List<String> equations)
+    {
+        int numSteps = (int) Math.ceil((tFinal-tInitial) / stepSize);
+
+        HashMap<String, Double> values = new HashMap<>(initialValues);
+        HashMap<String, Double> valuesNoTime = new HashMap<>(initialValues);
+        valuesNoTime.remove("t");
+
+        double t = tInitial;
+        HashMap<String, Double> temporaryValues = new HashMap<>();
+
+        for (int i = 0; i < numSteps; i++) {
+            int j=0;
+            for (Expression function : derivatives)
+            {
+                String variableName = valuesNoTime.keySet().toArray(new String[0])[j];
+                temporaryValues.put(variableName, function.evaluate());
+                j++;
+            }
+
+            for (String variableName : values.keySet()) {
+                if (variableName.equals("t")) {
+                    values.put(variableName, t + stepSize);
+                } else {
+                    values.put(variableName, values.get(variableName) + temporaryValues.get(variableName) * stepSize);
+                }
+            }
+
+            derivatives = inputManagement.constructExpression(equations, values);
+
             t += stepSize;
         }
 
