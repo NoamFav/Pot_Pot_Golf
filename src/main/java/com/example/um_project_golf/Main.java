@@ -235,7 +235,7 @@ public class Main extends Application {
             functionFields.clear();
             functionFields.add(inputField);
 
-            dynamicInputPanel.getChildren().clear(); // Clear existing TextFields
+            dynamicInputPanel.getChildren().clear(); //clear existing TextFields
             int numberOfEquations = newVal.intValue();
             for (int i = 0; i < numberOfEquations - 1; i++) {
                 TextField equationInput = new TextField();
