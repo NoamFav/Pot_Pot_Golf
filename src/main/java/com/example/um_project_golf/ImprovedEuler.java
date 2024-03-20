@@ -1,29 +1,69 @@
 package com.example.um_project_golf;
-import java.util.function.BiFunction;
 
-public class ImprovedEuler{
-    public static double improvedEulerMethod(double x0, double y0, double x, BiFunction<Double, Double, Double> function, double stepSize)
+import java.util.HashMap;
+import java.util.List;
+
+public class ImprovedEuler {
+
+    // Improved Euler's method for solving systems of first-order differential equations
+    public static HashMap<String, Double> improvedEulerMethod(List<List<InputManagement.Token>> derivatives, HashMap<String, Double> initialValues, double stepSize, double tInitial, double tFinal, List<String> equations)
     {
-        double xi = x0;
-        double y = y0;
-        double y_tilde = y0;
+        int numSteps = (int) Math.ceil((tFinal - tInitial) / stepSize); // Number of steps necessary to get to the final time
 
-        while (xi <= x) {
-            y_tilde = y + stepSize * function.apply(x, y);
-            y = y + (stepSize / 2) * (function.apply(x, y) + function.apply(x + stepSize, y_tilde));
-            xi += stepSize;
-        } 
+        HashMap<String, Double> values = new HashMap<>(initialValues); // HashMap with all the values
+        HashMap<String, Double> valuesNoTime = new HashMap<>(initialValues);// HashMap with the values except time "t"
+        valuesNoTime.remove("t" , tInitial);
 
-        return y;
+        double t = tInitial; // Variable for time
+
+        // Iterate through the times necessary to get to the final time
+        for (int i = 0; i < numSteps; i++) {
+            // Compute derivatives at the beginning of the step
+            HashMap<String, Double> k1 = new HashMap<>();
+            int l = 0;
+            for (List<InputManagement.Token> function : derivatives) {
+                String variableName = valuesNoTime.keySet().toArray(new String[0])[l];
+                k1.put(variableName, inputManagement.doPEMDAS(function));
+                l++;
+            }
+
+            // Compute normal Euler
+            HashMap<String, Double> valuesMid = new HashMap<>(valuesNoTime);
+            for (String variableName : valuesMid.keySet()) {
+                valuesMid.put(variableName, values.get(variableName) + k1.get(variableName) * stepSize);
+            }
+            valuesMid.put("t",t + stepSize);
+
+            HashMap<String, Double> k2 = new HashMap<>();
+            List<List<InputManagement.Token>> derivativesMid = inputManagement.constructCompleteFunctions(equations, valuesMid);
+
+            int j = 0;
+            for (List<InputManagement.Token> function : derivativesMid) {
+                String variableName = valuesNoTime.keySet().toArray(new String[0])[j];
+                k2.put(variableName, inputManagement.doPEMDAS(function));
+                j++;
+            }
+
+            // Update values using improved Euler method
+            for (String variableName : values.keySet()) {
+                if (variableName.equals("t")) {
+                    values.put(variableName, t + stepSize); // Update time
+                } else {
+                    double newValue = values.get(variableName) + stepSize * (k1.get(variableName) + k2.get(variableName)) / 2;
+                    values.put(variableName, newValue); // Update variable
+                }
+            }
+
+            derivatives = inputManagement.constructCompleteFunctions(equations, values); // Update functions with the updated values
+
+            // Update time
+            t += stepSize;
+        }
+
+        return values;
     }
-    public static void main(String[] args)
-    {
-        BiFunction<Double, Double, Double> g = (x, y) -> -3.0 * y;
-        double x0 = 0;
-        double y0 = 1;
-        double x = 3;
-        double h = 0.00001;
-        System.out.println(improvedEulerMethod(x0, y0, x, g, h));
 
-    }
+    static InputManagement inputManagement = new InputManagement(); // Initializes the input management
+
+
 }
