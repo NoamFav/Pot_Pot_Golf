@@ -144,14 +144,6 @@ public class Main extends Application {
 
         inputField.textProperty().addListener((observable, oldValue, newValue) -> handleInput(newValue));
 
-
-        // Create empty VBox
-        VBox emptyVBox = new VBox();
-        emptyVBox.setLayoutX(411);
-        emptyVBox.setLayoutY(16);
-        emptyVBox.setPrefWidth(74);
-        emptyVBox.setPrefHeight(39);
-
         //ex graph to change
         NumberAxis timeAxis = new NumberAxis();
         NumberAxis variableAxis = new NumberAxis();
@@ -236,11 +228,8 @@ public class Main extends Application {
             numEquationsEntered = 0; // Reset the counter when slider value changes
             maxEquations = newVal.intValue(); // Update the maximum number of equations allowed
             warningLabel.setText(""); // Clear any previous warnings
-            if (numEquationsEntered >= maxEquations) {
-                inputField.setDisable(true); // Disable input field if limit is reached
-            } else {
-                inputField.setDisable(false); // Enable input field if below the limit
-            }
+            // Enable input field if below the limit
+            inputField.setDisable(numEquationsEntered >= maxEquations); // Disable input field if limit is reached
         });
 
         AnchorPane leftAnchorPane = new AnchorPane();
