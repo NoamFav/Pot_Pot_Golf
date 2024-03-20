@@ -6,6 +6,7 @@ import net.objecthunter.exp4j.ExpressionBuilder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class InputManagement
@@ -271,6 +272,22 @@ public class InputManagement
                     return builder.build(); //builds the expression
                 })
                 .collect(Collectors.toList());
+    }
+
+    public List<Expression> constructCompleteExpression(List<String> equations, HashMap<String, Double> variables) {
+        List<Expression> expressions = new ArrayList<>();
+        for (String equation : equations) {
+            ExpressionBuilder builder = new ExpressionBuilder(equation);
+            for (String variable : variables.keySet()) {
+                builder.variable(variable);
+            }
+            Expression expression = builder.build();
+            for (Map.Entry<String, Double> variable : variables.entrySet()) {
+                expression.setVariable(variable.getKey(), variable.getValue());
+            }
+            expressions.add(expression);
+        }
+        return expressions;
     }
 
     public List<Expression> addVariables(List<Expression> equations, HashMap<String, Double> variables) //adds the variables to the expression

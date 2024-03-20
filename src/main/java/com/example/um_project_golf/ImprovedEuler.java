@@ -87,7 +87,7 @@ public class ImprovedEuler {
             valuesMid.put("t",t + stepSize);
 
             HashMap<String, Double> k2 = new HashMap<>();
-            List<Expression> derivativesMid = inputManagement.constructExpression(equations, valuesMid);
+            List<Expression> derivativesMid = inputManagement.constructCompleteExpression(equations, valuesMid);
 
             int j = 0;
             for (Expression function : derivativesMid) {
@@ -105,7 +105,7 @@ public class ImprovedEuler {
                 }
             }
 
-            derivatives = inputManagement.constructExpression(equations, values);
+            derivatives = inputManagement.constructCompleteExpression(equations, values);
 
             t += stepSize;
         }

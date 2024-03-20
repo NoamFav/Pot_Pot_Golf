@@ -73,27 +73,27 @@ public class RK4 {
             int j = 0;
             for (Expression function : derivatives) {
                 String variableName = valuesNoTime.keySet().toArray(new String[0])[j];
-                List<Expression> updatedFunctions = inputManagement.constructExpression(equations, values);
+                List<Expression> updatedFunctions = inputManagement.constructCompleteExpression(equations, values);
                 function = updatedFunctions.get(j);
                 k1 = function.evaluate(); // Compute k1
 
                 // Compute k2
                 valuesK.put(variableName, values.get(variableName) + k1 * stepSize / 2);
                 valuesK.put("t", t + stepSize / 2);
-                updatedFunctions = inputManagement.constructExpression(equations, valuesK);
+                updatedFunctions = inputManagement.constructCompleteExpression(equations, valuesK);
                 function = updatedFunctions.get(j);
                 k2 = function.evaluate();
 
                 // Compute k3
                 valuesK.put(variableName, values.get(variableName) + k2 * stepSize / 2);
-                updatedFunctions = inputManagement.constructExpression(equations, valuesK);
+                updatedFunctions = inputManagement.constructCompleteExpression(equations, valuesK);
                 function = updatedFunctions.get(j);
                 k3 = function.evaluate();
 
                 // Compute k4
                 valuesK.put(variableName, values.get(variableName) + stepSize * k3);
                 valuesK.put("t", t + stepSize);
-                updatedFunctions = inputManagement.constructExpression(equations, valuesK);
+                updatedFunctions = inputManagement.constructCompleteExpression(equations, valuesK);
                 function = updatedFunctions.get(j);
                 k4 = function.evaluate();
 

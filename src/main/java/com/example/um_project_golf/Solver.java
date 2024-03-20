@@ -13,7 +13,7 @@ public class Solver {
     {
         // Initialize functions with variables
         List<List<InputManagement.Token>> functions = inputManagement.constructCompleteFunctions(equations, variables);
-        List<Expression> functionsHard = inputManagement.constructExpression(equations, variables);
+        List<Expression> functionsHard = inputManagement.constructCompleteExpression(equations, variables);
 
         // Solve using Euler's method
         HashMap<String, Double> solutionsEuler = EulerSolver.eulerMethod(functions, variables, stepSize, tInitial, tFinal, equations);
@@ -35,16 +35,17 @@ public class Solver {
         df.setMaximumFractionDigits(7);
 
         // Print the solutions
-        print(tFinal, solutionsEuler, solutionsImprovedEuler, solutionsRK4, df);
+        print(tFinal, solutionsEuler, solutionsImprovedEuler, solutionsRK4, df, false);
 
-        print(tFinal, solutionsEulerHard, solutionsImprovedEulerHard, solutionsRK4Hard, df);
+        print(tFinal, solutionsEulerHard, solutionsImprovedEulerHard, solutionsRK4Hard, df, true);
     }
 
-    private void print(double tFinal, HashMap<String, Double> solutionsEulerHard, HashMap<String, Double> solutionsImprovedEulerHard, HashMap<String, Double> solutionsRK4Hard, DecimalFormat df) {
+    private void print(double tFinal, HashMap<String, Double> solutionsEulerHard, HashMap<String, Double> solutionsImprovedEulerHard, HashMap<String, Double> solutionsRK4Hard, DecimalFormat df, boolean hard) {
         for (String solution : solutionsEulerHard.keySet()) {
             Double valueE = solutionsEulerHard.get(solution);
             Double valueIE = solutionsImprovedEulerHard.get(solution);
             Double valueRK4 = solutionsRK4Hard.get(solution);
+            System.out.println(hard ? "Hard" : "Normal");
             System.out.println("Euler's method:");
             System.out.println("The value of " + solution + " at t = " + tFinal + " is: " + df.format(valueE));
             System.out.println("Improved Euler's method:");
