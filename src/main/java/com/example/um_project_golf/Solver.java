@@ -1,5 +1,7 @@
 package com.example.um_project_golf;
 
+import net.objecthunter.exp4j.Expression;
+
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -11,26 +13,38 @@ public class Solver {
     {
         // Initialize functions with variables
         List<List<InputManagement.Token>> functions = inputManagement.constructCompleteFunctions(equations, variables);
+        List<Expression> functionsHard = inputManagement.constructExpression(equations, variables);
 
         // Solve using Euler's method
         HashMap<String, Double> solutionsEuler = EulerSolver.eulerMethod(functions, variables, stepSize, tInitial, tFinal, equations);
+        HashMap<String, Double> solutionsEulerHard = EulerSolver.eulerMethodHard(functionsHard, variables, stepSize, tInitial, tFinal, equations);
         solutionsEuler.remove("t",solutionsEuler.get("t"));
+        solutionsEulerHard.remove("t",solutionsEulerHard.get("t"));
 
         // Solve using Improved Euler's method
         HashMap<String, Double> solutionsImprovedEuler = ImprovedEuler.improvedEulerMethod(functions, variables, stepSize, tInitial, tFinal, equations);
+        HashMap<String, Double> solutionsImprovedEulerHard = ImprovedEuler.improvedEulerMethodHard(functionsHard, variables, stepSize, tInitial, tFinal, equations);
         solutionsImprovedEuler.remove("t",solutionsImprovedEuler.get("t"));
+        solutionsImprovedEulerHard.remove("t",solutionsImprovedEulerHard.get("t"));
 
         // Solve using RK4 method
         HashMap<String, Double> solutionsRK4 = RK4.RK4Method(tInitial, variables, tFinal, functions, stepSize, equations);
+        HashMap<String, Double> solutionsRK4Hard = RK4.RK4MethodHard(tInitial, variables, tFinal, functionsHard, stepSize, equations);
 
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(7);
 
         // Print the solutions
-        for (String solution : solutionsEuler.keySet()) {
-            Double valueE = solutionsEuler.get(solution);
-            Double valueIE = solutionsImprovedEuler.get(solution);
-            Double valueRK4 = solutionsRK4.get(solution);
+        print(tFinal, solutionsEuler, solutionsImprovedEuler, solutionsRK4, df);
+
+        print(tFinal, solutionsEulerHard, solutionsImprovedEulerHard, solutionsRK4Hard, df);
+    }
+
+    private void print(double tFinal, HashMap<String, Double> solutionsEulerHard, HashMap<String, Double> solutionsImprovedEulerHard, HashMap<String, Double> solutionsRK4Hard, DecimalFormat df) {
+        for (String solution : solutionsEulerHard.keySet()) {
+            Double valueE = solutionsEulerHard.get(solution);
+            Double valueIE = solutionsImprovedEulerHard.get(solution);
+            Double valueRK4 = solutionsRK4Hard.get(solution);
             System.out.println("Euler's method:");
             System.out.println("The value of " + solution + " at t = " + tFinal + " is: " + df.format(valueE));
             System.out.println("Improved Euler's method:");

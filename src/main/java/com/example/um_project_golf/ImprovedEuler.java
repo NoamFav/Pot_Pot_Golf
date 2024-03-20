@@ -1,5 +1,7 @@
 package com.example.um_project_golf;
 
+import net.objecthunter.exp4j.Expression;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -29,9 +31,7 @@ public class ImprovedEuler {
 
             // Compute normal Euler
             HashMap<String, Double> valuesMid = new HashMap<>(valuesNoTime);
-            for (String variableName : valuesMid.keySet()) {
-                valuesMid.put(variableName, values.get(variableName) + k1.get(variableName) * stepSize);
-            }
+            valuesMid.replaceAll((n, v) -> values.get(n) + k1.get(n) * stepSize);
             valuesMid.put("t",t + stepSize);
 
             HashMap<String, Double> k2 = new HashMap<>();
@@ -57,6 +57,56 @@ public class ImprovedEuler {
             derivatives = inputManagement.constructCompleteFunctions(equations, values); // Update functions with the updated values
 
             // Update time
+            t += stepSize;
+        }
+
+        return values;
+    }
+
+    public static HashMap<String, Double> improvedEulerMethodHard(List<Expression> derivatives, HashMap<String, Double> initialValues, double stepSize, double tInitial, double tFinal, List<String> equations)
+    {
+        int numSteps = (int) Math.ceil((tFinal - tInitial) / stepSize);
+
+        HashMap<String, Double> values = new HashMap<>(initialValues);
+        HashMap<String, Double> valuesNoTime = new HashMap<>(initialValues);
+        valuesNoTime.remove("t");
+
+        double t = tInitial;
+
+        for (int i = 0; i < numSteps; i++) {
+            HashMap<String, Double> k1 = new HashMap<>();
+            int l = 0;
+            for (Expression function : derivatives) {
+                String variableName = valuesNoTime.keySet().toArray(new String[0])[l];
+                k1.put(variableName, function.evaluate());
+                l++;
+            }
+
+            HashMap<String, Double> valuesMid = new HashMap<>(valuesNoTime);
+            valuesMid.replaceAll((n, v) -> values.get(n) + k1.get(n) * stepSize);
+            valuesMid.put("t",t + stepSize);
+
+            HashMap<String, Double> k2 = new HashMap<>();
+            List<Expression> derivativesMid = inputManagement.constructExpression(equations, valuesMid);
+
+            int j = 0;
+            for (Expression function : derivativesMid) {
+                String variableName = valuesNoTime.keySet().toArray(new String[0])[j];
+                k2.put(variableName, function.evaluate());
+                j++;
+            }
+
+            for (String variableName : values.keySet()) {
+                if (variableName.equals("t")) {
+                    values.put(variableName, t + stepSize);
+                } else {
+                    double newValue = values.get(variableName) + stepSize * (k1.get(variableName) + k2.get(variableName)) / 2;
+                    values.put(variableName, newValue);
+                }
+            }
+
+            derivatives = inputManagement.constructExpression(equations, values);
+
             t += stepSize;
         }
 
