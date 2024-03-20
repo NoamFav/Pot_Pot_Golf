@@ -295,22 +295,31 @@ public class InputManagement
 
         InputManagement inputManagement = new InputManagement(); //initializes the input management
 
+        boolean simple = true; //flag to check if the equation is supported by the simple solver
         for (String equation : equations)
         {
-            if (equation.contains("cos") || equation.contains("sin") || equation.contains("tan") || equation.contains("log") || equation.contains("sqrt") || equation.contains("!") || equation.contains("%") || equation.contains("abs") || equation.contains("e"))
+            if (equation.contains("cos") || equation.contains("sin") || equation.contains("tan") || equation.contains("log") || equation.contains("sqrt") || equation.contains("!") || equation.contains("%") || equation.contains("abs") || equation.contains("e")) {
+                simple = false; //sets the flag to false if the equation contains a function that is not supported by the simple solver
+                break;
+            }
+        }
+
+
+        for (String equation : equations)
+        {
+            if(simple) //checks if all the equations are supported by the simple solver
             {
-                System.out.println("The equation contains a function that is not supported by the simple solver. Using the hard solver instead.");
-                List<Expression> list = inputManagement.constructExpression(List.of(equation), variables); //constructs the expression
-                List<Double> results2 = inputManagement.solveHard(list, variables); //solves the equations
-                System.out.println(results2); //prints the results
+                List<List<Token>> functions = inputManagement.getFunctions(equations); //gets the functions
+                List<Double> solutions = inputManagement.solve(functions, variables); //solves the equations
+                System.out.println("Simple solver:");
+                System.out.println("The value of " + equation + " is: " + solutions.get(equations.indexOf(equation))); //prints the result of the equation
             }
             else
             {
-                System.out.println("Equation is supported by the simple solver. Using the simple solver.");
-                List<List<Token>> tokens = inputManagement.getFunctions(List.of(equation)); //constructs the functions
-                System.out.println(tokens); //prints the functions
-                List<Double> results = inputManagement.solve(tokens, variables); //solves the equations
-                System.out.println(results); //prints the results
+                List<Expression> expressions = inputManagement.constructExpression(equations, variables); //constructs the expressions
+                List<Double> solutions = inputManagement.solveHard(expressions, variables); //solves the equations
+                System.out.println("Hard solver:");
+                System.out.println("The value of " + equation + " is: " + solutions.get(equations.indexOf(equation))); //prints the result of the equation
             }
         }
     }
