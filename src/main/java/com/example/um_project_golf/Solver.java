@@ -4,12 +4,13 @@ import net.objecthunter.exp4j.Expression;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class Solver {
     static InputManagement inputManagement = new InputManagement(); // Initializes the input management
 
-    public void solve(double stepSize, double tInitial, double tFinal, HashMap<String, Double> variables, List<String> equations)
+    public List<LinkedHashMap<Double, LinkedHashMap<String, Double>>> solve(double stepSize, double tInitial, double tFinal, HashMap<String, Double> variables, List<String> equations)
     {
         // Initialize functions with variables
         List<List<InputManagement.Token>> functions = inputManagement.constructCompleteFunctions(equations, variables);
@@ -17,19 +18,26 @@ public class Solver {
 
         // Solve using Euler's method
         HashMap<String, Double> solutionsEuler = EulerSolver.eulerMethod(functions, variables, stepSize, tInitial, tFinal, equations);
-        HashMap<String, Double> solutionsEulerHard = EulerSolver.eulerMethodHard(functionsHard, variables, stepSize, tInitial, tFinal, equations);
+        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEulerHard = EulerSolver.eulerMethodHard(functionsHard, variables, stepSize, tInitial, tFinal, equations);
         solutionsEuler.remove("t",solutionsEuler.get("t"));
-        solutionsEulerHard.remove("t",solutionsEulerHard.get("t"));
+        for (LinkedHashMap<String, Double> innerMap : solutionsEulerHard.values()) {
+            innerMap.remove("t");
+        }
 
         // Solve using Improved Euler's method
         HashMap<String, Double> solutionsImprovedEuler = ImprovedEuler.improvedEulerMethod(functions, variables, stepSize, tInitial, tFinal, equations);
-        HashMap<String, Double> solutionsImprovedEulerHard = ImprovedEuler.improvedEulerMethodHard(functionsHard, variables, stepSize, tInitial, tFinal, equations);
+        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEulerHard = ImprovedEuler.improvedEulerMethodHard(functionsHard, variables, stepSize, tInitial, tFinal, equations);
         solutionsImprovedEuler.remove("t",solutionsImprovedEuler.get("t"));
-        solutionsImprovedEulerHard.remove("t",solutionsImprovedEulerHard.get("t"));
+        for (LinkedHashMap<String, Double> innerMap : solutionsImprovedEulerHard.values()) {
+            innerMap.remove("t");
+        }
 
         // Solve using RK4 method
         HashMap<String, Double> solutionsRK4 = RK4.RK4Method(tInitial, variables, tFinal, functions, stepSize, equations);
-        HashMap<String, Double> solutionsRK4Hard = RK4.RK4MethodHard(tInitial, variables, tFinal, functionsHard, stepSize, equations);
+        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4Hard = RK4.RK4MethodHard(tInitial, variables, tFinal, functionsHard, stepSize, equations);
+        for (LinkedHashMap<String, Double> innerMap : solutionsRK4Hard.values()) {
+            innerMap.remove("t");
+        }
 
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(7);
@@ -37,7 +45,13 @@ public class Solver {
         // Print the solutions
         print(tFinal, solutionsEuler, solutionsImprovedEuler, solutionsRK4, df, false);
 
-        print(tFinal, solutionsEulerHard, solutionsImprovedEulerHard, solutionsRK4Hard, df, true);
+        //print(tFinal, solutionsEulerHard.get(1), solutionsImprovedEulerHard, solutionsRK4Hard, df, true);
+
+        System.out.println(solutionsEulerHard);
+        System.out.println(solutionsImprovedEulerHard);
+        System.out.println(solutionsRK4Hard);
+
+        return List.of(solutionsEulerHard, solutionsImprovedEulerHard, solutionsRK4Hard);
     }
 
     private void print(double tFinal, HashMap<String, Double> solutionsEulerHard, HashMap<String, Double> solutionsImprovedEulerHard, HashMap<String, Double> solutionsRK4Hard, DecimalFormat df, boolean hard) {
@@ -66,8 +80,10 @@ public class Solver {
         // Placeholders for each variable
         variables.put("t", tInitial);
         variables.put("y", 1.0);
+        variables.put("x", 2.5);
 
-        List<String> equations = List.of("y");
+        List<String> equations = List.of("yx", "x");
+
 
         Solver solver = new Solver();
         solver.solve(stepSize,tInitial,tFinal,variables,equations);
