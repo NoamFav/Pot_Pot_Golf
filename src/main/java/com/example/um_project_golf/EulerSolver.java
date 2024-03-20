@@ -77,7 +77,7 @@ public class EulerSolver {
                 }
             }
 
-            derivatives = inputManagement.constructExpression(equations, values);
+            derivatives = inputManagement.constructCompleteExpression(equations, values);
 
             t += stepSize;
         }
