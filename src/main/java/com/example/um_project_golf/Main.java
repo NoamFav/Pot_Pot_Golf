@@ -26,6 +26,9 @@ public class Main extends Application {
     private final  List<Label> variableLabels = new ArrayList<>();
     private ScrollPane scrollPane;
 
+    private boolean isPi = false;
+    private boolean isE = false;
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -148,7 +151,7 @@ public class Main extends Application {
             StringBuilder output = new StringBuilder();
             for (String equation : equations)
             {
-                if (equation.contains("cos") || equation.contains("sin") || equation.contains("tan") || equation.contains("log") || equation.contains("sqrt"))
+                if (equation.contains("cos") || equation.contains("sin") || equation.contains("tan") || equation.contains("log") || equation.contains("sqrt") || equation.contains("!") || equation.contains("%") || equation.contains("abs") || equation.contains("e") || equation.contains("pi"))
                 {
                     System.out.println("The equation contains a function that is not supported by the simple solver. Using the hard solver instead.");
                     List<Expression> list = inputManagement.constructExpression(List.of(equation), variables); //constructs the expression
@@ -181,6 +184,22 @@ public class Main extends Application {
     private void handleInput(String equation) {
         // Clearing previous content
         ((AnchorPane) inputField.getParent().getParent()).getChildren().remove(scrollPane);
+        isPi = false;
+        isE = false;
+
+        List<String> nonVariables = List.of("cos", "sin", "tan", "log", "sqrt", "abs");
+        for (String nonVariable : nonVariables) {
+            if (equation.contains(nonVariable)) {
+                equation = equation.replace(nonVariable, "");
+            }
+        }
+        if (equation.contains("pi") || equation.contains("e")) {
+            isPi = equation.contains("pi");
+            isE = equation.contains("e");
+
+            equation = equation.replace("pi", "");
+            equation = equation.replace("e", "");
+        }
 
         // Creating a single GridPane for all variables
         GridPane grid = new GridPane();
@@ -202,16 +221,40 @@ public class Main extends Application {
             }
         }
 
+        int basedIndex = 0;
         // Adding variable labels and text fields to the grid
+        if (isE) {
+            Label label = new Label("Euler's number: ");
+            TextField textField = new TextField();
+            textField.setPromptText("2.71828");
+            textField.setPrefWidth(50);
+            textField.setEditable(false);
+            grid.add(label, 0, basedIndex); // Column 0, row 0
+            grid.add(textField, 1, basedIndex); // Column 1, row 0
+            basedIndex++;
+        }
+        if (isPi) {
+            Label label = new Label("Pi: ");
+            TextField textField = new TextField();
+            textField.setPromptText("3.14159");
+            textField.setPrefWidth(50);
+            textField.setEditable(false);
+            grid.add(label, 0, basedIndex); // Column 0, row 1
+            grid.add(textField, 1, basedIndex); // Column 1, row 1
+            basedIndex++;
+        }
+
         for (int i = 0; i < variables.size(); i++) {
             String variable = variables.get(i);
+
             Label label = new Label("Variable " + (i + 1) + ": " + variable);
             TextField textField = new TextField();
             textField.setPromptText("value");
             textField.setPrefWidth(50);
+            int counter = 0;
 
-            grid.add(label, 0, i); // Column 0, row i
-            grid.add(textField, 1, i); // Column 1, row i
+            grid.add(label, 0, i + basedIndex); // Column 0, row i
+            grid.add(textField, 1, i + basedIndex); // Column 1, row i
 
             variableLabels.add(label);
             variableValueFields.add(textField);
@@ -229,7 +272,7 @@ public class Main extends Application {
         AnchorPane.setLeftAnchor(scrollPane, 700.0); // Adjust layout anchors as needed
 
         // Adding the scrollPane to the parent only if there are variables to show
-        if (!variables.isEmpty()) {
+        if (!variables.isEmpty() || isPi || isE) {
             ((AnchorPane) inputField.getParent().getParent()).getChildren().add(scrollPane);
         }
     }
