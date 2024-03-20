@@ -1,5 +1,8 @@
 package com.example.um_project_golf;
 
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -255,6 +258,33 @@ public class InputManagement
         };
     }
 
+    public List<Expression> constructExpression(List<String> equationsString, HashMap<String,Double> variables) //constructs the expression from the list of tokens
+    {
+        return equationsString.stream()
+                .map(equation -> {
+                    ExpressionBuilder builder = new ExpressionBuilder(equation); //initializes the expression builder
+                    for (var e : variables.entrySet()) //iterates through the variables
+                    {
+                        builder.variable(e.getKey()); //adds the variable to the expression builder
+                    }
+                    return builder.build(); //builds the expression
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<Double> solveHard(List<Expression> equations, HashMap<String, Double> variables) //solves the equations
+    {
+        return equations.stream()
+                .map(equation -> {
+                    for (var e : variables.entrySet()) //iterates through the variables
+                    {
+                        equation.setVariable(e.getKey(), e.getValue()); //sets the variable in the equation
+                    }
+                    return equation.evaluate(); //returns the result of the equation
+                })
+                .collect(Collectors.toList());
+    }
+
     public static void main(String[] args)
     {
         List<String> equations = List.of("21.2x^2 + 3y", "-3x + 4y - (8 + 9x) * -x"); //initializes the equations
@@ -269,5 +299,9 @@ public class InputManagement
         System.out.println(tokens); //prints the functions
         List<Double> results = inputManagement.solve(tokens, variables); //solves the equations
         System.out.println(results); //prints the results
+
+        List<Expression> list = inputManagement.constructExpression(equations, variables); //constructs the expression
+        List<Double> results2 = inputManagement.solveHard(list, variables); //solves the equations
+        System.out.println(results2); //prints the results
     }
 }
