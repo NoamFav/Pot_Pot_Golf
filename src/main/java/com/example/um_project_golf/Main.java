@@ -4,38 +4,33 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.input.KeyCode;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
-import javafx.scene.control.Slider;
+import javafx.util.converter.DoubleStringConverter;
+import net.objecthunter.exp4j.Expression;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javafx.scene.control.*;
-import javafx.util.converter.DoubleStringConverter;
-import net.objecthunter.exp4j.Expression;
 
 
 public class Main extends Application {
 
-    private TextField inputField;
+    private final List<TextField> functionFields = new ArrayList<>();
     private final List<TextField> variableValueFields = new ArrayList<>();
-    private final  List<Label> variableLabels = new ArrayList<>();
-    private ScrollPane scrollPane;
-
+    private final List<Label> variableLabels = new ArrayList<>();
     private final Map<String, Object> equationDetails = new HashMap<>();
-
-    private Slider equationNumSlider;
-    private int numEquationsEntered = 0;
-    private int maxEquations = 1;
-    private Label warningLabel;
+    private TextField inputField;
+    private ScrollPane scrollPane;
 
     public static void main(String[] args) {
         launch(args);
@@ -50,7 +45,7 @@ public class Main extends Application {
         primaryStage.setResizable(false);
 
         Scene scene = new Scene(root);
-        URL cssUrl =  getClass().getResource("Style.css");
+        URL cssUrl = getClass().getResource("Style.css");
         if (cssUrl != null) {
             scene.getStylesheets().add(cssUrl.toExternalForm());
         } else {
@@ -65,6 +60,18 @@ public class Main extends Application {
         solverChoiceBox.setPrefWidth(136);
         solverChoiceBox.setPrefHeight(18);
         solverChoiceBox.valueProperty().setValue("Euler solver");
+
+        Slider equationNumSlider = new Slider(1, 10, 1);
+        equationNumSlider.setLayoutX(220);
+        equationNumSlider.setLayoutY(88);
+        equationNumSlider.setPrefWidth(283);
+        equationNumSlider.setPrefHeight(39);
+        equationNumSlider.setShowTickLabels(true);
+        equationNumSlider.setShowTickMarks(true);
+        equationNumSlider.setBlockIncrement(1);
+        equationNumSlider.setMajorTickUnit(1);
+        equationNumSlider.setMinorTickCount(0);
+        equationNumSlider.setSnapToTicks(true);
 
 
         Label titleLabel = new Label("Group 14");
@@ -99,10 +106,10 @@ public class Main extends Application {
         inputVBox.setPrefWidth(202);
         inputVBox.setPrefHeight(86);
 
-        inputField.textProperty().addListener((observable, oldValue, newValue) -> handleInput(newValue));
+        inputField.textProperty().addListener((observable, oldValue, newValue) -> handleInput(root));
 
         //warning if you don't input the correct value
-        warningLabel = new Label();
+        Label warningLabel = new Label();
         warningLabel.setLayoutX(220);
         warningLabel.setLayoutY(130);
         warningLabel.setPrefWidth(283);
@@ -110,39 +117,18 @@ public class Main extends Application {
         warningLabel.setStyle("-fx-text-fill: #2196F3;");
         warningLabel.setText("");
 
-
-        inputField.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                // Check if the number of equations entered exceeds the limit
-                int maxEquations = (int) equationNumSlider.getValue();
-                if (numEquationsEntered >= maxEquations) {
-                    warningLabel.setText("Number of equations exceeds the limit!");
-                    return;
-                }
-
-                // Save the equation details and increment the counter
-                saveEquationDetails(inputField.getText());
-                inputField.clear();
-                numEquationsEntered++;
-
-                if (numEquationsEntered == maxEquations) {
-                    warningLabel.setText("Number of equations reached the limit!");
-
-                }
-            }
-        });
-
         // Create Label and TextField
         inputLabel = new Label("Input a differential equation:");
         inputLabel.setFont(new Font("Calisto MT", 13));
         inputField = new TextField();
-        inputVBox = new VBox(inputLabel, inputField);
+        functionFields.add(inputField);
+        inputVBox = new VBox(inputLabel);
         inputVBox.setLayoutX(245);
         inputVBox.setLayoutY(36);
         inputVBox.setPrefWidth(202);
         inputVBox.setPrefHeight(86);
 
-        inputField.textProperty().addListener((observable, oldValue, newValue) -> handleInput(newValue));
+        inputField.textProperty().addListener((observable, oldValue, newValue) -> handleInput(root));
 
         //ex graph to change
         NumberAxis timeAxis = new NumberAxis();
@@ -154,7 +140,6 @@ public class Main extends Application {
         lineChart.setPrefWidth(500);
         lineChart.setPrefHeight(400);
 
-        // Label for step size input
         Label stepSizeLabel = new Label("Input Step Size:");
         stepSizeLabel.setLayoutX(20);
         stepSizeLabel.setLayoutY(390);
@@ -167,18 +152,6 @@ public class Main extends Application {
         stepSizeTextField.setPrefWidth(100);
         stepSizeTextField.setPromptText("Step size");
 
-        Pattern validDoubleText = Pattern.compile("-?(([1-9][0-9]*)|0)?(\\.[0-9]*)?");
-        UnaryOperator<TextFormatter.Change> doubleFilter = change -> {
-            if (validDoubleText.matcher(change.getControlNewText()).matches()) {
-                return change;
-            } else {
-                return null;
-            }
-        };
-        TextFormatter<Double> doubleFormatter = new TextFormatter<>(new DoubleStringConverter(), 0.0, doubleFilter);
-        stepSizeTextField.setTextFormatter(doubleFormatter);
-
-        // Label for start value input
         Label startLabel = new Label("Input Start Value:");
         startLabel.setLayoutX(20);
         startLabel.setLayoutY(460);
@@ -190,9 +163,6 @@ public class Main extends Application {
         startTextField.setLayoutY(480);
         startTextField.setPrefWidth(100);
         startTextField.setPromptText("Start value");
-
-        TextFormatter<Double> startDoubleFormatter = new TextFormatter<>(new DoubleStringConverter(), 0.0, doubleFilter);
-        startTextField.setTextFormatter(startDoubleFormatter);
 
         // Label for end value input
         Label endLabel = new Label("Input End Value:");
@@ -207,56 +177,105 @@ public class Main extends Application {
         endTextField.setPrefWidth(100);
         endTextField.setPromptText("End value");
 
-        TextFormatter<Double> endDoubleFormatter = new TextFormatter<>(new DoubleStringConverter(), 0.0, doubleFilter);
-        endTextField.setTextFormatter(endDoubleFormatter);
-
-
-        //slider to select the num of equations
-        Slider equationNumSlider = new Slider(1, 10, 1);
-        equationNumSlider.setLayoutX(220);
-        equationNumSlider.setLayoutY(88);
-        equationNumSlider.setPrefWidth(283);
-        equationNumSlider.setPrefHeight(39);
-        equationNumSlider.setShowTickLabels(true);
-        equationNumSlider.setShowTickMarks(true);
-        equationNumSlider.setBlockIncrement(1);
-        equationNumSlider.setMajorTickUnit(1);
-        equationNumSlider.setMinorTickCount(0);
-        equationNumSlider.setSnapToTicks(true);
-
-        equationNumSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            numEquationsEntered = 0; // Reset the counter when slider value changes
-            maxEquations = newVal.intValue(); // Update the maximum number of equations allowed
-            warningLabel.setText(""); // Clear any previous warnings
-            // Enable input field if below the limit
-            inputField.setDisable(numEquationsEntered >= maxEquations); // Disable input field if limit is reached
-        });
-
         AnchorPane leftAnchorPane = new AnchorPane();
         leftAnchorPane.setLayoutX(0);
         leftAnchorPane.setPrefWidth(200);
         leftAnchorPane.setPrefHeight(600);
         leftAnchorPane.getStyleClass().add("pane");
 
+        Pattern validDoubleText = Pattern.compile("-?(([1-9][0-9]*)|0)?(\\.[0-9]*)?");
+        UnaryOperator<TextFormatter.Change> doubleFilter = change -> {
+            if (validDoubleText.matcher(change.getControlNewText()).matches()) {
+                return change;
+            } else {
+                return null;
+            }
+        };
+        TextFormatter<Double> doubleFormatter = new TextFormatter<>(new DoubleStringConverter(), 0.0, doubleFilter);
+        stepSizeTextField.setTextFormatter(doubleFormatter);
+
+        // Label for start value input
+
+        TextFormatter<Double> startDoubleFormatter = new TextFormatter<>(new DoubleStringConverter(), 0.0, doubleFilter);
+        startTextField.setTextFormatter(startDoubleFormatter);
+
+        TextFormatter<Double> endDoubleFormatter = new TextFormatter<>(new DoubleStringConverter(), 0.0, doubleFilter);
+        endTextField.setTextFormatter(endDoubleFormatter);
+
+        VBox dynamicInputPanel = new VBox(5);
+        dynamicInputPanel.setStyle("-fx-padding: 10; -fx-background-color: lightgrey; -fx-border-color: black;");
+
+
+        Popup inputPopup = new Popup();
+        inputPopup.getContent().add(dynamicInputPanel);
+        inputPopup.setAutoHide(false);
+
+        AtomicReference<Double> initialX = new AtomicReference<>((double) 0);
+        AtomicReference<Double> initialY = new AtomicReference<>((double) 0);
+
+        dynamicInputPanel.setOnMousePressed(event -> {
+            initialX.set(event.getSceneX());
+            initialY.set(event.getSceneY());
+        });
+
+        dynamicInputPanel.setOnMouseDragged(event -> {
+            inputPopup.setX(event.getScreenX() - initialX.get());
+            inputPopup.setY(event.getScreenY() - initialY.get());
+        });
+
+        equationNumSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            for (TextField textField : functionFields) {
+                textField.clear();
+            }
+
+            if (equationNumSlider.getValue() > 1) {
+                inputPopup.show(primaryStage, primaryStage.getX() + 50, primaryStage.getY() + 50);
+            }
+
+            functionFields.clear();
+            functionFields.add(inputField);
+
+            dynamicInputPanel.getChildren().clear(); // Clear existing TextFields
+            int numberOfEquations = newVal.intValue();
+            for (int i = 0; i < numberOfEquations - 1; i++) {
+                TextField equationInput = new TextField();
+                equationInput.setPromptText("Equation " + (i + 2));
+                equationInput.textProperty().addListener((observable, oldValue, newValue) -> handleInput(root));
+                functionFields.add(equationInput);
+                dynamicInputPanel.getChildren().add(equationInput);
+            }
+        });
+
+        // Button to toggle the popup
+        Button togglePopupButton = new Button("Edit Equations");
+        togglePopupButton.setOnAction(e -> {
+            if (!inputPopup.isShowing() && equationNumSlider.getValue() > 1) {
+                inputPopup.show(primaryStage, primaryStage.getX() + 50, primaryStage.getY() + 50);
+            } else {
+                inputPopup.hide();
+            }
+        });
+        HBox inputHBox = new HBox(5);
+        inputHBox.getChildren().addAll(inputField, togglePopupButton);
+        inputVBox.getChildren().add(inputHBox);
 
         // Add children to the left AnchorPane
         leftAnchorPane.getChildren().addAll(titleLabel, solverChoiceBox, runButton, outputTextArea, stepSizeTextField, stepSizeLabel, startLabel, startTextField, endLabel, endTextField);
 
         // Create AnchorPane and add children
-        root.getChildren().addAll(
-                leftAnchorPane,
-                inputVBox, lineChart, equationNumSlider, warningLabel
-        );
+        root.getChildren().addAll(leftAnchorPane, inputVBox, lineChart, equationNumSlider, warningLabel);
 
         runButton.setOnAction(event -> {
-            List<String> equations = List.of(inputField.getText());
+            List<String> equations = new ArrayList<>();
+            for (TextField textField : functionFields) {
+                equations.add(textField.getText());
+                saveEquationDetails(textField.getText());
+            }
             HashMap<String, Double> variables = new HashMap<>();
-            for (int i = 0; i < variableLabels.size(); i++)
-            {
+            for (int i = 0; i < variableLabels.size(); i++) {
                 String variable = variableLabels.get(i).getText().split(":")[1].trim();
                 String value = variableValueFields.get(i).getText();
-                if (!value.isEmpty())
-                {
+                if (!value.isEmpty()) {
                     variables.put(variable, Double.parseDouble(value));
                 }
             }
@@ -265,10 +284,8 @@ public class Main extends Application {
 
             InputManagement inputManagement = new InputManagement();
             StringBuilder output = new StringBuilder();
-            for (String equation : equations)
-            {
-                if (equation.contains("cos") || equation.contains("sin") || equation.contains("tan") || equation.contains("log") || equation.contains("sqrt") || equation.contains("!") || equation.contains("%") || equation.contains("abs") || equation.contains("e") || equation.contains("pi"))
-                {
+            for (String equation : equations) {
+                if (equation.contains("cos") || equation.contains("sin") || equation.contains("tan") || equation.contains("log") || equation.contains("sqrt") || equation.contains("!") || equation.contains("%") || equation.contains("abs") || equation.contains("e") || equation.contains("pi")) {
                     System.out.println("The equation contains a function that is not supported by the simple solver. Using the hard solver instead.");
                     List<Expression> list = inputManagement.constructExpression(List.of(equation), variables); //constructs the expression
                     List<Double> results2 = inputManagement.solveHard(list, variables); //solves the equations
@@ -276,9 +293,7 @@ public class Main extends Application {
                     output.append("The equation contains a function that is not supported by the simple solver. Using the hard solver instead.").append("\n");
                     output.append(equation).append("\n");
                     output.append(results2).append("\n");
-                }
-                else
-                {
+                } else {
                     System.out.println("Equation is supported by the simple solver. Using the simple solver.");
                     List<List<InputManagement.Token>> tokens = inputManagement.getFunctions(List.of(equation)); //constructs the functions
                     System.out.println(tokens); //prints the functions
@@ -290,6 +305,7 @@ public class Main extends Application {
                 }
             }
             outputTextArea.setText(output.toString());
+            System.out.println(equationDetails);
         });
 
         primaryStage.setScene(scene);
@@ -297,10 +313,15 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    private void handleInput(String equation) {
+    private void handleInput(AnchorPane root) {
         // Clearing previous content
+        StringBuilder combinedText = new StringBuilder();
+        for (TextField textField : functionFields) {
+            combinedText.append(textField.getText());
+        }
+        String equation = combinedText.toString();
 
-        ((AnchorPane) inputField.getParent().getParent()).getChildren().remove(scrollPane);
+        root.getChildren().remove(scrollPane);
         boolean isPi = false;
         boolean isE = false;
 
@@ -389,10 +410,8 @@ public class Main extends Application {
 
         // Adding the scrollPane to the parent only if there are variables to show
         if (!variables.isEmpty() || isPi || isE) {
-            ((AnchorPane) inputField.getParent().getParent()).getChildren().add(scrollPane);
+            root.getChildren().add(scrollPane);
         }
-
-
     }
 
     private void saveEquationDetails(String equation) {
