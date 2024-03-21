@@ -69,75 +69,58 @@ public class RK4 {
             HashMap<String, Double> initialValues,
             double stepSize,
             double tInitial,
-            double tFinal,
-            HashMap<String, String> equations) {
+            double tFinal) {
 
-        int numSteps = (int) Math.ceil((tFinal - tInitial) / stepSize);
         LinkedHashMap<Double, LinkedHashMap<String, Double>> solutions = new LinkedHashMap<>();
-        HashMap<String, Double> values = new HashMap<>(initialValues);
+        HashMap<String, Double> currentValues = new HashMap<>(initialValues);
         double t = tInitial;
+        solutions.put(t, new LinkedHashMap<>(currentValues));
 
-        solutions.put(t, new LinkedHashMap<>(values));
+        while (t < tFinal) {
+            HashMap<String, Double> k1Values = calculateDerivativeValues(derivatives, currentValues, t);
+            HashMap<String, Double> k2Values = calculateDerivativeValues(derivatives, updateIntermediateValues(currentValues, k1Values, stepSize / 2), t + stepSize / 2);
+            HashMap<String, Double> k3Values = calculateDerivativeValues(derivatives, updateIntermediateValues(currentValues, k2Values, stepSize / 2), t + stepSize / 2);
+            HashMap<String, Double> k4Values = calculateDerivativeValues(derivatives, updateIntermediateValues(currentValues, k3Values, stepSize), t + stepSize);
 
-        for (int i = 0; i < numSteps; i++) {
-            HashMap<String, Double> k1 = new HashMap<>();
-            HashMap<String, Double> k2 = new HashMap<>();
-            HashMap<String, Double> k3 = new HashMap<>();
-            HashMap<String, Double> k4 = new HashMap<>();
-            for (Map.Entry<String, Expression> derivativeEntry : derivatives.entrySet()) {
-                String variableName = derivativeEntry.getKey();
-                Expression function = derivativeEntry.getValue();
-
-                // Ensure the correct current time and variable values are set before evaluating
-                function.setVariable("t", t);
-                initialValues.forEach(function::setVariable); // Set initial values for all variables
-                double k1Value = function.evaluate();
-                k1.put(variableName, k1Value);
-
-                // Calculate k2
-                HashMap<String, Double> valuesForK2 = new HashMap<>(values);
-                valuesForK2.put(variableName, values.get(variableName) + k1Value * stepSize / 2);
-                valuesForK2.put("t", t + stepSize / 2);
-                function.setVariable(variableName, valuesForK2.get(variableName));
-                function.setVariable("t", valuesForK2.get("t"));
-                double k2Value = function.evaluate();
-                k2.put(variableName, k2Value);
-
-                // Similar process for k3
-                HashMap<String, Double> valuesForK3 = new HashMap<>(values);
-                valuesForK3.put(variableName, values.get(variableName) + k2Value * stepSize / 2);
-                valuesForK3.put("t", t + stepSize / 2);
-                function.setVariable(variableName, valuesForK3.get(variableName));
-                function.setVariable("t", valuesForK3.get("t"));
-                double k3Value = function.evaluate();
-                k3.put(variableName, k3Value);
-
-                // And for k4
-                HashMap<String, Double> valuesForK4 = new HashMap<>(values);
-                valuesForK4.put(variableName, values.get(variableName) + k3Value * stepSize);
-                valuesForK4.put("t", t + stepSize);
-                function.setVariable(variableName, valuesForK4.get(variableName));
-                function.setVariable("t", valuesForK4.get("t"));
-                double k4Value = function.evaluate();
-                k4.put(variableName, k4Value);
-            }
-
-            for (String variableName : derivatives.keySet()) {
-                if (!"t".equals(variableName)) { // Exclude "t" from this update
-                    double newValue = values.get(variableName) + stepSize / 6.0 * (k1.get(variableName) + 2 * k2.get(variableName) + 2 * k3.get(variableName) + k4.get(variableName));
-                    values.put(variableName, newValue);
+            // Update current values for all variables except 't'
+            for (String var : currentValues.keySet()) {
+                if (!"t".equals(var)) { // Skip time variable 't' for direct integration
+                    double newValue = currentValues.get(var) + (stepSize / 6.0) * (k1Values.get(var) + 2 * k2Values.get(var) + 2 * k3Values.get(var) + k4Values.get(var));
+                    currentValues.put(var, newValue);
                 }
             }
 
             t += stepSize;
-            values.put("t", t); // Update the time variable for the next iteration
-
-            derivatives = inputManagement.constructCompleteExpression(equations, values);
+            currentValues.put("t", t); // Update the time variable
+            solutions.put(t, new LinkedHashMap<>(currentValues)); // Store the solution for the current step
         }
 
         return solutions;
     }
 
+    private static HashMap<String, Double> calculateDerivativeValues(HashMap<String, Expression> derivatives, HashMap<String, Double> values, double t) {
+        HashMap<String, Double> derivativeValues = new HashMap<>();
+        for (Map.Entry<String, Expression> entry : derivatives.entrySet()) {
+            String varName = entry.getKey();
+            Expression derivativeExp = entry.getValue();
+            derivativeExp.setVariables(values); // Set all variable values
+            derivativeExp.setVariable("t", t); // Set the current time
+            double derivativeValue = derivativeExp.evaluate();
+            derivativeValues.put(varName, derivativeValue);
+        }
+        return derivativeValues;
+    }
+
+    private static HashMap<String, Double> updateIntermediateValues(HashMap<String, Double> currentValues, HashMap<String, Double> derivativeValues, double delta) {
+        HashMap<String, Double> intermediateValues = new HashMap<>();
+        for (String var : currentValues.keySet()) {
+            if (!"t".equals(var)) { // Skip time variable 't' for direct integration
+                double intermediateValue = currentValues.get(var) + delta * derivativeValues.get(var);
+                intermediateValues.put(var, intermediateValue);
+            }
+        }
+        return intermediateValues;
+    }
 
     static InputManagement inputManagement = new InputManagement(); // Initializes the input management
 }
