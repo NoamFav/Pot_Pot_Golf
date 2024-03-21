@@ -119,7 +119,9 @@ public class Main extends Application {
 
         //ex graph to change
         NumberAxis timeAxis = new NumberAxis();
+        timeAxis.setLabel("Time");
         NumberAxis variableAxis = new NumberAxis();
+        variableAxis.setLabel("Variable");
         LineChart<Number, Number> lineChart = new LineChart<>(timeAxis, variableAxis);
         lineChart.setTitle("Evolution of Variables Over Time");
         lineChart.setLayoutX(200);
@@ -306,18 +308,45 @@ public class Main extends Application {
             LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler = solutionLists.get(1);
             LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4 = solutionLists.get(1);
 
+            LinkedHashMap<Double, LinkedHashMap<String, Double>> roundedSolutionsEuler = new LinkedHashMap<>();
+            for (Map.Entry<Double, LinkedHashMap<String, Double>> entry : solutionsEuler.entrySet()) {
+                double roundedKey = Math.round(entry.getKey());
+                roundedSolutionsEuler.put(roundedKey, entry.getValue());
+            }
+
+            LinkedHashMap<Double, LinkedHashMap<String, Double>> roundedSolutionsImprovedEuler = new LinkedHashMap<>();
+            for (Map.Entry<Double, LinkedHashMap<String, Double>> entry : solutionsImprovedEuler.entrySet()) {
+                double roundedKey = Math.round(entry.getKey());
+                roundedSolutionsImprovedEuler.put(roundedKey, entry.getValue());
+            }
+
+            LinkedHashMap<Double, LinkedHashMap<String, Double>> roundedSolutionsRK4 = new LinkedHashMap<>();
+            for (Map.Entry<Double, LinkedHashMap<String, Double>> entry : solutionsRK4.entrySet()) {
+                double roundedKey = Math.round(entry.getKey());
+                roundedSolutionsRK4.put(roundedKey, entry.getValue());
+            }
+
             String choice = solverChoiceBox.getValue();
             boolean euler = choice.equals("Euler solver");
             boolean improvedEuler = choice.equals("Improved Euler solver");
             boolean rk4 = choice.equals("RK4 solver");
             // Update your graph with the new solutions
             GraphSolver graphSolver = new GraphSolver(); // Assuming GraphSolver can be instantiated like this
-            LineChart<Number, Number> newLineChart = graphSolver.createGraph(solutionsEuler, solutionsImprovedEuler, solutionsRK4, tInitial, euler, improvedEuler, rk4);
+            LineChart<Number, Number> newLineChart = graphSolver.createGraph(roundedSolutionsEuler, roundedSolutionsImprovedEuler, roundedSolutionsRK4, tInitial, euler, improvedEuler, rk4);
 
             newLineChart.setTitle("Graph of y against t");
-            lineChart.getData().clear();
-            lineChart.getData().addAll(newLineChart.getData());
 
+            lineChart.getData().setAll(newLineChart.getData());
+            String output;
+            if (euler) {
+                output = "Euler's method:\n" + "value of vars at" + tFinal + "\n" + roundedSolutionsEuler.get(tFinal);
+            } else if (improvedEuler) {
+                output = "Improved Euler's method:\n" + "value of vars at" + tFinal + "\n" + roundedSolutionsImprovedEuler.get(tFinal);
+            } else {
+                output = "RK4 method:\n" + "value of vars at" + tFinal + "\n" + roundedSolutionsRK4.get(tFinal);
+            }
+
+            outputTextArea.setText(output);
         });
 
 
@@ -335,6 +364,8 @@ public class Main extends Application {
         String equation = combinedText.toString();
 
         root.getChildren().remove(scrollPane);
+        variableLabels.clear();
+        variableValueFields.clear();
         boolean isPi = false;
         boolean isE = false;
 
@@ -372,6 +403,12 @@ public class Main extends Application {
             }
         }
 
+
+        for (ComboBox<String> pickerValue : pickerValues) {
+            pickerValue.getItems().clear();
+        }
+
+
         int basedIndex = 0;
         // Adding variable labels and text fields to the grid
         if (isE) {
@@ -406,17 +443,17 @@ public class Main extends Application {
             grid.add(label, 0, i + basedIndex); // Column 0, row i
             grid.add(textField, 1, i + basedIndex); // Column 1, row i
 
+
             variableLabels.add(label);
             variableValueFields.add(textField);
         }
-        for (Label variableLabel : variableLabels) {
-            String variable = variableLabel.getText().split(":")[1].trim();
-            for (ComboBox<String> pickerValue : pickerValues) {
-                if (!pickerValue.getItems().contains(variable)) {
-                    pickerValue.getItems().add(variable);
-                }
-            }
-        }
+
+        System.out.println(variableLabels);
+        System.out.println(variableValueFields);
+        System.out.println(pickerValues);
+        System.out.println(functionFields);
+
+        updateComboBoxes();
 
         scrollPane = new ScrollPane();
         scrollPane.setContent(grid);
@@ -435,6 +472,18 @@ public class Main extends Application {
         }
     }
 
+    private void updateComboBoxes() {
+        // Collect all current variables from variableLabels
+        Set<String> currentVariables = new HashSet<>();
+        for (Label label : variableLabels) {
+            String variable = label.getText().split(":")[1].trim();
+            currentVariables.add(variable);
+        }
+
+        for (ComboBox<String> comboBox : pickerValues) {
+            comboBox.getItems().setAll(currentVariables);
+        }
+    }
 }
 
 
