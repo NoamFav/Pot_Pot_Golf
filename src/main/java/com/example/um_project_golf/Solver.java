@@ -10,31 +10,31 @@ import java.util.List;
 public class Solver {
     static InputManagement inputManagement = new InputManagement(); // Initializes the input management
 
-    public List<LinkedHashMap<Double, LinkedHashMap<String, Double>>> solve(double stepSize, double tInitial, double tFinal, HashMap<String, Double> variables, List<String> equations)
+    public List<LinkedHashMap<Double, LinkedHashMap<String, Double>>> solve(double stepSize, double tInitial, double tFinal, HashMap<String, Double> variables, HashMap<String, String> equations)
     {
         // Initialize functions with variables
-        List<List<InputManagement.Token>> functions = inputManagement.constructCompleteFunctions(equations, variables);
-        List<Expression> functionsHard = inputManagement.constructCompleteExpression(equations, variables);
+        HashMap<String, Expression> functionsHard = inputManagement.constructCompleteExpression(equations, variables);
+        //HashMap<String, List<InputManagement.Token>> functions = inputManagement.constructCompleteFunctions(equations, variables);
 
         // Solve using Euler's method
-        HashMap<String, Double> solutionsEuler = EulerSolver.eulerMethod(functions, variables, stepSize, tInitial, tFinal, equations);
-        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEulerHard = EulerSolver.eulerMethodHard(functionsHard, variables, stepSize, tInitial, tFinal, equations);
-        solutionsEuler.remove("t",solutionsEuler.get("t"));
+        //HashMap<String, Double> solutionsEuler = EulerSolver.eulerMethod(functions, variables, stepSize, tInitial, tFinal, equations);
+        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEulerHard = EulerSolver.eulerMethodHard(functionsHard, variables, stepSize, tInitial, tFinal);
+        //solutionsEuler.remove("t",solutionsEuler.get("t"));
         for (LinkedHashMap<String, Double> innerMap : solutionsEulerHard.values()) {
             innerMap.remove("t");
         }
 
         // Solve using Improved Euler's method
-        HashMap<String, Double> solutionsImprovedEuler = ImprovedEuler.improvedEulerMethod(functions, variables, stepSize, tInitial, tFinal, equations);
-        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEulerHard = ImprovedEuler.improvedEulerMethodHard(functionsHard, variables, stepSize, tInitial, tFinal, equations);
-        solutionsImprovedEuler.remove("t",solutionsImprovedEuler.get("t"));
+        //HashMap<String, Double> solutionsImprovedEuler = ImprovedEuler.improvedEulerMethod(functions, variables, stepSize, tInitial, tFinal, equations);
+        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEulerHard = ImprovedEuler.improvedEulerMethodHard(functionsHard, variables, stepSize, tInitial, tFinal);
+        //solutionsImprovedEuler.remove("t",solutionsImprovedEuler.get("t"));
         for (LinkedHashMap<String, Double> innerMap : solutionsImprovedEulerHard.values()) {
             innerMap.remove("t");
         }
 
         // Solve using RK4 method
-        HashMap<String, Double> solutionsRK4 = RK4.RK4Method(tInitial, variables, tFinal, functions, stepSize, equations);
-        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4Hard = RK4.RK4MethodHard(tInitial, variables, tFinal, functionsHard, stepSize, equations);
+        //HashMap<String, Double> solutionsRK4 = RK4.RK4Method(tInitial, variables, tFinal, functions, stepSize, equations);
+        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4Hard = RK4.RK4MethodHard(functionsHard, variables, stepSize ,tInitial, tFinal, equations);
         for (LinkedHashMap<String, Double> innerMap : solutionsRK4Hard.values()) {
             innerMap.remove("t");
         }
@@ -43,7 +43,7 @@ public class Solver {
         df.setMaximumFractionDigits(7);
 
         // Print the solutions
-        print(tFinal, solutionsEuler, solutionsImprovedEuler, solutionsRK4, df, false);
+        //print(tFinal, solutionsEuler, solutionsImprovedEuler, solutionsRK4, df, false);
 
         //print(tFinal, solutionsEulerHard.get(1), solutionsImprovedEulerHard, solutionsRK4Hard, df, true);
 
@@ -86,6 +86,6 @@ public class Solver {
 
 
         Solver solver = new Solver();
-        solver.solve(stepSize,tInitial,tFinal,variables,equations);
+        //solver.solve(stepSize,tInitial,tFinal,variables, equations);
     }
 }

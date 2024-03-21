@@ -5,6 +5,7 @@ import net.objecthunter.exp4j.Expression;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ImprovedEuler {
 
@@ -64,55 +65,70 @@ public class ImprovedEuler {
         return values;
     }
 
-    public static LinkedHashMap<Double, LinkedHashMap<String, Double>> improvedEulerMethodHard(List<Expression> derivatives, HashMap<String, Double> initialValues, double stepSize, double tInitial, double tFinal, List<String> equations)
-    {
+    public static LinkedHashMap<Double, LinkedHashMap<String, Double>> improvedEulerMethodHard(
+            HashMap<String, Expression> derivatives,
+            HashMap<String, Double> initialValues,
+            double stepSize,
+            double tInitial,
+            double tFinal) {
+
         int numSteps = (int) Math.ceil((tFinal - tInitial) / stepSize);
-
         HashMap<String, Double> values = new HashMap<>(initialValues);
-        HashMap<String, Double> valuesNoTime = new HashMap<>(initialValues);
-        valuesNoTime.remove("t");
-
         double t = tInitial;
-
         LinkedHashMap<Double, LinkedHashMap<String, Double>> solutions = new LinkedHashMap<>();
         solutions.put(t, new LinkedHashMap<>(values));
 
-        for (int i = 0; i <= numSteps; i++) {
+        for (int i = 0; i < numSteps; i++) {
+            // Calculate k1 for each variable
             HashMap<String, Double> k1 = new HashMap<>();
-            int l = 0;
-            for (Expression function : derivatives) {
-                String variableName = valuesNoTime.keySet().toArray(new String[0])[l];
-                k1.put(variableName, function.evaluate());
-                l++;
+            for (Map.Entry<String, Expression> entry : derivatives.entrySet()) {
+                String variableName = entry.getKey();
+                Expression function = entry.getValue();
+
+                // Set the current time 't' and all other variable values for the expression
+                function.setVariable("t", t);
+                values.forEach(function::setVariable); // Use current values for setting variables in the function
+
+                if (!"t".equals(variableName)) { // Exclude "t" from direct updates here
+                    double derivativeValue = function.evaluate();
+                    k1.put(variableName, derivativeValue);
+                }
             }
 
-            HashMap<String, Double> valuesMid = new HashMap<>(valuesNoTime);
-            valuesMid.replaceAll((n, v) -> values.get(n) + k1.get(n) * stepSize);
-            valuesMid.put("t",t + stepSize);
+            // Prepare valuesMid for k2 calculation by estimating mid-point values
+            HashMap<String, Double> valuesMid = new HashMap<>(values);
+            k1.forEach((var, val) -> valuesMid.put(var, values.get(var) + val * stepSize / 2)); // Estimate mid-point values
+            valuesMid.put("t", t + stepSize / 2); // Update time for mid-step
 
+            // Calculate k2 based on the mid-step values
             HashMap<String, Double> k2 = new HashMap<>();
-            List<Expression> derivativesMid = inputManagement.constructCompleteExpression(equations, valuesMid);
+            for (Map.Entry<String, Expression> entry : derivatives.entrySet()) {
+                String variableName = entry.getKey();
+                Expression function = entry.getValue();
 
-            int j = 0;
-            for (Expression function : derivativesMid) {
-                String variableName = valuesNoTime.keySet().toArray(new String[0])[j];
-                k2.put(variableName, function.evaluate());
-                j++;
+                // Set mid-step values for k2 calculation
+                function.setVariable("t", t + stepSize / 2);
+                valuesMid.forEach(function::setVariable); // Ensure function uses mid-step values
+
+                if (!"t".equals(variableName)) { // Exclude "t" from direct updates here
+                    double derivativeValue = function.evaluate();
+                    k2.put(variableName, derivativeValue);
+                }
             }
 
-            for (String variableName : values.keySet()) {
-                if (variableName.equals("t")) {
-                    values.put(variableName, t + stepSize);
-                } else {
+            // Update variables with the average of k1 and k2
+            for (String variableName : derivatives.keySet()) {
+                if (!variableName.equals("t")) { // Exclude "t" from this update
                     double newValue = values.get(variableName) + stepSize * (k1.get(variableName) + k2.get(variableName)) / 2;
                     values.put(variableName, newValue);
                 }
             }
 
-            derivatives = inputManagement.constructCompleteExpression(equations, values);
-
+            // Update time for the next iteration
             t += stepSize;
+            values.put("t", t); // Now update "t"
 
+            // Store the updated state after each iteration
             solutions.put(t, new LinkedHashMap<>(values));
         }
 
