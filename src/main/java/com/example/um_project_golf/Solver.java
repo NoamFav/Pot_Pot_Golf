@@ -68,24 +68,4 @@ public class Solver {
             System.out.println("The value of " + solution + " at t = " + tFinal + " is: " + df.format(valueRK4));
         }
     }
-
-    public static void main(String[] args)
-    {
-        // Step size, initial time and final time
-        double stepSize = 0.1;
-        double tInitial = 0.0;
-        double tFinal = 1.0;
-
-        HashMap<String, Double> variables = new HashMap<>();
-        // Placeholders for each variable
-        variables.put("t", tInitial);
-        variables.put("y", 1.0);
-        variables.put("x", 2.5);
-
-        List<String> equations = List.of("yx", "x");
-
-
-        Solver solver = new Solver();
-        //solver.solve(stepSize,tInitial,tFinal,variables, equations);
-    }
 }
