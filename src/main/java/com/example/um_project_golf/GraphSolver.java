@@ -78,13 +78,18 @@ public class GraphSolver extends Application {
         variables.put("t", tInitial);
         variables.put("y", 1.0);
         variables.put("x", 2.5);
+        variables.put("a", 1.3);
 
-        List<String> equations = List.of("x","yx");
+        HashMap<String, String> equationsMap = new HashMap<>();
+        equationsMap.put("x", "x");
+        equationsMap.put("y", "yx-a");
 
-        List<LinkedHashMap<Double, LinkedHashMap<String, Double>>> plot = solver.solve(stepSize, tInitial, tFinal, variables, equations);
+        System.out.println(variables);
+
+        List<LinkedHashMap<Double, LinkedHashMap<String, Double>>> plot = solver.solve(stepSize, tInitial, tFinal, variables, equationsMap);
         solutionsEuler = plot.get(0);
         solutionsImprovedEuler = plot.get(1);
-        solutionsRK4 = plot.get(2);
+        solutionsRK4 = plot.get(1);
 
         LineChart<Number, Number> lineChart = createGraph(solutionsEuler, solutionsImprovedEuler, solutionsRK4, df, 0, 10, 0.1, true);
         lineChart.setTitle("Graph of y against t");
