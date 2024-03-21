@@ -5,6 +5,7 @@ import net.objecthunter.exp4j.Expression;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EulerSolver {
 
@@ -50,41 +51,47 @@ public class EulerSolver {
         return values;
     }
 
-    public static LinkedHashMap<Double, LinkedHashMap<String, Double>> eulerMethodHard(List<Expression> derivatives, HashMap<String, Double> initialValues, double stepSize, double tInitial, double tFinal, List<String> equations)
-    {
-        int numSteps = (int) Math.ceil((tFinal-tInitial) / stepSize);
+    public static LinkedHashMap<Double, LinkedHashMap<String, Double>> eulerMethodHard(
+            HashMap<String, Expression> derivatives,
+            HashMap<String, Double> initialValues,
+            double stepSize,
+            double tInitial,
+            double tFinal) {
 
+        int numSteps = (int) Math.ceil((tFinal - tInitial) / stepSize);
         HashMap<String, Double> values = new HashMap<>(initialValues);
-        HashMap<String, Double> valuesNoTime = new HashMap<>(initialValues);
-        valuesNoTime.remove("t");
-
         double t = tInitial;
-        HashMap<String, Double> temporaryValues = new HashMap<>();
         LinkedHashMap<Double, LinkedHashMap<String, Double>> solutions = new LinkedHashMap<>();
         solutions.put(t, new LinkedHashMap<>(values));
 
-        for (int i = 0; i <= numSteps; i++) {
-            int j=0;
-            for (Expression function : derivatives)
-            {
-                String variableName = valuesNoTime.keySet().toArray(new String[0])[j];
-                temporaryValues.put(variableName, function.evaluate());
-                j++;
-            }
+        for (int i = 0; i < numSteps; i++) {
+            // It might be safer to clone or create a new map for the next state to avoid potential mutable state issues.
+            HashMap<String, Double> nextValues = new HashMap<>(values);
 
-            for (String variableName : values.keySet()) {
-                if (variableName.equals("t")) {
-                    values.put(variableName, t + stepSize);
-                } else {
-                    values.put(variableName, values.get(variableName) + temporaryValues.get(variableName) * stepSize);
+            // Update dynamic variables
+            for (Map.Entry<String, Expression> entry : derivatives.entrySet()) {
+                String variableName = entry.getKey();
+                Expression function = entry.getValue();
+                // Ensure the function is updated with the latest values, including 't'
+                function.setVariable("t", t);
+                values.forEach(function::setVariable); // Use current values for setting variables in the function
+
+                if (!"t".equals(variableName)) { // Skip "t" as it's manually updated
+                    double derivativeValue = function.evaluate();
+                    double newValue = values.get(variableName) + stepSize * derivativeValue;
+                    nextValues.put(variableName, newValue); // Store updated values in nextValues
                 }
             }
 
-            derivatives = inputManagement.constructCompleteExpression(equations, values);
-
-            solutions.put(t, new LinkedHashMap<>(values));
-
+            // Update time for the next iteration
             t += stepSize;
+            nextValues.put("t", t); // Update 't' in nextValues
+
+            // Store the updated state after each iteration
+            solutions.put(t, new LinkedHashMap<>(nextValues));
+
+            // Prepare for the next iteration
+            values = nextValues; // Update values map for the next loop iteration
         }
 
         return solutions;

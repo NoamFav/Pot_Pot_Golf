@@ -10,13 +10,9 @@ import javafx.scene.text.Font;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
-import net.objecthunter.exp4j.Expression;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
@@ -28,8 +24,9 @@ public class Main extends Application {
     private final List<TextField> functionFields = new ArrayList<>();
     private final List<TextField> variableValueFields = new ArrayList<>();
     private final List<Label> variableLabels = new ArrayList<>();
-    private final Map<String, Object> equationDetails = new HashMap<>();
+    private final List<ComboBox<String>> pickerValues = new ArrayList<>();
     private TextField inputField;
+    private ComboBox<String> varMenu;
     private ScrollPane scrollPane;
 
     public static void main(String[] args) {
@@ -54,7 +51,7 @@ public class Main extends Application {
 
         // ChoiceBox to select a solver
         ChoiceBox<String> solverChoiceBox = new ChoiceBox<>();
-        solverChoiceBox.getItems().addAll("Euler solver", "Other solver");
+        solverChoiceBox.getItems().addAll("Euler solver", "Improved Euler solver", "RK4 solver");
         solverChoiceBox.setLayoutX(28);
         solverChoiceBox.setLayoutY(52);
         solverChoiceBox.setPrefWidth(136);
@@ -100,10 +97,13 @@ public class Main extends Application {
         Label inputLabel = new Label("Input a differential equation:");
         inputLabel.setFont(new Font("Calisto MT", 13));
         inputField = new TextField();
-        VBox inputVBox = new VBox(inputLabel, inputField);
+        functionFields.add(inputField);
+        varMenu = new ComboBox<>();
+        varMenu.setPromptText(varMenu.getValue());
+        pickerValues.add(varMenu);
+        VBox inputVBox = new VBox(inputLabel);
         inputVBox.setLayoutX(245);
         inputVBox.setLayoutY(36);
-        inputVBox.setPrefWidth(202);
         inputVBox.setPrefHeight(86);
 
         inputField.textProperty().addListener((observable, oldValue, newValue) -> handleInput(root));
@@ -116,19 +116,6 @@ public class Main extends Application {
         warningLabel.setPrefHeight(20);
         warningLabel.setStyle("-fx-text-fill: #2196F3;");
         warningLabel.setText("");
-
-        // Create Label and TextField
-        inputLabel = new Label("Input a differential equation:");
-        inputLabel.setFont(new Font("Calisto MT", 13));
-        inputField = new TextField();
-        functionFields.add(inputField);
-        inputVBox = new VBox(inputLabel);
-        inputVBox.setLayoutX(245);
-        inputVBox.setLayoutY(36);
-        inputVBox.setPrefWidth(202);
-        inputVBox.setPrefHeight(86);
-
-        inputField.textProperty().addListener((observable, oldValue, newValue) -> handleInput(root));
 
         //ex graph to change
         NumberAxis timeAxis = new NumberAxis();
@@ -228,6 +215,8 @@ public class Main extends Application {
                 textField.clear();
             }
 
+            varMenu.getItems().clear();
+
             if (equationNumSlider.getValue() > 1) {
                 inputPopup.show(primaryStage, primaryStage.getX() + 50, primaryStage.getY() + 50);
             }
@@ -239,10 +228,15 @@ public class Main extends Application {
             int numberOfEquations = newVal.intValue();
             for (int i = 0; i < numberOfEquations - 1; i++) {
                 TextField equationInput = new TextField();
+                ComboBox<String> varMenuCopy = new ComboBox<>();
+                varMenuCopy.setPromptText(varMenuCopy.getValue());
+                pickerValues.add(varMenuCopy);
                 equationInput.setPromptText("Equation " + (i + 2));
                 equationInput.textProperty().addListener((observable, oldValue, newValue) -> handleInput(root));
                 functionFields.add(equationInput);
-                dynamicInputPanel.getChildren().add(equationInput);
+                HBox hBox = new HBox(5);
+                hBox.getChildren().addAll(equationInput, varMenuCopy);
+                dynamicInputPanel.getChildren().add(hBox);
             }
         });
 
@@ -256,7 +250,8 @@ public class Main extends Application {
             }
         });
         HBox inputHBox = new HBox(5);
-        inputHBox.getChildren().addAll(inputField, togglePopupButton);
+        inputHBox.layout();
+        inputHBox.getChildren().addAll(inputField, varMenu, togglePopupButton);
         inputVBox.getChildren().add(inputHBox);
 
         // Add children to the left AnchorPane
@@ -266,47 +261,65 @@ public class Main extends Application {
         root.getChildren().addAll(leftAnchorPane, inputVBox, lineChart, equationNumSlider, warningLabel);
 
         runButton.setOnAction(event -> {
-            List<String> equations = new ArrayList<>();
-            for (TextField textField : functionFields) {
-                equations.add(textField.getText());
-                saveEquationDetails(textField.getText());
-            }
             HashMap<String, Double> variables = new HashMap<>();
-            for (int i = 0; i < variableLabels.size(); i++) {
-                String variable = variableLabels.get(i).getText().split(":")[1].trim();
-                String value = variableValueFields.get(i).getText();
-                if (!value.isEmpty()) {
-                    variables.put(variable, Double.parseDouble(value));
-                }
-            }
-            System.out.println(variables);
-            System.out.println(equations);
+            HashMap<String, String> expressions = new HashMap<>();
 
-            InputManagement inputManagement = new InputManagement();
-            StringBuilder output = new StringBuilder();
-            for (String equation : equations) {
-                if (equation.contains("cos") || equation.contains("sin") || equation.contains("tan") || equation.contains("log") || equation.contains("sqrt") || equation.contains("!") || equation.contains("%") || equation.contains("abs") || equation.contains("e") || equation.contains("pi")) {
-                    System.out.println("The equation contains a function that is not supported by the simple solver. Using the hard solver instead.");
-                    List<Expression> list = inputManagement.constructExpression(List.of(equation), variables); //constructs the expression
-                    List<Double> results2 = inputManagement.solveHard(list, variables); //solves the equations
-                    System.out.println(results2); //prints the results
-                    output.append("The equation contains a function that is not supported by the simple solver. Using the hard solver instead.").append("\n");
-                    output.append(equation).append("\n");
-                    output.append(results2).append("\n");
-                } else {
-                    System.out.println("Equation is supported by the simple solver. Using the simple solver.");
-                    List<List<InputManagement.Token>> tokens = inputManagement.getFunctions(List.of(equation)); //constructs the functions
-                    System.out.println(tokens); //prints the functions
-                    List<Double> results = inputManagement.solve(tokens, variables); //solves the equations
-                    System.out.println(results); //prints the results
-                    output.append("Equation is supported by the simple solver. Using the simple solver.").append("\n");
-                    output.append(equation).append("\n");
-                    output.append(results).append("\n");
+            // Collect variables and their values
+            for (int i = 0; i < variableLabels.size(); i++) {
+                String variable = variableLabels.get(i).getText().split(":")[1].trim();// Adjust based on actual text format
+                String valueText = variableValueFields.get(i).getText().trim();
+
+                try {
+                    double value = Double.parseDouble(valueText);
+                    variables.put(variable, value);
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid value for variable: " + variable);
+                    // Optionally, notify the user and skip solving
                 }
             }
-            outputTextArea.setText(output.toString());
-            System.out.println(equationDetails);
+
+            // Collect equations and their corresponding variable from the pickerValues (ComboBoxes)
+            for (int i = 0; i < functionFields.size(); i++) {
+                String equation = functionFields.get(i).getText().trim();
+                String variable = pickerValues.get(i).getValue(); // Assuming each pickerValue corresponds to each functionField
+
+                if (!equation.isEmpty() && variable != null) {
+                    expressions.put(variable, equation);
+                }
+            }
+
+            // Use the collected data for solving
+            double stepSize = Double.parseDouble(stepSizeTextField.getText().trim());
+            double tInitial = Double.parseDouble(startTextField.getText().trim());
+            double tFinal = Double.parseDouble(endTextField.getText().trim());
+
+            // Call your solver here with variables and expressions
+            System.out.println("Variables: " + variables);
+            System.out.println("Expressions: " + expressions);
+
+            // Now, use Solver to solve the equations with the collected data
+            Solver solver = new Solver();
+            List<LinkedHashMap<Double, LinkedHashMap<String, Double>>> solutionLists = solver.solve(stepSize, tInitial, tFinal, variables, expressions);
+
+            // Assuming solutionLists contains Euler, Improved Euler, and RK4 solutions respectively
+            LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEuler = solutionLists.get(0);
+            LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler = solutionLists.get(1);
+            LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4 = solutionLists.get(1);
+
+            String choice = solverChoiceBox.getValue();
+            boolean euler = choice.equals("Euler solver");
+            boolean improvedEuler = choice.equals("Improved Euler solver");
+            boolean rk4 = choice.equals("RK4 solver");
+            // Update your graph with the new solutions
+            GraphSolver graphSolver = new GraphSolver(); // Assuming GraphSolver can be instantiated like this
+            LineChart<Number, Number> newLineChart = graphSolver.createGraph(solutionsEuler, solutionsImprovedEuler, solutionsRK4, tInitial, euler, improvedEuler, rk4);
+
+            newLineChart.setTitle("Graph of y against t");
+            lineChart.getData().clear();
+            lineChart.getData().addAll(newLineChart.getData());
+
         });
+
 
         primaryStage.setScene(scene);
         primaryStage.setTitle("Group 14 - phase 1");
@@ -396,6 +409,14 @@ public class Main extends Application {
             variableLabels.add(label);
             variableValueFields.add(textField);
         }
+        for (Label variableLabel : variableLabels) {
+            String variable = variableLabel.getText().split(":")[1].trim();
+            for (ComboBox<String> pickerValue : pickerValues) {
+                if (!pickerValue.getItems().contains(variable)) {
+                    pickerValue.getItems().add(variable);
+                }
+            }
+        }
 
         scrollPane = new ScrollPane();
         scrollPane.setContent(grid);
@@ -414,46 +435,6 @@ public class Main extends Application {
         }
     }
 
-    private void saveEquationDetails(String equation) {
-
-        List<String> variables = extractVariables(equation);
-
-        // Extract variable values from text fields
-        Map<String, Double> variableValues = new HashMap<>();
-        for (int i = 0; i < variables.size(); i++) {
-            String variable = variables.get(i);
-            String value = variableValueFields.get(i).getText();
-            try {
-                double doubleValue = Double.parseDouble(value);
-                variableValues.put(variable, doubleValue);
-            } catch (NumberFormatException e) {
-                // Handle invalid input
-                System.err.println("Invalid value for variable: " + variable);
-            }
-        }
-
-
-        equationDetails.put("Equation", equation);
-        equationDetails.put("Variables", variables);
-        equationDetails.put("VariableValues", variableValues);
-
-        System.out.println("Equation: " + equation);
-        System.out.println("Variables: " + variables);
-        System.out.println("VariableValues: " + variableValues);
-    }
-
-    private List<String> extractVariables(String equation) {
-        List<String> variables = new ArrayList<>();
-        Pattern pattern = Pattern.compile("[a-zA-Z]");
-        Matcher matcher = pattern.matcher(equation);
-        while (matcher.find()) {
-            String variable = matcher.group();
-            if (!variables.contains(variable)) {
-                variables.add(variable);
-            }
-        }
-        return variables;
-    }
 }
 
 

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class GraphSolver extends Application {
-    public LineChart<Number,Number> createGraph(LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4, DecimalFormat df, double tInitial, double tFinal, double StepSize, boolean hard) {
+    public LineChart<Number,Number> createGraph(LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4, double tInitial, boolean euler, boolean improvedEuler, boolean rk4) {
         NumberAxis xAxis = new NumberAxis();
         xAxis.setLabel("Time");
         NumberAxis yAxis = new NumberAxis();
@@ -52,9 +52,18 @@ public class GraphSolver extends Application {
                     seriesRK4.getData().add(dataRK4);
                 }
             }
-            lineChart.getData().add(seriesEuler);
-            lineChart.getData().add(seriesImprovedEuler);
-            //lineChart.getData().add(seriesRK4);
+            if (euler) {
+                lineChart.getData().add(seriesEuler);
+                lineChart.setCreateSymbols(false);
+            }
+            if (improvedEuler) {
+                lineChart.getData().add(seriesImprovedEuler);
+                lineChart.setCreateSymbols(false);
+            }
+            if (rk4) {
+                lineChart.getData().add(seriesRK4);
+                lineChart.setCreateSymbols(false);
+            }
             lineChart.setCreateSymbols(false);
         }
 
@@ -62,7 +71,7 @@ public class GraphSolver extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         Solver solver = new Solver();
         LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEuler = new LinkedHashMap<>();
         LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler = new LinkedHashMap<>();
@@ -78,15 +87,21 @@ public class GraphSolver extends Application {
         variables.put("t", tInitial);
         variables.put("y", 1.0);
         variables.put("x", 2.5);
+        variables.put("a", 1.3);
 
-        List<String> equations = List.of("x","yx");
+        HashMap<String, String> equationsMap = new HashMap<>();
+        equationsMap.put("x", "x");
+        equationsMap.put("y", "yx-a");
+        equationsMap.put("a", "cos(axy)x20");
 
-        List<LinkedHashMap<Double, LinkedHashMap<String, Double>>> plot = solver.solve(stepSize, tInitial, tFinal, variables, equations);
+        System.out.println(variables);
+
+        List<LinkedHashMap<Double, LinkedHashMap<String, Double>>> plot = solver.solve(stepSize, tInitial, tFinal, variables, equationsMap);
         solutionsEuler = plot.get(0);
         solutionsImprovedEuler = plot.get(1);
-        solutionsRK4 = plot.get(2);
+        solutionsRK4 = plot.get(1);
 
-        LineChart<Number, Number> lineChart = createGraph(solutionsEuler, solutionsImprovedEuler, solutionsRK4, df, 0, 10, 0.1, true);
+        LineChart<Number, Number> lineChart = createGraph(solutionsEuler, solutionsImprovedEuler, solutionsRK4, 0, true, true, false);
         lineChart.setTitle("Graph of y against t");
         primaryStage.setScene(new javafx.scene.Scene(lineChart, 800, 600));
         primaryStage.show();

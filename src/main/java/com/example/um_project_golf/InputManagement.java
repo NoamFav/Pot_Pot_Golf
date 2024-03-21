@@ -274,9 +274,12 @@ public class InputManagement
                 .collect(Collectors.toList());
     }
 
-    public List<Expression> constructCompleteExpression(List<String> equations, HashMap<String, Double> variables) {
-        List<Expression> expressions = new ArrayList<>();
-        for (String equation : equations) {
+    public HashMap<String, Expression> constructCompleteExpression(HashMap<String, String> equations, HashMap<String, Double> variables) {
+        HashMap<String, Expression> expressions = new HashMap<>();
+        for (Map.Entry<String, String> entry : equations.entrySet()) {
+            String variableName = entry.getKey();
+            String equation = entry.getValue();
+
             ExpressionBuilder builder = new ExpressionBuilder(equation);
             for (String variable : variables.keySet()) {
                 builder.variable(variable);
@@ -285,7 +288,8 @@ public class InputManagement
             for (Map.Entry<String, Double> variable : variables.entrySet()) {
                 expression.setVariable(variable.getKey(), variable.getValue());
             }
-            expressions.add(expression);
+
+            expressions.put(variableName, expression);
         }
         return expressions;
     }
