@@ -56,8 +56,7 @@ public class EulerSolver {
             HashMap<String, Double> initialValues,
             double stepSize,
             double tInitial,
-            double tFinal,
-            HashMap<String, String> equations) {
+            double tFinal) {
 
         int numSteps = (int) Math.ceil((tFinal - tInitial) / stepSize);
         HashMap<String, Double> values = new HashMap<>(initialValues);
@@ -65,7 +64,7 @@ public class EulerSolver {
         LinkedHashMap<Double, LinkedHashMap<String, Double>> solutions = new LinkedHashMap<>();
         solutions.put(t, new LinkedHashMap<>(values));
 
-        for (int i = 0; i <= numSteps; i++) {
+        for (int i = 0; i < numSteps; i++) {
             // It might be safer to clone or create a new map for the next state to avoid potential mutable state issues.
             HashMap<String, Double> nextValues = new HashMap<>(values);
 

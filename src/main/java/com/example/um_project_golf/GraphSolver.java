@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class GraphSolver extends Application {
-    public LineChart<Number,Number> createGraph(LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4, DecimalFormat df, double tInitial, double tFinal, double StepSize, boolean hard) {
+    public LineChart<Number,Number> createGraph(LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4, double tInitial) {
         NumberAxis xAxis = new NumberAxis();
         xAxis.setLabel("Time");
         NumberAxis yAxis = new NumberAxis();
@@ -62,7 +62,7 @@ public class GraphSolver extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         Solver solver = new Solver();
         LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEuler = new LinkedHashMap<>();
         LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler = new LinkedHashMap<>();
@@ -83,6 +83,7 @@ public class GraphSolver extends Application {
         HashMap<String, String> equationsMap = new HashMap<>();
         equationsMap.put("x", "x");
         equationsMap.put("y", "yx-a");
+        equationsMap.put("a", "cos(axy)x20");
 
         System.out.println(variables);
 
@@ -91,7 +92,7 @@ public class GraphSolver extends Application {
         solutionsImprovedEuler = plot.get(1);
         solutionsRK4 = plot.get(1);
 
-        LineChart<Number, Number> lineChart = createGraph(solutionsEuler, solutionsImprovedEuler, solutionsRK4, df, 0, 10, 0.1, true);
+        LineChart<Number, Number> lineChart = createGraph(solutionsEuler, solutionsImprovedEuler, solutionsRK4, 0);
         lineChart.setTitle("Graph of y against t");
         primaryStage.setScene(new javafx.scene.Scene(lineChart, 800, 600));
         primaryStage.show();
