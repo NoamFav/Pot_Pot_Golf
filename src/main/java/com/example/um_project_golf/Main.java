@@ -343,7 +343,7 @@ public class Main extends Application {
             boolean rk4 = choice.equals("RK4 solver");
             // Update your graph with the new solutions
             GraphSolver graphSolver = new GraphSolver(); // Assuming GraphSolver can be instantiated like this
-            LineChart<Number, Number> newLineChart = graphSolver.createGraph(roundedSolutionsEuler, roundedSolutionsImprovedEuler, roundedSolutionsRK4, tInitial, euler, improvedEuler, rk4);
+            LineChart<Number, Number> newLineChart = graphSolver.createGraph(solutionsEuler, solutionsImprovedEuler, solutionsRK4, tInitial, euler, improvedEuler, rk4, stepSize);
 
             newLineChart.setTitle("Graph of y against t");
 
