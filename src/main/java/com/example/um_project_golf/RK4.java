@@ -14,32 +14,37 @@ public class RK4 {
 
         HashMap<String, Double> valuesNoTime = new HashMap<>(values); // Values without the time
         valuesNoTime.remove("t");
-        HashMap<String, Double> valuesK = new HashMap<>(values); // Values for calculation of the k's
 
         double t = tInitial;
 
         double k1, k2, k3, k4; // Variables for mid-way derivative calculation
 
         for (int i = 0; i < numSteps; i++) {
+            HashMap<String, Double> valuesMid = new HashMap<>(values);
             int j = 0;
             for (List<InputManagement.Token> function : derivatives) {
+                HashMap<String, Double> valuesK = new HashMap<>(values); // Values for calculation of the k's
                 String variableName = valuesNoTime.keySet().toArray(new String[0])[j];
                 List<List<InputManagement.Token>> updatedFunctions = inputManagement.constructCompleteFunctions(equations, values);
                 function = updatedFunctions.get(j);
                 k1 = inputManagement.doPEMDAS(function); // Compute k1
+                System.out.println("k1- "+k1);
 
                 // Compute k2
                 valuesK.put(variableName, values.get(variableName) + k1 * stepSize / 2);
                 valuesK.put("t", t + stepSize / 2);
                 updatedFunctions = inputManagement.constructCompleteFunctions(equations, valuesK);
                 function = updatedFunctions.get(j);
+                System.out.println(function);
                 k2 = inputManagement.doPEMDAS(function);
+                System.out.println("k2- "+k2);
 
                 // Compute k3
                 valuesK.put(variableName, values.get(variableName) + k2 * stepSize / 2);
                 updatedFunctions = inputManagement.constructCompleteFunctions(equations, valuesK);
                 function = updatedFunctions.get(j);
                 k3 = inputManagement.doPEMDAS(function);
+                System.out.println("k3- "+k3);
 
                 // Compute k4
                 valuesK.put(variableName, values.get(variableName) + stepSize * k3);
@@ -47,16 +52,22 @@ public class RK4 {
                 updatedFunctions = inputManagement.constructCompleteFunctions(equations, valuesK);
                 function = updatedFunctions.get(j);
                 k4 = inputManagement.doPEMDAS(function);
+                System.out.println("k4- "+k4);
 
                 // Update the variables
-                values.put(variableName, values.get(variableName) + stepSize * (k1 + 2 * k2 + 2 * k3 + k4) / 6);
-
+                valuesMid.put(variableName, values.get(variableName) + stepSize * (k1 + 2 * k2 + 2 * k3 + k4) / 6);
                 j++;
             }
             t += stepSize;
+            for (int l = 0; l< valuesNoTime.size(); l++){
+                String variableName = valuesNoTime.keySet().toArray(new String[0])[l];
+                values.put(variableName, valuesMid.get(variableName));
+            }
             values.put("t",t);
+            System.out.println("values- "+values);
         }
         return values;
+
     }
 
     public static LinkedHashMap<Double, LinkedHashMap<String, Double>> RK4MethodHard(
