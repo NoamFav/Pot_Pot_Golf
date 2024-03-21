@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class GraphSolver extends Application {
-    public LineChart<Number,Number> createGraph(LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4, double tInitial) {
+    public LineChart<Number,Number> createGraph(LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4, double tInitial, boolean euler, boolean improvedEuler, boolean rk4) {
         NumberAxis xAxis = new NumberAxis();
         xAxis.setLabel("Time");
         NumberAxis yAxis = new NumberAxis();
@@ -52,9 +52,18 @@ public class GraphSolver extends Application {
                     seriesRK4.getData().add(dataRK4);
                 }
             }
-            lineChart.getData().add(seriesEuler);
-            lineChart.getData().add(seriesImprovedEuler);
-            //lineChart.getData().add(seriesRK4);
+            if (euler) {
+                lineChart.getData().add(seriesEuler);
+                lineChart.setCreateSymbols(false);
+            }
+            if (improvedEuler) {
+                lineChart.getData().add(seriesImprovedEuler);
+                lineChart.setCreateSymbols(false);
+            }
+            if (rk4) {
+                lineChart.getData().add(seriesRK4);
+                lineChart.setCreateSymbols(false);
+            }
             lineChart.setCreateSymbols(false);
         }
 
@@ -92,7 +101,7 @@ public class GraphSolver extends Application {
         solutionsImprovedEuler = plot.get(1);
         solutionsRK4 = plot.get(1);
 
-        LineChart<Number, Number> lineChart = createGraph(solutionsEuler, solutionsImprovedEuler, solutionsRK4, 0);
+        LineChart<Number, Number> lineChart = createGraph(solutionsEuler, solutionsImprovedEuler, solutionsRK4, 0, true, true, false);
         lineChart.setTitle("Graph of y against t");
         primaryStage.setScene(new javafx.scene.Scene(lineChart, 800, 600));
         primaryStage.show();
