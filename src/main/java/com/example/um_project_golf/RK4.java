@@ -83,7 +83,7 @@ public class RK4 {
             HashMap<String, Double> k4Values = calculateDerivativeValues(derivatives, updateIntermediateValues(currentValues, k3Values, stepSize), t + stepSize);
 
             // Update current values for all variables except 't'
-            for (String var : currentValues.keySet()) {
+            for (String var : derivatives.keySet()) {
                 if (!"t".equals(var)) { // Skip time variable 't' for direct integration
                     double newValue = currentValues.get(var) + (stepSize / 6.0) * (k1Values.get(var) + 2 * k2Values.get(var) + 2 * k3Values.get(var) + k4Values.get(var));
                     currentValues.put(var, newValue);
@@ -113,7 +113,7 @@ public class RK4 {
 
     private static HashMap<String, Double> updateIntermediateValues(HashMap<String, Double> currentValues, HashMap<String, Double> derivativeValues, double delta) {
         HashMap<String, Double> intermediateValues = new HashMap<>();
-        for (String var : currentValues.keySet()) {
+        for (String var : derivativeValues.keySet()) {
             if (!"t".equals(var)) { // Skip time variable 't' for direct integration
                 double intermediateValue = currentValues.get(var) + delta * derivativeValues.get(var);
                 intermediateValues.put(var, intermediateValue);
