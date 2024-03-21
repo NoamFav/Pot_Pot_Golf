@@ -295,9 +295,20 @@ public class Main extends Application {
             double tInitial = Double.parseDouble(startTextField.getText().trim());
             double tFinal = Double.parseDouble(endTextField.getText().trim());
 
+            StringBuilder combinedText = new StringBuilder();
+            for (TextField textField : functionFields) {
+                combinedText.append(textField.getText());
+            }
+            for (String var : variables.keySet()) {
+                if (!combinedText.toString().contains(var)) {
+                    variables.remove(var);
+                }
+            }
+
             // Call your solver here with variables and expressions
             System.out.println("Variables: " + variables);
             System.out.println("Expressions: " + expressions);
+
 
             // Now, use Solver to solve the equations with the collected data
             Solver solver = new Solver();
@@ -306,7 +317,7 @@ public class Main extends Application {
             // Assuming solutionLists contains Euler, Improved Euler, and RK4 solutions respectively
             LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEuler = solutionLists.get(0);
             LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler = solutionLists.get(1);
-            LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4 = solutionLists.get(1);
+            LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4 = solutionLists.get(2);
 
             LinkedHashMap<Double, LinkedHashMap<String, Double>> roundedSolutionsEuler = new LinkedHashMap<>();
             for (Map.Entry<Double, LinkedHashMap<String, Double>> entry : solutionsEuler.entrySet()) {
@@ -364,8 +375,6 @@ public class Main extends Application {
         String equation = combinedText.toString();
 
         root.getChildren().remove(scrollPane);
-        variableLabels.clear();
-        variableValueFields.clear();
         boolean isPi = false;
         boolean isE = false;
 
