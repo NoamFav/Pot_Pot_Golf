@@ -18,7 +18,7 @@ public class Solver {
 
         // Solve using Euler's method
         //HashMap<String, Double> solutionsEuler = EulerSolver.eulerMethod(functions, variables, stepSize, tInitial, tFinal, equations);
-        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEulerHard = EulerSolver.eulerMethodHard(functionsHard, variables, stepSize, tInitial, tFinal, equations);
+        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEulerHard = EulerSolver.eulerMethodHard(functionsHard, variables, stepSize, tInitial, tFinal);
         //solutionsEuler.remove("t",solutionsEuler.get("t"));
         for (LinkedHashMap<String, Double> innerMap : solutionsEulerHard.values()) {
             innerMap.remove("t");
@@ -26,7 +26,7 @@ public class Solver {
 
         // Solve using Improved Euler's method
         //HashMap<String, Double> solutionsImprovedEuler = ImprovedEuler.improvedEulerMethod(functions, variables, stepSize, tInitial, tFinal, equations);
-        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEulerHard = ImprovedEuler.improvedEulerMethodHard(functionsHard, variables, stepSize, tInitial, tFinal, equations);
+        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEulerHard = ImprovedEuler.improvedEulerMethodHard(functionsHard, variables, stepSize, tInitial, tFinal);
         //solutionsImprovedEuler.remove("t",solutionsImprovedEuler.get("t"));
         for (LinkedHashMap<String, Double> innerMap : solutionsImprovedEulerHard.values()) {
             innerMap.remove("t");

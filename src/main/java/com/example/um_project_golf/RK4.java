@@ -74,7 +74,7 @@ public class RK4 {
 
         solutions.put(t, new LinkedHashMap<>(values));
 
-        for (int i = 0; i <= numSteps; i++) {
+        for (int i = 0; i < numSteps; i++) {
             HashMap<String, Double> k1 = new HashMap<>();
             HashMap<String, Double> k2 = new HashMap<>();
             HashMap<String, Double> k3 = new HashMap<>();

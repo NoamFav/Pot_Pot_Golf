@@ -70,8 +70,7 @@ public class ImprovedEuler {
             HashMap<String, Double> initialValues,
             double stepSize,
             double tInitial,
-            double tFinal,
-            HashMap<String, String> equations) {
+            double tFinal) {
 
         int numSteps = (int) Math.ceil((tFinal - tInitial) / stepSize);
         HashMap<String, Double> values = new HashMap<>(initialValues);
@@ -79,15 +78,21 @@ public class ImprovedEuler {
         LinkedHashMap<Double, LinkedHashMap<String, Double>> solutions = new LinkedHashMap<>();
         solutions.put(t, new LinkedHashMap<>(values));
 
-        for (int i = 0; i <= numSteps; i++) {
+        for (int i = 0; i < numSteps; i++) {
             // Calculate k1 for each variable
             HashMap<String, Double> k1 = new HashMap<>();
             for (Map.Entry<String, Expression> entry : derivatives.entrySet()) {
                 String variableName = entry.getKey();
-                Expression function = entry.getValue().setVariable("t", t);
-                initialValues.forEach(function::setVariable); // Set all initial variable values for the expression
-                double derivativeValue = function.evaluate();
-                k1.put(variableName, derivativeValue);
+                Expression function = entry.getValue();
+
+                // Set the current time 't' and all other variable values for the expression
+                function.setVariable("t", t);
+                values.forEach(function::setVariable); // Use current values for setting variables in the function
+
+                if (!"t".equals(variableName)) { // Exclude "t" from direct updates here
+                    double derivativeValue = function.evaluate();
+                    k1.put(variableName, derivativeValue);
+                }
             }
 
             // Prepare valuesMid for k2 calculation by estimating mid-point values
@@ -99,10 +104,16 @@ public class ImprovedEuler {
             HashMap<String, Double> k2 = new HashMap<>();
             for (Map.Entry<String, Expression> entry : derivatives.entrySet()) {
                 String variableName = entry.getKey();
-                Expression function = entry.getValue().setVariable("t", t + stepSize / 2);
-                valuesMid.forEach(function::setVariable); // Update function with mid-step values
-                double derivativeValue = function.evaluate();
-                k2.put(variableName, derivativeValue);
+                Expression function = entry.getValue();
+
+                // Set mid-step values for k2 calculation
+                function.setVariable("t", t + stepSize / 2);
+                valuesMid.forEach(function::setVariable); // Ensure function uses mid-step values
+
+                if (!"t".equals(variableName)) { // Exclude "t" from direct updates here
+                    double derivativeValue = function.evaluate();
+                    k2.put(variableName, derivativeValue);
+                }
             }
 
             // Update variables with the average of k1 and k2
@@ -117,7 +128,7 @@ public class ImprovedEuler {
             t += stepSize;
             values.put("t", t); // Now update "t"
 
-            // Store the updated state
+            // Store the updated state after each iteration
             solutions.put(t, new LinkedHashMap<>(values));
         }
 
