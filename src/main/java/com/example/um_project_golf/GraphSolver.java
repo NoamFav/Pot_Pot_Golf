@@ -13,9 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 public class GraphSolver extends Application {
-    public LineChart<Number,Number> createGraph(LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4, double tInitial, boolean euler, boolean improvedEuler, boolean rk4) {
+    public LineChart<Number,Number> createGraph(LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4, double tInitial, boolean euler, boolean improvedEuler, boolean rk4, double stepSize) {
         NumberAxis xAxis = new NumberAxis();
         xAxis.setLabel("Time");
+        xAxis.setTickUnit(stepSize);
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("Value");
         LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
@@ -54,6 +55,7 @@ public class GraphSolver extends Application {
             }
             if (euler) {
                 lineChart.getData().add(seriesEuler);
+                System.out.println(seriesEuler.getData());
                 lineChart.setCreateSymbols(false);
             }
             if (improvedEuler) {
@@ -99,9 +101,9 @@ public class GraphSolver extends Application {
         List<LinkedHashMap<Double, LinkedHashMap<String, Double>>> plot = solver.solve(stepSize, tInitial, tFinal, variables, equationsMap);
         solutionsEuler = plot.get(0);
         solutionsImprovedEuler = plot.get(1);
-        solutionsRK4 = plot.get(1);
+        solutionsRK4 = plot.get(2);
 
-        LineChart<Number, Number> lineChart = createGraph(solutionsEuler, solutionsImprovedEuler, solutionsRK4, 0, true, true, false);
+        LineChart<Number, Number> lineChart = createGraph(solutionsEuler, solutionsImprovedEuler, solutionsRK4, 0, true, true, true, stepSize);
         lineChart.setTitle("Graph of y against t");
         primaryStage.setScene(new javafx.scene.Scene(lineChart, 800, 600));
         primaryStage.show();
