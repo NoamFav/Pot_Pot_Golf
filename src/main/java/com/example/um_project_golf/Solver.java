@@ -34,7 +34,7 @@ public class Solver {
 
         // Solve using RK4 method
         //HashMap<String, Double> solutionsRK4 = RK4.RK4Method(tInitial, variables, tFinal, functions, stepSize, equations);
-        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4Hard = RK4.RK4MethodHard(functionsHard, variables, stepSize ,tInitial, tFinal, equations);
+        LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4Hard = RK4.RK4MethodHard(functionsHard, variables, stepSize ,tInitial, tFinal);
         for (LinkedHashMap<String, Double> innerMap : solutionsRK4Hard.values()) {
             innerMap.remove("t");
         }
