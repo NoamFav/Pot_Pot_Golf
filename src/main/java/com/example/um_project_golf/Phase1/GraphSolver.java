@@ -1,4 +1,4 @@
-package com.example.um_project_golf;
+package com.example.um_project_golf.phase1;
 
 import javafx.application.Application;
 import javafx.scene.chart.LineChart;
