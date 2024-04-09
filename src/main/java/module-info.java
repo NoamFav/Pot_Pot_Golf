@@ -11,7 +11,9 @@ module com.example.um_project_golf {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires exp4j;
+    requires org.lwjgl.glfw;
+    requires org.lwjgl.opengl;
 
     opens com.example.um_project_golf to javafx.fxml;
-    exports com.example.um_project_golf;
+    exports com.example.um_project_golf.Main;
 }
