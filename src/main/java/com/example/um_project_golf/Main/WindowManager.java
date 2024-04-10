@@ -74,7 +74,7 @@ public class WindowManager {
             GLFW.glfwMaximizeWindow(window);
         } else {
             GLFWVidMode vid_mode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
-            GLFW.glfwSetWindowPos(window, (vid_mode.width() - width) / 2, (vid_mode.height() - height) / 2);
+            GLFW.glfwSetWindowPos(window, ((vid_mode != null ? vid_mode.width() : 0) - width) / 2, ((vid_mode != null ? vid_mode.height() : 0) - height) / 2);
         }
         
         GLFW.glfwMakeContextCurrent(window);
@@ -107,52 +107,39 @@ public class WindowManager {
     public void setClearColor(float r, float g, float b, float alpha) {
         GL11.glClearColor(r, g, b, alpha);
     }
-
-    public boolean iskeyPressed(int keyCode) {
+    public boolean is_keyPressed(int keyCode) {
         return GLFW.glfwGetKey(window, keyCode) == GLFW.GLFW_PRESS;
     }
-
     public boolean windowShouldClose() {
         return GLFW.glfwWindowShouldClose(window);
     }
-
     public String getTitle() {
         return title;
     }
-
     public void setTitle(String title) {
         GLFW.glfwSetWindowTitle(window, title);
     }
-
     public void setResized(boolean resized) {
         this.resized = resized;
     }
-
     public boolean isResized() {
         return resized;
     }
-
-
     public boolean isvSync() {
         return vSync;
     }
-
-    public void setvSync(boolean vSync) {
+    public void set_vSync(boolean vSync) {
         this.vSync = vSync;
     }
-
     public int getWidth() {
         return width;
     }
-
     public int getHeight() {
         return height;
     }
-
     public long getWindow() {
         return window;
     }
-
     public Matrix4f getProjectionMatrix() {
         return projectionMatrix;
     }
