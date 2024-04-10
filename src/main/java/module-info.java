@@ -13,6 +13,7 @@ module com.example.um_project_golf {
     requires exp4j;
     requires org.lwjgl.glfw;
     requires org.lwjgl.opengl;
+    requires org.joml;
 
     opens com.example.um_project_golf to javafx.fxml;
     exports com.example.um_project_golf.Main;
