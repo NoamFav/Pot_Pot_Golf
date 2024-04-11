@@ -78,7 +78,7 @@ public class WindowManager {
         }
         
         GLFW.glfwMakeContextCurrent(window);
-        
+
         if (isvSync()) {
             GLFW.glfwSwapInterval(1);
         }
