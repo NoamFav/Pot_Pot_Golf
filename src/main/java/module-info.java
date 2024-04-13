@@ -15,7 +15,7 @@ module com.example.um_project_golf {
     requires org.lwjgl.opengl;
     requires org.joml;
 
-    opens com.example.um_project_golf to javafx.fxml;
-    exports com.example.um_project_golf.Core;
-    exports com.example.um_project_golf.Game;
+    opens com.um_project_golf to javafx.fxml;
+    exports com.um_project_golf.Core;
+    exports com.um_project_golf.Game;
 }

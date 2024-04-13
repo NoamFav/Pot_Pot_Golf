@@ -1,4 +1,4 @@
-package com.example.um_project_golf.Core;
+package com.um_project_golf.Core;
 
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;

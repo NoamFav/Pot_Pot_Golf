@@ -1,8 +1,8 @@
-package com.example.um_project_golf.Game;
+package com.um_project_golf.Game;
 
-import com.example.um_project_golf.Core.Consts.Consts;
-import com.example.um_project_golf.Core.EngineManager;
-import com.example.um_project_golf.Core.WindowManager;
+import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Core.EngineManager;
+import com.um_project_golf.Core.WindowManager;
 import org.lwjgl.Version;
 
 public class Launcher {

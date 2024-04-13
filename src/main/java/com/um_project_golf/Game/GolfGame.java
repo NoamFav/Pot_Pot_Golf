@@ -1,8 +1,10 @@
-package com.example.um_project_golf.Game;
+package com.um_project_golf.Game;
 
-import com.example.um_project_golf.Core.ILogic;
-import com.example.um_project_golf.Core.RenderManager;
-import com.example.um_project_golf.Core.WindowManager;
+import com.um_project_golf.Core.Entity.Model;
+import com.um_project_golf.Core.ILogic;
+import com.um_project_golf.Core.ObjectLoader;
+import com.um_project_golf.Core.RenderManager;
+import com.um_project_golf.Core.WindowManager;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -12,16 +14,31 @@ public class GolfGame implements ILogic {
     private float colour = 0.0f;
 
     private final RenderManager renderer;
+    private final ObjectLoader loader;
     private final WindowManager window;
 
+    private Model model;
+
     public GolfGame() {
-        this.renderer = new RenderManager();
-        this.window = Launcher.getWindow();
+        renderer = new RenderManager();
+        window = Launcher.getWindow();
+        loader = new ObjectLoader();
     }
 
     @Override
     public void init() throws Exception {
         renderer.init();
+
+        float[] vertices = {
+                -0.5f, 0.5f, 0.0f,
+                -0.5f, -0.5f, 0.0f,
+                0.5f, -0.5f, 0.0f,
+                0.5f, -0.5f, 0.0f,
+                0.5f, 0.5f, 0.0f,
+                -0.5f, 0.5f, 0.0f
+        };
+
+        model = loader.loadModel(vertices);
     }
 
     @Override
@@ -53,11 +70,12 @@ public class GolfGame implements ILogic {
         }
 
         window.setClearColor(colour, colour, colour, 0.0f);
-        renderer.clear();
+        renderer.render(model);
     }
 
     @Override
     public void cleanUp() {
         renderer.cleanUp();
+        loader.cleanUp();
     }
 }

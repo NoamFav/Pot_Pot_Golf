@@ -1,4 +1,4 @@
-package com.example.um_project_golf.Phase1;
+package com.um_project_golf.Phase1;
 
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
