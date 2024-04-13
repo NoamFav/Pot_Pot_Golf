@@ -1,0 +1,143 @@
+.root {
+    -fx-background-color: #f0f0f0;
+}
+
+.label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #37474F; /* A deeper, more sophisticated gray */
+    -fx-font-weight: bold; /* Make labels slightly bolder for better readability */
+}
+
+.button {
+    -fx-background-color:
+            linear-gradient(#42A5F5, #2196F3),
+            linear-gradient(#1E88E5, #1976D2); /* Gradient for a more vibrant look */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-border-color: transparent;
+    -fx-border-width: 2;
+    -fx-border-radius: 15px; /* More pronounced rounding */
+    -fx-background-radius: 15px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 5, 0, 0, 1); /* Soft shadow for depth */
+}
+
+.button:hover {
+    -fx-background-color:
+            linear-gradient(#2196F3, #42A5F5),
+            linear-gradient(#1976D2, #1E88E5); /* Inverse gradient on hover for an interactive feel */
+}
+
+.choice-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #BDBDBD;
+    -fx-border-width: 2;
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-padding: 4px; /* Better spacing inside the box */
+}
+
+.text-field, .text-area {
+    -fx-font-size: 14px;
+    -fx-border-color: #BDBDBD;
+    -fx-border-width: 2;
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-background-color: #ffffff;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 2, 0, 0, 2); /* Subtle shadow for depth */
+}
+
+.text-area .content { /* Targeting the content area of the TextArea */
+    -fx-background-color: transparent;
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+}
+
+.text-area .scroll-pane { /* Targeting the ScrollPane within the TextArea */
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.text-area .scroll-pane .viewport { /* Targeting the viewport within the ScrollPane */
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.text-area .scroll-pane .content { /* Further targeting the content within the ScrollPane */
+    -fx-background-color: transparent; /* Match the TextArea background */
+    -fx-background-radius: 13px; /* Slightly smaller to fit within the border */
+}
+
+.line-chart {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #BDBDBD;
+    -fx-border-width: 2;
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-padding: 10px; /* Space inside the chart */
+}
+
+.anchor-pane, .vbox {
+    -fx-background-color: #ECEFF1; /* Lighter gray for a clean look */
+    -fx-background-radius: 15px;
+}
+
+.slider .track, .slider .thumb {
+    -fx-background-color: #42A5F5; /* Harmonize slider colors with the button */
+    -fx-background-radius: 15px;
+}
+
+.slider .thumb {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 2); /* Shadow for the thumb for better visibility */
+}
+
+/* Enhanced styling for the pane class for a more distinct appearance */
+.pane {
+    -fx-background-color: #CFD8DC; /* A slightly different shade for contrast */
+    -fx-background-radius: 15px;
+    -fx-padding: 10px;
+}
+
+/* Hover effects for text fields to indicate interactivity */
+.text-field:focused, .text-area:focused {
+    -fx-border-color: #64B5F6; /* Brighter border color on focus */
+    -fx-border-width: 2px;
+}
+
+.grid-pane {
+    -fx-background-color: #CFD8DC;
+    -fx-background-radius: 15px;
+    -fx-padding: 10px;
+    -fx-border-color: #BDBDBD;
+    -fx-border-width: 2;
+    -fx-border-radius: 15px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0);
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .scroll-bar:vertical, .scroll-pane .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+
+}
+
+.scroll-pane .scroll-bar .thumb {
+    -fx-background-color: #2196F3; /* Blue to match your button gradient */
+    -fx-background-insets: 2 2 2 2; /* Adjusted for visual offset */
+    -fx-background-radius: 4em; /* Rounded corners for the thumb */
+    -fx-border-width: 1;
+    -fx-padding: 10px; /* Adjusted for visual offset */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 0); /* Optional: adding a subtle shadow for depth */
+}
+.scroll-pane .scroll-bar .track {
+    -fx-background-color: #E0E0E0; /* Light grey to keep it subtle */
+    -fx-background-radius: 4em; /* Rounded corners for the track */
+}
