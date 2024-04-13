@@ -16,5 +16,6 @@ module com.example.um_project_golf {
     requires org.joml;
 
     opens com.example.um_project_golf to javafx.fxml;
-    exports com.example.um_project_golf.Main;
+    exports com.example.um_project_golf.Core;
+    exports com.example.um_project_golf.Game;
 }
