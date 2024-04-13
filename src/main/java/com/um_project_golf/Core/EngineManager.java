@@ -1,7 +1,7 @@
-package com.example.um_project_golf.Core;
+package com.um_project_golf.Core;
 
-import com.example.um_project_golf.Core.Consts.Consts;
-import com.example.um_project_golf.Game.Launcher;
+import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.Launcher;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
@@ -11,7 +11,7 @@ public class EngineManager {
     public static final float FRAME_CAP = 5000f;
 
     private static int fps;
-    private static float framerate = 1.0f / FRAME_CAP;
+    private static final float framerate = 1.0f / FRAME_CAP;
 
     private boolean isRunning;
 

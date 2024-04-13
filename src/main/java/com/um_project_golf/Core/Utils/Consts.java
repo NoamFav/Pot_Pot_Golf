@@ -1,4 +1,4 @@
-package com.example.um_project_golf.Core.Consts;
+package com.um_project_golf.Core.Utils;
 
 public class Consts {
 
