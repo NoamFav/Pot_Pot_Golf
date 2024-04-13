@@ -13,7 +13,7 @@ public class Launcher {
 
     public static void main(String[] args) {
         System.out.println(Version.getVersion());
-        window = new WindowManager(Consts.Title, 0, 0, false);
+        window = new WindowManager(Consts.Title, 0, 0, true);
         golfGame = new GolfGame();
         EngineManager engine = new EngineManager();
 

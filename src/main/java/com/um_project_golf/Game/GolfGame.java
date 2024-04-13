@@ -29,20 +29,20 @@ public class GolfGame implements ILogic {
     public void init() throws Exception {
         renderer.init();
 
-        float[] vertices = new float[]{
-                // First Triangle
-                -0.5f,  0.5f, 0.0f,  // Top-left
-                0.5f,  0.5f, 0.0f,  // Top-right
-                -0.5f, -0.5f, 0.0f,  // Bottom-left
-                // Second Triangle
-                -0.5f, -0.5f, 0.0f,  // Bottom-left
-                0.5f,  0.5f, 0.0f,  // Top-right
-                0.5f, -0.5f, 0.0f   // Bottom-right
+        float[] vertices = {
+                // First triangle
+                -0.5f,  0.5f, 0.0f, // Top Left
+                -0.5f, -0.5f, 0.0f, // Bottom Left
+                0.5f, -0.5f, 0.0f, // Bottom Right
+                // Second triangle
+                0.5f, -0.5f, 0.0f, // Bottom Right
+                0.5f,  0.5f, 0.0f, // Top Right
+                -0.5f,  0.5f, 0.0f  // Top Left
         };
 
-        int[] indices = new int[]{
-                0, 1, 3,  // First Triangle
-                3, 1, 2   // Second Triangle
+        int[] indices = {
+                0, 1, 2,
+                2, 3, 0
         };
 
         model = loader.loadModel(vertices, indices);
