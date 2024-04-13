@@ -48,8 +48,8 @@ public class WindowManager {
         boolean maximized = false;
         if (width == 0 || height == 0) {
             maximized = true;
-            width = 100;
-            height = 100;
+            width = 1280;
+            height = 920;
             GLFW.glfwWindowHint(GLFW.GLFW_MAXIMIZED, GLFW.GLFW_TRUE);
         }
 
