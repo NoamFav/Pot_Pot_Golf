@@ -1,4 +1,4 @@
-package com.example.um_project_golf.Main;
+package com.example.um_project_golf.Core;
 
 public class Main {
     public static void main(String[] args) {
