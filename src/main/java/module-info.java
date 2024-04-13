@@ -18,4 +18,6 @@ module com.example.um_project_golf {
     opens com.um_project_golf to javafx.fxml;
     exports com.um_project_golf.Core;
     exports com.um_project_golf.Game;
+    exports com.um_project_golf.Core.Entity;
+    exports com.um_project_golf.Core.Utils;
 }
