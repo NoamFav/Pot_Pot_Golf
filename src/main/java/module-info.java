@@ -15,6 +15,7 @@ module com.example.um_project_golf {
     requires org.lwjgl.opengl;
     requires org.joml;
     requires org.apache.logging.log4j;
+    requires org.lwjgl.stb;
 
     opens com.um_project_golf to javafx.fxml;
     exports com.um_project_golf.Core;
