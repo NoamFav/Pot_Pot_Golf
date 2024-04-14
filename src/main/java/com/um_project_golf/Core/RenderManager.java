@@ -10,11 +10,10 @@ import org.lwjgl.opengl.GL30;
 
 public class RenderManager {
 
-    private final WindowManager window;
     private ShaderManager shader;
 
     public RenderManager() {
-        this.window = Launcher.getWindow();
+        WindowManager window = Launcher.getWindow();
     }
 
     public void init() throws Exception {
