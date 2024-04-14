@@ -1,11 +1,13 @@
 package com.um_project_golf.Game;
 
+import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.Model;
 import com.um_project_golf.Core.Entity.Texture;
 import com.um_project_golf.Core.ILogic;
 import com.um_project_golf.Core.ObjectLoader;
 import com.um_project_golf.Core.RenderManager;
 import com.um_project_golf.Core.WindowManager;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -18,7 +20,7 @@ public class GolfGame implements ILogic {
     private final ObjectLoader loader;
     private final WindowManager window;
 
-    private Model model;
+    private Entity entity;
 
     public GolfGame() {
         renderer = new RenderManager();
@@ -49,8 +51,9 @@ public class GolfGame implements ILogic {
                 1, 0
         };
 
-        model = loader.loadModel(vertices, textureCoords, indices);
+        Model model = loader.loadModel(vertices, textureCoords, indices);
         model.setTexture(new Texture(loader.loadTexture("Texture/grass.png")));
+        entity = new Entity(model, new Vector3f(1,0,0), new Vector3f(0,0,0), 1);
     }
 
     @Override
@@ -72,6 +75,11 @@ public class GolfGame implements ILogic {
         } else if (colour < 0.0f) {
             colour = 0.0f;
         }
+
+        if(entity.getPos().x < -1.5f) {
+            entity.getPos().x = 1.5f;
+        }
+        entity.getPos().x -= 0.01f;
     }
 
     @Override
@@ -82,7 +90,7 @@ public class GolfGame implements ILogic {
         }
 
         window.setClearColor(colour, colour, colour, 0.0f);
-        renderer.render(model);
+        renderer.render(entity);
     }
 
     @Override

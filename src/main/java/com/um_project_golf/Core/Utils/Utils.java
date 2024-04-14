@@ -22,9 +22,12 @@ public class Utils {
         return buffer;
     }
 
-    public static String loadResource(String fileName) throws Exception {
+    public static String loadResource(String fileName) {
         String result;
         InputStream in = Utils.class.getResourceAsStream(fileName);
+        if (in == null) {
+            throw new RuntimeException("Resource not found: " + fileName);
+        }
         try (Scanner scanner = new Scanner(in, StandardCharsets.UTF_8)) {
             result = scanner.useDelimiter("\\A").next();
         }
