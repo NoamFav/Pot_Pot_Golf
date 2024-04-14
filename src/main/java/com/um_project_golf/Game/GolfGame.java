@@ -1,6 +1,7 @@
 package com.um_project_golf.Game;
 
 import com.um_project_golf.Core.Entity.Model;
+import com.um_project_golf.Core.Entity.Texture;
 import com.um_project_golf.Core.ILogic;
 import com.um_project_golf.Core.ObjectLoader;
 import com.um_project_golf.Core.RenderManager;
@@ -30,22 +31,26 @@ public class GolfGame implements ILogic {
         renderer.init();
 
         float[] vertices = {
-                // First triangle
-                -0.5f,  0.5f, 0.0f, // Top Left
-                -0.5f, -0.5f, 0.0f, // Bottom Left
-                0.5f, -0.5f, 0.0f, // Bottom Right
-                // Second triangle
-                0.5f, -0.5f, 0.0f, // Bottom Right
-                0.5f,  0.5f, 0.0f, // Top Right
-                -0.5f,  0.5f, 0.0f  // Top Left
+                -0.5f, 0.5f, 0.0f,
+                -0.5f, -0.5f, 0.0f,
+                0.5f, -0.5f, 0.0f,
+                0.5f, 0.5f, 0.0f
         };
 
         int[] indices = {
                 0, 1, 2,
-                2, 3, 0
+                0, 2, 3
         };
 
-        model = loader.loadModel(vertices, indices);
+        float[] textureCoords = {
+                0, 0,
+                0, 1,
+                1, 1,
+                1, 0
+        };
+
+        model = loader.loadModel(vertices, textureCoords, indices);
+        model.setTexture(new Texture(loader.loadTexture("Texture/grass.png")));
     }
 
     @Override
