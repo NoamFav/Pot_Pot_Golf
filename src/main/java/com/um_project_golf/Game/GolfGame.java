@@ -31,15 +31,15 @@ public class GolfGame implements ILogic {
         renderer.init();
 
         float[] vertices = {
-                -0.5f, 0.5f, 0.0f,
-                -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-                0.5f, 0.5f, 0.0f
+                -0.5f,  0.5f, 0f, // Top-left
+                -0.5f, -0.5f, 0f, // Bottom-left
+                0.5f, -0.5f, 0f,  // Bottom-right
+                0.5f,  0.5f, 0f   // Top-right
         };
 
         int[] indices = {
                 0, 1, 2,
-                0, 2, 3
+                2, 3, 0
         };
 
         float[] textureCoords = {
