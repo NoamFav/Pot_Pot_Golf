@@ -52,7 +52,7 @@ public class GolfGame implements ILogic {
         };
 
         Model model = loader.loadModel(vertices, textureCoords, indices);
-        model.setTexture(new Texture(loader.loadTexture("Texture/Nyan.png")));
+        model.setTexture(new Texture(loader.loadTexture("Texture/grass  .png")));
         entity = new Entity(model, new Vector3f(1,0,0), new Vector3f(0,0,0), 1);
     }
 
