@@ -15,7 +15,7 @@ public class Entity {
         this.scale = scale;
     }
 
-    public void increasePosition(float x, float y, float z) {
+    public void increasePos(float x, float y, float z) {
         this.pos.add(x, y, z);
     }
 
