@@ -52,18 +52,30 @@ public class GolfGame implements ILogic {
         };
 
         Model model = loader.loadModel(vertices, textureCoords, indices);
-        model.setTexture(new Texture(loader.loadTexture("Texture/grass.png")));
+        model.setTexture(new Texture(loader.loadTexture("Texture/cat.png")));
         entity = new Entity(model, new Vector3f(1,0,0), new Vector3f(0,0,0), 1);
     }
 
     @Override
     public void input() {
-        if (window.is_keyPressed(GLFW.GLFW_KEY_UP)) {
+        if (window.is_keyPressed(GLFW.GLFW_KEY_SPACE)) {
             direction = 1;
-        } else if (window.is_keyPressed(GLFW.GLFW_KEY_DOWN)) {
+        } else if (window.is_keyPressed(GLFW.GLFW_KEY_BACKSPACE)) {
             direction = -1;
         } else {
             direction = 0;
+        }
+        if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
+            entity.getPos().x -= 0.02f;
+        }
+        if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT)) {
+            entity.getPos().x += 0.02f;
+        }
+        if (window.is_keyPressed(GLFW.GLFW_KEY_UP)) {
+            entity.getPos().y += 0.02f;
+        }
+        if (window.is_keyPressed(GLFW.GLFW_KEY_DOWN)) {
+            entity.getPos().y -= 0.02f;
         }
     }
 
@@ -79,7 +91,16 @@ public class GolfGame implements ILogic {
         if(entity.getPos().x < -1.5f) {
             entity.getPos().x = 1.5f;
         }
-        entity.getPos().x -= 0.01f;
+        if (entity.getPos().x > 1.5f) {
+            entity.getPos().x = -1.5f;
+        }
+        if (entity.getPos().y < -1.5f) {
+            entity.getPos().y = 1.5f;
+        }
+        if (entity.getPos().y > 1.5f) {
+            entity.getPos().y = -1.5f;
+        }
+
     }
 
     @Override
