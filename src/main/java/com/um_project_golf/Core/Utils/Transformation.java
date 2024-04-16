@@ -21,11 +21,11 @@ public class    Transformation {
        Vector3f cameraPos = camera.getPosition();
        Vector3f rotation = camera.getRotation();
        Matrix4f viewMatrix = new Matrix4f();
-       viewMatrix.identity();
-       viewMatrix.rotate((float) Math.toRadians(rotation.x), new Vector3f(1, 0, 0))
+       viewMatrix.identity()
+               .rotate((float) Math.toRadians(rotation.x), new Vector3f(1, 0, 0))
                .rotate((float) Math.toRadians(rotation.y), new Vector3f(0, 1, 0))
-               .rotate((float) Math.toRadians(rotation.z), new Vector3f(0, 0, 1));
-       viewMatrix.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
+               .rotate((float) Math.toRadians(rotation.z), new Vector3f(0, 0, 1))
+               .translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
        return viewMatrix;
     }
 }
