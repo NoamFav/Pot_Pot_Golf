@@ -2,6 +2,7 @@ package com.um_project_golf.Core;
 
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Game.Launcher;
+import com.um_project_golf.MouseInput;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
@@ -16,6 +17,7 @@ public class EngineManager {
     private boolean isRunning;
 
     private WindowManager window;
+    private MouseInput mouseInput;
     private GLFWErrorCallback errorCallback;
     private ILogic gameLogic;
 
@@ -23,9 +25,10 @@ public class EngineManager {
         GLFW.glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
         window = Launcher.getWindow();
         gameLogic = Launcher.getGolfGame();
+        mouseInput = new MouseInput();
         window.init();
         gameLogic.init();
-
+        mouseInput.init();
     }
 
     public void start() throws Exception {
@@ -87,6 +90,7 @@ public class EngineManager {
     }
 
     public void input() {
+        mouseInput.input();
         gameLogic.input();
     }
 
