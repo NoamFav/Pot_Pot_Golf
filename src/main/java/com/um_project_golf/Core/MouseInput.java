@@ -1,4 +1,4 @@
-package com.um_project_golf;
+package com.um_project_golf.Core;
 
 import com.um_project_golf.Game.Launcher;
 import org.joml.Vector2d;
@@ -30,8 +30,8 @@ public class MouseInput {
         });
 
         GLFW.glfwSetMouseButtonCallback(Launcher.getWindow().getWindow(), (window, button, action, mode) -> {
-            leftButtonPressed = button == GLFW.GLFW_MOUSE_BUTTON_1 && action == GLFW.GLFW_PRESS;
-            rightButtonPressed = button == GLFW.GLFW_MOUSE_BUTTON_2 && action == GLFW.GLFW_PRESS;
+            leftButtonPressed = button == GLFW.GLFW_MOUSE_BUTTON_LEFT && action == GLFW.GLFW_PRESS;
+            rightButtonPressed = button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && action == GLFW.GLFW_PRESS;
         });
     }
 
@@ -49,6 +49,8 @@ public class MouseInput {
                 displVec.x = (float) deltaY;
             }
         }
+        previousPos.x = currentPos.x;
+        previousPos.y = currentPos.y;
     }
 
     public Vector2f getDisplVec() {

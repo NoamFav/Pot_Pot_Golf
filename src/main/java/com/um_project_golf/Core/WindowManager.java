@@ -1,5 +1,6 @@
 package com.um_project_golf.Core;
 
+import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -9,10 +10,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
 
 public class WindowManager {
-    public static final float FOV = (float) Math.toRadians(60);
-    public static final float Z_NEAR = 0.1f;
-    public static final float Z_FAR = 1000.0f;
-
     private final String title;
 
     private int width, height;
@@ -48,8 +45,8 @@ public class WindowManager {
         boolean maximized = false;
         if (width == 0 || height == 0) {
             maximized = true;
-            width = 1280;
-            height = 920;
+            width = 1920;
+            height = 1080;
             GLFW.glfwWindowHint(GLFW.GLFW_MAXIMIZED, GLFW.GLFW_TRUE);
         }
 
@@ -90,8 +87,8 @@ public class WindowManager {
         GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_STENCIL_TEST);
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        GL11.glCullFace(GL11.GL_BACK);
+//        GL11.glEnable(GL11.GL_CULL_FACE);
+//        GL11.glCullFace(GL11.GL_BACK);
     }
 
     public void update() {
@@ -146,11 +143,11 @@ public class WindowManager {
 
     public Matrix4f updateProjectionMatrix() {
         float aspectRatio = (float) width / (float) height;
-        return projectionMatrix.setPerspective(FOV, aspectRatio, Z_NEAR, Z_FAR);
+        return projectionMatrix.setPerspective(Consts.FOV, aspectRatio, Consts.Z_NEAR, Consts.Z_FAR);
     }
 
     public Matrix4f updateProjectionMatrix(Matrix4f matrix, int width, int height) {
         float aspectRatio = (float) width / (float) height;
-        return matrix.setPerspective(FOV, aspectRatio, Z_NEAR, Z_FAR);
+        return matrix.setPerspective(Consts.FOV, aspectRatio, Consts.Z_NEAR, Consts.Z_FAR);
     }
 }

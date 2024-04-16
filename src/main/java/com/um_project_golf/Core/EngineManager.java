@@ -2,7 +2,6 @@ package com.um_project_golf.Core;
 
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Game.Launcher;
-import com.um_project_golf.MouseInput;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
@@ -100,7 +99,7 @@ public class EngineManager {
     }
 
     public void update() {
-        gameLogic.update();
+        gameLogic.update(mouseInput);
     }
 
     public void cleanup() {
