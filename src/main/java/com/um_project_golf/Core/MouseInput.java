@@ -25,9 +25,21 @@ public class MouseInput {
             currentPos.y = ypos;
         });
 
-        GLFW.glfwSetCursorEnterCallback(Launcher.getWindow().getWindow(), (window, entered) -> {
-            inWindow = entered;
+        GLFW.glfwSetWindowFocusCallback(Launcher.getWindow().getWindow(), (window, focused) -> {
+            if (focused) {
+                double[] xPos = new double[1];
+                double[] yPos = new double[1];
+                GLFW.glfwGetCursorPos(window, xPos, yPos);
+                int[] width = new int[1];
+                int[] height = new int[1];
+                GLFW.glfwGetWindowSize(window, width, height);
+                inWindow = (xPos[0] >= 0 && xPos[0] <= width[0] && yPos[0] >= 0 && yPos[0] <= height[0]);
+            } else {
+                inWindow = false;
+            }
         });
+
+        GLFW.glfwSetCursorEnterCallback(Launcher.getWindow().getWindow(), (window, entered) -> inWindow = entered);
 
         GLFW.glfwSetMouseButtonCallback(Launcher.getWindow().getWindow(), (window, button, action, mode) -> {
             leftButtonPressed = button == GLFW.GLFW_MOUSE_BUTTON_LEFT && action == GLFW.GLFW_PRESS;

@@ -20,7 +20,7 @@ public class GolfGame implements ILogic {
     private final WindowManager window;
 
     private Entity entity;
-    private Camera camera;
+    private final Camera camera;
 
     Vector3f cameraInc;
 
