@@ -20,7 +20,7 @@ public class GolfGame implements ILogic {
     private final WindowManager window;
 
     private Entity entity;
-    private Camera camera;
+    private final Camera camera;
 
     Vector3f cameraInc;
 
@@ -125,6 +125,7 @@ public class GolfGame implements ILogic {
 
         if (mouseInput.isRightButtonPressed()) {
             Vector2f rotVec = mouseInput.getDisplVec();
+            System.out.println(rotVec);
             camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
         }
 
