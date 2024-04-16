@@ -1,106 +1,135 @@
 package com.um_project_golf.Game;
 
+import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.Model;
 import com.um_project_golf.Core.Entity.Texture;
-import com.um_project_golf.Core.ILogic;
-import com.um_project_golf.Core.ObjectLoader;
-import com.um_project_golf.Core.RenderManager;
-import com.um_project_golf.Core.WindowManager;
+import com.um_project_golf.Core.MouseInput;
+import com.um_project_golf.Core.Utils.Consts;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 public class GolfGame implements ILogic {
 
-    private int direction = 0;
-    private float colour = 0.0f;
+    private static final float CAMERA_MOVEMENT_SPEED = 0.05f;
 
     private final RenderManager renderer;
     private final ObjectLoader loader;
     private final WindowManager window;
 
     private Entity entity;
+    private Camera camera;
+
+    Vector3f cameraInc;
 
     public GolfGame() {
         renderer = new RenderManager();
         window = Launcher.getWindow();
         loader = new ObjectLoader();
+        camera = new Camera();
+        cameraInc = new Vector3f(0, 0, 0);
     }
 
     @Override
     public void init() throws Exception {
         renderer.init();
 
-        float[] vertices = {
-                -0.5f,  0.5f, 0f, // Top-left
-                -0.5f, -0.5f, 0f, // Bottom-left
-                0.5f, -0.5f, 0f,  // Bottom-right
-                0.5f,  0.5f, 0f   // Top-right
+        float[] vertices = new float[] {
+                -0.5f, 0.5f, 0.5f,
+                -0.5f, -0.5f, 0.5f,
+                0.5f, -0.5f, 0.5f,
+                0.5f, 0.5f, 0.5f,
+                -0.5f, 0.5f, -0.5f,
+                0.5f, 0.5f, -0.5f,
+                -0.5f, -0.5f, -0.5f,
+                0.5f, -0.5f, -0.5f,
+                -0.5f, 0.5f, -0.5f,
+                0.5f, 0.5f, -0.5f,
+                -0.5f, 0.5f, 0.5f,
+                0.5f, 0.5f, 0.5f,
+                0.5f, 0.5f, 0.5f,
+                0.5f, -0.5f, 0.5f,
+                -0.5f, 0.5f, 0.5f,
+                -0.5f, -0.5f, 0.5f,
+                -0.5f, -0.5f, -0.5f,
+                0.5f, -0.5f, -0.5f,
+                -0.5f, -0.5f, 0.5f,
+                0.5f, -0.5f, 0.5f,
         };
 
-        int[] indices = {
-                0, 1, 2,
-                2, 3, 0
+        float[] textCoords = new float[]{
+                0.0f, 0.0f,
+                0.0f, 0.5f,
+                0.5f, 0.5f,
+                0.5f, 0.0f,
+                0.0f, 0.0f,
+                0.5f, 0.0f,
+                0.0f, 0.5f,
+                0.5f, 0.5f,
+                0.0f, 0.5f,
+                0.5f, 0.5f,
+                0.0f, 1.0f,
+                0.5f, 1.0f,
+                0.0f, 0.0f,
+                0.0f, 0.5f,
+                0.5f, 0.0f,
+                0.5f, 0.5f,
+                0.5f, 0.0f,
+                1.0f, 0.0f,
+                0.5f, 0.5f,
+                1.0f, 0.5f,
         };
 
-        float[] textureCoords = {
-                0, 0,
-                0, 1,
-                1, 1,
-                1, 0
+        int[] indices = new int[]{
+                0, 1, 3, 3, 1, 2,
+                8, 10, 11, 9, 8, 11,
+                12, 13, 7, 5, 12, 7,
+                14, 15, 6, 4, 14, 6,
+                16, 18, 19, 17, 16, 19,
+                4, 6, 7, 5, 4, 7,
         };
 
-        Model model = loader.loadModel(vertices, textureCoords, indices);
+        Model model = loader.loadModel(vertices, textCoords, indices);
         model.setTexture(new Texture(loader.loadTexture("Texture/grass.png")));
-        entity = new Entity(model, new Vector3f(1,0,0), new Vector3f(0,0,0), 1);
+        entity = new Entity(model, new Vector3f(0,0,-5), new Vector3f(0,0,0), 1);
     }
 
     @Override
     public void input() {
-        if (window.is_keyPressed(GLFW.GLFW_KEY_SPACE)) {
-            direction = 1;
-        } else if (window.is_keyPressed(GLFW.GLFW_KEY_BACKSPACE)) {
-            direction = -1;
-        } else {
-            direction = 0;
+        cameraInc.set(0, 0, 0);
+        if(window.is_keyPressed(GLFW.GLFW_KEY_W)) {
+            cameraInc.z = -1;
         }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
-            entity.getPos().x -= 0.02f;
+        if(window.is_keyPressed(GLFW.GLFW_KEY_S)) {
+            cameraInc.z = 1;
         }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT)) {
-            entity.getPos().x += 0.02f;
+        if(window.is_keyPressed(GLFW.GLFW_KEY_A)) {
+            cameraInc.x = -1;
         }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_UP)) {
-            entity.getPos().y += 0.02f;
+        if(window.is_keyPressed(GLFW.GLFW_KEY_D)) {
+            cameraInc.x = 1;
         }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_DOWN)) {
-            entity.getPos().y -= 0.02f;
+        if(window.is_keyPressed(GLFW.GLFW_KEY_Z)) {
+            cameraInc.y = -1;
+        }
+        if(window.is_keyPressed(GLFW.GLFW_KEY_X)) {
+            cameraInc.y = 1;
         }
     }
 
     @Override
-    public void update() {
-        colour += direction * 0.01f;
-        if (colour > 1.0f) {
-            colour = 1.0f;
-        } else if (colour < 0.0f) {
-            colour = 0.0f;
+    public void update(MouseInput mouseInput) {
+        camera.movePosition(cameraInc.x * CAMERA_MOVEMENT_SPEED, cameraInc.y * CAMERA_MOVEMENT_SPEED, cameraInc.z * CAMERA_MOVEMENT_SPEED);
+
+        if (mouseInput.isRightButtonPressed()) {
+            Vector2f rotVec = mouseInput.getDisplVec();
+            camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
         }
 
-        if(entity.getPos().x < -1.5f) {
-            entity.getPos().x = 1.5f;
-        }
-        if (entity.getPos().x > 1.5f) {
-            entity.getPos().x = -1.5f;
-        }
-        if (entity.getPos().y < -1.5f) {
-            entity.getPos().y = 1.5f;
-        }
-        if (entity.getPos().y > 1.5f) {
-            entity.getPos().y = -1.5f;
-        }
 
+        entity.increaseRotation(0.0f, 0.5f, 0.0f);
     }
 
     @Override
@@ -110,8 +139,8 @@ public class GolfGame implements ILogic {
             window.setResized(true);
         }
 
-        window.setClearColor(colour, colour, colour, 0.0f);
-        renderer.render(entity);
+        window.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        renderer.render(entity, camera);
     }
 
     @Override
