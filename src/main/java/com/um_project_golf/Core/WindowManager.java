@@ -81,8 +81,10 @@ public class WindowManager {
         }
 
         GLFW.glfwShowWindow(window);
+        GLFW.glfwFocusWindow(window);
 
         GL.createCapabilities();
+
 
         GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
