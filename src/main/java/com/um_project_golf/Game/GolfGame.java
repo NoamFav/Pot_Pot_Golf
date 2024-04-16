@@ -111,10 +111,9 @@ public class GolfGame implements ILogic {
         if(window.is_keyPressed(GLFW.GLFW_KEY_D)) {
             cameraInc.x = 1;
         }
-        if(window.is_keyPressed(GLFW.GLFW_KEY_Z)) {
+        if(window.is_keyPressed(GLFW.GLFW_KEY_SPACE) && window.is_keyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
             cameraInc.y = -1;
-        }
-        if(window.is_keyPressed(GLFW.GLFW_KEY_X)) {
+        } else if(window.is_keyPressed(GLFW.GLFW_KEY_SPACE)) {
             cameraInc.y = 1;
         }
     }
@@ -125,7 +124,6 @@ public class GolfGame implements ILogic {
 
         if (mouseInput.isRightButtonPressed()) {
             Vector2f rotVec = mouseInput.getDisplVec();
-            System.out.println(rotVec);
             camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
         }
 
