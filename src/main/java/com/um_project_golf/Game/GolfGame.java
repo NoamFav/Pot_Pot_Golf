@@ -28,6 +28,10 @@ public class GolfGame implements ILogic {
 
     Vector3f cameraInc;
 
+    /**
+     * The constructor of the game.
+     * It initializes the renderer, window, loader and camera.
+     */
     public GolfGame() {
         renderer = new RenderManager();
         window = Launcher.getWindow();
@@ -36,6 +40,12 @@ public class GolfGame implements ILogic {
         cameraInc = new Vector3f(0, 0, 0);
     }
 
+    /**
+     * Initializes the game.
+     * It loads the model and texture of the game.
+     *
+     * @throws Exception If the game fails to initialize.
+     */
     @Override
     public void init() throws Exception {
         renderer.init();
@@ -45,6 +55,10 @@ public class GolfGame implements ILogic {
         entity = new Entity(model, new Vector3f(0,0,-1), new Vector3f(0,0,0), 1);
     }
 
+    /**
+     * Handles the input of the game.
+     * It sets the cameraInc vector based on the input of the user.
+     */
     @Override
     public void input() {
         cameraInc.set(0, 0, 0);
@@ -67,6 +81,12 @@ public class GolfGame implements ILogic {
         }
     }
 
+    /**
+     * Updates the game state.
+     * It moves the camera and the entity based on the input of the user.
+     *
+     * @param mouseInput The mouse input of the user.
+     */
     @Override
     public void update(MouseInput mouseInput) {
         camera.movePosition(cameraInc.x * CAMERA_MOVEMENT_SPEED, cameraInc.y * CAMERA_MOVEMENT_SPEED, cameraInc.z * CAMERA_MOVEMENT_SPEED);
@@ -80,6 +100,10 @@ public class GolfGame implements ILogic {
         entity.increaseRotation(0.0f, 0.5f, 0.0f);
     }
 
+    /**
+     * Renders the game.
+     * It renders the entity and the camera.
+     */
     @Override
     public void render() {
         if (window.isResized()) {
@@ -91,6 +115,10 @@ public class GolfGame implements ILogic {
         renderer.render(entity, camera);
     }
 
+    /**
+     * Cleans up the game.
+     * It cleans up the renderer and loader.
+     */
     @Override
     public void cleanUp() {
         renderer.cleanup();

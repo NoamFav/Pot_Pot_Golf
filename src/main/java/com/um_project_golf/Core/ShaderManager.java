@@ -10,6 +10,10 @@ import org.lwjgl.system.MemoryStack;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The shader manager class.
+ * This class is responsible for creating and managing the shaders of the game.
+ */
 public class ShaderManager {
 
     private final int programID;
@@ -17,6 +21,12 @@ public class ShaderManager {
 
     private final Map<String, Integer> uniforms;
 
+    /**
+     * The constructor of the shader manager.
+     * It initializes the program ID and the uniforms.
+     *
+     * @throws Exception If the shader could not be created.
+     */
     public ShaderManager() throws Exception {
         programID = GL20.glCreateProgram();
         if (programID == 0) {
@@ -26,6 +36,12 @@ public class ShaderManager {
         uniforms = new HashMap<>();
     }
 
+    /**
+     * Creates a uniform.
+     *
+     * @param uniformName The name of the uniform.
+     * @throws Exception If the uniform could not be created.
+     */
     public void createUniform(String uniformName) throws Exception {
         int uniformLocation = GL20.glGetUniformLocation(programID, uniformName);
         if (uniformLocation < 0) {
@@ -34,40 +50,96 @@ public class ShaderManager {
         uniforms.put(uniformName, uniformLocation);
     }
 
+    /**
+     * Sets a uniform.
+     *
+     * @param uniformName The name of the uniform.
+     * @param value The value of the uniform.
+     */
     public void setUniform(String uniformName, Matrix4f value) {
         try(MemoryStack stack = MemoryStack.stackPush()) {
             GL20.glUniformMatrix4fv(uniforms.get(uniformName), false, value.get(stack.mallocFloat(16)));
         }
     }
 
+    /**
+     * Sets a uniform.
+     *
+     * @param uniformName The name of the uniform.
+     * @param value The value of the uniform.
+     */
     public void setUniform(String uniformName, Vector4f value) {
         GL20.glUniform4f(uniforms.get(uniformName), value.x, value.y, value.z, value.w);
     }
 
+    /**
+     * Sets a uniform.
+     *
+     * @param uniformName The name of the uniform.
+     * @param value The value of the uniform.
+     */
     public void setUniform(String uniformName, Vector3f value) {
         GL20.glUniform3f(uniforms.get(uniformName), value.x, value.y, value.z);
     }
 
+    /**
+     * Sets a uniform.
+     *
+     * @param uniformName The name of the uniform.
+     * @param value The value of the uniform.
+     */
     public void setUniform(String uniformName, boolean value) {
         GL20.glUniform1f(uniforms.get(uniformName), value ? 1 : 0);
     }
 
+    /**
+     * Sets a uniform.
+     *
+     * @param uniformName The name of the uniform.
+     * @param value The value of the uniform.
+     */
     public void setUniform(String uniformName, int value) {
         GL20.glUniform1i(uniforms.get(uniformName), value);
     }
 
+    /**
+     * Sets a uniform.
+     *
+     * @param uniformName The name of the uniform.
+     * @param value The value of the uniform.
+     */
     public void setUniform(String uniformName, float value) {
         GL20.glUniform1f(uniforms.get(uniformName), value);
     }
 
+    /**
+     * Creates a vertex shader.
+     *
+     * @param shaderCode The code of the shader.
+     * @throws Exception If the shader could not be created.
+     */
     public void createVertexShader(String shaderCode) throws Exception {
         vertexShaderID = createShader(shaderCode, GL20.GL_VERTEX_SHADER);
     }
 
+    /**
+     * Creates a fragment shader.
+     *
+     * @param shaderCode The code of the shader.
+     * @throws Exception If the shader could not be created.
+     */
     public void createFragmentShader(String shaderCode) throws Exception {
         fragmentShaderID = createShader(shaderCode, GL20.GL_FRAGMENT_SHADER);
     }
 
+    /**
+     * Creates a shader.
+     *
+     * @param shaderCode The code of the shader.
+     * @param type The type of the shader.
+     * @return The ID of the shader.
+     * @throws Exception If the shader could not be created.
+     */
     public int createShader(String shaderCode, int type) throws Exception {
         int shaderID = GL20.glCreateShader(type);
         if (shaderID == 0) {
@@ -86,6 +158,11 @@ public class ShaderManager {
         return shaderID;
     }
 
+    /**
+     * Links the shader.
+     *
+     * @throws Exception If the shader could not be linked.
+     */
     public void link() throws Exception {
         GL20.glLinkProgram(programID);
         if (GL20.glGetProgrami(programID, GL20.GL_LINK_STATUS) == 0) {
@@ -111,14 +188,23 @@ public class ShaderManager {
         GL30.glBindVertexArray(0);
     }
 
+    /**
+     * Binds the shader.
+     */
     public void bind() {
         GL20.glUseProgram(programID);
     }
 
+    /**
+     * Unbinds the shader.
+     */
     public void unbind() {
         GL20.glUseProgram(0);
     }
 
+    /**
+     * Cleans up the shader.
+     */
     public void cleanup() {
         unbind();
         if (programID != 0) {
