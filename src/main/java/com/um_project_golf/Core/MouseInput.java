@@ -5,6 +5,10 @@ import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * The mouse input class.
+ * This class is responsible for handling the mouse input of the game.
+ */
 public class MouseInput {
     private final Vector2d previousPos, currentPos;
     private final Vector2f displVec;
@@ -13,12 +17,20 @@ public class MouseInput {
     private boolean leftButtonPressed = false;
     private boolean rightButtonPressed = false;
 
+    /**
+     * The constructor of the mouse input.
+     * It initializes the previous position, current position and displacement vector of the mouse.
+     */
     public MouseInput() {
         previousPos = new Vector2d(-1, -1);
         currentPos = new Vector2d(0, 0);
         displVec = new Vector2f();
     }
 
+    /**
+     * Initializes the mouse input.
+     * It sets the cursor position, window focus, cursor enter and mouse button callbacks.
+     */
     public void init() {
         GLFW.glfwSetCursorPosCallback(Launcher.getWindow().getWindow(), (window, xpos, ypos) -> {
             currentPos.x = xpos;
@@ -65,14 +77,29 @@ public class MouseInput {
         previousPos.y = currentPos.y;
     }
 
+    /**
+     * Gets the displacement vector of the mouse.
+     *
+     * @return The displacement vector of the mouse.
+     */
     public Vector2f getDisplVec() {
         return displVec;
     }
 
+    /**
+     * Checks if the left button is pressed.
+     *
+     * @return True if the left button is pressed, false otherwise.
+     */
     public boolean isLeftButtonPressed() {
         return leftButtonPressed;
     }
 
+    /**
+     * Checks if the right button is pressed.
+     *
+     * @return True if the right button is pressed, false otherwise.
+     */
     public boolean isRightButtonPressed() {
         return rightButtonPressed;
     }

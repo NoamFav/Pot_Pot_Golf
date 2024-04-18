@@ -7,14 +7,22 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.Version;
 
-
+/**
+ * The main class of the game.
+ * It is responsible for starting the game.
+ */
 public class Launcher {
 
     private static final Logger log = LogManager.getLogger(Launcher.class);
     private static WindowManager window;
     private static GolfGame golfGame;
 
-
+    /**
+     * The main method of the game.
+     * It is responsible for starting the game.
+     *
+     * @param args The arguments passed to the game.
+     */
     public static void main(String[] args) {
         System.out.println(Version.getVersion());
         window = new WindowManager(Consts.Title, 0, 0, true);
