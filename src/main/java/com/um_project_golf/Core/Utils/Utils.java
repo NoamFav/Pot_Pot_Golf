@@ -52,9 +52,8 @@ public class Utils {
                 list.add(line);
             }
         } catch (IOException | ClassNotFoundException e) {
-            log.error("An error occured", e);
+            log.error("An error occurred", e);
         }
         return list;
     }
-
 }
