@@ -1,9 +1,12 @@
 package com.um_project_golf.Core;
 
 import com.um_project_golf.Core.Entity.Entity;
+import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.Utils.Transformation;
 import com.um_project_golf.Core.Utils.Utils;
 import com.um_project_golf.Game.Launcher;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -14,6 +17,7 @@ import org.lwjgl.opengl.GL30;
  */
 public class RenderManager {
 
+    private static final Logger log = LogManager.getLogger(RenderManager.class);
     private final WindowManager window;
     private ShaderManager shader;
 
@@ -40,6 +44,8 @@ public class RenderManager {
         shader.createUniform("transformationMatrix");
         shader.createUniform("projectionMatrix");
         shader.createUniform("viewMatrix");
+        shader.createUniform("ambientLight");
+        shader.createMaterialUniform("material");
     }
 
     /**
@@ -51,14 +57,18 @@ public class RenderManager {
     public void render(Entity entity, Camera camera) {
         clear();
         shader.bind();
+
         shader.setUniform("textureSampler", 0);
         shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix(entity));
         shader.setUniform("projectionMatrix", window.updateProjectionMatrix());
         shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera));
+        shader.setUniform("ambientLight", Consts.AMBIENT_LIGHT);
+        shader.setUniform("material", entity.getModel().getMaterial());
 
         GL30.glBindVertexArray(entity.getModel().getId());
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
+        GL20.glEnableVertexAttribArray(2);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
@@ -66,6 +76,7 @@ public class RenderManager {
         GL11.glDrawElements(GL11.GL_TRIANGLES, entity.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1);
+        GL20.glDisableVertexAttribArray(2);
         GL30.glBindVertexArray(0);
         shader.unbind();
     }
