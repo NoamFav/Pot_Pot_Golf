@@ -16,22 +16,44 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
+/**
+ * The utils class.
+ * This class is responsible for providing utility methods.
+ */
 public class Utils {
 
     private static final Logger log = LogManager.getLogger(Utils.class);
 
+    /**
+     * Stores data in a float buffer.
+     *
+     * @param data The data to store.
+     * @return The float buffer.
+     */
     public static FloatBuffer storeDataInFloatBuffer(float[] data) {
         FloatBuffer buffer = MemoryUtil.memAllocFloat(data.length);
         buffer.put(data).flip();
         return buffer;
     }
 
+    /**
+     * Stores data in an int buffer.
+     *
+     * @param data The data to store.
+     * @return The int buffer.
+     */
     public static IntBuffer storeDataInIntBuffer(int[] data) {
         IntBuffer buffer = MemoryUtil.memAllocInt(data.length);
         buffer.put(data).flip();
         return buffer;
     }
 
+    /**
+     * Loads a resource.
+     *
+     * @param fileName The name of the file to load.
+     * @return The resource loaded.
+     */
     public static String loadResource(String fileName) {
         String result;
         InputStream in = Utils.class.getResourceAsStream(fileName);
@@ -44,6 +66,12 @@ public class Utils {
         return result;
     }
 
+    /**
+     * Reads all lines from a file.
+     *
+     * @param fileName The name of the file to read.
+     * @return The lines read.
+     */
     public static List<String> readAllLines(String fileName) {
         List<String> list = new ArrayList<>();
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(Class.forName(Utils.class.getName()).getResourceAsStream(fileName))))) {

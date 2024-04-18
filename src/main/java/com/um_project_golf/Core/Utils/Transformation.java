@@ -5,8 +5,18 @@ import com.um_project_golf.Core.Entity.Entity;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-public class    Transformation {
+/**
+ * The transformation class.
+ * This class is responsible for the transformations of the game.
+ */
+public class Transformation {
 
+    /**
+     * Creates a transformation matrix.
+     *
+     * @param entity The entity to create the transformation matrix.
+     * @return The transformation matrix.
+     */
     public static Matrix4f createTransformationMatrix(Entity entity) {
         Matrix4f matrix = new Matrix4f();
         matrix.identity().translate(entity.getPos()).
@@ -17,6 +27,12 @@ public class    Transformation {
         return matrix;
     }
 
+    /**
+     * Creates a view matrix.
+     *
+     * @param camera The camera to create the view matrix.
+     * @return The view matrix.
+     */
     public static Matrix4f getViewMatrix(Camera camera) {
        Vector3f cameraPos = camera.getPosition();
        Vector3f rotation = camera.getRotation();

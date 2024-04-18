@@ -18,11 +18,20 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The class responsible for loading objects.
+ */
 public class ObjectLoader {
     private final List<Integer> vaos = new ArrayList<>();
     private final List<Integer> vbos = new ArrayList<>();
     private final List<Integer> textures = new ArrayList<>();
 
+    /**
+     * Loads an OBJ model.
+     *
+     * @param filename The name of the file to load.
+     * @return The model loaded.
+     */
     public Model loadOBJModel(String filename) {
         List<String> lines = Utils.readAllLines(filename);
 
@@ -85,6 +94,18 @@ public class ObjectLoader {
         return loadModel(verticesArray, textCoordArr, indicesArr);
     }
 
+    /**
+     * Processes a vertex.
+     *
+     * @param pos The position.
+     * @param texCoord The texture coordinate.
+     * @param normal The normal.
+     * @param textCoordList The list of texture coordinates.
+     * @param normalsList The list of normals.
+     * @param indicesList The list of indices.
+     * @param textCoordArr The array of texture coordinates.
+     * @param normalArr The array of normals.
+     */
     private static void processVertex(int pos, int texCoord, int normal,
                                       List<Vector2f> textCoordList, List<Vector3f> normalsList, List<Integer> indicesList,
                                       float[] textCoordArr, float[] normalArr) {
@@ -104,6 +125,12 @@ public class ObjectLoader {
         }
     }
 
+    /**
+     * Processes a face.
+     *
+     * @param token The token to process.
+     * @param faces The list of faces.
+     */
     private static void processFace(String token, List<Vector3i> faces) {
         String[] lineTokens = token.split("/");
         int length = lineTokens.length;
@@ -119,6 +146,14 @@ public class ObjectLoader {
         faces.add(new Vector3i(pos, coords, normal));
     }
 
+    /**
+     * Loads a model.
+     *
+     * @param vertices The vertices of the model.
+     * @param textureCoords The texture coordinates of the model.
+     * @param indices The indices of the model.
+     * @return The model loaded.
+     */
     public Model loadModel(float[] vertices, float[] textureCoords, int[] indices) {
         int id = createVAO();
         storeIndicesBuffer(indices);
@@ -128,6 +163,13 @@ public class ObjectLoader {
         return new Model(id, indices.length);
     }
 
+    /**
+     * Loads a texture.
+     *
+     * @param filename The name of the file to load.
+     * @return The texture loaded.
+     * @throws Exception If the texture fails to load.
+     */
     public int loadTexture(String filename) throws Exception {
         int width, height;
         ByteBuffer buffer;
@@ -155,6 +197,11 @@ public class ObjectLoader {
         return textureID;
     }
 
+    /**
+     * Creates a VAO.
+     *
+     * @return The ID of the VAO.
+     */
     private int createVAO() {
         int id = GL30.glGenVertexArrays();
         vaos.add(id);
@@ -162,6 +209,11 @@ public class ObjectLoader {
         return id;
     }
 
+    /**
+     * Stores the indices buffer.
+     *
+     * @param indices The indices to store.
+     */
     private void storeIndicesBuffer(int[] indices) {
         int vbo = GL15.glGenBuffers();
         vbos.add(vbo);
@@ -170,6 +222,13 @@ public class ObjectLoader {
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
     }
 
+    /**
+     * Stores the data in the attribute list.
+     *
+     * @param attributeNumber The number of the attribute.
+     * @param vertexCount The vertex count.
+     * @param data The data to store.
+     */
     private void storeDataInAttributeList(int attributeNumber, int vertexCount, float[] data) {
         int vbo = GL15.glGenBuffers();
         vbos.add(vbo);
@@ -180,10 +239,16 @@ public class ObjectLoader {
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     }
 
+    /**
+     * Unbinds the VAO.
+     */
     private void unbind() {
         GL30.glBindVertexArray(0);
     }
 
+    /**
+     * Cleans up the object loader.
+     */
     public void cleanUp() {
         for (int vao : vaos) {
             GL30.glDeleteVertexArrays(vao);

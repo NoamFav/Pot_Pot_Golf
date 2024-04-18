@@ -9,15 +9,27 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+/**
+ * The class responsible for rendering the game.
+ */
 public class RenderManager {
 
     private final WindowManager window;
     private ShaderManager shader;
 
+    /**
+     * The constructor of the render manager.
+     * It initializes the window.
+     */
     public RenderManager() {
         window = Launcher.getWindow();
     }
 
+    /**
+     * Initializes the render manager.
+     *
+     * @throws Exception If the render manager fails to initialize.
+     */
     public void init() throws Exception {
         shader = new ShaderManager();
         shader.createVertexShader(Utils.loadResource("/shaders/vertex.glsl"));
@@ -30,6 +42,12 @@ public class RenderManager {
         shader.createUniform("viewMatrix");
     }
 
+    /**
+     * Renders the entity.
+     *
+     * @param entity The entity to render.
+     * @param camera The camera of the game.
+     */
     public void render(Entity entity, Camera camera) {
         clear();
         shader.bind();
@@ -52,10 +70,16 @@ public class RenderManager {
         shader.unbind();
     }
 
+    /**
+     * Clears the screen.
+     */
     public void clear() {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
     }
 
+    /**
+     * Cleans up the render manager.
+     */
     public void cleanup() {
         shader.cleanup();
     }

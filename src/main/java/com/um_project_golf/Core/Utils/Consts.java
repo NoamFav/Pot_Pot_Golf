@@ -1,5 +1,9 @@
 package com.um_project_golf.Core.Utils;
 
+/**
+ * The consts class.
+ * This class is responsible for the constants of the game.
+ */
 public class Consts {
 
     public static String Title = "UM Project Golf";
