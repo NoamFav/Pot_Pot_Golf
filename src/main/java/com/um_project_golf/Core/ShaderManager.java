@@ -1,5 +1,6 @@
 package com.um_project_golf.Core;
 
+import com.um_project_golf.Core.Entity.Material;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -48,6 +49,20 @@ public class ShaderManager {
             throw new Exception("Could not find uniform: " + uniformName);
         }
         uniforms.put(uniformName, uniformLocation);
+    }
+
+    /**
+     * Creates a uniform.
+     *
+     * @param uniformName The name of the uniform.
+     * @throws Exception If the uniform could not be created.
+     */
+    public void createMaterialUniform(String uniformName) throws Exception {
+        createUniform(uniformName + ".ambient");
+        createUniform(uniformName + ".diffuse");
+        createUniform(uniformName + ".specular");
+        createUniform(uniformName + ".hasTexture");
+        createUniform(uniformName + ".reflectance");
     }
 
     /**
@@ -110,6 +125,20 @@ public class ShaderManager {
      */
     public void setUniform(String uniformName, float value) {
         GL20.glUniform1f(uniforms.get(uniformName), value);
+    }
+
+    /**
+     * Sets the uniforms of a material.
+     *
+     * @param uniformName The name of the uniform.
+     * @param material The material to set.
+     */
+    public void setUniform(String uniformName, Material material) {
+        setUniform(uniformName + ".ambient", material.getAmbientColor());
+        setUniform(uniformName + ".diffuse", material.getDiffuseColor());
+        setUniform(uniformName + ".specular", material.getSpecularColor());
+        setUniform(uniformName + ".hasTexture", material.hasTexture() ? 1 : 0);
+        setUniform(uniformName + ".reflectance", material.getReflectance());
     }
 
     /**

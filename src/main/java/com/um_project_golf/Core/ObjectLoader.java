@@ -91,7 +91,7 @@ public class ObjectLoader {
 
         int[] indicesArr = indices.stream().mapToInt(Integer::intValue).toArray();
 
-        return loadModel(verticesArray, textCoordArr, indicesArr);
+        return loadModel(verticesArray, textCoordArr, normalArr, indicesArr);
     }
 
     /**
@@ -154,11 +154,12 @@ public class ObjectLoader {
      * @param indices The indices of the model.
      * @return The model loaded.
      */
-    public Model loadModel(float[] vertices, float[] textureCoords, int[] indices) {
+    public Model loadModel(float[] vertices, float[] textureCoords, float[] normals, int[] indices) {
         int id = createVAO();
         storeIndicesBuffer(indices);
         storeDataInAttributeList(0, 3, vertices);
         storeDataInAttributeList(1, 2, textureCoords);
+        storeDataInAttributeList(2, 3, normals);
         unbind();
         return new Model(id, indices.length);
     }

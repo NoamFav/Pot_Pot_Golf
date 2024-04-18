@@ -1,5 +1,8 @@
 package com.um_project_golf.Core.Utils;
 
+import org.joml.Vector3f;
+import org.joml.Vector4f;
+
 /**
  * The consts class.
  * This class is responsible for the constants of the game.
@@ -14,4 +17,7 @@ public class Consts {
 
     public static final float MOUSE_SENSITIVITY = 0.2f;
     public static final float CAMERA_MOVEMENT_SPEED = 0.05f;
+
+    public static final Vector4f DEFAULT_COLOR = new Vector4f(1f, 1f, 1f, 1f);
+    public static final Vector3f AMBIENT_LIGHT = new Vector3f(1f, 1f, 1f);
 }

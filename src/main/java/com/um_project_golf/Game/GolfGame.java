@@ -51,7 +51,7 @@ public class GolfGame implements ILogic {
         renderer.init();
 
         Model model = loader.loadOBJModel("/Models/bunny.obj");
-        model.setTexture(new Texture(loader.loadTexture("Texture/grass.png")));
+        model.setTexture(new Texture(loader.loadTexture("Texture/grass.png")), 1f);
         entity = new Entity(model, new Vector3f(0,0,-1), new Vector3f(0,0,0), 1);
     }
 
@@ -62,22 +62,24 @@ public class GolfGame implements ILogic {
     @Override
     public void input() {
         cameraInc.set(0, 0, 0);
+
+        float moveSpeed = 0.1f;
         if(window.is_keyPressed(GLFW.GLFW_KEY_W)) {
-            cameraInc.z = -1;
+            cameraInc.z = -moveSpeed;
         }
         if(window.is_keyPressed(GLFW.GLFW_KEY_S)) {
-            cameraInc.z = 1;
+            cameraInc.z = moveSpeed;
         }
         if(window.is_keyPressed(GLFW.GLFW_KEY_A)) {
-            cameraInc.x = -1;
+            cameraInc.x = -moveSpeed;
         }
         if(window.is_keyPressed(GLFW.GLFW_KEY_D)) {
-            cameraInc.x = 1;
+            cameraInc.x = moveSpeed;
         }
         if(window.is_keyPressed(GLFW.GLFW_KEY_SPACE) && window.is_keyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
-            cameraInc.y = -1;
+            cameraInc.y = -moveSpeed;
         } else if(window.is_keyPressed(GLFW.GLFW_KEY_SPACE)) {
-            cameraInc.y = 1;
+            cameraInc.y = moveSpeed;
         }
     }
 
@@ -97,7 +99,7 @@ public class GolfGame implements ILogic {
         }
 
 
-        entity.increaseRotation(0.0f, 0.5f, 0.0f);
+        entity.increaseRotation(0.0f, 0.25f, 0.0f);
     }
 
     /**
@@ -111,7 +113,6 @@ public class GolfGame implements ILogic {
             window.setResized(true);
         }
 
-        window.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         renderer.render(entity, camera);
     }
 
