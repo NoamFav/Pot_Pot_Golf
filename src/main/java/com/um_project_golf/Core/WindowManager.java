@@ -9,6 +9,10 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
 
+/**
+ * The window manager class.
+ * This class is responsible for creating and managing the window of the game.
+ */
 public class WindowManager {
     private final String title;
 
@@ -19,6 +23,15 @@ public class WindowManager {
 
     private final Matrix4f projectionMatrix;
 
+    /**
+     * The constructor of the window manager.
+     * It initializes the title, width, height and vSync of the window.
+     *
+     * @param title The title of the window.
+     * @param width The width of the window.
+     * @param height The height of the window.
+     * @param vSync The vSync of the window.
+     */
     public WindowManager(String title, int width, int height, boolean vSync) {
         this.title = title;
         this.width = width;
@@ -28,6 +41,10 @@ public class WindowManager {
         projectionMatrix = new Matrix4f();
     }
 
+    /**
+     * Initializes the window.
+     * It creates the window and sets the window hints.
+     */
     public void init() {
         GLFWErrorCallback.createPrint(System.err).set();
 
@@ -93,61 +110,161 @@ public class WindowManager {
 //        GL11.glCullFace(GL11.GL_BACK);
     }
 
+    /**
+     * Updates the window.
+     * It swaps the buffers and polls the events.
+     */
     public void update() {
         GLFW.glfwSwapBuffers(window);
         GLFW.glfwPollEvents();
     }
 
+    /**
+     * Cleans up the window.
+     * It destroys the window and terminates GLFW.
+     */
     public void cleanup() {
         GLFW.glfwDestroyWindow(window);
         GLFW.glfwTerminate();
     }
 
+    /**
+     * Sets the clear color of the window.
+     *
+     * @param r The red color.
+     * @param g The green color.
+     * @param b The blue color.
+     * @param alpha The alpha color.
+     */
     public void setClearColor(float r, float g, float b, float alpha) {
         GL11.glClearColor(r, g, b, alpha);
     }
+
+    /**
+     * Checks if a key is pressed.
+     *
+     * @param keyCode The key code of the key.
+     * @return True if the key is pressed, false otherwise.
+     */
     public boolean is_keyPressed(int keyCode) {
         return GLFW.glfwGetKey(window, keyCode) == GLFW.GLFW_PRESS;
     }
+
+    /**
+     * Checks if the window should close.
+     *
+     * @return True if the window should close, false otherwise.
+     */
     public boolean windowShouldClose() {
         return GLFW.glfwWindowShouldClose(window);
     }
+
+    /**
+     * Gets the title of the window.
+     *
+     * @return The title of the window.
+     */
     public String getTitle() {
         return title;
     }
+
+    /**
+     * Sets the title of the window.
+     *
+     * @param title The title of the window.
+     */
     public void setTitle(String title) {
         GLFW.glfwSetWindowTitle(window, title);
     }
+
+    /**
+     * Sets the resized of the window.
+     *
+     * @param resized The resized of the window.
+     */
     public void setResized(boolean resized) {
         this.resized = resized;
     }
+
+    /**
+     * Checks if the window is resized.
+     *
+     * @return True if the window is resized, false otherwise.
+     */
     public boolean isResized() {
         return resized;
     }
+
+    /**
+     * Checks if the vSync is enabled.
+     *
+     * @return True if the vSync is enabled, false otherwise.
+     */
     public boolean isvSync() {
         return vSync;
     }
+
+    /**
+     * Sets the vSync of the window.
+     *
+     * @param vSync The vSync of the window.
+     */
     public void set_vSync(boolean vSync) {
         this.vSync = vSync;
     }
+
+    /**
+     * Gets the width of the window.
+     *
+     * @return The width of the window.
+     */
     public int getWidth() {
         return width;
     }
+
+    /**
+     * Gets the height of the window.
+     *
+     * @return The height of the window.
+     */
     public int getHeight() {
         return height;
     }
+
+    /**
+     * Gets the window of the window manager.
+     *
+     * @return The window of the window manager.
+     */
     public long getWindow() {
         return window;
     }
+
+    /**
+     * Gets the projection matrix of the window manager.
+     *
+     * @return The projection matrix of the window manager.
+     */
     public Matrix4f getProjectionMatrix() {
         return projectionMatrix;
     }
 
+    /**
+     * Updates the projection matrix of the window manager.
+     *
+     * @return The updated projection matrix.
+     */
     public Matrix4f updateProjectionMatrix() {
         float aspectRatio = (float) width / (float) height;
         return projectionMatrix.setPerspective(Consts.FOV, aspectRatio, Consts.Z_NEAR, Consts.Z_FAR);
     }
 
+    /**
+     * Updates the projection matrix of the window manager.
+     *
+     * @param matrix The matrix to update.
+     * @return The updated projection matrix.
+     */
     public Matrix4f updateProjectionMatrix(Matrix4f matrix, int width, int height) {
         float aspectRatio = (float) width / (float) height;
         return matrix.setPerspective(Consts.FOV, aspectRatio, Consts.Z_NEAR, Consts.Z_FAR);
