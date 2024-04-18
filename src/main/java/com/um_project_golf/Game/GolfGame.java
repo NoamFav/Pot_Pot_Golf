@@ -50,9 +50,9 @@ public class GolfGame implements ILogic {
     public void init() throws Exception {
         renderer.init();
 
-        Model model = loader.loadOBJModel("/Models/bunny.obj");
-        model.setTexture(new Texture(loader.loadTexture("Texture/grass.png")), 1f);
-        entity = new Entity(model, new Vector3f(0,0,-1), new Vector3f(0,0,0), 1);
+        Model model = loader.loadOBJModel("/Models/Skull_v3_L2.123c1407fc1e-ea5c-4cb9-9072-d28b8aba4c36/skulls.obj");
+        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull_v3_L2.123c1407fc1e-ea5c-4cb9-9072-d28b8aba4c36/Skull.jpg")), 1f);
+        entity = new Entity(model, new Vector3f(0,0,-1), new Vector3f(0,1,0), 1);
     }
 
     /**
@@ -63,7 +63,7 @@ public class GolfGame implements ILogic {
     public void input() {
         cameraInc.set(0, 0, 0);
 
-        float moveSpeed = 0.1f;
+        float moveSpeed = 1;
         if(window.is_keyPressed(GLFW.GLFW_KEY_W)) {
             cameraInc.z = -moveSpeed;
         }
