@@ -11,6 +11,9 @@ import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The main game logic class.
  * This class is responsible for initializing the game, handling input, updating the game state and rendering the game.
@@ -23,7 +26,7 @@ public class GolfGame implements ILogic {
     private final ObjectLoader loader;
     private final WindowManager window;
 
-    private Entity entity;
+    private final List<Entity> entities = new ArrayList<>();
     private final Camera camera;
 
     Vector3f cameraInc;
@@ -50,9 +53,28 @@ public class GolfGame implements ILogic {
     public void init() throws Exception {
         renderer.init();
 
-        Model model = loader.loadOBJModel("/Models/Skull_v3_L2.123c1407fc1e-ea5c-4cb9-9072-d28b8aba4c36/skulls.obj");
-        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull_v3_L2.123c1407fc1e-ea5c-4cb9-9072-d28b8aba4c36/Skull.jpg")), 1f);
-        entity = new Entity(model, new Vector3f(0,0,-1), new Vector3f(0,1,0), 1);
+        //TODO: Allow multiple textures for the same model
+        //TODO: Allow multiple models for the same entity
+
+        Model model = loader.loadOBJModel("/Models/HumanHeart_OBJ/Heart.obj");
+        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/HumanBase__normals.png")), 1f);
+        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/HumanBase___cavity.png")), 1f);
+        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/HumanOpening__cavity.png")), 1f);
+        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/HumanOpening__color.png")), 1f);
+        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/HumanOpening__normals.png")), 1f);
+        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/lightbox-ny-600.jpg")), 1f);
+        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/MitralValve__cavity.png")), 1f);
+        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/MitralValve_normals.png")), 1f);
+        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/TricuspidValve_cavity.png")), 1f);
+        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/TricuspidValve_normals.png")), 1f);
+        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/HumanBase__color.png")), 1f);
+        Entity entity = new Entity(model, new Vector3f(0,0,-1), new Vector3f(0,0,0), 1);
+        entities.add(entity);
+
+        Model skull = loader.loadOBJModel("/Models/Skull_v3_L2.123c1407fc1e-ea5c-4cb9-9072-d28b8aba4c36/skulls.obj");
+        skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull_v3_L2.123c1407fc1e-ea5c-4cb9-9072-d28b8aba4c36/Skull.jpg")), 1f);
+        Entity entity2 = new Entity(skull, new Vector3f(0,0,1), new Vector3f(0,1,0), 1);
+        entities.add(entity2);
     }
 
     /**
@@ -98,8 +120,8 @@ public class GolfGame implements ILogic {
             camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
         }
 
-
-        entity.increaseRotation(0.0f, 0.25f, 0.0f);
+        for (Entity entity : entities)
+            entity.increaseRotation(0.0f, 0.25f, 0.0f);
     }
 
     /**
@@ -113,7 +135,10 @@ public class GolfGame implements ILogic {
             window.setResized(true);
         }
 
-        renderer.render(entity, camera);
+        renderer.clear();
+
+        for (Entity entity : entities)
+            renderer.render(entity, camera);
     }
 
     /**
