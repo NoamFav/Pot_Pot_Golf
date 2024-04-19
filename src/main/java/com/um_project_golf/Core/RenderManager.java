@@ -55,7 +55,6 @@ public class RenderManager {
      * @param camera The camera of the game.
      */
     public void render(Entity entity, Camera camera) {
-        clear();
         shader.bind();
 
         shader.setUniform("textureSampler", 0);
