@@ -3,6 +3,7 @@ package com.um_project_golf.Core;
 import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
+import com.um_project_golf.Core.Lighting.SpotLight;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.Utils.Transformation;
 import com.um_project_golf.Core.Utils.Utils;
@@ -51,6 +52,7 @@ public class RenderManager {
         shader.createUniform("specularPower");
         shader.createDirectionalLightUniform("directionalLight");
         shader.createPointLightUniform("pointLight");
+        shader.createSpotLightUniform("spotLight");
     }
 
     /**
@@ -59,7 +61,7 @@ public class RenderManager {
      * @param entity The entity to render.
      * @param camera The camera of the game.
      */
-    public void render(Entity entity, Camera camera, DirectionalLight directionalLight, PointLight pointLights) {
+    public void render(Entity entity, Camera camera, DirectionalLight directionalLight, PointLight pointLights, SpotLight spotLight) {
         shader.bind();
 
         shader.setUniform("textureSampler", 0);
@@ -71,6 +73,7 @@ public class RenderManager {
         shader.setUniform("specularPower", Consts.SPECULAR_POWER);
         shader.setUniform("directionalLight", directionalLight);
         shader.setUniform("pointLight", pointLights);
+        shader.setUniform("spotLight", spotLight);
 
         GL30.glBindVertexArray(entity.getModel().getId());
         GL20.glEnableVertexAttribArray(0);

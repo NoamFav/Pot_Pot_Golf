@@ -3,6 +3,7 @@ package com.um_project_golf.Core;
 import com.um_project_golf.Core.Entity.Material;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
+import com.um_project_golf.Core.Lighting.SpotLight;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -66,6 +67,12 @@ public class ShaderManager {
         createUniform(uniformName + ".constant");
         createUniform(uniformName + ".linear");
         createUniform(uniformName + ".exponent");
+    }
+
+    public void createSpotLightUniform(String uniformName) throws Exception {
+        createPointLightUniform(uniformName + ".pointLight");
+        createUniform(uniformName + ".coneDirection");
+        createUniform(uniformName + ".cutoff");
     }
 
     /**
@@ -171,6 +178,12 @@ public class ShaderManager {
         setUniform(uniformName + ".color", directionalLight.getColor());
         setUniform(uniformName + ".direction", directionalLight.getDirection());
         setUniform(uniformName + ".intensity", directionalLight.getIntensity());
+    }
+
+    public void setUniform(String uniformName, SpotLight spotLight) {
+        setUniform(uniformName + ".pointLight", spotLight.getPointLight());
+        setUniform(uniformName + ".coneDirection", spotLight.getConeDirection());
+        setUniform(uniformName + ".cutoff", spotLight.getCutOff());
     }
 
     /**
