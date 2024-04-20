@@ -6,6 +6,7 @@ import com.um_project_golf.Core.Entity.Model;
 import com.um_project_golf.Core.Entity.Texture;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
+import com.um_project_golf.Core.Lighting.SpotLight;
 import com.um_project_golf.Core.MouseInput;
 import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector2f;
@@ -36,7 +37,7 @@ public class GolfGame implements ILogic {
     private float lightAngle;
     private DirectionalLight directionalLight;
     private PointLight pointLight;
-
+    private SpotLight spotLight;
     /**
      * The constructor of the game.
      * It initializes the renderer, window, loader and camera.
@@ -62,16 +63,23 @@ public class GolfGame implements ILogic {
 
         //TODO: Allow multiple textures for the same model
 
-        Model skull = loader.loadOBJModel("/Models/Skull/skulls.obj");
-        skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull/Skull.jpg")), 1f);
+        Model skull = loader.loadOBJModel("/Models/Minecraft_Grass_Block_OBJ/Grass_Block.obj");
+        skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block_TEX.png")), 1f);
         Entity skull_entity = new Entity(skull, new Vector3f(0,0,1), new Vector3f(0,1,0), 1);
         entities.add(skull_entity);
 
         float lightIntensity = 1.0f;
+        //point light
         Vector3f lightPosition = new Vector3f(0, 0, -3.2f);
         Vector3f lightColor = new Vector3f(1, 1, 1);
         pointLight = new PointLight(lightColor, lightPosition, lightIntensity);
 
+        //spot light
+        Vector3f coneDirection = new Vector3f(0, 0, -1);
+        float cutOff = (float) Math.cos(Math.toRadians(180));
+        spotLight = new SpotLight(new PointLight(lightColor, new Vector3f(0,0,1f), lightIntensity, 0,0,1), coneDirection, cutOff);
+
+        //directional light
         lightPosition = new Vector3f(-1, -10, 0);
         lightColor = new Vector3f(1, 1, 1);
         directionalLight = new DirectionalLight(lightColor, lightPosition, lightIntensity);
@@ -103,11 +111,31 @@ public class GolfGame implements ILogic {
         } else if(window.is_keyPressed(GLFW.GLFW_KEY_SPACE)) {
             cameraInc.y = moveSpeed;
         }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_O)) {
+        if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
             pointLight.getPosition().x += 0.1f;
         }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_P)) {
+        if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT)) {
             pointLight.getPosition().x -= 0.1f;
+        }
+
+        float lightPos = spotLight.getPointLight().getPosition().z;
+        if (window.is_keyPressed(GLFW.GLFW_KEY_I)) {
+            spotLight.getPointLight().getPosition().z = lightPos + 0.1f;
+        }
+        if (window.is_keyPressed(GLFW.GLFW_KEY_K)) {
+            spotLight.getPointLight().getPosition().z = lightPos - 0.1f;
+        }
+        if (window.is_keyPressed(GLFW.GLFW_KEY_L)) {
+            spotLight.getPointLight().getPosition().x += 0.1f;
+        }
+        if (window.is_keyPressed(GLFW.GLFW_KEY_J)) {
+            spotLight.getPointLight().getPosition().x -= 0.1f;
+        }
+        if (window.is_keyPressed(GLFW.GLFW_KEY_O)) {
+            spotLight.getPointLight().getPosition().y += 0.1f;
+        }
+        if (window.is_keyPressed(GLFW.GLFW_KEY_U)) {
+            spotLight.getPointLight().getPosition().y -= 0.1f;
         }
     }
 
@@ -126,8 +154,8 @@ public class GolfGame implements ILogic {
             camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
         }
 
-//        for (Entity entity : entities)
-//            entity.increaseRotation(0.0f, 0.25f, 0.0f);
+        for (Entity entity : entities)
+            entity.increaseRotation(0.0f, 0, 0.0f);
 
         lightAngle += 0.5f;
         if (lightAngle > 90) {
@@ -164,7 +192,7 @@ public class GolfGame implements ILogic {
         renderer.clear();
 
         for (Entity entity : entities)
-            renderer.render(entity, camera, directionalLight, pointLight);
+            renderer.render(entity, camera, directionalLight, pointLight, spotLight);
     }
 
     /**
