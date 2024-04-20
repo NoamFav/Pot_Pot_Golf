@@ -51,8 +51,9 @@ public class RenderManager {
         shader.createMaterialUniform("material");
         shader.createUniform("specularPower");
         shader.createDirectionalLightUniform("directionalLight");
-        shader.createPointLightUniform("pointLight");
-        shader.createSpotLightUniform("spotLight");
+
+        shader.createPointLightListUniform("pointLights", Consts.MAX_POINT_LIGHTS);
+        shader.createSpotLightListUniform("spotLights" , Consts.MAX_SPOT_LIGHTS);
     }
 
     /**
@@ -61,7 +62,7 @@ public class RenderManager {
      * @param entity The entity to render.
      * @param camera The camera of the game.
      */
-    public void render(Entity entity, Camera camera, DirectionalLight directionalLight, PointLight pointLights, SpotLight spotLight) {
+    public void render(Entity entity, Camera camera, DirectionalLight directionalLight, PointLight[] pointLights, SpotLight[] spotLights) {
         shader.bind();
 
         shader.setUniform("textureSampler", 0);
@@ -72,8 +73,16 @@ public class RenderManager {
         shader.setUniform("material", entity.getModel().getMaterial());
         shader.setUniform("specularPower", Consts.SPECULAR_POWER);
         shader.setUniform("directionalLight", directionalLight);
-        shader.setUniform("pointLight", pointLights);
-        shader.setUniform("spotLight", spotLight);
+
+        int numLights = pointLights != null ? pointLights.length : 0;
+        for (int i = 0 ; i < numLights; i++) {
+            shader.setUniform("pointLights[" + i + "]", pointLights[i]);
+        }
+
+        numLights = spotLights != null ? spotLights.length : 0;
+        for (int i = 0 ; i < numLights; i++) {
+            shader.setUniform("spotLights[" + i + "]", spotLights[i]);
+        }
 
         GL30.glBindVertexArray(entity.getModel().getId());
         GL20.glEnableVertexAttribArray(0);

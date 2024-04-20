@@ -69,10 +69,22 @@ public class ShaderManager {
         createUniform(uniformName + ".exponent");
     }
 
+    public void createPointLightListUniform(String uniformName, int size) throws Exception {
+        for (int i = 0; i < size; i++) {
+            createPointLightUniform(uniformName + "[" + i + "]");
+        }
+    }
+
     public void createSpotLightUniform(String uniformName) throws Exception {
         createPointLightUniform(uniformName + ".pointLight");
         createUniform(uniformName + ".coneDirection");
         createUniform(uniformName + ".cutoff");
+    }
+
+    public void createSpotLightListUniform(String uniformName, int size) throws Exception {
+        for (int i = 0; i < size; i++) {
+            createSpotLightUniform(uniformName + "[" + i + "]");
+        }
     }
 
     /**
@@ -184,6 +196,30 @@ public class ShaderManager {
         setUniform(uniformName + ".pointLight", spotLight.getPointLight());
         setUniform(uniformName + ".coneDirection", spotLight.getConeDirection());
         setUniform(uniformName + ".cutoff", spotLight.getCutOff());
+    }
+
+    public void setUniform(String uniformName, PointLight[] pointLights) {
+        int numLights = pointLights != null ? pointLights.length : 0;
+        setUniform(uniformName + ".numLights", numLights);
+        for (int i = 0; i < numLights; i++) {
+            setUniform(uniformName, pointLights[i], i);
+        }
+    }
+
+    public void setUniform(String uniformName, PointLight pointLight, int pos) {
+        setUniform(uniformName + "[" + pos + "]", pointLight);
+    }
+
+    public void setUniform(String uniformName, SpotLight[] spotLights) {
+        int numLights = spotLights != null ? spotLights.length : 0;
+        setUniform(uniformName + ".numLights", numLights);
+        for (int i = 0; i < numLights; i++) {
+            setUniform(uniformName, spotLights[i], i);
+        }
+    }
+
+    public void setUniform(String uniformName, SpotLight spotLight, int pos) {
+        setUniform(uniformName + "[" + pos + "]", spotLight);
     }
 
     /**
