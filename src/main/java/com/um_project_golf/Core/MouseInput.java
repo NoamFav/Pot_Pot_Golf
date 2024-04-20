@@ -13,7 +13,7 @@ public class MouseInput {
     private final Vector2d previousPos, currentPos;
     private final Vector2f displVec;
 
-    private boolean inWindow = false;
+    private boolean inWindow = true;
     private boolean leftButtonPressed = false;
     private boolean rightButtonPressed = false;
 
