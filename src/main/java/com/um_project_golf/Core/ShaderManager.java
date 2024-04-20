@@ -2,6 +2,7 @@ package com.um_project_golf.Core;
 
 import com.um_project_golf.Core.Entity.Material;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
+import com.um_project_golf.Core.Lighting.PointLight;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -56,6 +57,15 @@ public class ShaderManager {
         createUniform(uniformName + ".color");
         createUniform(uniformName + ".direction");
         createUniform(uniformName + ".intensity");
+    }
+
+    public void createPointLightUniform(String uniformName) throws Exception {
+        createUniform(uniformName + ".color");
+        createUniform(uniformName + ".position");
+        createUniform(uniformName + ".intensity");
+        createUniform(uniformName + ".constant");
+        createUniform(uniformName + ".linear");
+        createUniform(uniformName + ".exponent");
     }
 
     /**
@@ -146,6 +156,15 @@ public class ShaderManager {
         setUniform(uniformName + ".specular", material.getSpecularColor());
         setUniform(uniformName + ".hasTexture", material.hasTexture() ? 1 : 0);
         setUniform(uniformName + ".reflectance", material.getReflectance());
+    }
+
+    public void setUniform(String uniformName, PointLight pointLight) {
+        setUniform(uniformName + ".color", pointLight.getColor());
+        setUniform(uniformName + ".position", pointLight.getPosition());
+        setUniform(uniformName + ".intensity", pointLight.getIntensity());
+        setUniform(uniformName + ".constant", pointLight.getConstant());
+        setUniform(uniformName + ".linear", pointLight.getLinear());
+        setUniform(uniformName + ".exponent", pointLight.getExponent());
     }
 
     public void setUniform(String uniformName, DirectionalLight directionalLight) {
