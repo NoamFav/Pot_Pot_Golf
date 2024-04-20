@@ -5,6 +5,7 @@ import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.Model;
 import com.um_project_golf.Core.Entity.Texture;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
+import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.MouseInput;
 import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector2f;
@@ -34,6 +35,7 @@ public class GolfGame implements ILogic {
 
     private float lightAngle;
     private DirectionalLight directionalLight;
+    private PointLight pointLight;
 
     /**
      * The constructor of the game.
@@ -65,10 +67,14 @@ public class GolfGame implements ILogic {
         Entity skull_entity = new Entity(skull, new Vector3f(0,0,1), new Vector3f(0,1,0), 1);
         entities.add(skull_entity);
 
-        float lightIntensity = 0.0f;
-        Vector3f lightPosition = new Vector3f(-1, -10, 0);
+        float lightIntensity = 1.0f;
+        Vector3f lightPosition = new Vector3f(0, 0, -3.2f);
         Vector3f lightColor = new Vector3f(1, 1, 1);
-        directionalLight = new DirectionalLight(new Vector3f(lightColor), new Vector3f(lightPosition), lightIntensity);
+        pointLight = new PointLight(lightColor, lightPosition, lightIntensity);
+
+        lightPosition = new Vector3f(-1, -10, 0);
+        lightColor = new Vector3f(1, 1, 1);
+        directionalLight = new DirectionalLight(lightColor, lightPosition, lightIntensity);
     }
 
     /**
@@ -96,6 +102,12 @@ public class GolfGame implements ILogic {
             cameraInc.y = -moveSpeed;
         } else if(window.is_keyPressed(GLFW.GLFW_KEY_SPACE)) {
             cameraInc.y = moveSpeed;
+        }
+        if (window.is_keyPressed(GLFW.GLFW_KEY_O)) {
+            pointLight.getPosition().x += 0.1f;
+        }
+        if (window.is_keyPressed(GLFW.GLFW_KEY_P)) {
+            pointLight.getPosition().x -= 0.1f;
         }
     }
 
@@ -152,7 +164,7 @@ public class GolfGame implements ILogic {
         renderer.clear();
 
         for (Entity entity : entities)
-            renderer.render(entity, camera, directionalLight);
+            renderer.render(entity, camera, directionalLight, pointLight);
     }
 
     /**
