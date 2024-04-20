@@ -4,6 +4,7 @@ import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.Model;
 import com.um_project_golf.Core.Entity.Texture;
+import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.MouseInput;
 import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector2f;
@@ -31,6 +32,9 @@ public class GolfGame implements ILogic {
 
     Vector3f cameraInc;
 
+    private float lightAngle;
+    private DirectionalLight directionalLight;
+
     /**
      * The constructor of the game.
      * It initializes the renderer, window, loader and camera.
@@ -41,6 +45,7 @@ public class GolfGame implements ILogic {
         loader = new ObjectLoader();
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
+        lightAngle = -90;
     }
 
     /**
@@ -54,27 +59,16 @@ public class GolfGame implements ILogic {
         renderer.init();
 
         //TODO: Allow multiple textures for the same model
-        //TODO: Allow multiple models for the same entity
 
-        Model model = loader.loadOBJModel("/Models/HumanHeart_OBJ/Heart.obj");
-        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/HumanBase__normals.png")), 1f);
-        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/HumanBase___cavity.png")), 1f);
-        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/HumanOpening__cavity.png")), 1f);
-        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/HumanOpening__color.png")), 1f);
-        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/HumanOpening__normals.png")), 1f);
-        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/lightbox-ny-600.jpg")), 1f);
-        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/MitralValve__cavity.png")), 1f);
-        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/MitralValve_normals.png")), 1f);
-        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/TricuspidValve_cavity.png")), 1f);
-        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/TricuspidValve_normals.png")), 1f);
-        model.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/HumanHeart_OBJ/HumanBase__color.png")), 1f);
-        Entity entity = new Entity(model, new Vector3f(0,0,-1), new Vector3f(0,0,0), 1);
-        entities.add(entity);
+        Model skull = loader.loadOBJModel("/Models/Skull/skulls.obj");
+        skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull/Skull.jpg")), 1f);
+        Entity skull_entity = new Entity(skull, new Vector3f(0,0,1), new Vector3f(0,1,0), 1);
+        entities.add(skull_entity);
 
-        Model skull = loader.loadOBJModel("/Models/Skull_v3_L2.123c1407fc1e-ea5c-4cb9-9072-d28b8aba4c36/skulls.obj");
-        skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull_v3_L2.123c1407fc1e-ea5c-4cb9-9072-d28b8aba4c36/Skull.jpg")), 1f);
-        Entity entity2 = new Entity(skull, new Vector3f(0,0,1), new Vector3f(0,1,0), 1);
-        entities.add(entity2);
+        float lightIntensity = 0.0f;
+        Vector3f lightPosition = new Vector3f(-1, -10, 0);
+        Vector3f lightColor = new Vector3f(1, 1, 1);
+        directionalLight = new DirectionalLight(new Vector3f(lightColor), new Vector3f(lightPosition), lightIntensity);
     }
 
     /**
@@ -120,8 +114,28 @@ public class GolfGame implements ILogic {
             camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
         }
 
-        for (Entity entity : entities)
-            entity.increaseRotation(0.0f, 0.25f, 0.0f);
+//        for (Entity entity : entities)
+//            entity.increaseRotation(0.0f, 0.25f, 0.0f);
+
+        lightAngle += 0.5f;
+        if (lightAngle > 90) {
+            directionalLight.setIntensity(0);
+            if (lightAngle >= 360)
+                lightAngle = -90;
+        } else if (lightAngle <= -80 || lightAngle >= 80) {
+            float factor = 1 - (Math.abs(lightAngle) - 80) / 10.0f;
+            directionalLight.setIntensity(factor);
+            directionalLight.getColor().x = Math.max(factor, 0.9f);
+            directionalLight.getColor().z = Math.max(factor, 0.5f);
+        } else {
+            directionalLight.setIntensity(1);
+            directionalLight.getColor().x = 1;
+            directionalLight.getColor().z = 1;
+            directionalLight.getColor().y = 1;
+        }
+        double angle = Math.toRadians(lightAngle);
+        directionalLight.getDirection().x = (float) Math.sin(angle);
+        directionalLight.getDirection().y = (float) Math.cos(angle);
     }
 
     /**
@@ -138,7 +152,7 @@ public class GolfGame implements ILogic {
         renderer.clear();
 
         for (Entity entity : entities)
-            renderer.render(entity, camera);
+            renderer.render(entity, camera, directionalLight);
     }
 
     /**
