@@ -36,8 +36,8 @@ public class GolfGame implements ILogic {
 
     private float lightAngle;
     private DirectionalLight directionalLight;
-    private PointLight pointLight;
-    private SpotLight spotLight;
+    private PointLight[] pointLights;
+    private SpotLight[] spotLights;
     /**
      * The constructor of the game.
      * It initializes the renderer, window, loader and camera.
@@ -70,19 +70,23 @@ public class GolfGame implements ILogic {
 
         float lightIntensity = 1.0f;
         //point light
-        Vector3f lightPosition = new Vector3f(0, 0, -3.2f);
+        Vector3f lightPosition = new Vector3f(0, 0, 0.2f);
         Vector3f lightColor = new Vector3f(1, 1, 1);
-        pointLight = new PointLight(lightColor, lightPosition, lightIntensity);
+        PointLight pointLight = new PointLight(lightColor, lightPosition, lightIntensity, 0,0,1);
 
         //spot light
         Vector3f coneDirection = new Vector3f(0, 0, -1);
         float cutOff = (float) Math.cos(Math.toRadians(180));
-        spotLight = new SpotLight(new PointLight(lightColor, new Vector3f(0,0,1f), lightIntensity, 0,0,1), coneDirection, cutOff);
-
+        SpotLight spotLight = new SpotLight(new PointLight(lightColor, new Vector3f(0,0,0.2f), lightIntensity, 0,0,1), coneDirection, cutOff);
+        SpotLight spotLight2 = new SpotLight(new PointLight(lightColor, new Vector3f(0,0,1f), lightIntensity, 0,0,1), coneDirection, cutOff);
+        spotLight2.getPointLight().setPosition(new Vector3f(0.5f, 0.5f, 0.5f));
         //directional light
         lightPosition = new Vector3f(-1, -10, 0);
         lightColor = new Vector3f(1, 1, 1);
         directionalLight = new DirectionalLight(lightColor, lightPosition, lightIntensity);
+
+        pointLights = new PointLight[]{pointLight};
+        spotLights = new SpotLight[]{spotLight, spotLight2};
     }
 
     /**
@@ -112,30 +116,37 @@ public class GolfGame implements ILogic {
             cameraInc.y = moveSpeed;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
-            pointLight.getPosition().x += 0.1f;
+            pointLights[0].getPosition().x += 0.1f;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT)) {
-            pointLight.getPosition().x -= 0.1f;
+            pointLights[0].getPosition().x -= 0.1f;
         }
 
-        float lightPos = spotLight.getPointLight().getPosition().z;
+        float lightPos = spotLights[0].getPointLight().getPosition().z;
+        float lightPos2 = spotLights[1].getPointLight().getPosition().z;
         if (window.is_keyPressed(GLFW.GLFW_KEY_I)) {
-            spotLight.getPointLight().getPosition().z = lightPos + 0.1f;
+            spotLights[0].getPointLight().getPosition().z = lightPos + 0.1f;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_K)) {
-            spotLight.getPointLight().getPosition().z = lightPos - 0.1f;
+            spotLights[0].getPointLight().getPosition().z = lightPos - 0.1f;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_L)) {
-            spotLight.getPointLight().getPosition().x += 0.1f;
+            spotLights[0].getPointLight().getPosition().x += 0.1f;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_J)) {
-            spotLight.getPointLight().getPosition().x -= 0.1f;
+            spotLights[0].getPointLight().getPosition().x -= 0.1f;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_O)) {
-            spotLight.getPointLight().getPosition().y += 0.1f;
+            spotLights[0].getPointLight().getPosition().y += 0.1f;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_U)) {
-            spotLight.getPointLight().getPosition().y -= 0.1f;
+            spotLights[0].getPointLight().getPosition().y -= 0.1f;
+        }
+        if (window.is_keyPressed(GLFW.GLFW_KEY_0)) {
+            spotLights[1].getPointLight().getPosition().z = lightPos2 + 0.1f;
+        }
+        if (window.is_keyPressed(GLFW.GLFW_KEY_P)) {
+            spotLights[1].getPointLight().getPosition().z = lightPos2 - 0.1f;
         }
     }
 
@@ -192,7 +203,7 @@ public class GolfGame implements ILogic {
         renderer.clear();
 
         for (Entity entity : entities)
-            renderer.render(entity, camera, directionalLight, pointLight, spotLight);
+            renderer.render(entity, camera, directionalLight, pointLights, spotLights);
     }
 
     /**
