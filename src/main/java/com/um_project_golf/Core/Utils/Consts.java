@@ -20,7 +20,7 @@ public class Consts {
     public static final float SPECULAR_POWER = 10f;
 
     public static final float MOUSE_SENSITIVITY = 0.2f;
-    public static final float CAMERA_MOVEMENT_SPEED = 0.05f;
+    public static final float CAMERA_MOVEMENT_SPEED = 5f;
 
     public static final Vector4f DEFAULT_COLOR = new Vector4f(1f, 1f, 1f, 1f);
     public static final Vector3f AMBIENT_LIGHT = new Vector3f(.3f, .3f, .3f);
