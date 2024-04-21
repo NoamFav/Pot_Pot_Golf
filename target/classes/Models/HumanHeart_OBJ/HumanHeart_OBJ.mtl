@@ -1,0 +1,70 @@
+newmtl HeartHigh20_blinnSG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+bump HumanOpening__normals.png
+Ni 1.00
+Ks 0.00 0.00 0.00
+map_Ks HumanOpening__cavity.png
+newmtl HeartHighResInsideCOMPLETE_Zremesh_blinnSG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+bump HumanBase__normals.png
+Ni 1.00
+Ks 0.00 0.00 0.00
+map_Ks HumanBase___cavity.png
+newmtl Vains01_blinnSG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 1.00 1.00 1.00
+newmtl Vains02_blinnSG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 1.00 1.00 1.00
+newmtl initialShadingGroup
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+newmtl pTorus1_blinnSG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+bump MitralValve_normals.png
+Ni 1.00
+Ks 0.00 0.00 0.00
+map_Ks MitralValve__cavity.png
+newmtl pTorus2_blinnSG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+bump TricuspidValve_normals.png
+Ni 1.00
+Ks 0.00 0.00 0.00
+map_Ks TricuspidValve_cavity.png
+newmtl polySurface1_blinnSG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 1.00 1.00 1.00
+newmtl polySurface2_blinnSG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 1.00 1.00 1.00
