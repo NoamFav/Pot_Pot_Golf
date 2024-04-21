@@ -43,6 +43,14 @@ public class RenderManager {
         entityRenderer.init();
     }
 
+    /**
+     * Renders the light.
+     *
+     * @param pointLights The point lights of the game.
+     * @param spotLights The spot lights of the game.
+     * @param directionalLight The directional light of the game.
+     * @param shader The shader of the game.
+     */
     public static void renderLight(PointLight[] pointLights, SpotLight[] spotLights, DirectionalLight directionalLight, ShaderManager shader) {
         shader.setUniform("ambientLight", Consts.AMBIENT_LIGHT);
         shader.setUniform("specularPower", Consts.SPECULAR_POWER);
@@ -61,9 +69,12 @@ public class RenderManager {
     }
 
     /**
-     * Renders the entity.
+     * Renders the game.
      *
      * @param camera The camera of the game.
+     * @param directionalLight The directional light of the game.
+     * @param pointLights The point lights of the game.
+     * @param spotLights The spot lights of the game.
      */
     public void render(Camera camera, DirectionalLight directionalLight, PointLight[] pointLights, SpotLight[] spotLights) {
 
@@ -75,6 +86,11 @@ public class RenderManager {
         entityRenderer.render(camera, pointLights, spotLights, directionalLight);
     }
 
+    /**
+     * Processes the entity.
+     *
+     * @param entity The entity to process.
+     */
     public void processEntity(Entity entity) {
         List<Entity> batch = entityRenderer.getEntities().get(entity.getModel());
         if (batch != null) {

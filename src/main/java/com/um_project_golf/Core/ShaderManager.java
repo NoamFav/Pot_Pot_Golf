@@ -54,12 +54,24 @@ public class ShaderManager {
         uniforms.put(uniformName, uniformLocation);
     }
 
+    /**
+     * Creates a directional light uniform.
+     *
+     * @param uniformName The name of the uniform.
+     * @throws Exception If the uniform could not be created.
+     */
     public void createDirectionalLightUniform(String uniformName) throws Exception {
         createUniform(uniformName + ".color");
         createUniform(uniformName + ".direction");
         createUniform(uniformName + ".intensity");
     }
 
+    /**
+     * Creates a point light uniform.
+     *
+     * @param uniformName The name of the uniform.
+     * @throws Exception If the uniform could not be created.
+     */
     public void createPointLightUniform(String uniformName) throws Exception {
         createUniform(uniformName + ".color");
         createUniform(uniformName + ".position");
@@ -69,18 +81,38 @@ public class ShaderManager {
         createUniform(uniformName + ".exponent");
     }
 
+    /**
+     * Creates a point light list uniform.
+     *
+     * @param uniformName The name of the uniform.
+     * @param size The size of the uniform.
+     * @throws Exception If the uniform could not be created.
+     */
     public void createPointLightListUniform(String uniformName, int size) throws Exception {
         for (int i = 0; i < size; i++) {
             createPointLightUniform(uniformName + "[" + i + "]");
         }
     }
 
+    /**
+     * Creates a spot light uniform.
+     *
+     * @param uniformName The name of the uniform.
+     * @throws Exception If the uniform could not be created.
+     */
     public void createSpotLightUniform(String uniformName) throws Exception {
         createPointLightUniform(uniformName + ".pointLight");
         createUniform(uniformName + ".coneDirection");
         createUniform(uniformName + ".cutoff");
     }
 
+    /**
+     * Creates a spot light list uniform.
+     *
+     * @param uniformName The name of the uniform.
+     * @param size The size of the uniform.
+     * @throws Exception If the uniform could not be created.
+     */
     public void createSpotLightListUniform(String uniformName, int size) throws Exception {
         for (int i = 0; i < size; i++) {
             createSpotLightUniform(uniformName + "[" + i + "]");
@@ -177,6 +209,12 @@ public class ShaderManager {
         setUniform(uniformName + ".reflectance", material.getReflectance());
     }
 
+    /**
+     * Sets the uniforms of a point light.
+     *
+     * @param uniformName The name of the uniform.
+     * @param pointLight The point light to set.
+     */
     public void setUniform(String uniformName, PointLight pointLight) {
         setUniform(uniformName + ".color", pointLight.getColor());
         setUniform(uniformName + ".position", pointLight.getPosition());
@@ -186,18 +224,35 @@ public class ShaderManager {
         setUniform(uniformName + ".exponent", pointLight.getExponent());
     }
 
+    /**
+     * Sets the uniforms of a direction Light.
+     *
+     * @param uniformName The name of the uniform.
+     * @param directionalLight The directional light to set.
+     */
     public void setUniform(String uniformName, DirectionalLight directionalLight) {
         setUniform(uniformName + ".color", directionalLight.getColor());
         setUniform(uniformName + ".direction", directionalLight.getDirection());
         setUniform(uniformName + ".intensity", directionalLight.getIntensity());
     }
 
+    /**
+     * Sets the uniforms of a spot light.
+     *
+     * @param uniformName The name of the uniform.
+     * @param spotLight The spot light to set.
+     */
     public void setUniform(String uniformName, SpotLight spotLight) {
         setUniform(uniformName + ".pointLight", spotLight.getPointLight());
         setUniform(uniformName + ".coneDirection", spotLight.getConeDirection());
         setUniform(uniformName + ".cutoff", spotLight.getCutOff());
     }
 
+    /**
+     * Sets the uniforms of a point light list.
+     * @param uniformName
+     * @param pointLights
+     */
     public void setUniform(String uniformName, PointLight[] pointLights) {
         int numLights = pointLights != null ? pointLights.length : 0;
         setUniform(uniformName + ".numLights", numLights);
@@ -206,10 +261,21 @@ public class ShaderManager {
         }
     }
 
+    /**
+     * Sets the uniforms of a point light list.
+     * @param uniformName The name of the uniform.
+     * @param pointLight The point light to set.
+     * @param pos The position of the point light.
+     */
     public void setUniform(String uniformName, PointLight pointLight, int pos) {
         setUniform(uniformName + "[" + pos + "]", pointLight);
     }
 
+    /**
+     * Sets the uniforms of a spot light list.
+     * @param uniformName The name of the uniform.
+     * @param spotLights The spot lights to set.
+     */
     public void setUniform(String uniformName, SpotLight[] spotLights) {
         int numLights = spotLights != null ? spotLights.length : 0;
         setUniform(uniformName + ".numLights", numLights);
@@ -218,6 +284,12 @@ public class ShaderManager {
         }
     }
 
+    /**
+     * Sets the uniforms of a spot light.
+     * @param uniformName The name of the uniform.
+     * @param spotLight The spot light to set.
+     * @param pos The position of the spot light.
+     */
     public void setUniform(String uniformName, SpotLight spotLight, int pos) {
         setUniform(uniformName + "[" + pos + "]", spotLight);
     }

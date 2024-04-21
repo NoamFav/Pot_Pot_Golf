@@ -20,16 +20,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The class responsible for rendering the entities.
+ */
 public class EntityRender implements IRenderer{
 
     ShaderManager shader;
     private final Map<Model, List<Entity>> entities;
 
+    /**
+     * The constructor of the entity render.
+     *
+     * @throws Exception If the entity render fails to initialize.
+     */
     public EntityRender() throws Exception{
         entities = new HashMap<>();
         shader = new ShaderManager();
     }
 
+    /**
+     * Initializes the entity render.
+     *
+     * @throws Exception If the entity render fails to initialize.
+     */
     @Override
     public void init() throws Exception {
         shader.createVertexShader(Utils.loadResource("/shaders/entity_vertex.glsl"));
@@ -49,6 +62,14 @@ public class EntityRender implements IRenderer{
         shader.createSpotLightListUniform("spotLights" , Consts.MAX_SPOT_LIGHTS);
     }
 
+    /**
+     * Renders the entities.
+     *
+     * @param camera The camera of the game.
+     * @param pointLights The point lights of the game.
+     * @param spotLights The spot lights of the game.
+     * @param directionalLight The directional light of the game.
+     */
     @Override
     public void render(Camera camera, PointLight[] pointLights, SpotLight[] spotLights, DirectionalLight directionalLight) {
         shader.bind();
@@ -67,11 +88,19 @@ public class EntityRender implements IRenderer{
         shader.unbind();
     }
 
+    /**
+     * Cleans up the entity render.
+     */
     @Override
     public void cleanup() {
         shader.cleanup();
     }
 
+    /**
+     * Binds the model.
+     *
+     * @param model The model to bind.
+     */
     @Override
     public void bind(Model model) {
         shader.setUniform("material", model.getMaterial());
@@ -88,6 +117,9 @@ public class EntityRender implements IRenderer{
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     }
 
+    /**
+     * Unbinds the model.
+     */
     @Override
     public void unbind() {
         GL20.glDisableVertexAttribArray(0);
@@ -96,6 +128,12 @@ public class EntityRender implements IRenderer{
         GL30.glBindVertexArray(0);
     }
 
+    /**
+     * Prepares the entity.
+     *
+     * @param entity The entity to prepare.
+     * @param camera The camera of the game.
+     */
     @Override
     public void prepare(Object entity, Camera camera) {
         shader.setUniform("textureSampler", 0);
