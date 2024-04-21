@@ -2,6 +2,7 @@ package com.um_project_golf.Core.Utils;
 
 import com.um_project_golf.Core.Camera;
 import com.um_project_golf.Core.Entity.Entity;
+import com.um_project_golf.Core.Rendering.Terrain;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -24,6 +25,12 @@ public class Transformation {
                 rotateY((float) Math.toRadians(entity.getRotation().y)).
                 rotateZ((float) Math.toRadians(entity.getRotation().z)).
                 scale(entity.getScale());
+        return matrix;
+    }
+
+    public static Matrix4f createTransformationMatrix(Terrain terrain) {
+        Matrix4f matrix = new Matrix4f();
+        matrix.identity().translate(terrain.getPosition()).scale(1);
         return matrix;
     }
 

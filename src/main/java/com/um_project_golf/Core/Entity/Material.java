@@ -52,8 +52,8 @@ public class Material {
      * The constructor of the material.
      * @param texture The texture of the material.
      */
-    public Material(Texture texture) {
-        this(Consts.DEFAULT_COLOR, Consts.DEFAULT_COLOR, Consts.DEFAULT_COLOR, 0, texture);
+    public Material(Texture texture, float reflectance) {
+        this(Consts.DEFAULT_COLOR, Consts.DEFAULT_COLOR, Consts.DEFAULT_COLOR, reflectance, texture);
     }
 
     /**
