@@ -23,5 +23,6 @@ module com.example.um_project_golf {
     exports com.um_project_golf.Core.Entity;
     exports com.um_project_golf.Core.Utils;
     exports com.um_project_golf.Core.Lighting;
+    exports com.um_project_golf.Core.Rendering;
     opens com.um_project_golf.Core to javafx.fxml;
 }
