@@ -73,7 +73,7 @@ public class GolfGame implements ILogic {
 
         terrains = new ArrayList<>();
         Terrain terrain = new Terrain(new Vector3f(0, -1, -800), loader, new Material(new Texture(loader.loadTexture("Texture/grass.png")), 0.1f));
-        Terrain terrain2 = new Terrain(new Vector3f(-800, -1, -800), loader, new Material(new Texture(loader.loadTexture("Texture/nyan.png")), 0.1f));
+        Terrain terrain2 = new Terrain(new Vector3f(-800, -1, -800), loader, new Material(new Texture(loader.loadTexture("Texture/grassBlock.jpg")), 0.1f));
         terrains.add(terrain);
         terrains.add(terrain2);
 

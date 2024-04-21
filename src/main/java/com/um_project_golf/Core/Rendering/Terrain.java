@@ -9,7 +9,7 @@ import org.joml.Vector3f;
 public class Terrain {
 
     private static final float SIZE = 800;
-    private static final int VERTEX_COUNT = 128;
+    private static final int VERTEX_COUNT = 1024;
 
     private final Vector3f position;
     private final Model model;
@@ -30,15 +30,22 @@ public class Terrain {
 
         for(int i = 0; i < VERTEX_COUNT; i++){
             for(int j = 0; j < VERTEX_COUNT; j++){
-                float height = getHeight(j / (VERTEX_COUNT - 1f) * SIZE, i / (VERTEX_COUNT - 1f) * SIZE);
-                vertices[vertexPointer * 3] = j / ( VERTEX_COUNT - 1f) * SIZE;
+
+                float x = j / (VERTEX_COUNT - 1f) * SIZE;
+                float z = i / (VERTEX_COUNT - 1f) * SIZE;
+                float height = getHeight(x, z);
+
+                vertices[vertexPointer * 3] = x;
                 vertices[vertexPointer * 3 + 1] = height;
-                vertices[vertexPointer * 3 + 2] = i / ( VERTEX_COUNT - 1f) * SIZE;
+                vertices[vertexPointer * 3 + 2] = z;
+
                 normals[vertexPointer * 3] = 0;
                 normals[vertexPointer * 3 + 1] = 1;
                 normals[vertexPointer * 3 + 2] = 0;
-                textureCoords[vertexPointer * 2] = j / ( VERTEX_COUNT - 1f) * SIZE;
-                textureCoords[vertexPointer * 2 + 1] = i / ( VERTEX_COUNT - 1f) * SIZE;
+
+                textureCoords[vertexPointer * 2] = x;
+                textureCoords[vertexPointer * 2 + 1] = z;
+
                 vertexPointer++;
             }
         }
