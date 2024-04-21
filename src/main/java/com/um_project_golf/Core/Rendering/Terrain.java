@@ -30,8 +30,9 @@ public class Terrain {
 
         for(int i = 0; i < VERTEX_COUNT; i++){
             for(int j = 0; j < VERTEX_COUNT; j++){
+                float height = getHeight(j / (VERTEX_COUNT - 1f) * SIZE, i / (VERTEX_COUNT - 1f) * SIZE);
                 vertices[vertexPointer * 3] = j / ( VERTEX_COUNT - 1f) * SIZE;
-                vertices[vertexPointer * 3 + 1] = 0; // Height of the terrain
+                vertices[vertexPointer * 3 + 1] = height;
                 vertices[vertexPointer * 3 + 2] = i / ( VERTEX_COUNT - 1f) * SIZE;
                 normals[vertexPointer * 3] = 0;
                 normals[vertexPointer * 3 + 1] = 1;
@@ -58,6 +59,11 @@ public class Terrain {
         }
         return loader.loadModel(vertices, textureCoords, normals, indices);
     }
+
+    private float getHeight(float x, float z) {
+        return (float)(10 * Math.sin(x * 0.1) * Math.cos(z * 0.1) + 5 * Math.sin(x * 0.05) * Math.cos(z * 0.05));
+    }
+
 
     public Model getModel() {
         return model;
