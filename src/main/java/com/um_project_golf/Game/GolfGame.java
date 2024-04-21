@@ -12,10 +12,10 @@ import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * The main game logic class.
@@ -29,7 +29,7 @@ public class GolfGame implements ILogic {
     private final ObjectLoader loader;
     private final WindowManager window;
 
-    private final List<Entity> entities = new ArrayList<>();
+    private List<Entity> entities = new ArrayList<>();
     private final Camera camera;
 
     Vector3f cameraInc;
@@ -61,12 +61,25 @@ public class GolfGame implements ILogic {
     public void init() throws Exception {
         renderer.init();
 
-        //TODO: Allow multiple textures for the same model
+        Model cube = loader.loadOBJModel("/Models/Minecraft_Grass_Block_OBJ/Grass_Block.obj");
+        Model skull = loader.loadOBJModel("/Models/Skull/skulls.obj");
+        cube.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block_TEX.png")), 1f);
+        skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull/Skull.jpg")), 1f);
 
-        Model skull = loader.loadOBJModel("/Models/Minecraft_Grass_Block_OBJ/Grass_Block.obj");
-        skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block_TEX.png")), 1f);
-        Entity skull_entity = new Entity(skull, new Vector3f(0,0,1), new Vector3f(0,1,0), 1);
-        entities.add(skull_entity);
+        entities = new ArrayList<>();
+        Random rnd = new Random();
+        for (int i = 0; i < 200 ; i++) {
+            float x = rnd.nextFloat() * 100 - 50;
+            float y = rnd.nextFloat() * 100 - 50;
+            float z = rnd.nextFloat() * -200;
+            float scale = rnd.nextFloat() * 0.1f + 0.1f;
+            entities.add(new Entity(skull, new Vector3f(x * 4, y * 4, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1));
+            entities.add(new Entity(cube, new Vector3f(x, y, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1.5f));
+        }
+        entities.add(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
+
+
+        //TODO: Allow multiple textures for the same model
 
         float lightIntensity = 1.0f;
         //point light
@@ -97,7 +110,7 @@ public class GolfGame implements ILogic {
     public void input() {
         cameraInc.set(0, 0, 0);
 
-        float moveSpeed = 1;
+        float moveSpeed = Consts.CAMERA_MOVEMENT_SPEED;
         if(window.is_keyPressed(GLFW.GLFW_KEY_W)) {
             cameraInc.z = -moveSpeed;
         }
@@ -187,6 +200,10 @@ public class GolfGame implements ILogic {
         double angle = Math.toRadians(lightAngle);
         directionalLight.getDirection().x = (float) Math.sin(angle);
         directionalLight.getDirection().y = (float) Math.cos(angle);
+
+        for (Entity entity : entities) {
+            renderer.processEntity(entity);
+        }
     }
 
     /**
@@ -195,15 +212,9 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void render() {
-        if (window.isResized()) {
-            GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
-            window.setResized(true);
-        }
-
         renderer.clear();
 
-        for (Entity entity : entities)
-            renderer.render(entity, camera, directionalLight, pointLights, spotLights);
+        renderer.render(camera, directionalLight, pointLights, spotLights);
     }
 
     /**
