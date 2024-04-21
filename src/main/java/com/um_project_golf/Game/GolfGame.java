@@ -8,6 +8,7 @@ import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
 import com.um_project_golf.Core.MouseInput;
+import com.um_project_golf.Core.Rendering.RenderManager;
 import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -82,8 +83,9 @@ public class GolfGame implements ILogic {
         //TODO: Allow multiple textures for the same model
 
         float lightIntensity = 1.0f;
+
         //point light
-        Vector3f lightPosition = new Vector3f(0, 0, 0.2f);
+        Vector3f lightPosition = new Vector3f(0, 0, 1f);
         Vector3f lightColor = new Vector3f(1, 1, 1);
         PointLight pointLight = new PointLight(lightColor, lightPosition, lightIntensity, 0,0,1);
 
@@ -93,6 +95,7 @@ public class GolfGame implements ILogic {
         SpotLight spotLight = new SpotLight(new PointLight(lightColor, new Vector3f(0,0,0.2f), lightIntensity, 0,0,1), coneDirection, cutOff);
         SpotLight spotLight2 = new SpotLight(new PointLight(lightColor, new Vector3f(0,0,1f), lightIntensity, 0,0,1), coneDirection, cutOff);
         spotLight2.getPointLight().setPosition(new Vector3f(0.5f, 0.5f, 0.5f));
+
         //directional light
         lightPosition = new Vector3f(-1, -10, 0);
         lightColor = new Vector3f(1, 1, 1);
@@ -203,6 +206,7 @@ public class GolfGame implements ILogic {
 
         for (Entity entity : entities) {
             renderer.processEntity(entity);
+            entity.increaseRotation(1, 1, 1);
         }
     }
 
