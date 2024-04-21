@@ -2,6 +2,7 @@ package com.um_project_golf.Game;
 
 import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.Entity.Entity;
+import com.um_project_golf.Core.Entity.Material;
 import com.um_project_golf.Core.Entity.Model;
 import com.um_project_golf.Core.Entity.Texture;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
@@ -9,6 +10,7 @@ import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
 import com.um_project_golf.Core.MouseInput;
 import com.um_project_golf.Core.Rendering.RenderManager;
+import com.um_project_golf.Core.Rendering.Terrain;
 import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -30,7 +32,9 @@ public class GolfGame implements ILogic {
     private final ObjectLoader loader;
     private final WindowManager window;
 
-    private List<Entity> entities = new ArrayList<>();
+    private List<Entity> entities;
+    private List<Terrain> terrains;
+
     private final Camera camera;
 
     Vector3f cameraInc;
@@ -66,6 +70,12 @@ public class GolfGame implements ILogic {
         Model skull = loader.loadOBJModel("/Models/Skull/skulls.obj");
         cube.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block_TEX.png")), 1f);
         skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull/Skull.jpg")), 1f);
+
+        terrains = new ArrayList<>();
+        Terrain terrain = new Terrain(new Vector3f(0, -1, -800), loader, new Material(new Texture(loader.loadTexture("Texture/grass.png")), 0.1f));
+        Terrain terrain2 = new Terrain(new Vector3f(-800, -1, -800), loader, new Material(new Texture(loader.loadTexture("Texture/nyan.png")), 0.1f));
+        terrains.add(terrain);
+        terrains.add(terrain2);
 
         entities = new ArrayList<>();
         Random rnd = new Random();
@@ -207,6 +217,10 @@ public class GolfGame implements ILogic {
         for (Entity entity : entities) {
             renderer.processEntity(entity);
             entity.increaseRotation(1, 1, 1);
+        }
+
+        for (Terrain terrain : terrains) {
+            renderer.processTerrain(terrain);
         }
     }
 

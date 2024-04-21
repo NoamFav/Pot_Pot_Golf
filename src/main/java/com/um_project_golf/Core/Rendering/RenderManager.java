@@ -22,7 +22,8 @@ public class RenderManager {
 
     private static final Logger log = LogManager.getLogger(RenderManager.class);
     private final WindowManager window;
-    private EntityRender entityRenderer;
+    private EntityRenderer entityRenderer;
+    private TerrainRenderer terrainRenderer;
 
     /**
      * The constructor of the render manager.
@@ -38,9 +39,11 @@ public class RenderManager {
      * @throws Exception If the render manager fails to initialize.
      */
     public void init() throws Exception {
-        entityRenderer = new EntityRender();
+        entityRenderer = new EntityRenderer();
+        terrainRenderer = new TerrainRenderer();
 
         entityRenderer.init();
+        terrainRenderer.init();
     }
 
     /**
@@ -84,6 +87,7 @@ public class RenderManager {
         }
 
         entityRenderer.render(camera, pointLights, spotLights, directionalLight);
+        terrainRenderer.render(camera, pointLights, spotLights, directionalLight);
     }
 
     /**
@@ -102,6 +106,9 @@ public class RenderManager {
         }
     }
 
+    public void processTerrain(Terrain terrain) {
+        terrainRenderer.getTerrain().add(terrain);
+    }
     /**
      * Clears the screen.
      */
@@ -114,5 +121,6 @@ public class RenderManager {
      */
     public void cleanup() {
         entityRenderer.cleanup();
+        terrainRenderer.cleanup();
     }
 }

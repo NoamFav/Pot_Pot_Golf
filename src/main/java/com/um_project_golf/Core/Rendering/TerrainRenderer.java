@@ -1,7 +1,6 @@
 package com.um_project_golf.Core.Rendering;
 
 import com.um_project_golf.Core.Camera;
-import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.Model;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
@@ -16,25 +15,24 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The class responsible for rendering the entities.
  */
-public class EntityRender implements IRenderer{
+public class TerrainRenderer implements IRenderer{
 
     ShaderManager shader;
-    private final Map<Model, List<Entity>> entities;
+    private final List<Terrain> terrains;
 
     /**
      * The constructor of the entity render.
      *
      * @throws Exception If the entity render fails to initialize.
      */
-    public EntityRender() throws Exception{
-        entities = new HashMap<>();
+    public TerrainRenderer() throws Exception{
+        terrains = new ArrayList<>();
         shader = new ShaderManager();
     }
 
@@ -45,8 +43,8 @@ public class EntityRender implements IRenderer{
      */
     @Override
     public void init() throws Exception {
-        shader.createVertexShader(Utils.loadResource("/shaders/entity_vertex.glsl"));
-        shader.createFragmentShader(Utils.loadResource("/shaders/entity_fragment.glsl"));
+        shader.createVertexShader(Utils.loadResource("/shaders/terrain_vertex.glsl"));
+        shader.createFragmentShader(Utils.loadResource("/shaders/terrain_fragment.glsl"));
         shader.link();
 
         shader.createUniform("textureSampler");
@@ -67,7 +65,7 @@ public class EntityRender implements IRenderer{
      *
      * @param camera The camera of the game.
      * @param pointLights The point lights of the game.
-     * @param spotLights The spot lights of the game.
+     * @param spotLights The spotlights of the game.
      * @param directionalLight The directional light of the game.
      */
     @Override
@@ -75,16 +73,13 @@ public class EntityRender implements IRenderer{
         shader.bind();
         shader.setUniform("projectionMatrix", Launcher.getWindow().updateProjectionMatrix());
         RenderManager.renderLight(pointLights, spotLights, directionalLight, shader);
-        for(Model model : entities.keySet()) {
-            bind(model);
-            List<Entity> batch = entities.get(model);
-            for(Entity ent : batch) {
-                prepare(ent, camera);
-                GL11.glDrawElements(GL11.GL_TRIANGLES, ent.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
-            }
+        for(Terrain terrain : terrains) {
+            bind(terrain.getModel());
+            prepare(terrain, camera);
+            GL11.glDrawElements(GL11.GL_TRIANGLES, terrain.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
             unbind();
         }
-        entities.clear();
+        terrains.clear();
         shader.unbind();
     }
 
@@ -131,17 +126,17 @@ public class EntityRender implements IRenderer{
     /**
      * Prepares the entity.
      *
-     * @param entity The entity to prepare.
+     * @param terrain The entity to prepare.
      * @param camera The camera of the game.
      */
     @Override
-    public void prepare(Object entity, Camera camera) {
+    public void prepare(Object terrain, Camera camera) {
         shader.setUniform("textureSampler", 0);
-        shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix((Entity) entity));
+        shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix((Terrain) terrain));
         shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera));
     }
 
-    public Map<Model, List<Entity>> getEntities() {
-        return entities;
+    public List<Terrain> getTerrain() {
+        return terrains;
     }
 }
