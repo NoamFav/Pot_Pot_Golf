@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
+import org.lwjgl.assimp.*;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -33,6 +34,7 @@ public class ObjectLoader {
      * @return The model loaded.
      */
     public Model loadOBJModel(String filename) {
+        // TODO: Implement the file loader with ASSIMP instead of manual parsing
         List<String> lines = Utils.readAllLines(filename);
 
         List<Vector3f> vertices = new ArrayList<>();
