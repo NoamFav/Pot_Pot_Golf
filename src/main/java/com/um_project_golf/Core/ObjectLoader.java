@@ -21,6 +21,7 @@ import java.util.Objects;
  * The class responsible for loading objects.
  */
 public class ObjectLoader {
+
     private final List<Integer> vaos = new ArrayList<>();
     private final List<Integer> vbos = new ArrayList<>();
     private final List<Integer> textures = new ArrayList<>();
@@ -32,7 +33,6 @@ public class ObjectLoader {
      * @return The model loaded.
      */
     public Model loadAssimpModel(String path) {
-        // Import the file
         AIScene scene = Assimp.aiImportFile(path,
                 Assimp.aiProcess_JoinIdenticalVertices |
                         Assimp.aiProcess_Triangulate |
@@ -46,43 +46,44 @@ public class ObjectLoader {
         AIMesh mesh = AIMesh.create(Objects.requireNonNull(scene.mMeshes()).get(0));
         Model model = processMesh(mesh);
 
-        // Cleanup
         Assimp.aiReleaseImport(scene);
 
         return model;
     }
 
+    /**
+     * Processes a mesh.
+     *
+     * @param mesh The mesh to process.
+     * @return The model processed.
+     */
     private Model processMesh(AIMesh mesh) {
         List<Float> vertices = new ArrayList<>();
         List<Float> textures = new ArrayList<>();
         List<Float> normals = new ArrayList<>();
         List<Integer> indices = new ArrayList<>();
 
-        // Vertices
         for (int i = 0; i < mesh.mNumVertices(); i++) {
             AIVector3D vertex = mesh.mVertices().get(i);
             vertices.add(vertex.x());
             vertices.add(vertex.y());
             vertices.add(vertex.z());
 
-            // Normals
             AIVector3D normal = Objects.requireNonNull(mesh.mNormals()).get(i);
             normals.add(normal.x());
             normals.add(normal.y());
             normals.add(normal.z());
 
-            // Texture coordinates (if present)
             if (mesh.mTextureCoords(0) != null) {
                 AIVector3D texCoord = Objects.requireNonNull(mesh.mTextureCoords(0)).get(i);
                 textures.add(texCoord.x());
-                textures.add(1 - texCoord.y()); // Adjust for OpenGL's Y coordinate
+                textures.add(1 - texCoord.y());
             } else {
-                textures.add(0.0f); // Default texture coords
+                textures.add(0.0f);
                 textures.add(0.0f);
             }
         }
 
-        // Indices
         for (int i = 0; i < mesh.mNumFaces(); i++) {
             AIFace face = mesh.mFaces().get(i);
             for (int j = 0; j < face.mNumIndices(); j++) {
@@ -90,10 +91,15 @@ public class ObjectLoader {
             }
         }
 
-        // Convert lists to arrays and create the model
         return loadModel(listToArray(vertices), listToArray(textures), listToArray(normals), listToIntArray(indices));
     }
 
+    /**
+     * Converts a list to an array.
+     *
+     * @param list The list of materials.
+     * @return The material processed.
+     */
     private float[] listToArray(List<Float> list) {
         float[] array = new float[list.size()];
         for (int i = 0; i < list.size(); i++) {
@@ -102,6 +108,12 @@ public class ObjectLoader {
         return array;
     }
 
+    /**
+     * Converts a list to an array.
+     *
+     * @param list The list of materials.
+     * @return The material processed.
+     */
     private int[] listToIntArray(List<Integer> list) {
         int[] array = new int[list.size()];
         for (int i = 0; i < list.size(); i++) {
