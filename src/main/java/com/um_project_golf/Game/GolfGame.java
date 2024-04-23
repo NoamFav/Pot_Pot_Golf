@@ -1,10 +1,7 @@
 package com.um_project_golf.Game;
 
 import com.um_project_golf.Core.*;
-import com.um_project_golf.Core.Entity.Entity;
-import com.um_project_golf.Core.Entity.Material;
-import com.um_project_golf.Core.Entity.Model;
-import com.um_project_golf.Core.Entity.Texture;
+import com.um_project_golf.Core.Entity.*;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
@@ -16,8 +13,6 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -29,18 +24,11 @@ public class GolfGame implements ILogic {
     private final RenderManager renderer;
     private final ObjectLoader loader;
     private final WindowManager window;
-
-    private List<Entity> entities;
-    private List<Terrain> terrains;
+    private final SceneManager scene;
 
     private final Camera camera;
 
     Vector3f cameraInc;
-
-    private float lightAngle;
-    private DirectionalLight directionalLight;
-    private PointLight[] pointLights;
-    private SpotLight[] spotLights;
     /**
      * The constructor of the game.
      * It initializes the renderer, window, loader and camera.
@@ -49,9 +37,9 @@ public class GolfGame implements ILogic {
         renderer = new RenderManager();
         window = Launcher.getWindow();
         loader = new ObjectLoader();
+        scene = new SceneManager(-90);
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
-        lightAngle = -90;
     }
 
     /**
@@ -70,11 +58,11 @@ public class GolfGame implements ILogic {
         cube.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block_TEX.png")), 1f);
         //skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull/Skull.jpg")), 1f);
 
-        terrains = new ArrayList<>();
-        Terrain terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Texture(loader.loadTexture("Texture/grass.png")), 0.1f));
-        terrains.add(terrain);
+        Terrain terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Texture(loader.loadTexture("Texture/grass.png")), 0.1f), false);
+        Terrain water = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Texture(loader.loadTexture("Texture/blue.png")), 0.1f), true);
+        scene.addTerrain(terrain);
+        scene.addTerrain(water);
 
-        entities = new ArrayList<>();
         Random rnd = new Random();
         for (int i = 0; i < 4000 ; i++) {
             float x = rnd.nextFloat() * Consts.SIZE_X - Consts.SIZE_X / 2;
@@ -82,34 +70,34 @@ public class GolfGame implements ILogic {
             float y = terrain.getHeight(x, z);
             float scale = rnd.nextFloat() * 0.1f + 0.1f;
             //entities.add(new Entity(skull, new Vector3f(x * 4, y * 4, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1));
-            entities.add(new Entity(cube, new Vector3f(x, y, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1.5f));
+            scene.addEntity(new Entity(cube, new Vector3f(x, y, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1.5f));
         }
-        entities.add(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
+        scene.addEntity(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
 
 
         //TODO: Allow multiple textures for the same model
 
-        float lightIntensity = 1.0f;
+        float lightIntensity =10f;
 
         //point light
-        Vector3f lightPosition = new Vector3f(0, 0, 1f);
+        Vector3f lightPosition = new Vector3f(Consts.SIZE_X / 2, 10, 0);
         Vector3f lightColor = new Vector3f(1, 1, 1);
         PointLight pointLight = new PointLight(lightColor, lightPosition, lightIntensity, 0,0,1);
 
-        //spot light
-        Vector3f coneDirection = new Vector3f(0, 0, -1);
-        float cutOff = (float) Math.cos(Math.toRadians(180));
-        SpotLight spotLight = new SpotLight(new PointLight(lightColor, new Vector3f(0,0,0.2f), lightIntensity, 0,0,1), coneDirection, cutOff);
-        SpotLight spotLight2 = new SpotLight(new PointLight(lightColor, new Vector3f(0,0,1f), lightIntensity, 0,0,1), coneDirection, cutOff);
-        spotLight2.getPointLight().setPosition(new Vector3f(0.5f, 0.5f, 0.5f));
+        //spot light 1
+        Vector3f coneDir = new Vector3f(0, -50, 0);
+        float cutoff = (float) Math.cos(Math.toRadians(140));
+        lightIntensity = 2;
+        SpotLight spotLight = new SpotLight(new PointLight(new Vector3f(0,0.25f,0), new Vector3f(0,0,0), lightIntensity), coneDir, cutoff);
+        SpotLight spotLight2 = new SpotLight(new PointLight(new Vector3f(0.25f,0,0), new Vector3f(0,0,0), lightIntensity), coneDir, cutoff);
 
         //directional light
-        lightPosition = new Vector3f(-1, -10, 0);
+        lightPosition = new Vector3f(-1, 10, 0);
         lightColor = new Vector3f(1, 1, 1);
-        directionalLight = new DirectionalLight(lightColor, lightPosition, lightIntensity);
+        scene.setDirectionalLight(new DirectionalLight(lightColor, lightPosition, lightIntensity));
 
-        pointLights = new PointLight[]{pointLight};
-        spotLights = new SpotLight[]{spotLight, spotLight2};
+        scene.setPointLights(new PointLight[]{pointLight});
+        scene.setSpotLights(new SpotLight[]{spotLight, spotLight2});
     }
 
     /**
@@ -119,8 +107,8 @@ public class GolfGame implements ILogic {
     @Override
     public void input() {
         cameraInc.set(0, 0, 0);
-        float lightPos = spotLights[0].getPointLight().getPosition().z;
-        float lightPos2 = spotLights[1].getPointLight().getPosition().z;
+        float lightPos = scene.getSpotLights()[0].getPointLight().getPosition().z;
+        float lightPos2 = scene.getSpotLights()[1].getPointLight().getPosition().z;
 
         float moveSpeed = Consts.CAMERA_MOVEMENT_SPEED;
         if(window.is_keyPressed(GLFW.GLFW_KEY_W)) {
@@ -141,34 +129,34 @@ public class GolfGame implements ILogic {
             cameraInc.y = moveSpeed;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
-            pointLights[0].getPosition().x += 0.1f;
+            scene.getPointLights()[0].getPosition().x += 0.1f;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT)) {
-            pointLights[0].getPosition().x -= 0.1f;
+            scene.getPointLights()[0].getPosition().x -= 0.1f;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_I)) {
-            spotLights[0].getPointLight().getPosition().z = lightPos + 0.1f;
+            scene.getSpotLights()[0].getPointLight().getPosition().z = lightPos + 0.1f;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_K)) {
-            spotLights[0].getPointLight().getPosition().z = lightPos - 0.1f;
+            scene.getSpotLights()[0].getPointLight().getPosition().z = lightPos - 0.1f;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_L)) {
-            spotLights[0].getPointLight().getPosition().x += 0.1f;
+            scene.getSpotLights()[0].getPointLight().getPosition().x += 0.1f;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_J)) {
-            spotLights[0].getPointLight().getPosition().x -= 0.1f;
+            scene.getSpotLights()[0].getPointLight().getPosition().x -= 0.1f;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_O)) {
-            spotLights[0].getPointLight().getPosition().y += 0.1f;
+            scene.getSpotLights()[0].getPointLight().getPosition().y += 0.1f;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_U)) {
-            spotLights[0].getPointLight().getPosition().y -= 0.1f;
+            scene.getSpotLights()[0].getPointLight().getPosition().y -= 0.1f;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_0)) {
-            spotLights[1].getPointLight().getPosition().z = lightPos2 + 0.1f;
+            scene.getSpotLights()[1].getPointLight().getPosition().z = lightPos2 + 0.1f;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_P)) {
-            spotLights[1].getPointLight().getPosition().z = lightPos2 - 0.1f;
+            scene.getSpotLights()[1].getPointLight().getPosition().z = lightPos2 - 0.1f;
         }
     }
 
@@ -187,35 +175,49 @@ public class GolfGame implements ILogic {
             camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
         }
 
-        for (Entity entity : entities)
+        for (Entity entity : scene.getEntities()) {
             entity.increaseRotation(0.0f, 0, 0.0f);
 
-        lightAngle += 0.5f;
-        if (lightAngle > 90) {
-            directionalLight.setIntensity(0);
-            if (lightAngle >= 360)
-                lightAngle = -90;
-        } else if (lightAngle <= -80 || lightAngle >= 80) {
-            float factor = 1 - (Math.abs(lightAngle) - 80) / 10.0f;
-            directionalLight.setIntensity(factor);
-            directionalLight.getColor().x = Math.max(factor, 0.9f);
-            directionalLight.getColor().z = Math.max(factor, 0.5f);
-        } else {
-            directionalLight.setIntensity(1);
-            directionalLight.getColor().x = 1;
-            directionalLight.getColor().z = 1;
-            directionalLight.getColor().y = 1;
         }
-        double angle = Math.toRadians(lightAngle);
-        directionalLight.getDirection().x = (float) Math.sin(angle);
-        directionalLight.getDirection().y = (float) Math.cos(angle);
 
-        for (Entity entity : entities) {
+        scene.increaseSpotAngle(0.15f);
+        if(scene.getSpotAngle() > 4) {
+            scene.setSpotInc(-1);
+        } else if(scene.getSpotAngle() < -4) {
+            scene.setSpotInc(1);
+        }
+        double spotAngleRad = Math.toRadians(scene.getSpotAngle());
+        Vector3f coneDir = scene.getSpotLights()[0].getPointLight().getPosition();
+        coneDir.y = (float) Math.sin(spotAngleRad);
+
+        scene.increaseLightAngle(0.1f); // Adjust the increment as needed for desired rotation speed
+        if (scene.getLightAngle() > 180)
+            scene.setLightAngle(0); // Reset angle after a full rotation
+
+        // Calculate the direction based on the light angle for rotation around the y-axis
+        double angle = Math.toRadians(scene.getLightAngle());
+        float lightDirectionX = (float) Math.sin(angle); // Sine for the x-component
+        float lightDirectionY = (float) Math.abs(Math.cos(angle)); // Absolute cosine for the y-component to stay above horizon
+        float lightDirectionZ = 0; // Z-component remains constant as light does not move along z-axis
+
+        // Set the new light direction
+        scene.getDirectionalLight().getDirection().set(lightDirectionX, lightDirectionY, lightDirectionZ);
+
+        // Adjust light intensity based on the y-component
+        // As the light moves to the highest point (cosine = 1), its intensity is max; at the horizons (cosine = 0), intensity is zero
+        float intensity = 0.5f + 0.5f * lightDirectionY;
+        scene.getDirectionalLight().setIntensity(intensity);
+
+        // Set light color to simulate sun brightness variation (optional)
+        float redness = 1.0f - lightDirectionY; // Varies from 0.5 to 1.0
+        scene.getDirectionalLight().getColor().set(1.0f, 1.0f - 0.5f * redness, 1.0f - 0.5f * redness);
+
+        for (Entity entity : scene.getEntities()) {
             renderer.processEntity(entity);
             entity.increaseRotation(1, 1, 1);
         }
 
-        for (Terrain terrain : terrains) {
+        for (Terrain terrain : scene.getTerrains()) {
             renderer.processTerrain(terrain);
         }
     }
@@ -228,7 +230,7 @@ public class GolfGame implements ILogic {
     public void render() {
         renderer.clear();
 
-        renderer.render(camera, directionalLight, pointLights, spotLights);
+        renderer.render(camera, scene);
     }
 
     /**
