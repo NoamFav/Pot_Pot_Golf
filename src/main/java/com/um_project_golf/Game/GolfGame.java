@@ -26,8 +26,6 @@ import java.util.Random;
  */
 public class GolfGame implements ILogic {
 
-    private static final float CAMERA_MOVEMENT_SPEED = 0.05f;
-
     private final RenderManager renderer;
     private final ObjectLoader loader;
     private final WindowManager window;
@@ -65,26 +63,25 @@ public class GolfGame implements ILogic {
     @Override
     public void init() throws Exception {
         renderer.init();
+        window.setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
 
         Model cube = loader.loadAssimpModel("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block.obj");
-        Model skull = loader.loadAssimpModel("src/main/resources/Models/Skull/skulls.obj");
+        //Model skull = loader.loadAssimpModel("src/main/resources/Models/Skull/skulls.obj");
         cube.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block_TEX.png")), 1f);
-        skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull/Skull.jpg")), 1f);
+        //skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull/Skull.jpg")), 1f);
 
         terrains = new ArrayList<>();
-        Terrain terrain = new Terrain(new Vector3f(0, -1, -800), loader, new Material(new Texture(loader.loadTexture("Texture/grass.png")), 0.1f));
-        Terrain terrain2 = new Terrain(new Vector3f(-800, -1, -800), loader, new Material(new Texture(loader.loadTexture("Texture/grassBlock.jpg")), 0.1f));
+        Terrain terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Texture(loader.loadTexture("Texture/grass.png")), 0.1f));
         terrains.add(terrain);
-        terrains.add(terrain2);
 
         entities = new ArrayList<>();
         Random rnd = new Random();
-        for (int i = 0; i < 200 ; i++) {
-            float x = rnd.nextFloat() * 100 - 50;
-            float y = rnd.nextFloat() * 100 - 50;
-            float z = rnd.nextFloat() * -200;
+        for (int i = 0; i < 4000 ; i++) {
+            float x = rnd.nextFloat() * Consts.SIZE_X - Consts.SIZE_X / 2;
+            float z = rnd.nextFloat() * Consts.SIZE_Z - Consts.SIZE_Z / 2;
+            float y = terrain.getHeight(x, z);
             float scale = rnd.nextFloat() * 0.1f + 0.1f;
-            entities.add(new Entity(skull, new Vector3f(x * 4, y * 4, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1));
+            //entities.add(new Entity(skull, new Vector3f(x * 4, y * 4, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1));
             entities.add(new Entity(cube, new Vector3f(x, y, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1.5f));
         }
         entities.add(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
@@ -122,6 +119,8 @@ public class GolfGame implements ILogic {
     @Override
     public void input() {
         cameraInc.set(0, 0, 0);
+        float lightPos = spotLights[0].getPointLight().getPosition().z;
+        float lightPos2 = spotLights[1].getPointLight().getPosition().z;
 
         float moveSpeed = Consts.CAMERA_MOVEMENT_SPEED;
         if(window.is_keyPressed(GLFW.GLFW_KEY_W)) {
@@ -147,9 +146,6 @@ public class GolfGame implements ILogic {
         if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT)) {
             pointLights[0].getPosition().x -= 0.1f;
         }
-
-        float lightPos = spotLights[0].getPointLight().getPosition().z;
-        float lightPos2 = spotLights[1].getPointLight().getPosition().z;
         if (window.is_keyPressed(GLFW.GLFW_KEY_I)) {
             spotLights[0].getPointLight().getPosition().z = lightPos + 0.1f;
         }
@@ -184,7 +180,7 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void update(MouseInput mouseInput) {
-        camera.movePosition(cameraInc.x * CAMERA_MOVEMENT_SPEED, cameraInc.y * CAMERA_MOVEMENT_SPEED, cameraInc.z * CAMERA_MOVEMENT_SPEED);
+        camera.movePosition(cameraInc.x * Consts.CAMERA_MOVEMENT_SPEED, cameraInc.y * Consts.CAMERA_MOVEMENT_SPEED, cameraInc.z * Consts.CAMERA_MOVEMENT_SPEED);
 
         if (mouseInput.isRightButtonPressed()) {
             Vector2f rotVec = mouseInput.getDisplVec();
