@@ -2,6 +2,7 @@ package com.um_project_golf.Core.Rendering;
 
 import com.um_project_golf.Core.Camera;
 import com.um_project_golf.Core.Entity.Entity;
+import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
@@ -75,19 +76,17 @@ public class RenderManager {
      * Renders the game.
      *
      * @param camera The camera of the game.
-     * @param directionalLight The directional light of the game.
-     * @param pointLights The point lights of the game.
-     * @param spotLights The spot lights of the game.
+     * @param scene The scene of the game.
      */
-    public void render(Camera camera, DirectionalLight directionalLight, PointLight[] pointLights, SpotLight[] spotLights) {
+    public void render(Camera camera, SceneManager scene) {
 
         if (window.isResized()) {
             GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
             window.setResized(true);
         }
 
-        entityRenderer.render(camera, pointLights, spotLights, directionalLight);
-        terrainRenderer.render(camera, pointLights, spotLights, directionalLight);
+        entityRenderer.render(camera, scene.getPointLights(), scene.getSpotLights(), scene.getDirectionalLight());
+        terrainRenderer.render(camera,  scene.getPointLights(), scene.getSpotLights(), scene.getDirectionalLight());
     }
 
     /**

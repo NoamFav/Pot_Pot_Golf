@@ -103,8 +103,26 @@ vec4 calcSpotLight(SpotLight light, vec3 position, vec3 normal) {
 }
 
 vec4 calcDirectionalLight(DirectionalLight light, vec3 position, vec3 normal) {
-    return calcLightColor(light.color, light.intensity, position, normalize(light.direction), normal);
+    vec3 lightDirNorm = normalize(light.direction);
+    float lightAngleCosine = dot(lightDirNorm, vec3(0, 1, 0)); // Cosine of angle with the 'up' direction
+
+    vec3 to_light_dir = lightDirNorm;
+    float diffuseFactor = max(dot(normal, to_light_dir), 0.0);
+
+    // Adjust the zenith factor to be less pronounced
+    // Use a narrower range for the smoothstep to reduce the impact at the zenith
+    float zenithFactor = smoothstep(0.80, 0.85, abs(lightAngleCosine)); // More subtle transition near vertical
+
+    // Adjust diffuseFactor to subtly increase brightness at zenith
+    diffuseFactor = mix(diffuseFactor, 0.9, zenithFactor); // Mix towards a slightly increased brightness at zenith
+
+    vec4 lightColor = vec4(light.color, 1.0) * light.intensity;
+    vec4 diffuseColor = diffuseC * lightColor * diffuseFactor;
+    vec4 specularColor = vec4(0.0); // Specular calculation remains unchanged for simplicity
+
+    return diffuseColor + specularColor;
 }
+
 
 void main()
 {

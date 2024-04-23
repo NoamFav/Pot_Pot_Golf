@@ -23,9 +23,9 @@ public class Terrain {
      * @param loader The loader of the terrain.
      * @param material The material of the terrain.
      */
-    public Terrain(Vector3f position, ObjectLoader loader, Material material) {
+    public Terrain(Vector3f position, ObjectLoader loader, Material material, boolean isWater) {
         this.position = position;
-        this.model = generateTerrain(loader);
+        this.model = generateTerrain(loader, isWater);
         this.model.setMaterial(material);
     }
 
@@ -35,7 +35,7 @@ public class Terrain {
      * @param loader The loader of the terrain.
      * @return The model of the terrain.
      */
-    private Model generateTerrain(ObjectLoader loader) {
+    private Model generateTerrain(ObjectLoader loader, boolean isWater) {
         int count = Consts.VERTEX_COUNT * Consts.VERTEX_COUNT;
         float[] vertices = new float[count * 3];
         float[] normals = new float[count * 3];
@@ -51,7 +51,7 @@ public class Terrain {
                 float height = getHeight(x, z);
 
                 vertices[vertexPointer * 3] = x;
-                vertices[vertexPointer * 3 + 1] = height;
+                vertices[vertexPointer * 3 + 1] = isWater ? 0 : height;
                 vertices[vertexPointer * 3 + 2] = z;
 
                 normals[vertexPointer * 3] = 0;
