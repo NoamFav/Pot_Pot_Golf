@@ -2,9 +2,6 @@ package com.um_project_golf.Core;
 
 import com.um_project_golf.Core.Entity.Model;
 import com.um_project_golf.Core.Utils.Utils;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.joml.Vector3i;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
@@ -18,6 +15,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The class responsible for loading objects.
@@ -28,124 +26,88 @@ public class ObjectLoader {
     private final List<Integer> textures = new ArrayList<>();
 
     /**
-     * Loads an OBJ model.
+     * Loads a model from a file.
      *
-     * @param filename The name of the file to load.
+     * @param path The path to the file.
      * @return The model loaded.
      */
-    public Model loadOBJModel(String filename) {
-        // TODO: Implement the file loader with ASSIMP instead of manual parsing
-        List<String> lines = Utils.readAllLines(filename);
+    public Model loadAssimpModel(String path) {
+        // Import the file
+        AIScene scene = Assimp.aiImportFile(path,
+                Assimp.aiProcess_JoinIdenticalVertices |
+                        Assimp.aiProcess_Triangulate |
+                        Assimp.aiProcess_FixInfacingNormals);
 
-        List<Vector3f> vertices = new ArrayList<>();
-        List<Vector3f> normals = new ArrayList<>();
-        List<Vector2f> textures = new ArrayList<>();
-        List<Vector3i> faces = new ArrayList<>();
-
-        for(String line : lines) {
-            String[] tokens = line.split("\\s+");
-            switch (tokens[0]) {
-                case "v":
-                    vertices.add(new Vector3f(
-                            Float.parseFloat(tokens[1]),
-                            Float.parseFloat(tokens[2]),
-                            Float.parseFloat(tokens[3])
-                    ));
-                    break;
-                case "vt":
-                    textures.add(new Vector2f(
-                            Float.parseFloat(tokens[1]),
-                            Float.parseFloat(tokens[2])
-                    ));
-                    break;
-                case "vn":
-                    normals.add(new Vector3f(
-                            Float.parseFloat(tokens[1]),
-                            Float.parseFloat(tokens[2]),
-                            Float.parseFloat(tokens[3])
-                    ));
-                    break;
-                case "f":
-                    processFace(tokens[1], faces);
-                    processFace(tokens[2], faces);
-                    processFace(tokens[3], faces);
-                    break;
-                default:
-                    break;
-            }
+        if (scene == null) {
+            throw new RuntimeException("Failed to load model: " + path + "\n" + Assimp.aiGetErrorString());
         }
+
+        // Process the first mesh (for simplicity)
+        AIMesh mesh = AIMesh.create(Objects.requireNonNull(scene.mMeshes()).get(0));
+        Model model = processMesh(mesh);
+
+        // Cleanup
+        Assimp.aiReleaseImport(scene);
+
+        return model;
+    }
+
+    private Model processMesh(AIMesh mesh) {
+        List<Float> vertices = new ArrayList<>();
+        List<Float> textures = new ArrayList<>();
+        List<Float> normals = new ArrayList<>();
         List<Integer> indices = new ArrayList<>();
-        float[] verticesArray = new float[vertices.size() * 3];
-        int i = 0;
-        for (Vector3f vertex : vertices) {
-            verticesArray[i * 3] = vertex.x;
-            verticesArray[i * 3 + 1] = vertex.y;
-            verticesArray[i * 3 + 2] = vertex.z;
-            i++;
-        }
 
-        float[] textCoordArr = new float[vertices.size() * 2];
-        float[] normalArr = new float[vertices.size() * 3];
+        // Vertices
+        for (int i = 0; i < mesh.mNumVertices(); i++) {
+            AIVector3D vertex = mesh.mVertices().get(i);
+            vertices.add(vertex.x());
+            vertices.add(vertex.y());
+            vertices.add(vertex.z());
 
-        for (Vector3i face : faces) {
-            processVertex(face.x, face.y, face.z, textures, normals, indices, textCoordArr, normalArr);
-        }
+            // Normals
+            AIVector3D normal = Objects.requireNonNull(mesh.mNormals()).get(i);
+            normals.add(normal.x());
+            normals.add(normal.y());
+            normals.add(normal.z());
 
-        int[] indicesArr = indices.stream().mapToInt(Integer::intValue).toArray();
-
-        return loadModel(verticesArray, textCoordArr, normalArr, indicesArr);
-    }
-
-    /**
-     * Processes a vertex.
-     *
-     * @param pos The position.
-     * @param texCoord The texture coordinate.
-     * @param normal The normal.
-     * @param textCoordList The list of texture coordinates.
-     * @param normalsList The list of normals.
-     * @param indicesList The list of indices.
-     * @param textCoordArr The array of texture coordinates.
-     * @param normalArr The array of normals.
-     */
-    private static void processVertex(int pos, int texCoord, int normal,
-                                      List<Vector2f> textCoordList, List<Vector3f> normalsList, List<Integer> indicesList,
-                                      float[] textCoordArr, float[] normalArr) {
-        indicesList.add(pos);
-
-        if(texCoord >= 0) {
-            Vector2f textCoordVec = textCoordList.get(texCoord);
-            textCoordArr[pos * 2] = textCoordVec.x;
-            textCoordArr[pos * 2 + 1] = 1 - textCoordVec.y;
-        }
-
-        if (normal >= 0) {
-            Vector3f normalVec = normalsList.get(normal);
-            normalArr[pos * 3] = normalVec.x;
-            normalArr[pos * 3 + 1] = normalVec.y;
-            normalArr[pos * 3 + 2] = normalVec.z;
-        }
-    }
-
-    /**
-     * Processes a face.
-     *
-     * @param token The token to process.
-     * @param faces The list of faces.
-     */
-    private static void processFace(String token, List<Vector3i> faces) {
-        String[] lineTokens = token.split("/");
-        int length = lineTokens.length;
-        int pos = -1, coords = -1, normal = -1;
-        pos = Integer.parseInt(lineTokens[0]) - 1;
-        if (length > 1) {
-            String textCoord = lineTokens[1];
-            coords = !textCoord.isEmpty() ? Integer.parseInt(textCoord) - 1 : -1;
-            if (length > 2) {
-                normal = Integer.parseInt(lineTokens[2]) - 1;
+            // Texture coordinates (if present)
+            if (mesh.mTextureCoords(0) != null) {
+                AIVector3D texCoord = Objects.requireNonNull(mesh.mTextureCoords(0)).get(i);
+                textures.add(texCoord.x());
+                textures.add(1 - texCoord.y()); // Adjust for OpenGL's Y coordinate
+            } else {
+                textures.add(0.0f); // Default texture coords
+                textures.add(0.0f);
             }
         }
-        faces.add(new Vector3i(pos, coords, normal));
+
+        // Indices
+        for (int i = 0; i < mesh.mNumFaces(); i++) {
+            AIFace face = mesh.mFaces().get(i);
+            for (int j = 0; j < face.mNumIndices(); j++) {
+                indices.add(face.mIndices().get(j));
+            }
+        }
+
+        // Convert lists to arrays and create the model
+        return loadModel(listToArray(vertices), listToArray(textures), listToArray(normals), listToIntArray(indices));
+    }
+
+    private float[] listToArray(List<Float> list) {
+        float[] array = new float[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            array[i] = list.get(i);
+        }
+        return array;
+    }
+
+    private int[] listToIntArray(List<Integer> list) {
+        int[] array = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            array[i] = list.get(i);
+        }
+        return array;
     }
 
     /**
