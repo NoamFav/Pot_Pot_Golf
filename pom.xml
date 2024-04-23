@@ -10,17 +10,13 @@
     <name>UM_PROJECT_GOLF</name>
 
     <properties>
-        <!-- Existing properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.10.0</junit.version>
 
-        <!-- LWJGL properties -->
         <lwjgl.version>3.3.3</lwjgl.version>
         <joml.version>1.10.5</joml.version>
         <joml-primitives.version>1.10.0</joml-primitives.version>
         <lwjgl3-awt.version>0.1.8</lwjgl3-awt.version>
-        <steamworks4j-server.version>1.9.0</steamworks4j-server.version>
-        <steamworks4j.version>1.9.0</steamworks4j.version>
     </properties>
 
     <dependencies>
@@ -483,16 +479,6 @@
             <groupId>org.lwjglx</groupId>
             <artifactId>lwjgl3-awt</artifactId>
             <version>${lwjgl3-awt.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.code-disaster.steamworks4j</groupId>
-            <artifactId>steamworks4j-server</artifactId>
-            <version>${steamworks4j-server.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.code-disaster.steamworks4j</groupId>
-            <artifactId>steamworks4j</artifactId>
-            <version>${steamworks4j.version}</version>
         </dependency>
     </dependencies>
 
