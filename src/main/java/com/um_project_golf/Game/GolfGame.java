@@ -190,27 +190,27 @@ public class GolfGame implements ILogic {
         Vector3f coneDir = scene.getSpotLights()[0].getPointLight().getPosition();
         coneDir.y = (float) Math.sin(spotAngleRad);
 
-        scene.increaseLightAngle(0.1f); // Adjust the increment as needed for desired rotation speed
-        if (scene.getLightAngle() > 180)
-            scene.setLightAngle(0); // Reset angle after a full rotation
+        scene.increaseLightAngle(0.1f);
 
-        // Calculate the direction based on the light angle for rotation around the y-axis
+        if (scene.getLightAngle() > 90) {
+            scene.getDirectionalLight().setIntensity(0);
+            if (scene.getLightAngle() >= 360)
+                scene.setLightAngle(-90);
+        } else if (scene.getLightAngle() <= -80 || scene.getLightAngle() >= 80) {
+            float factor = 1 - (Math.abs(scene.getLightAngle()) - 80) / 10.0f;
+            scene.getDirectionalLight().setIntensity(factor);
+            scene.getDirectionalLight().getColor().x = Math.max(factor, 0.9f);
+            scene.getDirectionalLight().getColor().z = Math.max(factor, 0.5f);
+        } else {
+            scene.getDirectionalLight().setIntensity(1);
+            scene.getDirectionalLight().getColor().x = 1;
+            scene.getDirectionalLight().getColor().z = 1;
+            scene.getDirectionalLight().getColor().y = 1;
+        }
+
         double angle = Math.toRadians(scene.getLightAngle());
-        float lightDirectionX = (float) Math.sin(angle); // Sine for the x-component
-        float lightDirectionY = (float) Math.abs(Math.cos(angle)); // Absolute cosine for the y-component to stay above horizon
-        float lightDirectionZ = 0; // Z-component remains constant as light does not move along z-axis
-
-        // Set the new light direction
-        scene.getDirectionalLight().getDirection().set(lightDirectionX, lightDirectionY, lightDirectionZ);
-
-        // Adjust light intensity based on the y-component
-        // As the light moves to the highest point (cosine = 1), its intensity is max; at the horizons (cosine = 0), intensity is zero
-        float intensity = 0.5f + 0.5f * lightDirectionY;
-        scene.getDirectionalLight().setIntensity(intensity);
-
-        // Set light color to simulate sun brightness variation (optional)
-        float redness = 1.0f - lightDirectionY; // Varies from 0.5 to 1.0
-        scene.getDirectionalLight().getColor().set(1.0f, 1.0f - 0.5f * redness, 1.0f - 0.5f * redness);
+        scene.getDirectionalLight().getDirection().x = (float) Math.sin(angle);
+        scene.getDirectionalLight().getDirection().y = (float) Math.cos(angle);
 
         for (Entity entity : scene.getEntities()) {
             renderer.processEntity(entity);
