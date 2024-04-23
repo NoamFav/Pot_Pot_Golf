@@ -4,35 +4,50 @@ import com.um_project_golf.Core.Entity.Material;
 import com.um_project_golf.Core.Entity.Model;
 import com.um_project_golf.Core.Entity.Texture;
 import com.um_project_golf.Core.ObjectLoader;
+import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector3f;
 
+/**
+ * The class responsible for the terrain.
+ */
 public class Terrain {
-
-    private static final float SIZE = 800;
-    private static final int VERTEX_COUNT = 1024;
 
     private final Vector3f position;
     private final Model model;
 
+    /**
+     * The constructor of the terrain.
+     * It initializes the position, loader and material of the terrain.
+     *
+     * @param position The position of the terrain.
+     * @param loader The loader of the terrain.
+     * @param material The material of the terrain.
+     */
     public Terrain(Vector3f position, ObjectLoader loader, Material material) {
         this.position = position;
         this.model = generateTerrain(loader);
         this.model.setMaterial(material);
     }
 
+    /**
+     * Generates the terrain.
+     *
+     * @param loader The loader of the terrain.
+     * @return The model of the terrain.
+     */
     private Model generateTerrain(ObjectLoader loader) {
-        int count = VERTEX_COUNT * VERTEX_COUNT;
+        int count = Consts.VERTEX_COUNT * Consts.VERTEX_COUNT;
         float[] vertices = new float[count * 3];
         float[] normals = new float[count * 3];
         float[] textureCoords = new float[count * 2];
-        int[] indices = new int[6 * (VERTEX_COUNT - 1) * (VERTEX_COUNT - 1)];
+        int[] indices = new int[6 * (Consts.VERTEX_COUNT - 1) * (Consts.VERTEX_COUNT - 1)];
         int vertexPointer = 0;
 
-        for(int i = 0; i < VERTEX_COUNT; i++){
-            for(int j = 0; j < VERTEX_COUNT; j++){
+        for(int i = 0; i < Consts.VERTEX_COUNT; i++){
+            for(int j = 0; j < Consts.VERTEX_COUNT; j++){
 
-                float x = j / (VERTEX_COUNT - 1f) * SIZE;
-                float z = i / (VERTEX_COUNT - 1f) * SIZE;
+                float x = j / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_X;
+                float z = i / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_Z;
                 float height = getHeight(x, z);
 
                 vertices[vertexPointer * 3] = x;
@@ -50,11 +65,11 @@ public class Terrain {
             }
         }
         int pointer = 0;
-        for(int gz = 0; gz < VERTEX_COUNT - 1.0f; gz++){
-            for(int gx = 0; gx < VERTEX_COUNT - 1.0f; gx++){
-                int topLeft = (gz * VERTEX_COUNT) + gx;
+        for(int gz = 0; gz < Consts.VERTEX_COUNT - 1.0f; gz++){
+            for(int gx = 0; gx < Consts.VERTEX_COUNT - 1.0f; gx++){
+                int topLeft = (gz * Consts.VERTEX_COUNT) + gx;
                 int topRight = topLeft + 1;
-                int bottomLeft = ((gz + 1) * VERTEX_COUNT) + gx;
+                int bottomLeft = ((gz + 1) * Consts.VERTEX_COUNT) + gx;
                 int bottomRight = bottomLeft + 1;
                 indices[pointer++] = topLeft;
                 indices[pointer++] = bottomLeft;
@@ -67,7 +82,7 @@ public class Terrain {
         return loader.loadModel(vertices, textureCoords, normals, indices);
     }
 
-    private float getHeight(float x, float z) {
+    public float getHeight(float x, float z) {
         return (float)(10 * Math.sin(x * 0.1) * Math.cos(z * 0.1) + 5 * Math.sin(x * 0.05) * Math.cos(z * 0.05));
     }
 
