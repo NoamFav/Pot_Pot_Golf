@@ -3,7 +3,7 @@ package com.um_project_golf.Core.Entity;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
-import com.um_project_golf.Core.Rendering.Terrain;
+import com.um_project_golf.Core.Entity.Terrain.Terrain;
 import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector3f;
 

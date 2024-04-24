@@ -2,15 +2,18 @@ package com.um_project_golf.Game;
 
 import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.Entity.*;
+import com.um_project_golf.Core.Entity.Terrain.BlendMapTerrain;
+import com.um_project_golf.Core.Entity.Terrain.TerrainTexture;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
 import com.um_project_golf.Core.MouseInput;
 import com.um_project_golf.Core.Rendering.RenderManager;
-import com.um_project_golf.Core.Rendering.Terrain;
+import com.um_project_golf.Core.Entity.Terrain.Terrain;
 import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Random;
@@ -53,26 +56,40 @@ public class GolfGame implements ILogic {
         renderer.init();
         window.setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
 
-        Model cube = loader.loadAssimpModel("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block.obj");
+        //Model cube = loader.loadAssimpModel("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block.obj");
         //Model skull = loader.loadAssimpModel("src/main/resources/Models/Skull/skulls.obj");
-        cube.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block_TEX.png")), 1f);
+        Model tree = loader.loadAssimpModel("src/main/resources/Models/tree/Tree.obj");
+        //cube.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block_TEX.png")), 1f);
         //skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull/Skull.jpg")), 1f);
+        tree.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/tree/Tree.jpg")), 1f);
+        tree.getMaterial().setDisableCulling(true);
 
-        Terrain terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Texture(loader.loadTexture("Texture/grass.png")), 0.1f), false);
-        Terrain water = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Texture(loader.loadTexture("Texture/blue.png")), 0.1f), true);
+        TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("Texture/grass.png"));
+        TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("Texture/flowers.png"));
+        TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("Texture/blue.png"));
+        TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("Texture/sand.png"));
+        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("Texture/BlendMap.png"));
+        TerrainTexture blue = new TerrainTexture(loader.loadTexture("Texture/blue.png"));
+
+        BlendMapTerrain blendMapTerrain = new BlendMapTerrain(backgroundTexture, rTexture, gTexture, bTexture);
+        BlendMapTerrain blueTerrain = new BlendMapTerrain(blue, blue, blue, blue);
+
+        Terrain terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap, false);
+        //Terrain water = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blueTerrain, blendMap, true);
         scene.addTerrain(terrain);
-        scene.addTerrain(water);
+        //scene.addTerrain(water);
 
         Random rnd = new Random();
-        for (int i = 0; i < 4000 ; i++) {
+        for (int i = 0; i < 100 ; i++) {
             float x = rnd.nextFloat() * Consts.SIZE_X - Consts.SIZE_X / 2;
             float z = rnd.nextFloat() * Consts.SIZE_Z - Consts.SIZE_Z / 2;
             float y = terrain.getHeight(x, z);
             float scale = rnd.nextFloat() * 0.1f + 0.1f;
             //entities.add(new Entity(skull, new Vector3f(x * 4, y * 4, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1));
-            scene.addEntity(new Entity(cube, new Vector3f(x, y, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1.5f));
+            //scene.addEntity(new Entity(cube, new Vector3f(x, y, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1.5f));
+            scene.addEntity(new Entity(tree, new Vector3f(x, y, z), new Vector3f(-90, 0, 0), scale));
         }
-        scene.addEntity(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
+        //scene.addEntity(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
 
 
         //TODO: Allow multiple textures for the same model
@@ -175,11 +192,6 @@ public class GolfGame implements ILogic {
             camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
         }
 
-        for (Entity entity : scene.getEntities()) {
-            entity.increaseRotation(0.0f, 0, 0.0f);
-
-        }
-
         scene.increaseSpotAngle(0.15f);
         if(scene.getSpotAngle() > 4) {
             scene.setSpotInc(-1);
@@ -214,7 +226,7 @@ public class GolfGame implements ILogic {
 
         for (Entity entity : scene.getEntities()) {
             renderer.processEntity(entity);
-            entity.increaseRotation(1, 1, 1);
+            //entity.increaseRotation(1, 1, 1);
         }
 
         for (Terrain terrain : scene.getTerrains()) {

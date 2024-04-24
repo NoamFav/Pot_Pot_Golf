@@ -19,9 +19,9 @@ public class Consts {
     public static final float Z_FAR = 10000.0f;
     public static final float SPECULAR_POWER = 10f;
 
-    public static final float SIZE_X = 1000;
-    public static final float SIZE_Z = 1000;
-    public static final int VERTEX_COUNT = 2048;
+    public static final float SIZE_X = 2000;
+    public static final float SIZE_Z = 2000;
+    public static final int VERTEX_COUNT = 1024;
     public static final float MAX_HEIGHT = 10;
 
     public static final float MOUSE_SENSITIVITY = 0.2f;
