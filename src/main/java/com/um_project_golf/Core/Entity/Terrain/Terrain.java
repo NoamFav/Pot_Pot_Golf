@@ -1,4 +1,4 @@
-package com.um_project_golf.Core.Rendering;
+package com.um_project_golf.Core.Entity.Terrain;
 
 import com.um_project_golf.Core.Entity.Material;
 import com.um_project_golf.Core.Entity.Model;
@@ -14,6 +14,8 @@ public class Terrain {
 
     private final Vector3f position;
     private final Model model;
+    private final TerrainTexture blendMap;
+    private final BlendMapTerrain blendMapTerrain;
 
     /**
      * The constructor of the terrain.
@@ -23,18 +25,29 @@ public class Terrain {
      * @param loader The loader of the terrain.
      * @param material The material of the terrain.
      */
+    public Terrain(Vector3f position, ObjectLoader loader, Material material, BlendMapTerrain blendMapTerrain, TerrainTexture blendMap,boolean isWater) {
+        this.position = position;
+        this.model = generateTerrain(loader, isWater);
+        this.model.setMaterial(material);
+        this.blendMap = blendMap;
+        this.blendMapTerrain = blendMapTerrain;
+    }
+
     public Terrain(Vector3f position, ObjectLoader loader, Material material, boolean isWater) {
         this.position = position;
         this.model = generateTerrain(loader, isWater);
         this.model.setMaterial(material);
+        this.blendMap = null;
+        this.blendMapTerrain = null;
     }
 
-    /**
-     * Generates the terrain.
-     *
-     * @param loader The loader of the terrain.
-     * @return The model of the terrain.
-     */
+
+        /**
+         * Generates the terrain.
+         *
+         * @param loader The loader of the terrain.
+         * @return The model of the terrain.
+         */
     private Model generateTerrain(ObjectLoader loader, boolean isWater) {
         int count = Consts.VERTEX_COUNT * Consts.VERTEX_COUNT;
         float[] vertices = new float[count * 3];
@@ -58,8 +71,8 @@ public class Terrain {
                 normals[vertexPointer * 3 + 1] = 1;
                 normals[vertexPointer * 3 + 2] = 0;
 
-                textureCoords[vertexPointer * 2] = x;
-                textureCoords[vertexPointer * 2 + 1] = z;
+                textureCoords[vertexPointer * 2] = j / (Consts.VERTEX_COUNT - 1f);
+                textureCoords[vertexPointer * 2 + 1] = i / (Consts.VERTEX_COUNT - 1f);
 
                 vertexPointer++;
             }
@@ -101,5 +114,13 @@ public class Terrain {
 
     public Texture getTexture() {
         return model.getTexture();
+    }
+
+    public TerrainTexture getBlendMap() {
+        return blendMap;
+    }
+
+    public BlendMapTerrain getBlendMapTerrain() {
+        return blendMapTerrain;
     }
 }

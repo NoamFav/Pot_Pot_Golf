@@ -2,7 +2,7 @@ package com.um_project_golf.Core.Utils;
 
 import com.um_project_golf.Core.Camera;
 import com.um_project_golf.Core.Entity.Entity;
-import com.um_project_golf.Core.Rendering.Terrain;
+import com.um_project_golf.Core.Entity.Terrain.Terrain;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 

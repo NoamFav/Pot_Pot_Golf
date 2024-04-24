@@ -3,6 +3,7 @@ package com.um_project_golf.Core.Rendering;
 import com.um_project_golf.Core.Camera;
 import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.SceneManager;
+import com.um_project_golf.Core.Entity.Terrain.Terrain;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
@@ -25,6 +26,8 @@ public class RenderManager {
     private final WindowManager window;
     private EntityRenderer entityRenderer;
     private TerrainRenderer terrainRenderer;
+
+    private static boolean isCulling = false;
 
     /**
      * The constructor of the render manager.
@@ -87,6 +90,21 @@ public class RenderManager {
 
         entityRenderer.render(camera, scene.getPointLights(), scene.getSpotLights(), scene.getDirectionalLight());
         terrainRenderer.render(camera,  scene.getPointLights(), scene.getSpotLights(), scene.getDirectionalLight());
+    }
+
+    public static void enableCulling() {
+        if (!isCulling) {
+            GL11.glEnable(GL11.GL_CULL_FACE);
+            GL11.glCullFace(GL11.GL_BACK);
+            isCulling = true;
+        }
+    }
+
+    public static void disableCulling() {
+        if (isCulling) {
+            GL11.glDisable(GL11.GL_CULL_FACE);
+            isCulling = false;
+        }
     }
 
     /**
