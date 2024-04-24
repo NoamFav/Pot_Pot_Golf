@@ -30,6 +30,7 @@ public class GolfGame implements ILogic {
     private final SceneManager scene;
 
     private final Camera camera;
+    private Terrain terrain;
 
     Vector3f cameraInc;
     /**
@@ -74,7 +75,7 @@ public class GolfGame implements ILogic {
         BlendMapTerrain blendMapTerrain = new BlendMapTerrain(backgroundTexture, rTexture, gTexture, bTexture);
         BlendMapTerrain blueTerrain = new BlendMapTerrain(blue, blue, blue, blue);
 
-        Terrain terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap, false);
+        terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap, false);
         //Terrain water = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blueTerrain, blendMap, true);
         scene.addTerrain(terrain);
         //scene.addTerrain(water);
@@ -126,6 +127,7 @@ public class GolfGame implements ILogic {
         cameraInc.set(0, 0, 0);
         float lightPos = scene.getSpotLights()[0].getPointLight().getPosition().z;
         float lightPos2 = scene.getSpotLights()[1].getPointLight().getPosition().z;
+
 
         float moveSpeed = Consts.CAMERA_MOVEMENT_SPEED;
         if(window.is_keyPressed(GLFW.GLFW_KEY_W)) {
@@ -192,6 +194,8 @@ public class GolfGame implements ILogic {
             camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
         }
 
+        checkCollision();
+
         scene.increaseSpotAngle(0.15f);
         if(scene.getSpotAngle() > 4) {
             scene.setSpotInc(-1);
@@ -202,6 +206,19 @@ public class GolfGame implements ILogic {
         Vector3f coneDir = scene.getSpotLights()[0].getPointLight().getPosition();
         coneDir.y = (float) Math.sin(spotAngleRad);
 
+        daytimeCycle();
+
+        for (Entity entity : scene.getEntities()) {
+            renderer.processEntity(entity);
+            //entity.increaseRotation(1, 1, 1);
+        }
+
+        for (Terrain terrain : scene.getTerrains()) {
+            renderer.processTerrain(terrain);
+        }
+    }
+
+    private void daytimeCycle() {
         scene.increaseLightAngle(0.1f);
 
         if (scene.getLightAngle() > 90) {
@@ -223,15 +240,46 @@ public class GolfGame implements ILogic {
         double angle = Math.toRadians(scene.getLightAngle());
         scene.getDirectionalLight().getDirection().x = (float) Math.sin(angle);
         scene.getDirectionalLight().getDirection().y = (float) Math.cos(angle);
+    }
 
-        for (Entity entity : scene.getEntities()) {
-            renderer.processEntity(entity);
-            //entity.increaseRotation(1, 1, 1);
-        }
+    private void checkCollision() {
+        Vector3f newPosition = camera.getPosition();
 
-        for (Terrain terrain : scene.getTerrains()) {
-            renderer.processTerrain(terrain);
+        terrainCollision(newPosition);
+        borderCollision(newPosition);
+
+        camera.setPosition(newPosition);
+    }
+
+    private void borderCollision(Vector3f newPosition) {
+        if (camera.getPosition().x < -Consts.SIZE_X / 2) {
+            newPosition.x = -Consts.SIZE_X / 2 + 1;
+            cameraInc.x = 0;
+        } else if (camera.getPosition().x > Consts.SIZE_X / 2) {
+            newPosition.x = Consts.SIZE_X / 2 - 1;
+            cameraInc.x = 0;
         }
+        if (camera.getPosition().z < -Consts.SIZE_Z / 2) {
+            newPosition.z = -Consts.SIZE_Z / 2 + 1;
+            cameraInc.z = 0;
+        } else if (camera.getPosition().z > Consts.SIZE_Z / 2) {
+            newPosition.z = Consts.SIZE_Z / 2 - 1;
+            cameraInc.z = 0;
+        }
+    }
+
+    private void terrainCollision(Vector3f newPosition) {
+        float terrainHeight = terrain.getHeight(newPosition.x, newPosition.z) + 10;
+        if (newPosition.y <= terrainHeight) {
+            // If the new position is inside the terrain, prevent the camera from moving to that position
+            newPosition.y = terrainHeight;
+        }
+    }
+
+    private void entityCollision(Vector3f newPosition) {
+        //TODO: Implement entity collision
+        // Check if the new position is inside an entity
+        // Implement a hit box for the entity
     }
 
     /**
