@@ -90,4 +90,8 @@ public class Camera {
     public Vector3f getRotation() {
         return rotation;
     }
+
+    public void setPosition(Vector3f newPosition) {
+        position.set(newPosition);
+    }
 }

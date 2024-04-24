@@ -30,6 +30,7 @@ public class GolfGame implements ILogic {
     private final SceneManager scene;
 
     private final Camera camera;
+    private Terrain terrain;
 
     Vector3f cameraInc;
     /**
@@ -74,7 +75,7 @@ public class GolfGame implements ILogic {
         BlendMapTerrain blendMapTerrain = new BlendMapTerrain(backgroundTexture, rTexture, gTexture, bTexture);
         BlendMapTerrain blueTerrain = new BlendMapTerrain(blue, blue, blue, blue);
 
-        Terrain terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap, false);
+        terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap, false);
         //Terrain water = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blueTerrain, blendMap, true);
         scene.addTerrain(terrain);
         //scene.addTerrain(water);
@@ -126,6 +127,7 @@ public class GolfGame implements ILogic {
         cameraInc.set(0, 0, 0);
         float lightPos = scene.getSpotLights()[0].getPointLight().getPosition().z;
         float lightPos2 = scene.getSpotLights()[1].getPointLight().getPosition().z;
+
 
         float moveSpeed = Consts.CAMERA_MOVEMENT_SPEED;
         if(window.is_keyPressed(GLFW.GLFW_KEY_W)) {
@@ -191,6 +193,31 @@ public class GolfGame implements ILogic {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
         }
+
+        Vector3f newPosition = camera.getPosition();
+        // Check if the new position is inside the terrain
+        float terrainHeight = terrain.getHeight(newPosition.x, newPosition.z);
+        if (newPosition.y <= terrainHeight) {
+            // If the new position is inside the terrain, prevent the camera from moving to that position
+            newPosition.y = terrainHeight;
+        }
+
+        if (camera.getPosition().x < -Consts.SIZE_X / 2) {
+            newPosition.x = -Consts.SIZE_X / 2 + 1;
+            cameraInc.x = 0; // Reset the x-component of the camera's movement
+        } else if (camera.getPosition().x > Consts.SIZE_X / 2) {
+            newPosition.x = Consts.SIZE_X / 2 - 1;
+            cameraInc.x = 0; // Reset the x-component of the camera's movement
+        }
+        if (camera.getPosition().z < -Consts.SIZE_Z / 2) {
+            newPosition.z = -Consts.SIZE_Z / 2 + 1;
+            cameraInc.z = 0; // Reset the z-component of the camera's movement
+        } else if (camera.getPosition().z > Consts.SIZE_Z / 2) {
+            newPosition.z = Consts.SIZE_Z / 2 - 1;
+            cameraInc.z = 0; // Reset the z-component of the camera's movement
+        }
+
+        camera.setPosition(newPosition);
 
         scene.increaseSpotAngle(0.15f);
         if(scene.getSpotAngle() > 4) {
