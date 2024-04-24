@@ -128,7 +128,6 @@ public class GolfGame implements ILogic {
         float lightPos = scene.getSpotLights()[0].getPointLight().getPosition().z;
         float lightPos2 = scene.getSpotLights()[1].getPointLight().getPosition().z;
 
-
         float moveSpeed = Consts.CAMERA_MOVEMENT_SPEED;
         if(window.is_keyPressed(GLFW.GLFW_KEY_W)) {
             cameraInc.z = -moveSpeed;
