@@ -96,7 +96,9 @@ public class Terrain {
     }
 
     public float getHeight(float x, float z) {
-        return (float)(10 * Math.sin(x * 0.1) * Math.cos(z * 0.1) + 5 * Math.sin(x * 0.05) * Math.cos(z * 0.05));
+        double x1 = Math.sin(x / 10) * 10 + Math.cos(z / 10) * 10;
+        return (float) (x1);
+
     }
 
 

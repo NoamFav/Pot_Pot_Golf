@@ -1,6 +1,7 @@
 package com.um_project_golf.Game;
 
 import com.um_project_golf.Core.*;
+import com.um_project_golf.Core.AWT.Button;
 import com.um_project_golf.Core.Entity.*;
 import com.um_project_golf.Core.Entity.Terrain.BlendMapTerrain;
 import com.um_project_golf.Core.Entity.Terrain.TerrainTexture;
@@ -28,11 +29,16 @@ public class GolfGame implements ILogic {
     private final ObjectLoader loader;
     private final WindowManager window;
     private final SceneManager scene;
+    private final Button button;
 
     private final Camera camera;
     private Terrain terrain;
 
     Vector3f cameraInc;
+    private boolean canMove = true;
+    private boolean isJumping = false;
+    private float lastY;
+
     /**
      * The constructor of the game.
      * It initializes the renderer, window, loader and camera.
@@ -44,6 +50,9 @@ public class GolfGame implements ILogic {
         scene = new SceneManager(-90);
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
+        button = new Button(0, 10, 100, 100, "Button", () -> {
+            System.out.println("Button clicked");
+        });
     }
 
     /**
@@ -54,16 +63,22 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void init() throws Exception {
+
+        scene.setDefaultTexture(new Texture(loader.loadTexture("Texture/Default.png")));
+
         renderer.init();
         window.setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
 
         //Model cube = loader.loadAssimpModel("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block.obj");
         //Model skull = loader.loadAssimpModel("src/main/resources/Models/Skull/skulls.obj");
         Model tree = loader.loadAssimpModel("src/main/resources/Models/tree/Tree.obj");
+        Model wolf = loader.loadAssimpModel("src/main/resources/Models/Wolf_dae/wolf.dae");
         //cube.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block_TEX.png")), 1f);
         //skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull/Skull.jpg")), 1f);
         tree.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/tree/Tree.jpg")), 1f);
+        wolf.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Wolf_dae/Material__wolf_col_tga_diffuse.jpeg.001.jpg")), 1f);
         tree.getMaterial().setDisableCulling(true);
+        wolf.getMaterial().setDisableCulling(true);
 
         TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("Texture/grass.png"));
         TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("Texture/flowers.png"));
@@ -90,6 +105,10 @@ public class GolfGame implements ILogic {
             //scene.addEntity(new Entity(cube, new Vector3f(x, y, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1.5f));
             scene.addEntity(new Entity(tree, new Vector3f(x, y, z), new Vector3f(-90, 0, 0), scale));
         }
+
+
+
+        scene.addEntity(new Entity(wolf, new Vector3f(0, terrain.getHeight(0,0), 0), new Vector3f(0, 0, 0), 10 ));
         //scene.addEntity(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
 
 
@@ -128,7 +147,10 @@ public class GolfGame implements ILogic {
         float lightPos = scene.getSpotLights()[0].getPointLight().getPosition().z;
         float lightPos2 = scene.getSpotLights()[1].getPointLight().getPosition().z;
 
-        float moveSpeed = Consts.CAMERA_MOVEMENT_SPEED;
+        float moveSpeed = Consts.CAMERA_MOVEMENT_SPEED  / EngineManager.getFps();
+        float gravity = -9.81f;
+
+
         if(window.is_keyPressed(GLFW.GLFW_KEY_W)) {
             cameraInc.z = -moveSpeed;
         }
@@ -141,17 +163,18 @@ public class GolfGame implements ILogic {
         if(window.is_keyPressed(GLFW.GLFW_KEY_D)) {
             cameraInc.x = moveSpeed;
         }
-        if(window.is_keyPressed(GLFW.GLFW_KEY_SPACE) && window.is_keyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
-            cameraInc.y = -moveSpeed;
-        } else if(window.is_keyPressed(GLFW.GLFW_KEY_SPACE)) {
-            cameraInc.y = moveSpeed;
+        if(window.is_keyPressed(GLFW.GLFW_KEY_SPACE) && !isJumping) {
+            cameraInc.y = Consts.JUMP_FORCE;
+            isJumping = true;
         }
+
         if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
             scene.getPointLights()[0].getPosition().x += 0.1f;
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT)) {
             scene.getPointLights()[0].getPosition().x -= 0.1f;
         }
+
         if (window.is_keyPressed(GLFW.GLFW_KEY_I)) {
             scene.getSpotLights()[0].getPointLight().getPosition().z = lightPos + 0.1f;
         }
@@ -186,12 +209,22 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void update(MouseInput mouseInput) {
-        camera.movePosition(cameraInc.x * Consts.CAMERA_MOVEMENT_SPEED, cameraInc.y * Consts.CAMERA_MOVEMENT_SPEED, cameraInc.z * Consts.CAMERA_MOVEMENT_SPEED);
+
+        camera.movePosition(
+                cameraInc.x * Consts.CAMERA_MOVEMENT_SPEED,
+                (cameraInc.y * Consts.CAMERA_MOVEMENT_SPEED - 4),
+                cameraInc.z * Consts.CAMERA_MOVEMENT_SPEED
+        );
 
         if (mouseInput.isRightButtonPressed()) {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
         }
+
+        if (isJumping && camera.getPosition().y <= lastY) {
+            isJumping = false;
+        }
+        lastY = camera.getPosition().y;
 
         checkCollision();
 
@@ -218,7 +251,8 @@ public class GolfGame implements ILogic {
     }
 
     private void daytimeCycle() {
-        scene.increaseLightAngle(0.1f);
+
+        scene.increaseLightAngle(1.1f);
 
         if (scene.getLightAngle() > 90) {
             scene.getDirectionalLight().setIntensity(0);
@@ -268,7 +302,7 @@ public class GolfGame implements ILogic {
     }
 
     private void terrainCollision(Vector3f newPosition) {
-        float terrainHeight = terrain.getHeight(newPosition.x, newPosition.z) + 10;
+        float terrainHeight = terrain.getHeight(newPosition.x, newPosition.z) + 2;
         if (newPosition.y <= terrainHeight) {
             // If the new position is inside the terrain, prevent the camera from moving to that position
             newPosition.y = terrainHeight;

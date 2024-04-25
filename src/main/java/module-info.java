@@ -17,6 +17,7 @@ module com.example.um_project_golf {
     requires org.apache.logging.log4j;
     requires org.lwjgl.stb;
     requires org.lwjgl.assimp;
+    requires lwjgl3.awt;
 
     opens com.um_project_golf to javafx.fxml;
     opens com.um_project_golf.Core to javafx.fxml;
@@ -27,4 +28,5 @@ module com.example.um_project_golf {
     exports com.um_project_golf.Core.Lighting;
     exports com.um_project_golf.Core.Rendering;
     exports com.um_project_golf.Core.Entity.Terrain;
+    exports com.um_project_golf.Core.AWT;
 }

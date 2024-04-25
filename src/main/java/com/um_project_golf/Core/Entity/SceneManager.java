@@ -6,6 +6,7 @@ import com.um_project_golf.Core.Lighting.SpotLight;
 import com.um_project_golf.Core.Entity.Terrain.Terrain;
 import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector3f;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ public class SceneManager {
 
     private List<Entity> entities;
     private List<Terrain> terrains;
+    private static Texture defaultTexture;
 
     private SpotLight[] spotLights;
     private DirectionalLight directionalLight;
@@ -120,5 +122,13 @@ public class SceneManager {
         terrains = new ArrayList<>();
         ambientLight = Consts.AMBIENT_LIGHT;
         this.lightAngle = lightAngle;
+    }
+
+    public void setDefaultTexture(Texture defaultTexture) {
+        SceneManager.defaultTexture = defaultTexture;
+    }
+
+    public static Texture getDefaultTexture() {
+        return defaultTexture;
     }
 }
