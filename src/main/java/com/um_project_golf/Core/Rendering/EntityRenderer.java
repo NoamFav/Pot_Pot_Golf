@@ -3,6 +3,7 @@ package com.um_project_golf.Core.Rendering;
 import com.um_project_golf.Core.Camera;
 import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.Model;
+import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
@@ -115,6 +116,10 @@ public class EntityRenderer implements IRenderer{
             RenderManager.disableCulling();
         } else {
             RenderManager.enableCulling();
+        }
+
+        if (model.getTexture() == null) {
+            model.setTexture(SceneManager.getDefaultTexture());
         }
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);

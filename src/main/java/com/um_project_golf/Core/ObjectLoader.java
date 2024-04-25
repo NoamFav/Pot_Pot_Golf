@@ -2,10 +2,7 @@ package com.um_project_golf.Core;
 
 import com.um_project_golf.Core.Entity.Model;
 import com.um_project_golf.Core.Utils.Utils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.*;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.assimp.*;
@@ -37,6 +34,7 @@ public class ObjectLoader {
                 Assimp.aiProcess_JoinIdenticalVertices |
                         Assimp.aiProcess_Triangulate |
                         Assimp.aiProcess_FixInfacingNormals);
+
 
         if (scene == null) {
             throw new RuntimeException("Failed to load model: " + path + "\n" + Assimp.aiGetErrorString());
@@ -167,6 +165,10 @@ public class ObjectLoader {
         int textureID = GL11.glGenTextures();
         textures.add(textureID);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureID);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
         GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
