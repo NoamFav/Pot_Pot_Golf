@@ -4,6 +4,7 @@ import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.AWT.Button;
 import com.um_project_golf.Core.Entity.*;
 import com.um_project_golf.Core.Entity.Terrain.BlendMapTerrain;
+import com.um_project_golf.Core.Entity.Terrain.SimplexNoise;
 import com.um_project_golf.Core.Entity.Terrain.TerrainTexture;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
@@ -96,14 +97,14 @@ public class GolfGame implements ILogic {
         //scene.addTerrain(water);
 
         Random rnd = new Random();
-        for (int i = 0; i < 100 ; i++) {
+        for (int i = 0; i < 500 ; i++) {
             float x = rnd.nextFloat() * Consts.SIZE_X - Consts.SIZE_X / 2;
             float z = rnd.nextFloat() * Consts.SIZE_Z - Consts.SIZE_Z / 2;
-            float y = terrain.getHeight(x, z);
+            float y = (float) (SimplexNoise.octaveSimplexNoise(x * Consts.scales, z * Consts.scales, 0, Consts.octaves, Consts.persistence) * (Consts.MAX_HEIGHT/2));
             float scale = rnd.nextFloat() * 0.1f + 0.1f;
             //entities.add(new Entity(skull, new Vector3f(x * 4, y * 4, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1));
             //scene.addEntity(new Entity(cube, new Vector3f(x, y, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1.5f));
-            scene.addEntity(new Entity(tree, new Vector3f(x, y, z), new Vector3f(-90, 0, 0), scale));
+            scene.addEntity(new Entity(tree, new Vector3f(x, y, z), new Vector3f(-90, 0, 0), 0.03f));
         }
 
 
@@ -163,9 +164,12 @@ public class GolfGame implements ILogic {
         if(window.is_keyPressed(GLFW.GLFW_KEY_D)) {
             cameraInc.x = moveSpeed;
         }
-        if(window.is_keyPressed(GLFW.GLFW_KEY_SPACE) && !isJumping) {
-            cameraInc.y = Consts.JUMP_FORCE;
+        if(window.is_keyPressed(GLFW.GLFW_KEY_SPACE)) {
+            cameraInc.y = Consts.JUMP_FORCE / EngineManager.getFps();
             isJumping = true;
+        }
+        if(window.is_keyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
+            cameraInc.y = -Consts.JUMP_FORCE / EngineManager.getFps();
         }
 
         if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
@@ -212,7 +216,7 @@ public class GolfGame implements ILogic {
 
         camera.movePosition(
                 cameraInc.x * Consts.CAMERA_MOVEMENT_SPEED,
-                (cameraInc.y * Consts.CAMERA_MOVEMENT_SPEED - 4),
+                (cameraInc.y * Consts.CAMERA_MOVEMENT_SPEED),
                 cameraInc.z * Consts.CAMERA_MOVEMENT_SPEED
         );
 
@@ -228,7 +232,7 @@ public class GolfGame implements ILogic {
 
         checkCollision();
 
-        scene.increaseSpotAngle(0.15f);
+        scene.increaseSpotAngle(0.01f);
         if(scene.getSpotAngle() > 4) {
             scene.setSpotInc(-1);
         } else if(scene.getSpotAngle() < -4) {
@@ -302,7 +306,8 @@ public class GolfGame implements ILogic {
     }
 
     private void terrainCollision(Vector3f newPosition) {
-        float terrainHeight = terrain.getHeight(newPosition.x, newPosition.z) + 2;
+        //TODO: fix collisions
+        float terrainHeight = (float) (SimplexNoise.octaveSimplexNoise(newPosition.x * Consts.scales, newPosition.z * Consts.scales, 0, Consts.octaves, Consts.persistence) * (Consts.MAX_HEIGHT/2)) + 2;
         if (newPosition.y <= terrainHeight) {
             // If the new position is inside the terrain, prevent the camera from moving to that position
             newPosition.y = terrainHeight;
@@ -311,7 +316,7 @@ public class GolfGame implements ILogic {
 
     private void entityCollision(Vector3f newPosition) {
         //TODO: Implement entity collision
-        // Check if the new position is inside an entity
+        // Check if the new position is inside an entityOpenSafari
         // Implement a hit box for the entity
     }
 

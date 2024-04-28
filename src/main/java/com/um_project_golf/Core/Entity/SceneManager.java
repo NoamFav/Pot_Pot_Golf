@@ -25,6 +25,16 @@ public class SceneManager {
     private float spotAngle = 0;
     private float spotInc = 1;
 
+    private static float[][] heightMap;
+
+    public static float[][] getHeightMap() {
+        return heightMap;
+    }
+
+    public static void setHeightMap(float[][] heightMaps) {
+        heightMap = heightMaps;
+    }
+
     public List<Entity> getEntities() {
         return entities;
     }

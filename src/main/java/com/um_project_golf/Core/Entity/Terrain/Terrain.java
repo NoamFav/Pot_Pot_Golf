@@ -2,6 +2,7 @@ package com.um_project_golf.Core.Entity.Terrain;
 
 import com.um_project_golf.Core.Entity.Material;
 import com.um_project_golf.Core.Entity.Model;
+import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Texture;
 import com.um_project_golf.Core.ObjectLoader;
 import com.um_project_golf.Core.Utils.Consts;
@@ -55,21 +56,23 @@ public class Terrain {
         float[] textureCoords = new float[count * 2];
         int[] indices = new int[6 * (Consts.VERTEX_COUNT - 1) * (Consts.VERTEX_COUNT - 1)];
         int vertexPointer = 0;
+        float[][] heightmap = new float[Consts.VERTEX_COUNT][Consts.VERTEX_COUNT];
 
         for(int i = 0; i < Consts.VERTEX_COUNT; i++){
             for(int j = 0; j < Consts.VERTEX_COUNT; j++){
 
                 float x = j / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_X;
                 float z = i / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_Z;
-                float height = getHeight(x, z);
+
+
+                float height = (float) (SimplexNoise.octaveSimplexNoise(x * Consts.scales, z * Consts.scales, 0, Consts.octaves, Consts.persistence) * (Consts.MAX_HEIGHT/2) );
+                heightmap[j][i] = height;
 
                 vertices[vertexPointer * 3] = x;
                 vertices[vertexPointer * 3 + 1] = isWater ? 0 : height;
                 vertices[vertexPointer * 3 + 2] = z;
 
-                normals[vertexPointer * 3] = 0;
-                normals[vertexPointer * 3 + 1] = 1;
-                normals[vertexPointer * 3 + 2] = 0;
+                calcNormals(j, heightmap, i, height, normals, vertexPointer);
 
                 textureCoords[vertexPointer * 2] = j / (Consts.VERTEX_COUNT - 1f);
                 textureCoords[vertexPointer * 2 + 1] = i / (Consts.VERTEX_COUNT - 1f);
@@ -92,7 +95,28 @@ public class Terrain {
                 indices[pointer++] = bottomRight;
             }
         }
+        SceneManager.setHeightMap(heightmap);
+
         return loader.loadModel(vertices, textureCoords, normals, indices);
+    }
+
+    private static void calcNormals(int j, float[][] heightmap, int i, float height, float[] normals, int vertexPointer) {
+        float heightLeft = j > 0 ? heightmap[j - 1][i] : height;
+        float heightRight = j < Consts.VERTEX_COUNT - 1 ? heightmap[j + 1][i] : height;
+        float heightDown = i > 0 ? heightmap[j][i - 1] : height;
+        float heightUp = i < Consts.VERTEX_COUNT - 1 ? heightmap[j][i + 1] : height;
+
+        // Calculate the slopes in the x and z directions
+        float slopeX = heightRight - heightLeft;
+        float slopeZ = heightUp - heightDown;
+
+        // Calculate the normal
+        Vector3f normal = new Vector3f(slopeX, -2.0f, slopeZ);
+        normal.normalize();
+
+        normals[vertexPointer * 3] = normal.x;
+        normals[vertexPointer * 3 + 1] = normal.y;
+        normals[vertexPointer * 3 + 2] = normal.z;
     }
 
     public float getHeight(float x, float z) {
