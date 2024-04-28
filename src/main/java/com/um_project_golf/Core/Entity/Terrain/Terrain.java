@@ -2,6 +2,7 @@ package com.um_project_golf.Core.Entity.Terrain;
 
 import com.um_project_golf.Core.Entity.Material;
 import com.um_project_golf.Core.Entity.Model;
+import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Texture;
 import com.um_project_golf.Core.ObjectLoader;
 import com.um_project_golf.Core.Utils.Consts;
@@ -55,13 +56,17 @@ public class Terrain {
         float[] textureCoords = new float[count * 2];
         int[] indices = new int[6 * (Consts.VERTEX_COUNT - 1) * (Consts.VERTEX_COUNT - 1)];
         int vertexPointer = 0;
+        float[][] heightmap = new float[Consts.VERTEX_COUNT][Consts.VERTEX_COUNT];
 
         for(int i = 0; i < Consts.VERTEX_COUNT; i++){
             for(int j = 0; j < Consts.VERTEX_COUNT; j++){
 
                 float x = j / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_X;
                 float z = i / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_Z;
-                float height = getHeight(x, z);
+
+
+                float height = (float) (SimplexNoise.octaveSimplexNoise(x * Consts.scales, z * Consts.scales, 0, Consts.octaves, Consts.persistence) * (Consts.MAX_HEIGHT/2) );
+                heightmap[j][i] = height;
 
                 vertices[vertexPointer * 3] = x;
                 vertices[vertexPointer * 3 + 1] = isWater ? 0 : height;
@@ -92,6 +97,8 @@ public class Terrain {
                 indices[pointer++] = bottomRight;
             }
         }
+        SceneManager.setHeightMap(heightmap);
+
         return loader.loadModel(vertices, textureCoords, normals, indices);
     }
 
