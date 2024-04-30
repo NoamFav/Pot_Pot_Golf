@@ -81,11 +81,11 @@ public class GolfGame implements ILogic {
         tree.getMaterial().setDisableCulling(true);
         wolf.getMaterial().setDisableCulling(true);
 
-        TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("Texture/grass.png"));
-        TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("Texture/flowers.png"));
-        TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("Texture/blue.png"));
-        TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("Texture/sand.png"));
-        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("Texture/BlendMap.png"));
+        TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("Texture/stone.png"));
+        TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("Texture/sand.png"));
+        TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("Texture/grass.png"));
+        TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("Texture/blue.png"));
+        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
         TerrainTexture blue = new TerrainTexture(loader.loadTexture("Texture/blue.png"));
 
         BlendMapTerrain blendMapTerrain = new BlendMapTerrain(backgroundTexture, rTexture, gTexture, bTexture);
@@ -290,28 +290,40 @@ public class GolfGame implements ILogic {
 
     private void borderCollision(Vector3f newPosition) {
         if (camera.getPosition().x < -Consts.SIZE_X / 2) {
-            newPosition.x = -Consts.SIZE_X / 2 + 1;
+            newPosition.x = -Consts.SIZE_X / 2;
             cameraInc.x = 0;
         } else if (camera.getPosition().x > Consts.SIZE_X / 2) {
-            newPosition.x = Consts.SIZE_X / 2 - 1;
+            newPosition.x = Consts.SIZE_X / 2;
             cameraInc.x = 0;
         }
         if (camera.getPosition().z < -Consts.SIZE_Z / 2) {
-            newPosition.z = -Consts.SIZE_Z / 2 + 1;
+            newPosition.z = -Consts.SIZE_Z / 2;
             cameraInc.z = 0;
         } else if (camera.getPosition().z > Consts.SIZE_Z / 2) {
-            newPosition.z = Consts.SIZE_Z / 2 - 1;
+            newPosition.z = Consts.SIZE_Z / 2;
             cameraInc.z = 0;
         }
     }
 
     private void terrainCollision(Vector3f newPosition) {
-        //TODO: fix collisions
-        float terrainHeight = (float) (SimplexNoise.octaveSimplexNoise(newPosition.x * Consts.scales, newPosition.z * Consts.scales, 0, Consts.octaves, Consts.persistence) * (Consts.MAX_HEIGHT/2)) + 2;
+        // Correct the translation so -1000 maps to index 0
+        int heightX = (int) ((newPosition.x + Consts.SIZE_X/2) * ((Consts.VERTEX_COUNT/2) / Consts.SIZE_X));
+        int heightZ = (int) ((newPosition.z + Consts.SIZE_Z/2) * ((Consts.VERTEX_COUNT/2) / Consts.SIZE_Z));
+
+        // Clamp values to ensure they fall within the heightmap's index range
+        heightX = Math.max(0, Math.min(heightX, (Consts.VERTEX_COUNT/2)));
+        heightZ = Math.max(0, Math.min(heightZ, (Consts.VERTEX_COUNT/2)));
+
+        // Retrieve the terrain height using the clamped indices
+        float terrainHeight = SceneManager.getHeightMap()[heightZ][heightX] + 5;
         if (newPosition.y <= terrainHeight) {
-            // If the new position is inside the terrain, prevent the camera from moving to that position
             newPosition.y = terrainHeight;
         }
+
+        // Debug output to verify correct scaling and translation
+        System.out.println("Debug - World Pos: (" + newPosition.x + ", " + newPosition.z +
+                "), Scaled Indices: (" + heightX + ", " + heightZ +
+                "), Height: " + terrainHeight);
     }
 
     private void entityCollision(Vector3f newPosition) {
