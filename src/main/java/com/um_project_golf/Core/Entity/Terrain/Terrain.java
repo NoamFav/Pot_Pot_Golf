@@ -8,12 +8,6 @@ import com.um_project_golf.Core.ObjectLoader;
 import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector3f;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.PrintWriter;
-
 /**
  * The class responsible for the terrain.
  */
@@ -62,17 +56,14 @@ public class Terrain {
         float[] textureCoords = new float[count * 2];
         int[] indices = new int[6 * (Consts.VERTEX_COUNT - 1) * (Consts.VERTEX_COUNT - 1)];
         int vertexPointer = 0;
-        float[][] heightmap = new float[Consts.VERTEX_COUNT][Consts.VERTEX_COUNT];
+        float[][] heightmap = SceneManager.getHeightMap();
 
         for(int i = 0; i < Consts.VERTEX_COUNT; i++){
             for(int j = 0; j < Consts.VERTEX_COUNT; j++){
 
                 float x = j / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_X;
                 float z = i / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_Z;
-
-
-                float height = (float) (SimplexNoise.octaveSimplexNoise(x * Consts.scales, z * Consts.scales, 0, Consts.octaves, Consts.persistence) * (Consts.MAX_HEIGHT/2) );
-                heightmap[j][i] = height;
+                float height = heightmap[j][i];
 
                 vertices[vertexPointer * 3] = x;
                 vertices[vertexPointer * 3 + 1] = isWater ? 0 : height;
@@ -131,26 +122,6 @@ public class Terrain {
         return (float) (x1);
 
     }
-
-    public void heightmaptoCSV(float[][] heightmap) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < heightmap.length; i++) {
-            for (int j = 0; j < heightmap[i].length; j++) {
-                sb.append(heightmap[i][j]);
-                sb.append(",");
-            }
-            sb.append("\n");
-        }
-        File file = new File("heightmap.csv");
-        try (PrintWriter writer = new PrintWriter(file)) {
-            writer.write(sb.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
 
     public Model getModel() {
         return model;

@@ -3,15 +3,12 @@ package com.um_project_golf.Game;
 import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.AWT.Button;
 import com.um_project_golf.Core.Entity.*;
-import com.um_project_golf.Core.Entity.Terrain.BlendMapTerrain;
-import com.um_project_golf.Core.Entity.Terrain.SimplexNoise;
-import com.um_project_golf.Core.Entity.Terrain.TerrainTexture;
+import com.um_project_golf.Core.Entity.Terrain.*;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
 import com.um_project_golf.Core.MouseInput;
 import com.um_project_golf.Core.Rendering.RenderManager;
-import com.um_project_golf.Core.Entity.Terrain.Terrain;
 import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -34,6 +31,7 @@ public class GolfGame implements ILogic {
 
     private final Camera camera;
     private Terrain terrain;
+    private HeightMap heightMap;
 
     Vector3f cameraInc;
     private boolean canMove = true;
@@ -54,6 +52,7 @@ public class GolfGame implements ILogic {
         button = new Button(0, 10, 100, 100, "Button", () -> {
             System.out.println("Button clicked");
         });
+        heightMap = new HeightMap();
     }
 
     /**
@@ -65,23 +64,27 @@ public class GolfGame implements ILogic {
     @Override
     public void init() throws Exception {
 
+        heightMap.createHeightMap();
         scene.setDefaultTexture(new Texture(loader.loadTexture("Texture/Default.png")));
 
         renderer.init();
         window.setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
 
-        //Model cube = loader.loadAssimpModel("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block.obj");
+        //Model cube = loader.loadAssimpModel("src/main/resources/Models/Minecraft_Grass_Block_OBJ/SkyBox.obj");
         //Model skull = loader.loadAssimpModel("src/main/resources/Models/Skull/skulls.obj");
         Model tree = loader.loadAssimpModel("src/main/resources/Models/tree/Tree.obj");
         Model wolf = loader.loadAssimpModel("src/main/resources/Models/Wolf_dae/wolf.dae");
+        Model skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
         //cube.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block_TEX.png")), 1f);
         //skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull/Skull.jpg")), 1f);
         tree.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/tree/Tree.jpg")), 1f);
         wolf.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Wolf_dae/Material__wolf_col_tga_diffuse.jpeg.001.jpg")), 1f);
+        skyBox.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skybox/DayLight.png")), 1f);
         tree.getMaterial().setDisableCulling(true);
         wolf.getMaterial().setDisableCulling(true);
+        skyBox.getMaterial().setDisableCulling(true);
 
-        TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("Texture/stone.png"));
+        TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("Texture/rock.png"));
         TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("Texture/sand.png"));
         TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("Texture/grass.png"));
         TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("Texture/blue.png"));
@@ -100,16 +103,17 @@ public class GolfGame implements ILogic {
         for (int i = 0; i < 500 ; i++) {
             float x = rnd.nextFloat() * Consts.SIZE_X - Consts.SIZE_X / 2;
             float z = rnd.nextFloat() * Consts.SIZE_Z - Consts.SIZE_Z / 2;
-            float y = (float) (SimplexNoise.octaveSimplexNoise(x * Consts.scales, z * Consts.scales, 0, Consts.octaves, Consts.persistence) * (Consts.MAX_HEIGHT/2));
+            float y = heightMap.getHeight(new Vector3f(x, 0, z));
             float scale = rnd.nextFloat() * 0.1f + 0.1f;
             //entities.add(new Entity(skull, new Vector3f(x * 4, y * 4, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1));
             //scene.addEntity(new Entity(cube, new Vector3f(x, y, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1.5f));
-            scene.addEntity(new Entity(tree, new Vector3f(x, y, z), new Vector3f(-90, 0, 0), 0.03f));
+            if (y> 2.5 && y < 10) {
+                //scene.addEntity(new Entity(tree, new Vector3f(x, y, z), new Vector3f(-90, 0, 0), 0.03f));
+            }
         }
+        scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
 
-
-
-        scene.addEntity(new Entity(wolf, new Vector3f(0, terrain.getHeight(0,0), 0), new Vector3f(0, 0, 0), 10 ));
+        scene.addEntity(new Entity(wolf, new Vector3f(0, terrain.getHeight(0,0), 0), new Vector3f(45, 0 , 0), 10 ));
         //scene.addEntity(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
 
 
@@ -134,8 +138,8 @@ public class GolfGame implements ILogic {
         lightColor = new Vector3f(1, 1, 1);
         scene.setDirectionalLight(new DirectionalLight(lightColor, lightPosition, lightIntensity));
 
-        scene.setPointLights(new PointLight[]{pointLight});
-        scene.setSpotLights(new SpotLight[]{spotLight, spotLight2});
+        //scene.setPointLights(new PointLight[]{pointLight});
+        //scene.setSpotLights(new SpotLight[]{spotLight, spotLight2});
     }
 
     /**
@@ -145,8 +149,8 @@ public class GolfGame implements ILogic {
     @Override
     public void input() {
         cameraInc.set(0, 0, 0);
-        float lightPos = scene.getSpotLights()[0].getPointLight().getPosition().z;
-        float lightPos2 = scene.getSpotLights()[1].getPointLight().getPosition().z;
+        //float lightPos = scene.getSpotLights()[0].getPointLight().getPosition().z;
+        //float lightPos2 = scene.getSpotLights()[1].getPointLight().getPosition().z;
 
         float moveSpeed = Consts.CAMERA_MOVEMENT_SPEED  / EngineManager.getFps();
         float gravity = -9.81f;
@@ -179,30 +183,30 @@ public class GolfGame implements ILogic {
             scene.getPointLights()[0].getPosition().x -= 0.1f;
         }
 
-        if (window.is_keyPressed(GLFW.GLFW_KEY_I)) {
-            scene.getSpotLights()[0].getPointLight().getPosition().z = lightPos + 0.1f;
-        }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_K)) {
-            scene.getSpotLights()[0].getPointLight().getPosition().z = lightPos - 0.1f;
-        }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_L)) {
-            scene.getSpotLights()[0].getPointLight().getPosition().x += 0.1f;
-        }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_J)) {
-            scene.getSpotLights()[0].getPointLight().getPosition().x -= 0.1f;
-        }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_O)) {
-            scene.getSpotLights()[0].getPointLight().getPosition().y += 0.1f;
-        }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_U)) {
-            scene.getSpotLights()[0].getPointLight().getPosition().y -= 0.1f;
-        }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_0)) {
-            scene.getSpotLights()[1].getPointLight().getPosition().z = lightPos2 + 0.1f;
-        }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_P)) {
-            scene.getSpotLights()[1].getPointLight().getPosition().z = lightPos2 - 0.1f;
-        }
+//        if (window.is_keyPressed(GLFW.GLFW_KEY_I)) {
+//            scene.getSpotLights()[0].getPointLight().getPosition().z = lightPos + 0.1f;
+//        }
+//        if (window.is_keyPressed(GLFW.GLFW_KEY_K)) {
+//            scene.getSpotLights()[0].getPointLight().getPosition().z = lightPos - 0.1f;
+//        }
+//        if (window.is_keyPressed(GLFW.GLFW_KEY_L)) {
+//            scene.getSpotLights()[0].getPointLight().getPosition().x += 0.1f;
+//        }
+//        if (window.is_keyPressed(GLFW.GLFW_KEY_J)) {
+//            scene.getSpotLights()[0].getPointLight().getPosition().x -= 0.1f;
+//        }
+//        if (window.is_keyPressed(GLFW.GLFW_KEY_O)) {
+//            scene.getSpotLights()[0].getPointLight().getPosition().y += 0.1f;
+//        }
+//        if (window.is_keyPressed(GLFW.GLFW_KEY_U)) {
+//            scene.getSpotLights()[0].getPointLight().getPosition().y -= 0.1f;
+//        }
+//        if (window.is_keyPressed(GLFW.GLFW_KEY_0)) {
+//            scene.getSpotLights()[1].getPointLight().getPosition().z = lightPos2 + 0.1f;
+//        }
+//        if (window.is_keyPressed(GLFW.GLFW_KEY_P)) {
+//            scene.getSpotLights()[1].getPointLight().getPosition().z = lightPos2 - 0.1f;
+//        }
     }
 
     /**
@@ -238,9 +242,9 @@ public class GolfGame implements ILogic {
         } else if(scene.getSpotAngle() < -4) {
             scene.setSpotInc(1);
         }
-        double spotAngleRad = Math.toRadians(scene.getSpotAngle());
-        Vector3f coneDir = scene.getSpotLights()[0].getPointLight().getPosition();
-        coneDir.y = (float) Math.sin(spotAngleRad);
+//        double spotAngleRad = Math.toRadians(scene.getSpotAngle());
+//        Vector3f coneDir = scene.getSpotLights()[0].getPointLight().getPosition();
+//        coneDir.y = (float) Math.sin(spotAngleRad);
 
         daytimeCycle();
 
@@ -257,26 +261,28 @@ public class GolfGame implements ILogic {
     private void daytimeCycle() {
 
         scene.increaseLightAngle(1.1f);
+        scene.setLightAngle(65);
+        scene.getDirectionalLight().setIntensity(0.5f);
 
-        if (scene.getLightAngle() > 90) {
-            scene.getDirectionalLight().setIntensity(0);
-            if (scene.getLightAngle() >= 360)
-                scene.setLightAngle(-90);
-        } else if (scene.getLightAngle() <= -80 || scene.getLightAngle() >= 80) {
-            float factor = 1 - (Math.abs(scene.getLightAngle()) - 80) / 10.0f;
-            scene.getDirectionalLight().setIntensity(factor);
-            scene.getDirectionalLight().getColor().x = Math.max(factor, 0.9f);
-            scene.getDirectionalLight().getColor().z = Math.max(factor, 0.5f);
-        } else {
-            scene.getDirectionalLight().setIntensity(1);
-            scene.getDirectionalLight().getColor().x = 1;
-            scene.getDirectionalLight().getColor().z = 1;
-            scene.getDirectionalLight().getColor().y = 1;
-        }
-
-        double angle = Math.toRadians(scene.getLightAngle());
-        scene.getDirectionalLight().getDirection().x = (float) Math.sin(angle);
-        scene.getDirectionalLight().getDirection().y = (float) Math.cos(angle);
+//        if (scene.getLightAngle() > 90) {
+//            scene.getDirectionalLight().setIntensity(0);
+//            if (scene.getLightAngle() >= 360)
+//                scene.setLightAngle(-90);
+//        } else if (scene.getLightAngle() <= -80 || scene.getLightAngle() >= 80) {
+//            float factor = 1 - (Math.abs(scene.getLightAngle()) - 80) / 10.0f;
+//            scene.getDirectionalLight().setIntensity(factor);
+//            scene.getDirectionalLight().getColor().x = Math.max(factor, 0.9f);
+//            scene.getDirectionalLight().getColor().z = Math.max(factor, 0.5f);
+//        } else {
+//            scene.getDirectionalLight().setIntensity(1);
+//            scene.getDirectionalLight().getColor().x = 1;
+//            scene.getDirectionalLight().getColor().z = 1;
+//            scene.getDirectionalLight().getColor().y = 1;
+//        }
+//
+//        double angle = Math.toRadians(scene.getLightAngle());
+//        scene.getDirectionalLight().getDirection().x = (float) Math.sin(angle);
+//        scene.getDirectionalLight().getDirection().y = (float) Math.cos(angle);
     }
 
     private void checkCollision() {
@@ -307,23 +313,12 @@ public class GolfGame implements ILogic {
 
     private void terrainCollision(Vector3f newPosition) {
         // Correct the translation so -1000 maps to index 0
-        int heightX = (int) ((newPosition.x + Consts.SIZE_X/2) * ((Consts.VERTEX_COUNT/2) / Consts.SIZE_X));
-        int heightZ = (int) ((newPosition.z + Consts.SIZE_Z/2) * ((Consts.VERTEX_COUNT/2) / Consts.SIZE_Z));
-
-        // Clamp values to ensure they fall within the heightmap's index range
-        heightX = Math.max(0, Math.min(heightX, (Consts.VERTEX_COUNT/2)));
-        heightZ = Math.max(0, Math.min(heightZ, (Consts.VERTEX_COUNT/2)));
 
         // Retrieve the terrain height using the clamped indices
-        float terrainHeight = SceneManager.getHeightMap()[heightZ][heightX] + 5;
+        float terrainHeight = heightMap.getHeight(newPosition) + 5;
         if (newPosition.y <= terrainHeight) {
             newPosition.y = terrainHeight;
         }
-
-        // Debug output to verify correct scaling and translation
-        System.out.println("Debug - World Pos: (" + newPosition.x + ", " + newPosition.z +
-                "), Scaled Indices: (" + heightX + ", " + heightZ +
-                "), Height: " + terrainHeight);
     }
 
     private void entityCollision(Vector3f newPosition) {

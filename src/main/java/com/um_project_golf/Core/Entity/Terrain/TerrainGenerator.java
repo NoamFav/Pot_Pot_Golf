@@ -29,7 +29,7 @@ public class TerrainGenerator extends JPanel {
         // Generate height map
         for (int x = 0; x < width; x++) {
             for (int z = 0; z < height; z++) {
-                double y = SimplexNoise.octaveSimplexNoise(x * scale, z * scale, 0, octaves, persistence);
+                double y = SimplexNoise.octaveSimplexNoise(x * scale, z * scale, 0, octaves, persistence, 1.0);
                 heightMap[x][z] = y;
                 if (y > maxVal) maxVal = y;
                 if (y < minVal) minVal = y;

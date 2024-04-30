@@ -27,7 +27,7 @@ public class SimplexNoise {
         return x > 0 ? (int) x : (int) x - 1;
     }
 
-    private static double dot(int g[], double x, double y, double z) {
+    private static double dot(int[] g, double x, double y, double z) {
         return g[0] * x + g[1] * y + g[2] * z;
     }
 
@@ -108,10 +108,9 @@ public class SimplexNoise {
         return 32.0 * (n0 + n1 + n2 + n3);
     }
 
-    public static double octaveSimplexNoise(double x, double y, double z, int octaves, double persistence) {
+    public static double octaveSimplexNoise(double x, double y, double z, int octaves, double persistence, double amplitude) {
         double total = 0;
         double frequency = 1;
-        double amplitude = 1;
         double maxValue = 0;
         for (int i = 0; i < octaves; i++) {
             total += noise(x * frequency, y * frequency, z * frequency) * amplitude;
