@@ -8,6 +8,12 @@ import com.um_project_golf.Core.ObjectLoader;
 import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector3f;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.PrintWriter;
+
 /**
  * The class responsible for the terrain.
  */
@@ -95,6 +101,7 @@ public class Terrain {
                 indices[pointer++] = bottomRight;
             }
         }
+        System.out.println(heightmap.length + " " + heightmap[0].length);
         SceneManager.setHeightMap(heightmap);
 
         return loader.loadModel(vertices, textureCoords, normals, indices);
@@ -124,6 +131,25 @@ public class Terrain {
         return (float) (x1);
 
     }
+
+    public void heightmaptoCSV(float[][] heightmap) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < heightmap.length; i++) {
+            for (int j = 0; j < heightmap[i].length; j++) {
+                sb.append(heightmap[i][j]);
+                sb.append(",");
+            }
+            sb.append("\n");
+        }
+        File file = new File("heightmap.csv");
+        try (PrintWriter writer = new PrintWriter(file)) {
+            writer.write(sb.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
 
     public Model getModel() {
