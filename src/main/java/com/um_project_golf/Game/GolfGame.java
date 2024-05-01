@@ -15,6 +15,13 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -31,7 +38,7 @@ public class GolfGame implements ILogic {
 
     private final Camera camera;
     private Terrain terrain;
-    private HeightMap heightMap;
+    private final HeightMap heightMap;
 
     Vector3f cameraInc;
     private boolean canMove = true;
@@ -49,9 +56,7 @@ public class GolfGame implements ILogic {
         scene = new SceneManager(-90);
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
-        button = new Button(0, 10, 100, 100, "Button", () -> {
-            System.out.println("Button clicked");
-        });
+        button = new Button(0, 10, 100, 100, "Button", () -> System.out.println("Button clicked"));
         heightMap = new HeightMap();
     }
 
@@ -87,30 +92,21 @@ public class GolfGame implements ILogic {
         TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("Texture/rock.png"));
         TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("Texture/sand.png"));
         TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("Texture/grass.png"));
-        TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("Texture/blue.png"));
+        TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("Texture/dryGrass.png"));
         TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
-        TerrainTexture blue = new TerrainTexture(loader.loadTexture("Texture/blue.png"));
+        TerrainTexture blue = new TerrainTexture(loader.loadTexture("Texture/water.png"));
 
         BlendMapTerrain blendMapTerrain = new BlendMapTerrain(backgroundTexture, rTexture, gTexture, bTexture);
         BlendMapTerrain blueTerrain = new BlendMapTerrain(blue, blue, blue, blue);
 
-        terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap, false);
-        //Terrain water = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blueTerrain, blendMap, true);
+        terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap, false);
+        Terrain water = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blueTerrain, blendMap, true);
         scene.addTerrain(terrain);
-        //scene.addTerrain(water);
+        scene.addTerrain(water);
+        water.getModel().getMaterial().setDisableCulling(true);
 
-        Random rnd = new Random();
-        for (int i = 0; i < 500 ; i++) {
-            float x = rnd.nextFloat() * Consts.SIZE_X - Consts.SIZE_X / 2;
-            float z = rnd.nextFloat() * Consts.SIZE_Z - Consts.SIZE_Z / 2;
-            float y = heightMap.getHeight(new Vector3f(x, 0, z));
-            float scale = rnd.nextFloat() * 0.1f + 0.1f;
-            //entities.add(new Entity(skull, new Vector3f(x * 4, y * 4, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1));
-            //scene.addEntity(new Entity(cube, new Vector3f(x, y, z), new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0), 1.5f));
-            if (y> 2.5 && y < 10) {
-                //scene.addEntity(new Entity(tree, new Vector3f(x, y, z), new Vector3f(-90, 0, 0), 0.03f));
-            }
-        }
+        createTrees(tree);
+
         scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
 
         scene.addEntity(new Entity(wolf, new Vector3f(0, terrain.getHeight(0,0), 0), new Vector3f(45, 0 , 0), 10 ));
@@ -140,6 +136,32 @@ public class GolfGame implements ILogic {
 
         //scene.setPointLights(new PointLight[]{pointLight});
         //scene.setSpotLights(new SpotLight[]{spotLight, spotLight2});
+    }
+
+    private void createTrees(Model tree) throws IOException {
+        BufferedImage heightmapImage = ImageIO.read(new File("Texture/heightmap.png"));
+
+        List<Vector3f> positions = new ArrayList<>();
+
+        for (int x = 0; x < heightmapImage.getWidth(); x++) {
+            for (int z = 0; z < heightmapImage.getHeight(); z++) {
+                Color pixelColor = new Color(heightmapImage.getRGB(x, z));
+
+                if (pixelColor.equals(Color.GREEN) || pixelColor.equals(Color.BLUE)) {
+                    float terrainX = x / (float) heightmapImage.getWidth() * Consts.SIZE_X - Consts.SIZE_X / 2;
+                    float terrainZ = z / (float) heightmapImage.getHeight() * Consts.SIZE_Z - Consts.SIZE_Z / 2;
+                    float terrainY = heightMap.getHeight(new Vector3f(terrainX, 0, terrainZ));
+
+                    positions.add(new Vector3f(terrainX, terrainY, terrainZ));
+                }
+            }
+        }
+
+        Random rnd = new Random();
+        for (int i = 0; i < Math.max(Consts.SIZE_X, Consts.SIZE_Z) * 0.9; i++) {
+            Vector3f position = positions.get(rnd.nextInt(positions.size()));
+            scene.addEntity(new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f));
+        }
     }
 
     /**
@@ -295,6 +317,7 @@ public class GolfGame implements ILogic {
     }
 
     private void borderCollision(Vector3f newPosition) {
+        float outOfBounds = 1;
         if (camera.getPosition().x < -Consts.SIZE_X / 2) {
             newPosition.x = -Consts.SIZE_X / 2;
             cameraInc.x = 0;
@@ -309,13 +332,17 @@ public class GolfGame implements ILogic {
             newPosition.z = Consts.SIZE_Z / 2;
             cameraInc.z = 0;
         }
+        if (camera.getPosition().y > Consts.MAX_HEIGHT) {
+            newPosition.y = Consts.MAX_HEIGHT;
+            cameraInc.y = 0;
+        }
     }
 
     private void terrainCollision(Vector3f newPosition) {
         // Correct the translation so -1000 maps to index 0
 
         // Retrieve the terrain height using the clamped indices
-        float terrainHeight = heightMap.getHeight(newPosition) + 5;
+        float terrainHeight = heightMap.getHeight(newPosition) + Consts.PLAYER_HEIGHT;
         if (newPosition.y <= terrainHeight) {
             newPosition.y = terrainHeight;
         }
