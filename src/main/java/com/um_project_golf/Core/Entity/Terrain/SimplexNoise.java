@@ -1,5 +1,7 @@
 package com.um_project_golf.Core.Entity.Terrain;
 
+import java.util.Random;
+
 public class SimplexNoise {
 
     private static final int[][] grad3 = {{1,1,0}, {-1,1,0}, {1,-1,0}, {-1,-1,0},
@@ -119,5 +121,18 @@ public class SimplexNoise {
             frequency *= 2;
         }
         return total / maxValue;
+    }
+
+    public static void shufflePermutation() {
+        Random rand = new Random();
+        for (int i = 0; i < p.length; i++) {
+            int index = rand.nextInt(i + 1);
+            int temp = p[index];
+            p[index] = p[i];
+            p[i] = temp;
+        }
+        for (int i = 0; i < perm.length; i++) {
+            perm[i] = p[i & 255];
+        }
     }
 }

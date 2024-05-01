@@ -18,6 +18,7 @@ public class HeightMap {
     public void createHeightMap() {
 
         float[][] heightmap = new float[Consts.VERTEX_COUNT][Consts.VERTEX_COUNT];
+        SimplexNoise.shufflePermutation();
 
         for(int i = 0; i < Consts.VERTEX_COUNT; i++){
             for(int j = 0; j < Consts.VERTEX_COUNT; j++){
@@ -25,7 +26,7 @@ public class HeightMap {
                 float x = j / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_X;
                 float z = i / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_Z;
 
-                float height = (float) (SimplexNoise.octaveSimplexNoise(x * Consts.scales, z * Consts.scales, 0, Consts.octaves, Consts.persistence, Consts.amplitude) * (Consts.MAX_HEIGHT/2));
+                float height = (float) (SimplexNoise.octaveSimplexNoise(x * Consts.SCALE, z * Consts.SCALE, 0, Consts.OCTAVES, Consts.PERSISTENCE, Consts.AMPLITUDE) * (Consts.MAX_HEIGHT/2));
                 heightmap[j][i] = height;
             }
         }
@@ -42,12 +43,16 @@ public class HeightMap {
             for (int y = 0; y < height; y++) {
                 float heightValue = heightmap[x][y];
                 Color color;
-                if (heightValue < 0) {
-                    color = Color.BLUE;
-                } else if (heightValue >= 0 && heightValue < 2.5) {
+                float red = 2.5f + (float) (Math.random() * 5);
+                float green = 15 + (float) (Math.random() * 5);
+                float blue = 20 + (float) (Math.random() * 5);
+
+                if (heightValue < red) {
                     color = Color.RED;
-                } else if (heightValue >= 2.5 && heightValue < 15) {
+                } else if (heightValue >= red && heightValue < green) {
                     color = Color.GREEN;
+                } else if (heightValue >= green && heightValue < blue) {
+                    color = Color.BLUE;
                 } else {
                     color = Color.BLACK;
                 }
@@ -63,12 +68,12 @@ public class HeightMap {
     }
 
     public float getHeight(Vector3f position) {
-        int heightX = (int) ((position.x + Consts.SIZE_X/2) * ((Consts.VERTEX_COUNT/2) / Consts.SIZE_X));
-        int heightZ = (int) ((position.z + Consts.SIZE_Z/2) * ((Consts.VERTEX_COUNT/2) / Consts.SIZE_Z));
+        int heightX = (int) ((position.x + Consts.SIZE_X/2) * ((Consts.VERTEX_COUNT-1) / Consts.SIZE_X));
+        int heightZ = (int) ((position.z + Consts.SIZE_Z/2) * ((Consts.VERTEX_COUNT-1) / Consts.SIZE_Z));
 
         // Clamp values to ensure they fall within the heightmap's index range
-        heightX = Math.max(0, Math.min(heightX, (Consts.VERTEX_COUNT/2)));
-        heightZ = Math.max(0, Math.min(heightZ, (Consts.VERTEX_COUNT/2)));
+        heightX = Math.max(0, Math.min(heightX, (Consts.VERTEX_COUNT-1)));
+        heightZ = Math.max(0, Math.min(heightZ, (Consts.VERTEX_COUNT-1)));
 
         //Debug
 //        System.out.println("Debug - World Pos: (" + position.x + ", " + position.z +

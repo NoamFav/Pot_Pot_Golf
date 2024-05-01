@@ -71,9 +71,9 @@ public class EngineManager {
             input();
 
 
-            while (unprocessedTime > Consts.framerate) {
+            while (unprocessedTime > Consts.FRAMERATE) {
                 render = true;
-                unprocessedTime -= Consts.framerate;
+                unprocessedTime -= Consts.FRAMERATE;
 
                 if (window.windowShouldClose()) {
                     stop();
