@@ -19,7 +19,7 @@ public class WindowManager {
     private int width, height;
     private long window;
 
-    private boolean resized, vSync;
+    private boolean resized, vSync, antiAliasing;
 
     private final Matrix4f projectionMatrix;
 
@@ -67,6 +67,10 @@ public class WindowManager {
             GLFW.glfwWindowHint(GLFW.GLFW_MAXIMIZED, GLFW.GLFW_TRUE);
         }
 
+        if (antiAliasing) {
+            GLFW.glfwWindowHint(GLFW.GLFW_SAMPLES, 4);
+        }
+
         window = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
         if (window == MemoryUtil.NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
@@ -97,11 +101,11 @@ public class WindowManager {
             GLFW.glfwSwapInterval(1);
         }
 
+
         GLFW.glfwShowWindow(window);
         GLFW.glfwFocusWindow(window);
 
         GL.createCapabilities();
-
 
         GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -248,6 +252,14 @@ public class WindowManager {
      */
     public Matrix4f getProjectionMatrix() {
         return projectionMatrix;
+    }
+
+    public boolean isAntiAliasing() {
+        return antiAliasing;
+    }
+
+    public void setAntiAliasing(boolean antiAliasing) {
+        this.antiAliasing = antiAliasing;
     }
 
     /**

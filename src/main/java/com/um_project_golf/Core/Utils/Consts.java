@@ -30,7 +30,7 @@ public class Consts {
     public static final float Z_FAR = 10000.0f;
     public static final float SPECULAR_POWER = 10f;
 
-    private static final int POWER = 1;
+    private static final int POWER = 10;
     public static final float SIZE_X = (float) Math.pow(2, POWER);
     public static final float SIZE_Z = (float) Math.pow(2, POWER);
     public static final int VERTEX_COUNT = (int) Math.pow(2, POWER + 2);

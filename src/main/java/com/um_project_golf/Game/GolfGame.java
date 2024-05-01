@@ -14,6 +14,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -23,6 +24,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
+
+import static org.lwjgl.nanovg.NanoVG.*;
+import static org.lwjgl.nanovg.NanoVGGL3.*;
 
 /**
  * The main game logic class.
@@ -34,7 +38,8 @@ public class GolfGame implements ILogic {
     private final ObjectLoader loader;
     private final WindowManager window;
     private final SceneManager scene;
-    private final Button button;
+    private Button button;
+    private long vg;
 
     private final Camera camera;
     private Terrain terrain;
@@ -56,7 +61,6 @@ public class GolfGame implements ILogic {
         scene = new SceneManager(-90);
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
-        button = new Button(0, 10, 100, 100, "Button", () -> System.out.println("Button clicked"));
         heightMap = new HeightMap();
     }
 
@@ -69,8 +73,14 @@ public class GolfGame implements ILogic {
     @Override
     public void init() throws Exception {
 
+        vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+
+        // Initialize the button with the NanoVG context
+        button = new Button(100, 100, 500, 500, "Click me", () -> System.out.println("Button clicked!"), vg);
+
         heightMap.createHeightMap();
         scene.setDefaultTexture(new Texture(loader.loadTexture("Texture/Default.png")));
+        window.setAntiAliasing(true);
 
         renderer.init();
         window.setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
@@ -136,32 +146,6 @@ public class GolfGame implements ILogic {
 
         //scene.setPointLights(new PointLight[]{pointLight});
         //scene.setSpotLights(new SpotLight[]{spotLight, spotLight2});
-    }
-
-    private void createTrees(Model tree) throws IOException {
-        BufferedImage heightmapImage = ImageIO.read(new File("Texture/heightmap.png"));
-
-        List<Vector3f> positions = new ArrayList<>();
-
-        for (int x = 0; x < heightmapImage.getWidth(); x++) {
-            for (int z = 0; z < heightmapImage.getHeight(); z++) {
-                Color pixelColor = new Color(heightmapImage.getRGB(x, z));
-
-                if (pixelColor.equals(Color.GREEN) || pixelColor.equals(Color.BLUE)) {
-                    float terrainX = x / (float) heightmapImage.getWidth() * Consts.SIZE_X - Consts.SIZE_X / 2;
-                    float terrainZ = z / (float) heightmapImage.getHeight() * Consts.SIZE_Z - Consts.SIZE_Z / 2;
-                    float terrainY = heightMap.getHeight(new Vector3f(terrainX, 0, terrainZ));
-
-                    positions.add(new Vector3f(terrainX, terrainY, terrainZ));
-                }
-            }
-        }
-
-        Random rnd = new Random();
-        for (int i = 0; i < Math.max(Consts.SIZE_X, Consts.SIZE_Z) * 0.9; i++) {
-            Vector3f position = positions.get(rnd.nextInt(positions.size()));
-            scene.addEntity(new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f));
-        }
     }
 
     /**
@@ -239,6 +223,8 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void update(MouseInput mouseInput) {
+
+        button.update();
 
         camera.movePosition(
                 cameraInc.x * Consts.CAMERA_MOVEMENT_SPEED,
@@ -354,6 +340,32 @@ public class GolfGame implements ILogic {
         // Implement a hit box for the entity
     }
 
+    private void createTrees(Model tree) throws IOException {
+        BufferedImage heightmapImage = ImageIO.read(new File("Texture/heightmap.png"));
+
+        List<Vector3f> positions = new ArrayList<>();
+
+        for (int x = 0; x < heightmapImage.getWidth(); x++) {
+            for (int z = 0; z < heightmapImage.getHeight(); z++) {
+                Color pixelColor = new Color(heightmapImage.getRGB(x, z));
+
+                if (pixelColor.equals(Color.GREEN) || pixelColor.equals(Color.BLUE)) {
+                    float terrainX = x / (float) heightmapImage.getWidth() * Consts.SIZE_X - Consts.SIZE_X / 2;
+                    float terrainZ = z / (float) heightmapImage.getHeight() * Consts.SIZE_Z - Consts.SIZE_Z / 2;
+                    float terrainY = heightMap.getHeight(new Vector3f(terrainX, 0, terrainZ));
+
+                    positions.add(new Vector3f(terrainX, terrainY, terrainZ));
+                }
+            }
+        }
+
+        Random rnd = new Random();
+        for (int i = 0; i < Math.max(Consts.SIZE_X, Consts.SIZE_Z) * 0.9; i++) {
+            Vector3f position = positions.get(rnd.nextInt(positions.size()));
+            scene.addEntity(new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f));
+        }
+    }
+
     /**
      * Renders the game.
      * It renders the entity and the camera.
@@ -362,7 +374,14 @@ public class GolfGame implements ILogic {
     public void render() {
         renderer.clear();
 
+
         renderer.render(camera, scene);
+
+        // Disable depth testing for UI eleme
+        // Render your UI elements like buttons
+        button.render();
+
+        // Re-enable depth testing if there are subsequent 3D renderings
     }
 
     /**
@@ -373,5 +392,6 @@ public class GolfGame implements ILogic {
     public void cleanUp() {
         renderer.cleanup();
         loader.cleanUp();
+        nvgDelete(vg);
     }
 }
