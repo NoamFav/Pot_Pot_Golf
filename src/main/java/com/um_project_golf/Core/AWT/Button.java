@@ -56,7 +56,7 @@ public class Button {
                 System.out.println("Font loading failed");
             }
 
-            nvgFontSize(vg, 100);
+            nvgFontSize(vg, 80);
             nvgFontFace(vg, "golf");
             nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
             nvgFillColor(vg, textColor);

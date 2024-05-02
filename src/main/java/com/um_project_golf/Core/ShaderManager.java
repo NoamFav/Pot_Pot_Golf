@@ -95,7 +95,7 @@ public class ShaderManager {
     }
 
     /**
-     * Creates a spot light uniform.
+     * Creates a spotlight uniform.
      *
      * @param uniformName The name of the uniform.
      * @throws Exception If the uniform could not be created.
@@ -107,7 +107,7 @@ public class ShaderManager {
     }
 
     /**
-     * Creates a spot light list uniform.
+     * Creates a spotlight list uniform.
      *
      * @param uniformName The name of the uniform.
      * @param size The size of the uniform.
@@ -237,10 +237,10 @@ public class ShaderManager {
     }
 
     /**
-     * Sets the uniforms of a spot light.
+     * Sets the uniforms of a spotlight.
      *
      * @param uniformName The name of the uniform.
-     * @param spotLight The spot light to set.
+     * @param spotLight The spotlight to set.
      */
     public void setUniform(String uniformName, SpotLight spotLight) {
         setUniform(uniformName + ".pointLight", spotLight.getPointLight());
@@ -250,8 +250,8 @@ public class ShaderManager {
 
     /**
      * Sets the uniforms of a point light list.
-     * @param uniformName
-     * @param pointLights
+     * @param uniformName The name of the uniform.
+     * @param pointLights The point lights to set.
      */
     public void setUniform(String uniformName, PointLight[] pointLights) {
         int numLights = pointLights != null ? pointLights.length : 0;
@@ -272,9 +272,9 @@ public class ShaderManager {
     }
 
     /**
-     * Sets the uniforms of a spot light list.
+     * Sets the uniforms of a spotlight list.
      * @param uniformName The name of the uniform.
-     * @param spotLights The spot lights to set.
+     * @param spotLights The spotlights to set.
      */
     public void setUniform(String uniformName, SpotLight[] spotLights) {
         int numLights = spotLights != null ? spotLights.length : 0;
@@ -285,10 +285,10 @@ public class ShaderManager {
     }
 
     /**
-     * Sets the uniforms of a spot light.
+     * Sets the uniforms of a spotlight.
      * @param uniformName The name of the uniform.
-     * @param spotLight The spot light to set.
-     * @param pos The position of the spot light.
+     * @param spotLight The spotlight to set.
+     * @param pos The position of the spotlight.
      */
     public void setUniform(String uniformName, SpotLight spotLight, int pos) {
         setUniform(uniformName + "[" + pos + "]", spotLight);
