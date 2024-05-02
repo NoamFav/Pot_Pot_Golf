@@ -14,7 +14,6 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -25,7 +24,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static org.lwjgl.nanovg.NanoVG.*;
 import static org.lwjgl.nanovg.NanoVGGL3.*;
 
 /**
@@ -72,12 +70,6 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void init() throws Exception {
-
-        vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
-
-        // Initialize the button with the NanoVG context
-        button = new Button(100, 100, 500, 500, "Click me", () -> System.out.println("Button clicked!"), vg);
-
         heightMap.createHeightMap();
         scene.setDefaultTexture(new Texture(loader.loadTexture("Texture/Default.png")));
         window.setAntiAliasing(true);
@@ -121,6 +113,32 @@ public class GolfGame implements ILogic {
 
         scene.addEntity(new Entity(wolf, new Vector3f(0, terrain.getHeight(0,0), 0), new Vector3f(45, 0 , 0), 10 ));
         //scene.addEntity(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
+
+        //GUI
+        vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+        Runnable terrainChanger = () -> {
+            try {
+                heightMap.createHeightMap();
+                TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
+                scene.getTerrains().remove(terrain);
+                SimplexNoise.shufflePermutation();
+                terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap2, false);
+                scene.addTerrain(terrain);
+                scene.getEntities().removeIf(entity -> entity.getModel().equals(tree));
+                try {
+                    createTrees(tree);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                renderer.processTerrain(terrain);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        // Initialize the button with the NanoVG context
+        button = new Button(100, 100, 500, 500, "Change Terrain", terrainChanger, vg);
+
 
 
         //TODO: Allow multiple textures for the same model
