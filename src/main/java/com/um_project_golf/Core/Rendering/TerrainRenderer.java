@@ -21,8 +21,8 @@ import java.util.List;
  */
 public class TerrainRenderer implements IRenderer{
 
-    ShaderManager shader;
-    private final List<Terrain> terrains;
+    ShaderManager shader; // The shader of the entity render.
+    private final List<Terrain> terrains; // The list of entities to render.
 
     /**
      * The constructor of the entity render.
@@ -41,25 +41,25 @@ public class TerrainRenderer implements IRenderer{
      */
     @Override
     public void init() throws Exception {
-        shader.createVertexShader(Utils.loadResource("/shaders/terrain_vertex.glsl"));
-        shader.createFragmentShader(Utils.loadResource("/shaders/terrain_fragment.glsl"));
-        shader.link();
+        shader.createVertexShader(Utils.loadResource("/shaders/terrain_vertex.glsl")); // Loads the vertex shader.
+        shader.createFragmentShader(Utils.loadResource("/shaders/terrain_fragment.glsl")); // Loads the fragment shader.
+        shader.link(); // Links the shader.
 
-        shader.createUniform("backgroundTexture");
-        shader.createUniform("RTexture");
-        shader.createUniform("GTexture");
-        shader.createUniform("BTexture");
-        shader.createUniform("blendMap");
-        shader.createUniform("transformationMatrix");
-        shader.createUniform("projectionMatrix");
-        shader.createUniform("viewMatrix");
-        shader.createUniform("ambientLight");
-        shader.createMaterialUniform("material");
-        shader.createUniform("specularPower");
-        shader.createDirectionalLightUniform("directionalLight");
+        shader.createUniform("backgroundTexture"); // Creates the uniform for the background texture.
+        shader.createUniform("RTexture"); // Creates the uniform for the red texture.
+        shader.createUniform("GTexture"); // Creates the uniform for the green texture.
+        shader.createUniform("BTexture"); // Creates the uniform for the blue texture.
+        shader.createUniform("blendMap"); // Creates the uniform for the blend map.
+        shader.createUniform("transformationMatrix"); // Creates the uniform for the transformation matrix.
+        shader.createUniform("projectionMatrix"); // Creates the uniform for the projection matrix.
+        shader.createUniform("viewMatrix"); // Creates the uniform for the view matrix.
+        shader.createUniform("ambientLight"); // Creates the uniform for the ambient light.
+        shader.createMaterialUniform("material"); // Creates the uniform for the material.
+        shader.createUniform("specularPower"); // Creates the uniform for the specular power.
+        shader.createDirectionalLightUniform("directionalLight"); // Creates the uniform for the directional light.
 
-        shader.createPointLightListUniform("pointLights", Consts.MAX_POINT_LIGHTS);
-        shader.createSpotLightListUniform("spotLights" , Consts.MAX_SPOT_LIGHTS);
+        shader.createPointLightListUniform("pointLights", Consts.MAX_POINT_LIGHTS); // Creates the uniform for the point lights.
+        shader.createSpotLightListUniform("spotLights" , Consts.MAX_SPOT_LIGHTS); // Creates the uniform for the spotlights.
     }
 
     /**
@@ -72,17 +72,17 @@ public class TerrainRenderer implements IRenderer{
      */
     @Override
     public void render(Camera camera, PointLight[] pointLights, SpotLight[] spotLights, DirectionalLight directionalLight) {
-        shader.bind();
-        shader.setUniform("projectionMatrix", Launcher.getWindow().updateProjectionMatrix());
-        RenderManager.renderLight(pointLights, spotLights, directionalLight, shader);
-        for(Terrain terrain : terrains) {
-            bind(terrain.getModel());
-            prepare(terrain, camera);
-            GL11.glDrawElements(GL11.GL_TRIANGLES, terrain.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
-            unbind();
+        shader.bind(); // Binds the shader.
+        shader.setUniform("projectionMatrix", Launcher.getWindow().updateProjectionMatrix()); // Updates the projection matrix.
+        RenderManager.renderLight(pointLights, spotLights, directionalLight, shader); // Renders the lights.
+        for(Terrain terrain : terrains) { // Renders the entities.
+            bind(terrain.getModel()); // Binds the entity.
+            prepare(terrain, camera); // Prepares the entity.
+            GL11.glDrawElements(GL11.GL_TRIANGLES, terrain.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0); // Draws the entity.
+            unbind(); // Unbinds the entity.
         }
-        terrains.clear();
-        shader.unbind();
+        terrains.clear(); // Clears the list of entities.
+        shader.unbind(); // Unbinds the shader.
     }
 
     /**
@@ -90,7 +90,7 @@ public class TerrainRenderer implements IRenderer{
      */
     @Override
     public void cleanup() {
-        shader.cleanup();
+        shader.cleanup(); // Cleans up the shader.
     }
 
     /**
@@ -100,24 +100,24 @@ public class TerrainRenderer implements IRenderer{
      */
     @Override
     public void bind(Model model) {
-        GL30.glBindVertexArray(model.getId());
+        GL30.glBindVertexArray(model.getId()); // Binds the VAO.
 
-        GL20.glEnableVertexAttribArray(0);
-        GL20.glEnableVertexAttribArray(1);
-        GL20.glEnableVertexAttribArray(2);
-
-
-
-        shader.setUniform("backgroundTexture", 0);
-        shader.setUniform("RTexture", 1);
-        shader.setUniform("GTexture", 2);
-        shader.setUniform("BTexture", 3);
-        shader.setUniform("blendMap", 4);
-        shader.setUniform("material", model.getMaterial());
+        GL20.glEnableVertexAttribArray(0); // Enables the vertex array.
+        GL20.glEnableVertexAttribArray(1); // Enables the texture array.
+        GL20.glEnableVertexAttribArray(2); // Enables the normal array.
 
 
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+        shader.setUniform("backgroundTexture", 0); // Sets the background texture.
+        shader.setUniform("RTexture", 1); // Sets the red texture.
+        shader.setUniform("GTexture", 2); // Sets the green texture.
+        shader.setUniform("BTexture", 3); // Sets the blue texture.
+        shader.setUniform("blendMap", 4); // Sets the blend map.
+        shader.setUniform("material", model.getMaterial()); // Sets the material.
+
+
+        GL11.glEnable(GL11.GL_BLEND); // Enables blending.
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); // Enables blending.
     }
 
     /**
@@ -125,10 +125,10 @@ public class TerrainRenderer implements IRenderer{
      */
     @Override
     public void unbind() {
-        GL20.glDisableVertexAttribArray(0);
-        GL20.glDisableVertexAttribArray(1);
-        GL20.glDisableVertexAttribArray(2);
-        GL30.glBindVertexArray(0);
+        GL20.glDisableVertexAttribArray(0); // Disables the vertex array.
+        GL20.glDisableVertexAttribArray(1); // Disables the texture array.
+        GL20.glDisableVertexAttribArray(2); // Disables the normal array.
+        GL30.glBindVertexArray(0); // Unbinds the VAO.
     }
 
     /**
@@ -140,23 +140,23 @@ public class TerrainRenderer implements IRenderer{
     @Override
     public void prepare(Object terrain, Camera camera) {
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMapTerrain().getBackground().getId());
+        GL13.glActiveTexture(GL13.GL_TEXTURE0); // Activates the texture. (Background)
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMapTerrain().getBackground().getId()); // Binds the texture.
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMapTerrain().getRTexture().getId());
+        GL13.glActiveTexture(GL13.GL_TEXTURE1); // Activates the texture. (R)
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMapTerrain().getRTexture().getId()); // Binds the texture.
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMapTerrain().getGTexture().getId());
+        GL13.glActiveTexture(GL13.GL_TEXTURE2); // Activates the texture. (G)
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMapTerrain().getGTexture().getId()); // Binds the texture.
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE3);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMapTerrain().getBTexture().getId());
+        GL13.glActiveTexture(GL13.GL_TEXTURE3); // Activates the texture. (B)
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMapTerrain().getBTexture().getId()); // Binds the texture.
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE4);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMap().getId());
+        GL13.glActiveTexture(GL13.GL_TEXTURE4); // Activates the texture. (Blend Map)
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMap().getId()); // Binds the texture.
 
-        shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix((Terrain) terrain));
-        shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera));
+        shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix((Terrain) terrain)); // Sets the transformation matrix.
+        shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera)); // Sets the view matrix.
     }
 
     public List<Terrain> getTerrain() {

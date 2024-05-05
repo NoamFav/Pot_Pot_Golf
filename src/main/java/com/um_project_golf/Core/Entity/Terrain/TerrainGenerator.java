@@ -4,6 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+/**
+ * The TerrainGenerator class is used to generate a terrain using simplex noise and store it in a 2D array.
+ * The terrain is then used to calculate the height of the terrain at a given position.
+ * Independed from the rest of the project.
+ * Used to generate a terrain image and display it in a window.
+ * For testing purposes only.
+ */
 public class TerrainGenerator extends JPanel {
     private final int width = 512;
     private final int height = 512;

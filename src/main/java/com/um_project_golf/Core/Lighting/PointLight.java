@@ -4,8 +4,8 @@ import org.joml.Vector3f;
 
 public class PointLight {
 
-    private Vector3f color, position;
-    private float intensity, constant, linear, exponent;
+    private Vector3f color, position; // color of the light, position of the light
+    private float intensity, constant, linear, exponent; // intensity of the light, constant, linear, and exponent values
 
     public PointLight(Vector3f color, Vector3f position, float intensity, float constant, float linear, float exponent) {
         this.color = color;
@@ -20,9 +20,9 @@ public class PointLight {
         this.color = color;
         this.position = position;
         this.intensity = intensity;
-        this.constant = 1;
-        this.linear = 0;
-        this.exponent = 0;
+        this.constant = 1; // default constant value
+        this.linear = 0; // default linear value
+        this.exponent = 0; // default exponent value
     }
 
     public Vector3f getColor() {

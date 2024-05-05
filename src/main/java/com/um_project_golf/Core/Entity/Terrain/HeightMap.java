@@ -11,69 +11,86 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
+/**
+ * The HeightMap class is used to generate a heightmap using simplex noise and store it in a 2D array.
+ * The heightmap is then used to calculate the height of the terrain at a given position.
+ */
 public class HeightMap {
 
-    private static final Logger log = LogManager.getLogger(HeightMap.class);
+    private static final Logger log = LogManager.getLogger(HeightMap.class); // Log errors
 
+    /**
+     * Create a heightmap using simplex noise
+     */
     public void createHeightMap() {
 
-        float[][] heightmap = new float[Consts.VERTEX_COUNT][Consts.VERTEX_COUNT];
-        SimplexNoise.shufflePermutation();
+        float[][] heightmap = new float[Consts.VERTEX_COUNT][Consts.VERTEX_COUNT]; // Create a 2D array to store the heightmap
+        SimplexNoise.shufflePermutation(); // Shuffle the permutation array to create a random noise pattern
 
-        for(int i = 0; i < Consts.VERTEX_COUNT; i++){
-            for(int j = 0; j < Consts.VERTEX_COUNT; j++){
+        for(int i = 0; i < Consts.VERTEX_COUNT; i++){ // Loop through the heightmap array
+            for(int j = 0; j < Consts.VERTEX_COUNT; j++){ // Loop through the heightmap array
 
-                float x = j / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_X;
-                float z = i / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_Z;
+                float x = j / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_X; // Calculate the x position of the vertex
+                float z = i / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_Z; // Calculate the z position of the vertex
 
+                // Calculate the height of the vertex using simplex noise
                 float height = (float) (SimplexNoise.octaveSimplexNoise(x * Consts.SCALE, z * Consts.SCALE, 0, Consts.OCTAVES, Consts.PERSISTENCE, Consts.AMPLITUDE) * (Consts.MAX_HEIGHT/2));
-                heightmap[j][i] = height;
+                heightmap[j][i] = height; // Set the height of the vertex in the heightmap array
             }
         }
-        SceneManager.setHeightMap(heightmap);
-        createHeightmapImage(heightmap);
+        SceneManager.setHeightMap(heightmap); // Set the heightmap in the SceneManager
+        createHeightmapImage(heightmap); // Create an image of the heightmap
     }
 
+    /**
+     * Create an image of the heightmap
+     * @param heightmap The heightmap to create an image of
+     */
     public void createHeightmapImage(float[][] heightmap) {
-        int width = heightmap.length;
-        int height = heightmap[0].length;
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        int width = heightmap.length; // Get the width of the heightmap
+        int height = heightmap[0].length; // Get the height of the heightmap
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // Create a new image
 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                float heightValue = heightmap[x][y];
-                Color color;
-                float red = 2.5f + (float) (Math.random() * 2.5f);
-                float green = 15 + (float) (Math.random() * 2.5f);
-                float blue = 20 + (float) (Math.random() * 2.5f);
+        for (int x = 0; x < width; x++) { // Loop through the heightmap
+            for (int y = 0; y < height; y++) { // Loop through the heightmap
+                float heightValue = heightmap[x][y]; // Get the height value of the vertex
+                Color color; // Create a new color
+                float red = 2.5f + (float) (Math.random() * 2.5f); // Generate a random red value
+                float green = 15 + (float) (Math.random() * 2.5f); // Generate a random green value
+                float blue = 20 + (float) (Math.random() * 2.5f); // Generate a random blue value
 
-                if (heightValue < red) {
-                    color = Color.RED;
-                } else if (heightValue >= red && heightValue < green) {
-                    color = Color.GREEN;
-                } else if (heightValue >= green && heightValue < blue) {
-                    color = Color.BLUE;
-                } else {
-                    color = Color.BLACK;
+                if (heightValue < red) { // Check if the height value is less than the red value
+                    color = Color.RED; // Set the color to red
+                } else if (heightValue >= red && heightValue < green) { // Check if the height value is greater than or equal to the red value and less than the green value
+                    color = Color.GREEN; // Set the color to green
+                } else if (heightValue >= green && heightValue < blue) { // Check if the height value is greater than or equal to the green value and less than the blue value
+                    color = Color.BLUE; // Set the color to blue
+                } else { // Otherwise
+                    color = Color.BLACK; // Set the color to black
                 }
-                image.setRGB(x, y, color.getRGB());
+                image.setRGB(x, y, color.getRGB()); // Set the color of the pixel in the image
             }
         }
 
-        try {
+        try { // Try to write the image to a file
             ImageIO.write(image, "PNG", new File("Texture/heightmap.png"));
-        } catch (Exception e) {
-            log.error("Error creating heightmap image: {}", e.getMessage());
+        } catch (Exception e) { // Catch any exceptions
+            log.error("Error creating heightmap image: {}", e.getMessage()); // Log the error
         }
     }
 
+    /**
+     * Get the height of the terrain at a given position
+     * @param position The position to get the height of
+     * @return The height of the terrain at the given position
+     */
     public float getHeight(Vector3f position) {
-        int heightX = (int) ((position.x + Consts.SIZE_X/2) * ((Consts.VERTEX_COUNT-1) / Consts.SIZE_X));
-        int heightZ = (int) ((position.z + Consts.SIZE_Z/2) * ((Consts.VERTEX_COUNT-1) / Consts.SIZE_Z));
+        int heightX = (int) ((position.x + Consts.SIZE_X/2) * ((Consts.VERTEX_COUNT-1) / Consts.SIZE_X)); // Calculate the x index of the heightmap
+        int heightZ = (int) ((position.z + Consts.SIZE_Z/2) * ((Consts.VERTEX_COUNT-1) / Consts.SIZE_Z)); // Calculate the z index of the heightmap
 
         // Clamp values to ensure they fall within the heightmap's index range
-        heightX = Math.max(0, Math.min(heightX, (Consts.VERTEX_COUNT-1)));
-        heightZ = Math.max(0, Math.min(heightZ, (Consts.VERTEX_COUNT-1)));
+        heightX = Math.max(0, Math.min(heightX, (Consts.VERTEX_COUNT-1))); // Clamp the x index
+        heightZ = Math.max(0, Math.min(heightZ, (Consts.VERTEX_COUNT-1))); // Clamp the z index
 
         //Debug
 //        System.out.println("Debug - World Pos: (" + position.x + ", " + position.z +
@@ -81,6 +98,6 @@ public class HeightMap {
 //                "), Height: " + SceneManager.getHeightMap()[heightX][heightZ]);
 
 
-        return SceneManager.getHeightMap()[heightX][heightZ];
+        return SceneManager.getHeightMap()[heightX][heightZ]; // Return the height of the vertex
     }
 }

@@ -400,7 +400,7 @@ public class GolfGame implements ILogic {
         // Render your UI elements like buttons
         button.render();
 
-        // Re-enable depth testing if there are subsequent 3D renderings
+        // Re-enable depth testing if there are later 3D renderings
     }
 
     /**
