@@ -13,7 +13,7 @@ import static org.lwjgl.nanovg.NanoVG.*;
 public class Button {
     private float x, y;  // Button position
     private float width, height;  // Button dimensions
-    private String text;
+    private String text; // Button text
     private Runnable action;  // Action to be performed when the button is clicked
     private long vg;  // NanoVG context
 
@@ -79,16 +79,17 @@ public class Button {
 
 
     public void update() {
+        // Check if the mouse is over the button and the left mouse button is pressed
         if (isMouseOver() && GLFW.glfwGetMouseButton(GLFW.glfwGetCurrentContext(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS) {
-            action.run();
+            action.run(); // Run the action
         }
     }
 
     private boolean isMouseOver() {
-        double[] mouseX = new double[1];
-        double[] mouseY = new double[1];
-        GLFW.glfwGetCursorPos(GLFW.glfwGetCurrentContext(), mouseX, mouseY);
+        double[] mouseX = new double[1]; // Mouse x position
+        double[] mouseY = new double[1]; // Mouse y position
+        GLFW.glfwGetCursorPos(GLFW.glfwGetCurrentContext(), mouseX, mouseY); // Get the mouse position
 
-        return mouseX[0] >= x && mouseX[0] <= x + width && mouseY[0] >= y && mouseY[0] <= y + height;
+        return mouseX[0] >= x && mouseX[0] <= x + width && mouseY[0] >= y && mouseY[0] <= y + height; // Check if the mouse is over the button
     }
 }

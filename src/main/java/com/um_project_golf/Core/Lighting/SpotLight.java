@@ -4,10 +4,10 @@ import org.joml.Vector3f;
 
 public class SpotLight {
 
-    private PointLight pointLight;
+    private PointLight pointLight; // point light
 
-    private Vector3f coneDirection;
-    private float cutOff;
+    private Vector3f coneDirection; // direction of the cone
+    private float cutOff; // cut off value
 
     public SpotLight(PointLight pointLight, Vector3f coneDirection, float cutOff) {
         this.pointLight = pointLight;

@@ -13,19 +13,26 @@ import java.util.List;
 
 public class SceneManager {
 
-    private List<Entity> entities;
-    private List<Terrain> terrains;
-    private static Texture defaultTexture;
+    private List<Entity> entities; // The list of entities.
+    private List<Terrain> terrains; // The list of terrains.
+    private static Texture defaultTexture; // The default texture.
 
-    private SpotLight[] spotLights;
-    private DirectionalLight directionalLight;
-    private PointLight[] pointLights;
-    private Vector3f ambientLight;
-    private float lightAngle;
-    private float spotAngle = 0;
-    private float spotInc = 1;
+    private SpotLight[] spotLights; // The spotlights.
+    private DirectionalLight directionalLight; // The directional light.
+    private PointLight[] pointLights; // The point lights.
+    private Vector3f ambientLight; // The ambient light.
+    private float lightAngle; // The light angle.
+    private float spotAngle = 0; // The spot angle.
+    private float spotInc = 1; // The spot increment.
 
-    private static float[][] heightMap;
+    private static float[][] heightMap; // The height map.
+
+    public SceneManager(float lightAngle) {
+        entities = new ArrayList<>();
+        terrains = new ArrayList<>();
+        ambientLight = Consts.AMBIENT_LIGHT;
+        this.lightAngle = lightAngle;
+    }
 
     public static float[][] getHeightMap() {
         return heightMap;
@@ -125,13 +132,6 @@ public class SceneManager {
 
     public void setSpotInc(float spotInc) {
         this.spotInc = spotInc;
-    }
-
-    public SceneManager(float lightAngle) {
-        entities = new ArrayList<>();
-        terrains = new ArrayList<>();
-        ambientLight = Consts.AMBIENT_LIGHT;
-        this.lightAngle = lightAngle;
     }
 
     public void setDefaultTexture(Texture defaultTexture) {
