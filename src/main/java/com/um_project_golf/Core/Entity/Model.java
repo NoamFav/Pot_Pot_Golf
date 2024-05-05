@@ -6,9 +6,9 @@ package com.um_project_golf.Core.Entity;
  */
 public class Model {
 
-    private final int id;
-    private final int vertexCount;
-    private Material material;
+    private final int id; // The id of the model.
+    private final int vertexCount; // The vertex count of the model.
+    private Material material; // The material of the model.
 
     /**
      * The constructor of the model.
@@ -88,7 +88,7 @@ public class Model {
      * @param reflectance The reflectance to set.
      */
     public void setTexture(Texture texture, float reflectance) {
-        this.material.setTexture(texture);
-        this.material.setReflectance(reflectance);
+        this.material.setTexture(texture); // Set the texture.
+        this.material.setReflectance(reflectance); // Set the reflectance.
     }
 }

@@ -15,9 +15,9 @@ import java.io.PrintStream;
  */
 public class Launcher {
 
-    private static final Logger log = LogManager.getLogger(Launcher.class);
-    private static WindowManager window;
-    private static GolfGame golfGame;
+    private static final Logger log = LogManager.getLogger(Launcher.class); // Logger for the Launcher class
+    private static WindowManager window; // The window manager of the game
+    private static GolfGame golfGame; // The game itself
 
     /**
      * The main method of the game.
@@ -26,15 +26,16 @@ public class Launcher {
      * @param args The arguments passed to the game.
      */
     public static void main(String[] args) {
-        System.out.println(Version.getVersion());
-        window = new WindowManager(Consts.Title, 0, 0, true);
-        golfGame = new GolfGame();
-        EngineManager engine = new EngineManager();
+        System.out.println(Version.getVersion()); // Print the version of LWJGL
+        window = new WindowManager(Consts.Title, 0, 0, true); // Create the window manager
+        golfGame = new GolfGame(); // Create the game
+        EngineManager engine = new EngineManager(); // Create the engine manager
 
-        try {
+        try { // Try to start the engine
             engine.start();
-        } catch (Exception e) {
-            e.printStackTrace(new PrintStream(System.err));
+        } catch (Exception e) { // If an exception is thrown, print the stack trace
+            // TODO:modify this to use the logger (not useful for debugging)
+            e.printStackTrace(new PrintStream(System.err)); // Print the stack trace
         }
     }
 

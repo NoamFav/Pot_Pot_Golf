@@ -7,10 +7,10 @@ import org.joml.Vector3f;
  * This class is responsible for the entities of the game.
  */
 public class Entity {
-    public Object getRotation;
-    private final Model model;
-    private final Vector3f pos, rotation;
-    private final float scale;
+    public Object getRotation; // get the rotation of the entity
+    private final Model model; // model of the entity
+    private final Vector3f pos, rotation; // position and rotation of the entity
+    private final float scale; // scale of the entity
 
     /**
      * The constructor of the entity.
@@ -36,7 +36,7 @@ public class Entity {
      * @param z The z-axis position.
      */
     public void increasePos(float x, float y, float z) {
-        this.pos.add(x, y, z);
+        this.pos.add(x, y, z); // add the x, y, and z values to the position
     }
 
     /**
@@ -47,7 +47,7 @@ public class Entity {
      * @param z The z-axis position.
      */
     public void setPos(float x, float y, float z) {
-        this.pos.set(x, y, z);
+        this.pos.set(x, y, z); // set the x, y, and z values to the position
     }
 
     /**
@@ -58,7 +58,7 @@ public class Entity {
      * @param z The z-axis rotation.
      */
     public void increaseRotation(float x, float y, float z) {
-        this.rotation.add(x, y, z);
+        this.rotation.add(x, y, z); // add the x, y, and z values to the rotation
     }
 
     /**
@@ -69,7 +69,7 @@ public class Entity {
      * @param z The z-axis rotation.
      */
     public void setRotation(float x, float y, float z) {
-        this.rotation.set(x, y, z);
+        this.rotation.set(x, y, z); // set the x, y, and z values to the rotation
     }
 
     public Model getModel() {

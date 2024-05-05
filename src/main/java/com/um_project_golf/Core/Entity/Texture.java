@@ -6,7 +6,7 @@ package com.um_project_golf.Core.Entity;
  */
 public class Texture {
 
-    private int id;
+    private int id; // The id of the texture.
 
     /**
      * The constructor of the texture.

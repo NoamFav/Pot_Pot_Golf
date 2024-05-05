@@ -8,7 +8,7 @@ import org.joml.Vector3f;
  */
 public class Camera {
 
-    private final Vector3f position, rotation;
+    private final Vector3f position, rotation; // The position and rotation of the camera.
 
     /**
      * The constructor of the camera.
@@ -39,14 +39,19 @@ public class Camera {
      * @param offsetZ The offset of the z-axis.
      */
     public void movePosition(float offsetX, float offsetY, float offsetZ) {
+        // Check if the camera is moving on the z-axis.
         if (offsetZ != 0) {
-            position.x += (float) Math.sin(Math.toRadians(rotation.y)) * -1.0f * offsetZ;
+            // Move on the z-axis based on the rotation of the camera. Using sin and cos to calculate the new position.
+            position.x += (float) Math.sin(Math.toRadians(rotation.y)) * -1.0f * offsetZ; // -1.0f is used to invert the direction of the camera.
             position.z += (float) Math.cos(Math.toRadians(rotation.y)) * offsetZ;
         }
+        // Check if the camera is moving on the x-axis.
         if (offsetX != 0) {
-            position.x += (float) Math.sin(Math.toRadians(rotation.y - 90)) * -1.0f * offsetX;
+            // Move on the x-axis based on the rotation of the camera. Using sin and cos to calculate the new position.
+            position.x += (float) Math.sin(Math.toRadians(rotation.y - 90)) * -1.0f * offsetX; // -1.0f is used to invert the direction of the camera.
             position.z += (float) Math.cos(Math.toRadians(rotation.y - 90)) * offsetX;
         }
+        // Offset the y-axis.
         position.y += offsetY;
     }
 
