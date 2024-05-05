@@ -11,15 +11,15 @@ import org.lwjgl.system.MemoryStack;
 import static org.lwjgl.nanovg.NanoVG.*;
 
 public class Button {
-    private final float x, y;  // Button position
-    private final float width, height;  // Button dimensions
-    private final String text;
-    private final Runnable action;  // Action to be performed when the button is clicked
-    private final long vg;  // NanoVG context
+    private float x, y;  // Button position
+    private float width, height;  // Button dimensions
+    private String text;
+    private Runnable action;  // Action to be performed when the button is clicked
+    private long vg;  // NanoVG context
 
     private final WindowManager window = Launcher.getWindow();
 
-    public Button(float x, float y, float width, float height, String text, Runnable action, long vg) {
+    public void createButton(float x, float y, float width, float height, String text, Runnable action, long vg) {
         this.x = x;
         this.y = y;
         this.width = width;

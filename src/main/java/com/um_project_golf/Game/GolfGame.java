@@ -60,6 +60,7 @@ public class GolfGame implements ILogic {
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
         heightMap = new HeightMap();
+        button = new Button();
     }
 
     /**
@@ -137,7 +138,7 @@ public class GolfGame implements ILogic {
         };
 
         // Initialize the button with the NanoVG context
-        button = new Button(100, 100, 500, 500, "Change Terrain", terrainChanger, vg);
+        button.createButton(100, 100, 500, 500, "Change Terrain", terrainChanger, vg);
 
 
 

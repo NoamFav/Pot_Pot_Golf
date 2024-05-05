@@ -52,8 +52,8 @@ public class SimplexNoise {
         double z0 = zin - Z0;
         // For the 3D case, the simplex shape is a slightly irregular tetrahedron.
         // Determine which simplex we are in.
-        int i1, j1, k1; // Offsets for second corner of simplex in (i,j,k) coords
-        int i2, j2, k2; // Offsets for third corner of simplex in (i,j,k) coords
+        int i1, j1, k1; // Offsets for the second corner of simplex in (i,j,k) coords
+        int i2, j2, k2; // Offsets for the third corner of simplex in (i,j,k) coords
         if (x0 >= y0) {
             if (y0 >= z0) { i1 = 1; j1 = 0; k1 = 0; i2 = 1; j2 = 1; k2 = 0; } // X Y Z order
             else if (x0 >= z0) { i1 = 1; j1 = 0; k1 = 0; i2 = 1; j2 = 0; k2 = 1; } // X Z Y order
@@ -63,10 +63,10 @@ public class SimplexNoise {
             else if (x0 < z0) { i1 = 0; j1 = 1; k1 = 0; i2 = 0; j2 = 1; k2 = 1; } // Y Z X order
             else { i1 = 0; j1 = 1; k1 = 0; i2 = 1; j2 = 1; k2 = 0; } // Y X Z order
         }
-        double x1 = x0 - i1 + G3; // Offsets for second corner in (x,y,z) coords
+        double x1 = x0 - i1 + G3; // Offsets for the second corner in (x,y,z) coords
         double y1 = y0 - j1 + G3;
         double z1 = z0 - k1 + G3;
-        double x2 = x0 - i2 + 2.0 * G3; // Offsets for third corner in (x,y,z) coords
+        double x2 = x0 - i2 + 2.0 * G3; // Offsets for the third corner in (x,y,z) coords
         double y2 = y0 - j2 + 2.0 * G3;
         double z2 = z0 - k2 + 2.0 * G3;
         double x3 = x0 - 1.0 + 3.0 * G3; // Offsets for last corner in (x,y,z) coords
