@@ -1,9 +1,19 @@
 package com.um_project_golf.Core.Entity.Terrain;
 
+/**
+ * The BlendMapTerrain class is used to store the textures of the terrain.
+ */
 public class BlendMapTerrain {
 
-    TerrainTexture background, RTexture, GTexture, BTexture;
+    TerrainTexture background, RTexture, GTexture, BTexture; // textures of the terrain
 
+    /**
+     * Create a new blend map terrain
+     * @param background The background texture
+     * @param rTexture The red texture
+     * @param gTexture The green texture
+     * @param bTexture The blue texture
+     */
     public BlendMapTerrain(TerrainTexture background, TerrainTexture rTexture, TerrainTexture gTexture, TerrainTexture bTexture) {
         this.background = background;
         this.RTexture = rTexture;

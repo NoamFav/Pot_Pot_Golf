@@ -2,12 +2,17 @@ package com.um_project_golf.Core.Entity.Terrain;
 
 import java.util.Random;
 
+/**
+ * The SimplexNoise class is used to generate the noise of the terrain.
+ */
 public class SimplexNoise {
 
+    // Gradient vectors for 3D
     private static final int[][] grad3 = {{1,1,0}, {-1,1,0}, {1,-1,0}, {-1,-1,0},
             {1,0,1}, {-1,0,1}, {1,0,-1}, {-1,0,-1},
             {0,1,1}, {0,-1,1}, {0,1,-1}, {0,-1,-1}};
 
+    // permutation table
     private static final int[] p = {151,160,137,91,90,15,
             131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
             190, 6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,
@@ -22,18 +27,38 @@ public class SimplexNoise {
             49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,
             138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180};
 
+    // Permutation table calculated from the above p[] table
     private static final int[] perm = new int[512];
     static { for (int i = 0; i < 512; i++) perm[i] = p[i & 255]; }
 
+    /**
+     * Calculates the floor of a double.
+     * @param x The double to calculate the floor of.
+     * @return The floor of the double.
+     */
     private static int fastFloor(double x) {
-        return x > 0 ? (int) x : (int) x - 1;
+        return x > 0 ? (int) x : (int) x - 1; // equivalent to Math.floor(x) but faster
     }
 
+    /**
+     * Calculates the dot product of the gradient and the coordinates.
+     * @param g The gradient vector.
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     * @param z The z coordinate.
+     * @return The dot product.
+     */
     private static double dot(int[] g, double x, double y, double z) {
         return g[0] * x + g[1] * y + g[2] * z;
     }
 
-    // 3D simplex noise
+    /**
+     * Generates a 3D simplex noise value.
+     * @param xin The x coordinate.
+     * @param yin The y coordinate.
+     * @param zin The z coordinate.
+     * @return The noise value.
+     */
     public static double noise(double xin, double yin, double zin) {
         double n0, n1, n2, n3; // Noise contributions from the four corners
         // Skew the input space to determine which simplex cell we're in
@@ -110,6 +135,13 @@ public class SimplexNoise {
         return 32.0 * (n0 + n1 + n2 + n3);
     }
 
+    /**
+     * Generates a 3D simplex noise value using multiple octaves.
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     * @param z The z coordinate.
+     * @return The noise value.
+     */
     public static double octaveSimplexNoise(double x, double y, double z, int octaves, double persistence, double amplitude) {
         double total = 0;
         double frequency = 1;
@@ -123,6 +155,10 @@ public class SimplexNoise {
         return total / maxValue;
     }
 
+    /**
+     * Shuffles the permutation table.
+     * Used to create a semi-random noise pattern.
+     */
     public static void shufflePermutation() {
         Random rand = new Random();
         for (int i = 0; i < p.length; i++) {
