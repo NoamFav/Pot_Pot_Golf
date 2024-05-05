@@ -43,9 +43,9 @@ public class HeightMap {
             for (int y = 0; y < height; y++) {
                 float heightValue = heightmap[x][y];
                 Color color;
-                float red = 2.5f + (float) (Math.random() * 5);
-                float green = 15 + (float) (Math.random() * 5);
-                float blue = 20 + (float) (Math.random() * 5);
+                float red = 2.5f + (float) (Math.random() * 2.5f);
+                float green = 15 + (float) (Math.random() * 2.5f);
+                float blue = 20 + (float) (Math.random() * 2.5f);
 
                 if (heightValue < red) {
                     color = Color.RED;
