@@ -3,6 +3,7 @@ package com.um_project_golf.Core.Rendering;
 import com.um_project_golf.Core.Camera;
 import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.Model;
+import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
@@ -25,8 +26,8 @@ import java.util.Map;
  */
 public class EntityRenderer implements IRenderer{
 
-    ShaderManager shader;
-    private final Map<Model, List<Entity>> entities;
+    ShaderManager shader; // The shader manager of the entity render.
+    private final Map<Model, List<Entity>> entities; // The entities to render.
 
     /**
      * The constructor of the entity render.
@@ -45,21 +46,21 @@ public class EntityRenderer implements IRenderer{
      */
     @Override
     public void init() throws Exception {
-        shader.createVertexShader(Utils.loadResource("/shaders/entity_vertex.glsl"));
-        shader.createFragmentShader(Utils.loadResource("/shaders/entity_fragment.glsl"));
-        shader.link();
+        shader.createVertexShader(Utils.loadResource("/shaders/entity_vertex.glsl")); // Load the vertex shader.
+        shader.createFragmentShader(Utils.loadResource("/shaders/entity_fragment.glsl")); // Load the fragment shader.
+        shader.link(); // Link the shaders.
 
-        shader.createUniform("textureSampler");
-        shader.createUniform("transformationMatrix");
-        shader.createUniform("projectionMatrix");
-        shader.createUniform("viewMatrix");
-        shader.createUniform("ambientLight");
-        shader.createMaterialUniform("material");
-        shader.createUniform("specularPower");
-        shader.createDirectionalLightUniform("directionalLight");
+        shader.createUniform("textureSampler"); // Create the texture sampler uniform.
+        shader.createUniform("transformationMatrix"); // Create the transformation matrix uniform.
+        shader.createUniform("projectionMatrix"); // Create the projection matrix uniform.
+        shader.createUniform("viewMatrix"); // Create the view matrix uniform.
+        shader.createUniform("ambientLight"); // Create the ambient light uniform.
+        shader.createMaterialUniform("material"); // Create the material uniform.
+        shader.createUniform("specularPower"); // Create the specular power uniform.
+        shader.createDirectionalLightUniform("directionalLight"); // Create the directional light uniform.
 
-        shader.createPointLightListUniform("pointLights", Consts.MAX_POINT_LIGHTS);
-        shader.createSpotLightListUniform("spotLights" , Consts.MAX_SPOT_LIGHTS);
+        shader.createPointLightListUniform("pointLights", Consts.MAX_POINT_LIGHTS); // Create the point light list uniform.
+        shader.createSpotLightListUniform("spotLights" , Consts.MAX_SPOT_LIGHTS); // Create the spotlight list uniform.
     }
 
     /**
@@ -72,20 +73,20 @@ public class EntityRenderer implements IRenderer{
      */
     @Override
     public void render(Camera camera, PointLight[] pointLights, SpotLight[] spotLights, DirectionalLight directionalLight) {
-        shader.bind();
-        shader.setUniform("projectionMatrix", Launcher.getWindow().updateProjectionMatrix());
-        RenderManager.renderLight(pointLights, spotLights, directionalLight, shader);
-        for(Model model : entities.keySet()) {
-            bind(model);
-            List<Entity> batch = entities.get(model);
-            for(Entity ent : batch) {
-                prepare(ent, camera);
-                GL11.glDrawElements(GL11.GL_TRIANGLES, ent.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+        shader.bind(); // Bind the shader.
+        shader.setUniform("projectionMatrix", Launcher.getWindow().updateProjectionMatrix()); // Update the projection matrix.
+        RenderManager.renderLight(pointLights, spotLights, directionalLight, shader); // Render the lights.
+        for(Model model : entities.keySet()) { // For each model in the entities.
+            bind(model); // Bind the model.
+            List<Entity> batch = entities.get(model); // Get the entities.
+            for(Entity ent : batch) { // For each entity in the batch.
+                prepare(ent, camera); // Prepare the entity.
+                GL11.glDrawElements(GL11.GL_TRIANGLES, ent.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0); // Draw the elements.
             }
-            unbind();
+            unbind(); // Unbind the model.
         }
-        entities.clear();
-        shader.unbind();
+        entities.clear(); // Clear the entities.
+        shader.unbind(); // Unbind the shader.
     }
 
     /**
@@ -93,7 +94,7 @@ public class EntityRenderer implements IRenderer{
      */
     @Override
     public void cleanup() {
-        shader.cleanup();
+        shader.cleanup(); // Clean up the shader for memory management.
     }
 
     /**
@@ -103,35 +104,39 @@ public class EntityRenderer implements IRenderer{
      */
     @Override
     public void bind(Model model) {
-        shader.setUniform("material", model.getMaterial());
+        shader.setUniform("material", model.getMaterial()); // Set the material uniform.
 
-        GL30.glBindVertexArray(model.getId());
+        GL30.glBindVertexArray(model.getId()); // Bind the vertex array.
 
-        GL20.glEnableVertexAttribArray(0);
-        GL20.glEnableVertexAttribArray(1);
-        GL20.glEnableVertexAttribArray(2);
+        GL20.glEnableVertexAttribArray(0); // Enable the vertex array.
+        GL20.glEnableVertexAttribArray(1); // Enable the texture array.
+        GL20.glEnableVertexAttribArray(2); // Enable the normal array.
 
-        if (model.getMaterial().isDisableCulling()) {
-            RenderManager.disableCulling();
-        } else {
-            RenderManager.enableCulling();
+        if (model.getMaterial().isDisableCulling()) { // If the material is set to disable culling.
+            RenderManager.disableCulling(); // Disable culling.
+        } else { // Otherwise.
+            RenderManager.enableCulling(); // Enable culling.
         }
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, model.getTexture().getId());
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        if (model.getTexture() == null) { // If the model has no texture.
+            model.setTexture(SceneManager.getDefaultTexture()); // Set the default texture.
+        }
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE0); // Activate the texture.
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, model.getTexture().getId()); // Bind the texture.
+        GL11.glEnable(GL11.GL_BLEND); // Enable blending.
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); // Set the blending function.
     }
 
     /**
      * Unbinds the model.
      */
     @Override
-    public void unbind() {
-        GL20.glDisableVertexAttribArray(0);
-        GL20.glDisableVertexAttribArray(1);
-        GL20.glDisableVertexAttribArray(2);
-        GL30.glBindVertexArray(0);
+    public void unbind() { // Unbind the model.
+        GL20.glDisableVertexAttribArray(0); // Disable the vertex array.
+        GL20.glDisableVertexAttribArray(1); // Disable the texture array.
+        GL20.glDisableVertexAttribArray(2); // Disable the normal array.
+        GL30.glBindVertexArray(0); // Unbind the vertex array.
     }
 
     /**
@@ -142,9 +147,9 @@ public class EntityRenderer implements IRenderer{
      */
     @Override
     public void prepare(Object entity, Camera camera) {
-        shader.setUniform("textureSampler", 0);
-        shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix((Entity) entity));
-        shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera));
+        shader.setUniform("textureSampler", 0); // Set the texture sampler.
+        shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix((Entity) entity)); // Set the transformation matrix.
+        shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera)); // Set the view matrix.
     }
 
     public Map<Model, List<Entity>> getEntities() {

@@ -20,10 +20,10 @@ import java.util.Map;
  */
 public class ShaderManager {
 
-    private final int programID;
-    private int vertexShaderID, fragmentShaderID;
+    private final int programID; // The ID of the program
+    private int vertexShaderID, fragmentShaderID; // The IDs of the shaders
 
-    private final Map<String, Integer> uniforms;
+    private final Map<String, Integer> uniforms; // The map of uniforms
 
     /**
      * The constructor of the shader manager.
@@ -32,12 +32,12 @@ public class ShaderManager {
      * @throws Exception If the shader could not be created.
      */
     public ShaderManager() throws Exception {
-        programID = GL20.glCreateProgram();
-        if (programID == 0) {
-            throw new Exception("Could not create Shader");
+        programID = GL20.glCreateProgram(); // Create the program
+        if (programID == 0) { // If the program could not be created
+            throw new Exception("Could not create Shader"); // Throw an exception
         }
 
-        uniforms = new HashMap<>();
+        uniforms = new HashMap<>(); // Initialize the uniforms
     }
 
     /**
@@ -47,11 +47,11 @@ public class ShaderManager {
      * @throws Exception If the uniform could not be created.
      */
     public void createUniform(String uniformName) throws Exception {
-        int uniformLocation = GL20.glGetUniformLocation(programID, uniformName);
-        if (uniformLocation < 0) {
-            throw new Exception("Could not find uniform: " + uniformName);
+        int uniformLocation = GL20.glGetUniformLocation(programID, uniformName); // Get the location of the uniform
+        if (uniformLocation < 0) { // If the location is invalid
+            throw new Exception("Could not find uniform: " + uniformName); // Throw an exception
         }
-        uniforms.put(uniformName, uniformLocation);
+        uniforms.put(uniformName, uniformLocation); // Add the uniform to the map of uniforms
     }
 
     /**
@@ -61,9 +61,10 @@ public class ShaderManager {
      * @throws Exception If the uniform could not be created.
      */
     public void createDirectionalLightUniform(String uniformName) throws Exception {
-        createUniform(uniformName + ".color");
-        createUniform(uniformName + ".direction");
-        createUniform(uniformName + ".intensity");
+        // For the uniform of the directional light
+        createUniform(uniformName + ".color"); // Create the color uniform
+        createUniform(uniformName + ".direction"); // Create the direction uniform
+        createUniform(uniformName + ".intensity"); // Create the intensity uniform
     }
 
     /**
@@ -73,12 +74,13 @@ public class ShaderManager {
      * @throws Exception If the uniform could not be created.
      */
     public void createPointLightUniform(String uniformName) throws Exception {
-        createUniform(uniformName + ".color");
-        createUniform(uniformName + ".position");
-        createUniform(uniformName + ".intensity");
-        createUniform(uniformName + ".constant");
-        createUniform(uniformName + ".linear");
-        createUniform(uniformName + ".exponent");
+        // For the uniform of the point light
+        createUniform(uniformName + ".color"); // Create the color uniform
+        createUniform(uniformName + ".position"); // Create the position uniform
+        createUniform(uniformName + ".intensity"); // Create the intensity uniform
+        createUniform(uniformName + ".constant"); // Create the constant uniform
+        createUniform(uniformName + ".linear"); // Create the linear uniform
+        createUniform(uniformName + ".exponent"); // Create the exponent uniform
     }
 
     /**
@@ -89,33 +91,34 @@ public class ShaderManager {
      * @throws Exception If the uniform could not be created.
      */
     public void createPointLightListUniform(String uniformName, int size) throws Exception {
-        for (int i = 0; i < size; i++) {
-            createPointLightUniform(uniformName + "[" + i + "]");
+        for (int i = 0; i < size; i++) { // For each point light
+            createPointLightUniform(uniformName + "[" + i + "]"); // Create the point light uniform
         }
     }
 
     /**
-     * Creates a spot light uniform.
+     * Creates a spotlight uniform.
      *
      * @param uniformName The name of the uniform.
      * @throws Exception If the uniform could not be created.
      */
     public void createSpotLightUniform(String uniformName) throws Exception {
-        createPointLightUniform(uniformName + ".pointLight");
-        createUniform(uniformName + ".coneDirection");
-        createUniform(uniformName + ".cutoff");
+        // For the uniform of the spotlight
+        createPointLightUniform(uniformName + ".pointLight"); // Create the point light uniform
+        createUniform(uniformName + ".coneDirection"); // Create the cone direction uniform
+        createUniform(uniformName + ".cutoff"); // Create the cutoff uniform
     }
 
     /**
-     * Creates a spot light list uniform.
+     * Creates a spotlight list uniform.
      *
      * @param uniformName The name of the uniform.
      * @param size The size of the uniform.
      * @throws Exception If the uniform could not be created.
      */
     public void createSpotLightListUniform(String uniformName, int size) throws Exception {
-        for (int i = 0; i < size; i++) {
-            createSpotLightUniform(uniformName + "[" + i + "]");
+        for (int i = 0; i < size; i++) { // For each spotlight
+            createSpotLightUniform(uniformName + "[" + i + "]"); // Create the spotlight uniform
         }
     }
 
@@ -126,11 +129,12 @@ public class ShaderManager {
      * @throws Exception If the uniform could not be created.
      */
     public void createMaterialUniform(String uniformName) throws Exception {
-        createUniform(uniformName + ".ambient");
-        createUniform(uniformName + ".diffuse");
-        createUniform(uniformName + ".specular");
-        createUniform(uniformName + ".hasTexture");
-        createUniform(uniformName + ".reflectance");
+        // For the uniform of the material
+        createUniform(uniformName + ".ambient"); // Create the ambient uniform
+        createUniform(uniformName + ".diffuse"); // Create the diffuse uniform
+        createUniform(uniformName + ".specular"); // Create the specular uniform
+        createUniform(uniformName + ".hasTexture"); // Create the has texture uniform
+        createUniform(uniformName + ".reflectance"); // Create the reflectance uniform
     }
 
     /**
@@ -140,8 +144,8 @@ public class ShaderManager {
      * @param value The value of the uniform.
      */
     public void setUniform(String uniformName, Matrix4f value) {
-        try(MemoryStack stack = MemoryStack.stackPush()) {
-            GL20.glUniformMatrix4fv(uniforms.get(uniformName), false, value.get(stack.mallocFloat(16)));
+        try(MemoryStack stack = MemoryStack.stackPush()) { // Try with resources
+            GL20.glUniformMatrix4fv(uniforms.get(uniformName), false, value.get(stack.mallocFloat(16))); // Set the uniform
         }
     }
 
@@ -152,7 +156,7 @@ public class ShaderManager {
      * @param value The value of the uniform.
      */
     public void setUniform(String uniformName, Vector4f value) {
-        GL20.glUniform4f(uniforms.get(uniformName), value.x, value.y, value.z, value.w);
+        GL20.glUniform4f(uniforms.get(uniformName), value.x, value.y, value.z, value.w); // Set the uniform
     }
 
     /**
@@ -162,7 +166,7 @@ public class ShaderManager {
      * @param value The value of the uniform.
      */
     public void setUniform(String uniformName, Vector3f value) {
-        GL20.glUniform3f(uniforms.get(uniformName), value.x, value.y, value.z);
+        GL20.glUniform3f(uniforms.get(uniformName), value.x, value.y, value.z); // Set the uniform
     }
 
     /**
@@ -172,7 +176,7 @@ public class ShaderManager {
      * @param value The value of the uniform.
      */
     public void setUniform(String uniformName, boolean value) {
-        GL20.glUniform1f(uniforms.get(uniformName), value ? 1 : 0);
+        GL20.glUniform1f(uniforms.get(uniformName), value ? 1 : 0); // Set the uniform
     }
 
     /**
@@ -182,7 +186,7 @@ public class ShaderManager {
      * @param value The value of the uniform.
      */
     public void setUniform(String uniformName, int value) {
-        GL20.glUniform1i(uniforms.get(uniformName), value);
+        GL20.glUniform1i(uniforms.get(uniformName), value); // Set the uniform
     }
 
     /**
@@ -192,7 +196,7 @@ public class ShaderManager {
      * @param value The value of the uniform.
      */
     public void setUniform(String uniformName, float value) {
-        GL20.glUniform1f(uniforms.get(uniformName), value);
+        GL20.glUniform1f(uniforms.get(uniformName), value); // Set the uniform
     }
 
     /**
@@ -202,11 +206,12 @@ public class ShaderManager {
      * @param material The material to set.
      */
     public void setUniform(String uniformName, Material material) {
-        setUniform(uniformName + ".ambient", material.getAmbientColor());
-        setUniform(uniformName + ".diffuse", material.getDiffuseColor());
-        setUniform(uniformName + ".specular", material.getSpecularColor());
-        setUniform(uniformName + ".hasTexture", material.hasTexture() ? 1 : 0);
-        setUniform(uniformName + ".reflectance", material.getReflectance());
+        // For the uniform of the material
+        setUniform(uniformName + ".ambient", material.getAmbientColor()); // Set the ambient color uniform
+        setUniform(uniformName + ".diffuse", material.getDiffuseColor()); // Set the diffuse color uniform
+        setUniform(uniformName + ".specular", material.getSpecularColor()); // Set the specular color uniform
+        setUniform(uniformName + ".hasTexture", material.hasTexture() ? 1 : 0); // Set the hasTexture uniform
+        setUniform(uniformName + ".reflectance", material.getReflectance()); // Set the reflectance uniform
     }
 
     /**
@@ -216,12 +221,13 @@ public class ShaderManager {
      * @param pointLight The point light to set.
      */
     public void setUniform(String uniformName, PointLight pointLight) {
-        setUniform(uniformName + ".color", pointLight.getColor());
-        setUniform(uniformName + ".position", pointLight.getPosition());
-        setUniform(uniformName + ".intensity", pointLight.getIntensity());
-        setUniform(uniformName + ".constant", pointLight.getConstant());
-        setUniform(uniformName + ".linear", pointLight.getLinear());
-        setUniform(uniformName + ".exponent", pointLight.getExponent());
+        // For the uniform of the point light
+        setUniform(uniformName + ".color", pointLight.getColor()); // Set the color uniform
+        setUniform(uniformName + ".position", pointLight.getPosition()); // Set the position uniform
+        setUniform(uniformName + ".intensity", pointLight.getIntensity()); // Set the intensity uniform
+        setUniform(uniformName + ".constant", pointLight.getConstant()); // Set the constant uniform
+        setUniform(uniformName + ".linear", pointLight.getLinear()); // Set the linear uniform
+        setUniform(uniformName + ".exponent", pointLight.getExponent()); // Set the exponent uniform
     }
 
     /**
@@ -231,33 +237,36 @@ public class ShaderManager {
      * @param directionalLight The directional light to set.
      */
     public void setUniform(String uniformName, DirectionalLight directionalLight) {
-        setUniform(uniformName + ".color", directionalLight.getColor());
-        setUniform(uniformName + ".direction", directionalLight.getDirection());
-        setUniform(uniformName + ".intensity", directionalLight.getIntensity());
+        // For the uniform of the directional light
+        setUniform(uniformName + ".color", directionalLight.getColor()); // Set the color uniform
+        setUniform(uniformName + ".direction", directionalLight.getDirection()); // Set the direction uniform
+        setUniform(uniformName + ".intensity", directionalLight.getIntensity()); // Set the intensity uniform
     }
 
     /**
-     * Sets the uniforms of a spot light.
+     * Sets the uniforms of a spotlight.
      *
      * @param uniformName The name of the uniform.
-     * @param spotLight The spot light to set.
+     * @param spotLight The spotlight to set.
      */
     public void setUniform(String uniformName, SpotLight spotLight) {
-        setUniform(uniformName + ".pointLight", spotLight.getPointLight());
-        setUniform(uniformName + ".coneDirection", spotLight.getConeDirection());
-        setUniform(uniformName + ".cutoff", spotLight.getCutOff());
+        // For the uniform of the spotlight
+        setUniform(uniformName + ".pointLight", spotLight.getPointLight()); // Set the point light uniform
+        setUniform(uniformName + ".coneDirection", spotLight.getConeDirection()); // Set the cone direction uniform
+        setUniform(uniformName + ".cutoff", spotLight.getCutOff()); // Set the cutoff uniform
     }
 
     /**
      * Sets the uniforms of a point light list.
-     * @param uniformName
-     * @param pointLights
+     * @param uniformName The name of the uniform.
+     * @param pointLights The point lights to set.
      */
     public void setUniform(String uniformName, PointLight[] pointLights) {
-        int numLights = pointLights != null ? pointLights.length : 0;
-        setUniform(uniformName + ".numLights", numLights);
-        for (int i = 0; i < numLights; i++) {
-            setUniform(uniformName, pointLights[i], i);
+        // For the uniform of the point light list
+        int numLights = pointLights != null ? pointLights.length : 0; // Get the number of point lights
+        setUniform(uniformName + ".numLights", numLights); // Set the number of point lights
+        for (int i = 0; i < numLights; i++) { // For each point light
+            setUniform(uniformName, pointLights[i], i); // Set the point light uniform
         }
     }
 
@@ -268,30 +277,31 @@ public class ShaderManager {
      * @param pos The position of the point light.
      */
     public void setUniform(String uniformName, PointLight pointLight, int pos) {
-        setUniform(uniformName + "[" + pos + "]", pointLight);
+        setUniform(uniformName + "[" + pos + "]", pointLight); // Set the point light uniform
     }
 
     /**
-     * Sets the uniforms of a spot light list.
+     * Sets the uniforms of a spotlight list.
      * @param uniformName The name of the uniform.
-     * @param spotLights The spot lights to set.
+     * @param spotLights The spotlights to set.
      */
     public void setUniform(String uniformName, SpotLight[] spotLights) {
-        int numLights = spotLights != null ? spotLights.length : 0;
-        setUniform(uniformName + ".numLights", numLights);
-        for (int i = 0; i < numLights; i++) {
-            setUniform(uniformName, spotLights[i], i);
+        // For the uniform of the spotlight list
+        int numLights = spotLights != null ? spotLights.length : 0; // Get the number of spotlights
+        setUniform(uniformName + ".numLights", numLights); // Set the number of spotlights
+        for (int i = 0; i < numLights; i++) { // For each spotlight
+            setUniform(uniformName, spotLights[i], i); // Set the spotlight uniform
         }
     }
 
     /**
-     * Sets the uniforms of a spot light.
+     * Sets the uniforms of a spotlight.
      * @param uniformName The name of the uniform.
-     * @param spotLight The spot light to set.
-     * @param pos The position of the spot light.
+     * @param spotLight The spotlight to set.
+     * @param pos The position of the spotlight.
      */
     public void setUniform(String uniformName, SpotLight spotLight, int pos) {
-        setUniform(uniformName + "[" + pos + "]", spotLight);
+        setUniform(uniformName + "[" + pos + "]", spotLight); // Set the spotlight uniform
     }
 
     /**
@@ -301,7 +311,7 @@ public class ShaderManager {
      * @throws Exception If the shader could not be created.
      */
     public void createVertexShader(String shaderCode) throws Exception {
-        vertexShaderID = createShader(shaderCode, GL20.GL_VERTEX_SHADER);
+        vertexShaderID = createShader(shaderCode, GL20.GL_VERTEX_SHADER); // Create the vertex shader
     }
 
     /**
@@ -311,7 +321,7 @@ public class ShaderManager {
      * @throws Exception If the shader could not be created.
      */
     public void createFragmentShader(String shaderCode) throws Exception {
-        fragmentShaderID = createShader(shaderCode, GL20.GL_FRAGMENT_SHADER);
+        fragmentShaderID = createShader(shaderCode, GL20.GL_FRAGMENT_SHADER); // Create the fragment shader
     }
 
     /**
@@ -323,19 +333,19 @@ public class ShaderManager {
      * @throws Exception If the shader could not be created.
      */
     public int createShader(String shaderCode, int type) throws Exception {
-        int shaderID = GL20.glCreateShader(type);
-        if (shaderID == 0) {
-            throw new Exception("Error creating shader. Type: " + type);
+        int shaderID = GL20.glCreateShader(type); // Create the shader
+        if (shaderID == 0) { // If the shader could not be created
+            throw new Exception("Error creating shader. Type: " + type); // Throw an exception
         }
 
-        GL20.glShaderSource(shaderID, shaderCode);
-        GL20.glCompileShader(shaderID);
+        GL20.glShaderSource(shaderID, shaderCode); // Set the source of the shader
+        GL20.glCompileShader(shaderID); // Compile the shader
 
-        if (GL20.glGetShaderi(shaderID, GL20.GL_COMPILE_STATUS) == 0) {
-            throw new Exception("Error compiling Shader code: " + GL20.glGetShaderInfoLog(shaderID, 1024));
+        if (GL20.glGetShaderi(shaderID, GL20.GL_COMPILE_STATUS) == 0) { // If the shader could not be compiled
+            throw new Exception("Error compiling Shader code: " + GL20.glGetShaderInfoLog(shaderID, 1024)); // Throw an exception
         }
 
-        GL20.glAttachShader(programID, shaderID);
+        GL20.glAttachShader(programID, shaderID); // Attach the shader to the program
 
         return shaderID;
     }
@@ -346,51 +356,51 @@ public class ShaderManager {
      * @throws Exception If the shader could not be linked.
      */
     public void link() throws Exception {
-        GL20.glLinkProgram(programID);
-        if (GL20.glGetProgrami(programID, GL20.GL_LINK_STATUS) == 0) {
-            throw new Exception("Error linking Shader code: " + GL20.glGetProgramInfoLog(programID, 1024));
+        GL20.glLinkProgram(programID); // Link the program
+        if (GL20.glGetProgrami(programID, GL20.GL_LINK_STATUS) == 0) { // If the program could not be linked
+            throw new Exception("Error linking Shader code: " + GL20.glGetProgramInfoLog(programID, 1024)); // Throw an exception
         }
 
-        if (vertexShaderID != 0) {
-            GL20.glDetachShader(programID, vertexShaderID);
+        if (vertexShaderID != 0) { // If the vertex shader is not null
+            GL20.glDetachShader(programID, vertexShaderID); // Detach the vertex shader
         }
 
-        if (fragmentShaderID != 0) {
-            GL20.glDetachShader(programID, fragmentShaderID);
+        if (fragmentShaderID != 0) { // If the fragment shader is not null
+            GL20.glDetachShader(programID, fragmentShaderID); // Detach the fragment shader
         }
 
-        int vaoID = GL30.glGenVertexArrays();
-        GL30.glBindVertexArray(vaoID);
+        int vaoID = GL30.glGenVertexArrays(); // Generate a vertex array object
+        GL30.glBindVertexArray(vaoID); // Bind the vertex array object
 
-        GL20.glValidateProgram(programID);
-        if (GL20.glGetProgrami(programID, GL20.GL_VALIDATE_STATUS) == 0) {
-            System.err.println("Warning validating Shader code: " + GL20.glGetProgramInfoLog(programID, 1024));
+        GL20.glValidateProgram(programID); // Validate the program
+        if (GL20.glGetProgrami(programID, GL20.GL_VALIDATE_STATUS) == 0) { // If the program could not be validated
+            System.err.println("Warning validating Shader code: " + GL20.glGetProgramInfoLog(programID, 1024)); // Print a warning
         }
 
-        GL30.glBindVertexArray(0);
+        GL30.glBindVertexArray(0); // Unbind the vertex array object
     }
 
     /**
      * Binds the shader.
      */
     public void bind() {
-        GL20.glUseProgram(programID);
+        GL20.glUseProgram(programID); // Use the program to render
     }
 
     /**
      * Unbinds the shader.
      */
     public void unbind() {
-        GL20.glUseProgram(0);
+        GL20.glUseProgram(0); // Stop using the program to render the scene
     }
 
     /**
      * Cleans up the shader.
      */
     public void cleanup() {
-        unbind();
-        if (programID != 0) {
-            GL20.glDeleteProgram(programID);
+        unbind(); // Unbind the shader
+        if (programID != 0) { // If the program is not null
+            GL20.glDeleteProgram(programID); // Delete the program
         }
     }
 }
