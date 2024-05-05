@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,12 +23,12 @@ import java.util.List;
  */
 public class RenderManager {
 
-    private static final Logger log = LogManager.getLogger(RenderManager.class);
+    private static final Logger log = LogManager.getLogger(RenderManager.class); // The logger of the render manager.
     private final WindowManager window;
     private EntityRenderer entityRenderer;
     private TerrainRenderer terrainRenderer;
 
-    private static boolean isCulling = false;
+    private static boolean isCulling = false; // If the culling is enabled.
 
     /**
      * The constructor of the render manager.
@@ -46,8 +47,8 @@ public class RenderManager {
         entityRenderer = new EntityRenderer();
         terrainRenderer = new TerrainRenderer();
 
-        entityRenderer.init();
-        terrainRenderer.init();
+        entityRenderer.init(); // Initialize the entity renderer.
+        terrainRenderer.init(); // Initialize the terrain renderer.
     }
 
     /**
@@ -59,20 +60,20 @@ public class RenderManager {
      * @param shader The shader of the game.
      */
     public static void renderLight(PointLight[] pointLights, SpotLight[] spotLights, DirectionalLight directionalLight, ShaderManager shader) {
-        shader.setUniform("ambientLight", Consts.AMBIENT_LIGHT);
-        shader.setUniform("specularPower", Consts.SPECULAR_POWER);
+        shader.setUniform("ambientLight", Consts.AMBIENT_LIGHT); // Set the ambient light.
+        shader.setUniform("specularPower", Consts.SPECULAR_POWER); // Set the specular power.
 
-        int numLights = pointLights != null ? pointLights.length : 0;
-        for (int i = 0 ; i < numLights; i++) {
-            shader.setUniform("pointLights[" + i + "]", pointLights[i]);
+        int numLights = pointLights != null ? pointLights.length : 0; // Get the number of point lights.
+        for (int i = 0 ; i < numLights; i++) { // For each point light.
+            shader.setUniform("pointLights[" + i + "]", pointLights[i]); // Set the point light uniform.
         }
 
-        numLights = spotLights != null ? spotLights.length : 0;
-        for (int i = 0 ; i < numLights; i++) {
-            shader.setUniform("spotLights[" + i + "]", spotLights[i]);
+        numLights = spotLights != null ? spotLights.length : 0; // Get the number of spotlights.
+        for (int i = 0 ; i < numLights; i++) { // For each spotlight.
+            shader.setUniform("spotLights[" + i + "]", spotLights[i]); // Set the spotlight uniform.
         }
 
-        shader.setUniform("directionalLight", directionalLight);
+        shader.setUniform("directionalLight", directionalLight); // Set the directional light.
     }
 
     /**
@@ -83,27 +84,27 @@ public class RenderManager {
      */
     public void render(Camera camera, SceneManager scene) {
 
-        if (window.isResized()) {
-            GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
-            window.setResized(true);
+        if (window.isResized()) { // If the window is resized.
+            GL11.glViewport(0, 0, window.getWidth(), window.getHeight()); // Set the viewport.
+            window.setResized(true); // Set the window as resized.
         }
 
-        entityRenderer.render(camera, scene.getPointLights(), scene.getSpotLights(), scene.getDirectionalLight());
-        terrainRenderer.render(camera,  scene.getPointLights(), scene.getSpotLights(), scene.getDirectionalLight());
+        entityRenderer.render(camera, scene.getPointLights(), scene.getSpotLights(), scene.getDirectionalLight()); // Render the entities.
+        terrainRenderer.render(camera,  scene.getPointLights(), scene.getSpotLights(), scene.getDirectionalLight()); // Render the terrain.
     }
 
     public static void enableCulling() {
-        if (!isCulling) {
-            GL11.glEnable(GL11.GL_CULL_FACE);
-            GL11.glCullFace(GL11.GL_BACK);
-            isCulling = true;
+        if (!isCulling) { // If culling is not enabled.
+            GL11.glEnable(GL11.GL_CULL_FACE); // Enable culling.
+            GL11.glCullFace(GL11.GL_BACK); // Cull the back face.
+            isCulling = true; // Set culling as enabled.
         }
     }
 
     public static void disableCulling() {
-        if (isCulling) {
-            GL11.glDisable(GL11.GL_CULL_FACE);
-            isCulling = false;
+        if (isCulling) { // If culling is enabled.
+            GL11.glDisable(GL11.GL_CULL_FACE); // Disable culling.
+            isCulling = false; // Set culling as disabled.
         }
     }
 
@@ -113,31 +114,31 @@ public class RenderManager {
      * @param entity The entity to process.
      */
     public void processEntity(Entity entity) {
-        List<Entity> batch = entityRenderer.getEntities().get(entity.getModel());
-        if (batch != null) {
-            batch.add(entity);
-        } else {
-            List<Entity> newBatch = new java.util.ArrayList<>();
-            newBatch.add(entity);
-            entityRenderer.getEntities().put(entity.getModel(), newBatch);
+        List<Entity> batch = entityRenderer.getEntities().get(entity.getModel()); // Get the batch.
+        if (batch != null) { // If the batch is not null.
+            batch.add(entity); // Add the entity to the batch.
+        } else { // If the batch is null.
+            List<Entity> newBatch = new ArrayList<>(); // Create a new batch.
+            newBatch.add(entity); // Add the entity to the new batch.
+            entityRenderer.getEntities().put(entity.getModel(), newBatch); // Put the new batch in the entities.
         }
     }
 
     public void processTerrain(Terrain terrain) {
-        terrainRenderer.getTerrain().add(terrain);
+        terrainRenderer.getTerrain().add(terrain); // Add the terrain to the terrain renderer.
     }
     /**
      * Clears the screen.
      */
     public void clear() {
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_STENCIL_BUFFER_BIT); // Clear the screen.
     }
 
     /**
      * Cleans up the render manager.
      */
     public void cleanup() {
-        entityRenderer.cleanup();
-        terrainRenderer.cleanup();
+        entityRenderer.cleanup(); // Clean up the entity renderer.
+        terrainRenderer.cleanup(); // Clean up the terrain renderer.
     }
 }

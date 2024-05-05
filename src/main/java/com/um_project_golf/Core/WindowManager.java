@@ -14,14 +14,14 @@ import org.lwjgl.system.MemoryUtil;
  * This class is responsible for creating and managing the window of the game.
  */
 public class WindowManager {
-    private final String title;
+    private final String title; // The title of the window.
 
-    private int width, height;
-    private long window;
+    private int width, height; // The width and height of the window.
+    private long window; // The window of the window manager.
 
-    private boolean resized, vSync;
+    private boolean resized, vSync, antiAliasing; // The resized, vSync and antiAliasing of the window.
 
-    private final Matrix4f projectionMatrix;
+    private final Matrix4f projectionMatrix; // The projection matrix of the window manager.
 
     /**
      * The constructor of the window manager.
@@ -46,69 +46,73 @@ public class WindowManager {
      * It creates the window and sets the window hints.
      */
     public void init() {
-        GLFWErrorCallback.createPrint(System.err).set();
+        GLFWErrorCallback.createPrint(System.err).set(); // Set the error callback.
 
-        if (!GLFW.glfwInit()) {
-            throw new IllegalStateException("Unable to initialize GLFW");
+        if (!GLFW.glfwInit()) { // If GLFW is unable to initialize
+            throw new IllegalStateException("Unable to initialize GLFW"); // Throw an exception.
         }
-        GLFW.glfwDefaultWindowHints();
-        GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
-        GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
-        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
-        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 2);
-        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
-        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_TRUE);
+        GLFW.glfwDefaultWindowHints(); // Set the default window hints.
+        GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE); // Set the window hint to not visible.
+        GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE); // Set the window hint to resizable.
+        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3); // Set the window hint to the major version of the context.
+        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 2); // Set the window hint to the minor version of the context.
+        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE); // Set the window hint to the OpenGL profile.
+        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_TRUE); // Set the window hint to the OpenGL forward compatibility.
 
-        boolean maximized = false;
-        if (width == 0 || height == 0) {
-            maximized = true;
-            width = 1920;
-            height = 1080;
-            GLFW.glfwWindowHint(GLFW.GLFW_MAXIMIZED, GLFW.GLFW_TRUE);
-        }
-
-        window = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
-        if (window == MemoryUtil.NULL) {
-            throw new RuntimeException("Failed to create the GLFW window");
+        boolean maximized = false; // Set the maximized to false.
+        if (width == 0 || height == 0) { // If the width or height is 0
+            maximized = true; // Set the maximized to true.
+            width = 1920; // Set the width to 1920.
+            height = 1080; // Set the height to 1080.
+            GLFW.glfwWindowHint(GLFW.GLFW_MAXIMIZED, GLFW.GLFW_TRUE); // Set the window hint to maximized.
         }
 
-        GLFW.glfwSetFramebufferSizeCallback(window, (window, width, height) -> {
-            this.width = width;
-            this.height = height;
-            this.setResized(true);
+        if (antiAliasing) { // If the antiAliasing is enabled
+            GLFW.glfwWindowHint(GLFW.GLFW_SAMPLES, 4); // Set the window hint to 4 samples.
+        }
+
+        window = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL); // Create the GLFW window.
+        if (window == MemoryUtil.NULL) { // If the window is null
+            throw new RuntimeException("Failed to create the GLFW window"); // Throw a runtime exception.
+        }
+
+        GLFW.glfwSetFramebufferSizeCallback(window, (window, width, height) -> { // Set the framebuffer size callback.
+            this.width = width; // Set the width to the width.
+            this.height = height; // Set the height to the height.
+            this.setResized(true); // Set the resized to true.
         });
 
-        GLFW.glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
-            if (key == GLFW.GLFW_KEY_ESCAPE && action == GLFW.GLFW_RELEASE) {
-                GLFW.glfwSetWindowShouldClose(window, true);
+        GLFW.glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> { // Set the key callback.
+            if (key == GLFW.GLFW_KEY_ESCAPE && action == GLFW.GLFW_RELEASE) { // If the key is escape and the action is release
+                GLFW.glfwSetWindowShouldClose(window, true); // Set the window should close to true.
             }
         });
 
-        if (maximized) {
-            GLFW.glfwMaximizeWindow(window);
+        if (maximized) { // If the window is maximized
+            GLFW.glfwMaximizeWindow(window); // Maximize the window.
         } else {
-            GLFWVidMode vid_mode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
-            GLFW.glfwSetWindowPos(window, ((vid_mode != null ? vid_mode.width() : 0) - width) / 2, ((vid_mode != null ? vid_mode.height() : 0) - height) / 2);
+            GLFWVidMode vid_mode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor()); // Get the video mode.
+            GLFW.glfwSetWindowPos(window, ((vid_mode != null ? vid_mode.width() : 0) - width) / 2, ((vid_mode != null ? vid_mode.height() : 0) - height) / 2); // Set the window position.
         }
         
-        GLFW.glfwMakeContextCurrent(window);
+        GLFW.glfwMakeContextCurrent(window); // Make the context current.
 
-        if (isvSync()) {
-            GLFW.glfwSwapInterval(1);
+        if (isvSync()) { // If the vSync is enabled
+            GLFW.glfwSwapInterval(1); // Swap the interval to 1.
         }
 
-        GLFW.glfwShowWindow(window);
-        GLFW.glfwFocusWindow(window);
 
-        GL.createCapabilities();
+        GLFW.glfwShowWindow(window); // Show the window.
+        GLFW.glfwFocusWindow(window); // Focus the window.
 
+        GL.createCapabilities(); // Create the capabilities.
 
-        GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glEnable(GL11.GL_STENCIL_TEST);
-        GL11.glFrontFace(GL11.GL_CCW);
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        GL11.glCullFace(GL11.GL_BACK);
+        GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Set the clear color.
+        GL11.glEnable(GL11.GL_DEPTH_TEST); // Enable the depth test.
+        GL11.glEnable(GL11.GL_STENCIL_TEST); // Enable the stencil test.
+        GL11.glFrontFace(GL11.GL_CCW); // Set the front face to counter-clockwise.
+        GL11.glEnable(GL11.GL_CULL_FACE); // Enable the cull face. (Back face culling)
+        GL11.glCullFace(GL11.GL_BACK); // Set the cull face to back. (Back face culling)
     }
 
     /**
@@ -116,8 +120,8 @@ public class WindowManager {
      * It swaps the buffers and polls the events.
      */
     public void update() {
-        GLFW.glfwSwapBuffers(window);
-        GLFW.glfwPollEvents();
+        GLFW.glfwSwapBuffers(window); // Swap the buffers. (Double buffering)
+        GLFW.glfwPollEvents(); // Poll the events. (Keyboard, mouse, etc.)
     }
 
     /**
@@ -125,8 +129,8 @@ public class WindowManager {
      * It destroys the window and terminates GLFW.
      */
     public void cleanup() {
-        GLFW.glfwDestroyWindow(window);
-        GLFW.glfwTerminate();
+        GLFW.glfwDestroyWindow(window); // Destroy the window.
+        GLFW.glfwTerminate(); // Terminate GLFW. (Free the resources)
     }
 
     /**
@@ -138,7 +142,7 @@ public class WindowManager {
      * @param alpha The alpha color.
      */
     public void setClearColor(float r, float g, float b, float alpha) {
-        GL11.glClearColor(r, g, b, alpha);
+        GL11.glClearColor(r, g, b, alpha); // Set the clear color.
     }
 
     /**
@@ -148,7 +152,7 @@ public class WindowManager {
      * @return True if the key is pressed, false otherwise.
      */
     public boolean is_keyPressed(int keyCode) {
-        return GLFW.glfwGetKey(window, keyCode) == GLFW.GLFW_PRESS;
+        return GLFW.glfwGetKey(window, keyCode) == GLFW.GLFW_PRESS; // Get the key and check if it is pressed.
     }
 
     /**
@@ -157,7 +161,7 @@ public class WindowManager {
      * @return True if the window should close, false otherwise.
      */
     public boolean windowShouldClose() {
-        return GLFW.glfwWindowShouldClose(window);
+        return GLFW.glfwWindowShouldClose(window); // Check if the window should close.
     }
 
     /**
@@ -250,14 +254,22 @@ public class WindowManager {
         return projectionMatrix;
     }
 
+    public boolean isAntiAliasing() {
+        return antiAliasing;
+    }
+
+    public void setAntiAliasing(boolean antiAliasing) {
+        this.antiAliasing = antiAliasing;
+    }
+
     /**
      * Updates the projection matrix of the window manager.
      *
      * @return The updated projection matrix.
      */
     public Matrix4f updateProjectionMatrix() {
-        float aspectRatio = (float) width / (float) height;
-        return projectionMatrix.setPerspective(Consts.FOV, aspectRatio, Consts.Z_NEAR, Consts.Z_FAR);
+        float aspectRatio = (float) width / (float) height; // Calculate the aspect ratio.
+        return projectionMatrix.setPerspective(Consts.FOV, aspectRatio, Consts.Z_NEAR, Consts.Z_FAR); // Set the perspective.
     }
 
     /**
@@ -267,7 +279,7 @@ public class WindowManager {
      * @return The updated projection matrix.
      */
     public Matrix4f updateProjectionMatrix(Matrix4f matrix, int width, int height) {
-        float aspectRatio = (float) width / (float) height;
-        return matrix.setPerspective(Consts.FOV, aspectRatio, Consts.Z_NEAR, Consts.Z_FAR);
+        float aspectRatio = (float) width / (float) height; // Calculate the aspect ratio.
+        return matrix.setPerspective(Consts.FOV, aspectRatio, Consts.Z_NEAR, Consts.Z_FAR); // Set the perspective.
     }
 }

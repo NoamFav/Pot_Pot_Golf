@@ -9,10 +9,13 @@ import org.joml.Vector4f;
  */
 public class Material {
 
-    private Vector4f ambientColor, diffuseColor, specularColor;
-    private float reflectance;
-    private Texture texture;
-    private boolean disableCulling;
+
+    private Vector4f ambientColor; // ambient color of the material (color of the material in the shadow)
+    private Vector4f diffuseColor; // diffuse color of the material (color of the material in the light)
+    private Vector4f specularColor; // specular color of the material (color of the material in the reflection)
+    private float reflectance; // reflectance of the material (how much light is reflected)
+    private Texture texture; // texture of the material
+    private boolean disableCulling; // disable culling
 
     /**
      * The constructor of the material.
@@ -22,9 +25,9 @@ public class Material {
         this.ambientColor = Consts.DEFAULT_COLOR;
         this.diffuseColor = Consts.DEFAULT_COLOR;
         this.specularColor = Consts.DEFAULT_COLOR;
-        this.texture = null;
-        this.reflectance = 0;
-        this.disableCulling = false;
+        this.texture = null; // no texture
+        this.reflectance = 0; // no reflectance
+        this.disableCulling = false; // enable culling
     }
 
     /**
@@ -55,7 +58,7 @@ public class Material {
      * @param texture The texture of the material.
      */
     public Material(Texture texture, float reflectance) {
-        this(Consts.DEFAULT_COLOR, Consts.DEFAULT_COLOR, Consts.DEFAULT_COLOR, reflectance, texture);
+        this(Consts.DEFAULT_COLOR, Consts.DEFAULT_COLOR, Consts.DEFAULT_COLOR, reflectance, texture); // default color
     }
 
     /**

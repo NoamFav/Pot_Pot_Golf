@@ -22,7 +22,7 @@ import java.util.Scanner;
  */
 public class Utils {
 
-    private static final Logger log = LogManager.getLogger(Utils.class);
+    private static final Logger log = LogManager.getLogger(Utils.class); // The logger
 
     /**
      * Stores data in a float buffer.
@@ -31,9 +31,9 @@ public class Utils {
      * @return The float buffer.
      */
     public static FloatBuffer storeDataInFloatBuffer(float[] data) {
-        FloatBuffer buffer = MemoryUtil.memAllocFloat(data.length);
-        buffer.put(data).flip();
-        return buffer;
+        FloatBuffer buffer = MemoryUtil.memAllocFloat(data.length); // Allocate memory for the float buffer
+        buffer.put(data).flip(); // Put the data into the buffer and flip it
+        return buffer; // Return the buffer
     }
 
     /**
@@ -43,9 +43,9 @@ public class Utils {
      * @return The int buffer.
      */
     public static IntBuffer storeDataInIntBuffer(int[] data) {
-        IntBuffer buffer = MemoryUtil.memAllocInt(data.length);
-        buffer.put(data).flip();
-        return buffer;
+        IntBuffer buffer = MemoryUtil.memAllocInt(data.length); // Allocate memory for the int buffer
+        buffer.put(data).flip(); // Put the data into the buffer and flip it
+        return buffer; // Return the buffer
     }
 
     /**
@@ -55,15 +55,15 @@ public class Utils {
      * @return The resource loaded.
      */
     public static String loadResource(String fileName) {
-        String result;
-        InputStream in = Utils.class.getResourceAsStream(fileName);
-        if (in == null) {
-            throw new RuntimeException("Resource not found: " + fileName);
+        String result; // The result
+        InputStream in = Utils.class.getResourceAsStream(fileName); // Get the input stream
+        if (in == null) { // If the input stream is null
+            throw new RuntimeException("Resource not found: " + fileName); // Throw a new runtime exception
         }
-        try (Scanner scanner = new Scanner(in, StandardCharsets.UTF_8)) {
-            result = scanner.useDelimiter("\\A").next();
+        try (Scanner scanner = new Scanner(in, StandardCharsets.UTF_8)) { // Try with resources
+            result = scanner.useDelimiter("\\A").next(); // Get the result
         }
-        return result;
+        return result; // Return the result
     }
 
     /**
@@ -73,15 +73,15 @@ public class Utils {
      * @return The lines read.
      */
     public static List<String> readAllLines(String fileName) {
-        List<String> list = new ArrayList<>();
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(Class.forName(Utils.class.getName()).getResourceAsStream(fileName))))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                list.add(line);
+        List<String> list = new ArrayList<>(); // Initialize a new list
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(Class.forName(Utils.class.getName()).getResourceAsStream(fileName))))) { // Try with resources
+            String line; // The line
+            while ((line = reader.readLine()) != null) { // While the line is not null
+                list.add(line); // Add the line to the list
             }
-        } catch (IOException | ClassNotFoundException e) {
-            log.error("An error occurred", e);
+        } catch (IOException | ClassNotFoundException e) { // Catch any exceptions
+            log.error("An error occurred", e); // Log the error
         }
-        return list;
+        return list; // Return the list
     }
 }
