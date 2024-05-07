@@ -43,6 +43,8 @@ public class GolfGame implements ILogic {
     private Terrain terrain;
     private final HeightMap heightMap;
 
+    private Entity ball;
+
     Vector3f cameraInc;
     private boolean canMove = true;
     private boolean isJumping = false;
@@ -83,14 +85,17 @@ public class GolfGame implements ILogic {
         Model tree = loader.loadAssimpModel("src/main/resources/Models/tree/Tree.obj");
         Model wolf = loader.loadAssimpModel("src/main/resources/Models/Wolf_dae/wolf.dae");
         Model skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
+        Model ballModel = loader.loadAssimpModel("src/main/resources/Models/GolfBall/GolfballOBJ.obj");
         //cube.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block_TEX.png")), 1f);
         //skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull/Skull.jpg")), 1f);
         tree.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/tree/Tree.jpg")), 1f);
         wolf.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Wolf_dae/Material__wolf_col_tga_diffuse.jpeg.001.jpg")), 1f);
         skyBox.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skybox/DayLight.png")), 1f);
+        ballModel.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/GolfBall/GolfBallUnwrap.jpg")), 1f);
         tree.getMaterial().setDisableCulling(true);
         wolf.getMaterial().setDisableCulling(true);
         skyBox.getMaterial().setDisableCulling(true);
+        ballModel.getMaterial().setDisableCulling(true);
 
         TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("Texture/rock.png"));
         TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("Texture/sand.png"));
@@ -111,8 +116,10 @@ public class GolfGame implements ILogic {
         createTrees(tree);
 
         scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
+        ball = new Entity(ballModel, new Vector3f(0,  10, 0), new Vector3f(0, 0, 0), 10);
 
         scene.addEntity(new Entity(wolf, new Vector3f(0, terrain.getHeight(0,0), 0), new Vector3f(45, 0 , 0), 10 ));
+        scene.addEntity(ball);
         //scene.addEntity(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
 
         //GUI
@@ -194,19 +201,28 @@ public class GolfGame implements ILogic {
             cameraInc.x = moveSpeed;
         }
         if(window.is_keyPressed(GLFW.GLFW_KEY_SPACE)) {
-            cameraInc.y = Consts.JUMP_FORCE / EngineManager.getFps();
+            cameraInc.y = Consts.JUMP_FORCE;
             isJumping = true;
         }
         if(window.is_keyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
             cameraInc.y = -Consts.JUMP_FORCE / EngineManager.getFps();
         }
 
+        int id = scene.getEntities().indexOf(ball);
+        if (window.is_keyPressed(GLFW.GLFW_KEY_UP)) {
+            scene.getEntities().get(id).increasePos(0, 0, -0.1f);
+        }
+        if (window.is_keyPressed(GLFW.GLFW_KEY_DOWN)) {
+            scene.getEntities().get(id).increasePos(0, 0, 0.1f);
+        }
         if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
-            scene.getPointLights()[0].getPosition().x += 0.1f;
+            scene.getEntities().get(id).increasePos(-0.1f, 0, 0);
         }
         if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT)) {
-            scene.getPointLights()[0].getPosition().x -= 0.1f;
+            scene.getEntities().get(id).increasePos(0.1f, 0, 0);
         }
+        scene.getEntities().get(id).increaseRotation(0, 1, 0);
+
 
 //        if (window.is_keyPressed(GLFW.GLFW_KEY_I)) {
 //            scene.getSpotLights()[0].getPointLight().getPosition().z = lightPos + 0.1f;

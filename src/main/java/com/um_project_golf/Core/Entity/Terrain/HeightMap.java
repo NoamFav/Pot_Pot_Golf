@@ -57,7 +57,7 @@ public class HeightMap {
                 Color color; // Create a new color
                 float red = 2.5f + (float) (Math.random() * 2.5f); // Generate a random red value
                 float green = 15 + (float) (Math.random() * 2.5f); // Generate a random green value
-                float blue = 20 + (float) (Math.random() * 2.5f); // Generate a random blue value
+                float blue = 22.5f + (float) (Math.random() * 2.5f); // Generate a random blue value
 
                 if (heightValue < red) { // Check if the height value is less than the red value
                     color = Color.RED; // Set the color to red
