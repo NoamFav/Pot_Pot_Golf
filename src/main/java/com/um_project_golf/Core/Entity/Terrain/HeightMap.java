@@ -55,19 +55,29 @@ public class HeightMap {
             for (int y = 0; y < height; y++) { // Loop through the heightmap
                 float heightValue = heightmap[x][y]; // Get the height value of the vertex
                 Color color; // Create a new color
-                float red = 2.5f + (float) (Math.random() * 2.5f); // Generate a random red value
-                float green = 15 + (float) (Math.random() * 2.5f); // Generate a random green value
-                float blue = 22.5f + (float) (Math.random() * 2.5f); // Generate a random blue value
-
-                if (heightValue < red) { // Check if the height value is less than the red value
+                float sand = 2.5f + (float) (Math.random() * 2.5f); // Generate a random red value
+                float grass = 7 + (float) (Math.random() * 2.5f); // Generate a random green value
+                float fairway = 12 + (float) (Math.random() * 2.5f); // Generate a random blue value
+                float dryGrass = 17 + (float) (Math.random() * 2.5f); // Generate a random blue value
+                float mold = 20 + (float) (Math.random() * 2.5f); // Generate a random blue value
+                float rock = 22 + (float) (Math.random() * 2.5f); // Generate a random blue value
+                if (heightValue < sand) { // If the height value is less than the sand value
                     color = Color.RED; // Set the color to red
-                } else if (heightValue >= red && heightValue < green) { // Check if the height value is greater than or equal to the red value and less than the green value
-                    color = Color.GREEN; // Set the color to green
-                } else if (heightValue >= green && heightValue < blue) { // Check if the height value is greater than or equal to the green value and less than the blue value
-                    color = Color.BLUE; // Set the color to blue
-                } else { // Otherwise
-                    color = Color.BLACK; // Set the color to black
+                } else if (heightValue < grass) { // If the height value is less than the grass value
+                    color = Color.GREEN; // Set the color to blue
+                } else if (heightValue < fairway) { // If the height value is less than the fairway value
+                    color = Color.BLUE; // Set the color to green
+                } else if (heightValue < dryGrass) { // If the height value is less than the dry grass value
+                    color = new Color(255, 255, 0); // Set the color to yellow
+                } else if (heightValue < mold) { // If the height value is less than the rock value
+                    color = new Color(0, 255, 255); // Set the color to cyan
+                } else if (heightValue < rock){ // If the height value is greater than the rock value
+                    color = new Color(255,0, 255); // Set the color to black
+                } else {
+                    color = Color.BLACK; // Set the color to white
                 }
+
+
                 image.setRGB(x, y, color.getRGB()); // Set the color of the pixel in the image
             }
         }

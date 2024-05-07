@@ -95,21 +95,39 @@ public class GolfGame implements ILogic {
         skyBox.getMaterial().setDisableCulling(true);
         ball.getMaterial().setDisableCulling(true);
 
-        TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("Texture/rock.png"));
-        TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("Texture/sand.png"));
-        TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("Texture/grass.png"));
-        TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("Texture/dryGrass.png"));
+        TerrainTexture rock = new TerrainTexture(loader.loadTexture("Texture/rock.png"));
+        TerrainTexture sand = new TerrainTexture(loader.loadTexture("Texture/sand.png"));
+        TerrainTexture grass = new TerrainTexture(loader.loadTexture("Texture/grass.png"));
+        TerrainTexture dryGrass = new TerrainTexture(loader.loadTexture("Texture/dryGrass.png"));
+        TerrainTexture fairway = new TerrainTexture(loader.loadTexture("Texture/fairway.png"));
+        TerrainTexture snow = new TerrainTexture(loader.loadTexture("Texture/snow.png"));
+        TerrainTexture mold = new TerrainTexture(loader.loadTexture("Texture/mold.png"));
         TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
-        TerrainTexture blue = new TerrainTexture(loader.loadTexture("Texture/water.png"));
+        TerrainTexture water = new TerrainTexture(loader.loadTexture("Texture/water.png"));
 
-        BlendMapTerrain blendMapTerrain = new BlendMapTerrain(backgroundTexture, rTexture, gTexture, bTexture);
-        BlendMapTerrain blueTerrain = new BlendMapTerrain(blue, blue, blue, blue);
+        List<TerrainTexture> textures = new ArrayList<>();
+        textures.add(sand);
+        textures.add(grass);
+        textures.add(fairway);
+        textures.add(dryGrass);
+        textures.add(mold);
+        textures.add(rock);
+        textures.add(snow);
+
+
+        BlendMapTerrain blendMapTerrain = new BlendMapTerrain(textures);
+
+        List<TerrainTexture> waterTextures = new ArrayList<>();
+        for (TerrainTexture texture : textures) {
+            waterTextures.add(water);
+        }
+        BlendMapTerrain blueTerrain = new BlendMapTerrain(waterTextures);
 
         terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap, false);
-        Terrain water = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blueTerrain, blendMap, true);
+        Terrain ocean = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blueTerrain, blendMap, true);
         scene.addTerrain(terrain);
-        scene.addTerrain(water);
-        water.getModel().getMaterial().setDisableCulling(true);
+        scene.addTerrain(ocean);
+        ocean.getModel().getMaterial().setDisableCulling(true);
 
         createTrees(tree);
 
@@ -126,9 +144,11 @@ public class GolfGame implements ILogic {
                 heightMap.createHeightMap();
                 TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
                 scene.getTerrains().remove(terrain);
+                scene.getTerrains().remove(ocean);
                 SimplexNoise.shufflePermutation();
                 terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap2, false);
                 scene.addTerrain(terrain);
+                scene.addTerrain(ocean);
                 scene.getEntities().removeIf(entity -> entity.getModel().equals(tree));
                 try {
                     createTrees(tree);
@@ -204,13 +224,13 @@ public class GolfGame implements ILogic {
         if(window.is_keyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
             cameraInc.y = -Consts.JUMP_FORCE / EngineManager.getFps();
         }
-
-        if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
-            scene.getPointLights()[0].getPosition().x += 0.1f;
-        }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT)) {
-            scene.getPointLights()[0].getPosition().x -= 0.1f;
-        }
+//
+//        if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
+//            scene.getPointLights()[0].getPosition().x += 0.1f;
+//        }
+//        if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT)) {
+//            scene.getPointLights()[0].getPosition().x -= 0.1f;
+       // }
 
 //        if (window.is_keyPressed(GLFW.GLFW_KEY_I)) {
 //            scene.getSpotLights()[0].getPointLight().getPosition().z = lightPos + 0.1f;
@@ -381,12 +401,11 @@ public class GolfGame implements ILogic {
                 }
             }
         }
-
         Random rnd = new Random();
-        for (int i = 0; i < Math.max(Consts.SIZE_X, Consts.SIZE_Z) * 0.9; i++) {
-            Vector3f position = positions.get(rnd.nextInt(positions.size()));
-            scene.addEntity(new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f));
-        }
+//        for (int i = 0; i < Math.max(Consts.SIZE_X, Consts.SIZE_Z) * 0.9; i++) {
+//            Vector3f position = positions.get(rnd.nextInt(positions.size()));
+//            scene.addEntity(new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f));
+//        }
     }
 
     /**

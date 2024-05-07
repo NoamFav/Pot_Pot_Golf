@@ -45,10 +45,9 @@ public class TerrainRenderer implements IRenderer{
         shader.createFragmentShader(Utils.loadResource("/shaders/terrain_fragment.glsl")); // Loads the fragment shader.
         shader.link(); // Links the shader.
 
-        shader.createUniform("backgroundTexture"); // Creates the uniform for the background texture.
-        shader.createUniform("RTexture"); // Creates the uniform for the red texture.
-        shader.createUniform("GTexture"); // Creates the uniform for the green texture.
-        shader.createUniform("BTexture"); // Creates the uniform for the blue texture.
+        for (int i = 0; i < Consts.MAX_TEXTURES; i++) {
+            shader.createUniform("textures[" + i + "]");
+        } // Creates the uniform for the textures.
         shader.createUniform("blendMap"); // Creates the uniform for the blend map.
         shader.createUniform("transformationMatrix"); // Creates the uniform for the transformation matrix.
         shader.createUniform("projectionMatrix"); // Creates the uniform for the projection matrix.
@@ -108,11 +107,10 @@ public class TerrainRenderer implements IRenderer{
 
 
 
-        shader.setUniform("backgroundTexture", 0); // Sets the background texture.
-        shader.setUniform("RTexture", 1); // Sets the red texture.
-        shader.setUniform("GTexture", 2); // Sets the green texture.
-        shader.setUniform("BTexture", 3); // Sets the blue texture.
-        shader.setUniform("blendMap", 4); // Sets the blend map.
+        for (int i = 0; i < Consts.MAX_TEXTURES; i++) { // For each texture
+            shader.setUniform("textures[" + i + "]", i); // Sets the texture
+        }
+        shader.setUniform("blendMap", Consts.MAX_TEXTURES); // Sets the blend map.
         shader.setUniform("material", model.getMaterial()); // Sets the material.
 
 
@@ -140,19 +138,12 @@ public class TerrainRenderer implements IRenderer{
     @Override
     public void prepare(Object terrain, Camera camera) {
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0); // Activates the texture. (Background)
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMapTerrain().getBackground().getId()); // Binds the texture.
+        for (int i = 0; i < ((Terrain) terrain).getBlendMapTerrain().getTextures().size(); i++) { // For each texture
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + i); // Activates the texture
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMapTerrain().getTextures().get(i).getId()); // Binds the texture
+        }
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE1); // Activates the texture. (R)
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMapTerrain().getRTexture().getId()); // Binds the texture.
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE2); // Activates the texture. (G)
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMapTerrain().getGTexture().getId()); // Binds the texture.
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE3); // Activates the texture. (B)
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMapTerrain().getBTexture().getId()); // Binds the texture.
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE4); // Activates the texture. (Blend Map)
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + Consts.MAX_TEXTURES); // Activates the texture. (Blend Map)
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMap().getId()); // Binds the texture.
 
         shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix((Terrain) terrain)); // Sets the transformation matrix.

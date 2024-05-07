@@ -2,6 +2,7 @@
 
 const int MAX_POINT_LIGHTS = 5; // Maximum number of point lights
 const int MAX_SPOT_LIGHTS = 5; // Maximum number of spot lights
+const int MAX_TEXTURES = 10; // Maximum number of textures
 
 in vec2 fragTextureCoord; // Texture coordinates from the vertex shader
 in vec3 fragNormal; // Normal vector from the vertex shader
@@ -38,10 +39,7 @@ struct SpotLight { // Spot light properties
     float cutoff;
 };
 
-uniform sampler2D backgroundTexture;
-uniform sampler2D RTexture;
-uniform sampler2D GTexture;
-uniform sampler2D BTexture;
+uniform sampler2D textures[MAX_TEXTURES]; // Array of textures
 uniform sampler2D blendMap;
 
 uniform vec3 ambientLight;
@@ -55,23 +53,39 @@ vec4 ambientC;
 vec4 diffuseC;
 vec4 specularC;
 
-void setupColor(Material material, vec2 textCoords) { // Setup the color of the fragment
-    if (material.hasTexture == 0) { // If the material has a texture
+void setupColor(Material material, vec2 textCoords) {
+    if (material.hasTexture == 0) { // If the material has no other textures
         vec4 blendMapColor = texture(blendMap, textCoords); // Get the blend map color
-        float backgroundTextureAmount = 1.0 - (blendMapColor.r + blendMapColor.g + blendMapColor.b); // Calculate the amount of background texture
-        vec2 tiledCoords = textCoords * 400.0; // Tile the texture coordinates (the number of times the texture is repeated)
-        vec4 backgroundTextureColor = texture(backgroundTexture, tiledCoords) * backgroundTextureAmount; // Get the background texture color
-        vec4 rTextureColor = texture(RTexture, tiledCoords) * blendMapColor.r; // Get the red texture color
-        vec4 gTextureColor = texture(GTexture, tiledCoords) * blendMapColor.g; // Get the green texture color
-        vec4 bTextureColor = texture(BTexture, tiledCoords) * blendMapColor.b; // Get the blue texture color
+        vec2 tiledCoords = textCoords * 200.0; // Tile the texture coordinates
 
-        ambientC = backgroundTextureColor + rTextureColor + gTextureColor + bTextureColor; // Calculate the ambient color
+        // Normalize blend map colors by ensuring they do not exceed 1.0 in total
+        float maxColorWeight = max(blendMapColor.r + blendMapColor.g + blendMapColor.b, 1.0);
+        blendMapColor.rgb /= maxColorWeight;
+
+        // Recalculate the background texture amount
+        float backgroundTextureAmount = 1.0 - (blendMapColor.r + blendMapColor.g + blendMapColor.b);
+        vec4 backgroundTextureColor = texture(textures[6], tiledCoords) * backgroundTextureAmount;
+
+        // Apply textures with controlled blend factors
+        vec4 rTextureColor = texture(textures[0], tiledCoords) * blendMapColor.r;
+        vec4 gTextureColor = texture(textures[1], tiledCoords) * blendMapColor.g;
+        vec4 bTextureColor = texture(textures[2], tiledCoords) * blendMapColor.b;
+
+        // Ensure special colors are visible by using non-diluted factors
+        vec4 yellowTextureColor = texture(textures[3], tiledCoords) * (blendMapColor.r * blendMapColor.g);
+        vec4 cyanTextureColor = texture(textures[4], tiledCoords) * (blendMapColor.g * blendMapColor.b);
+        vec4 magentaTextureColor = texture(textures[5], tiledCoords) * (blendMapColor.r * blendMapColor.b);
+
+        // Calculate the ambient color with controlled blending
+        ambientC = backgroundTextureColor + rTextureColor + gTextureColor + bTextureColor
+        + yellowTextureColor + cyanTextureColor + magentaTextureColor;
         diffuseC = ambientC; // Set the diffuse color to the ambient color
         specularC = ambientC; // Set the specular color to the ambient color
     } else {
-        ambientC = material.ambient; // Set the ambient color
-        diffuseC = material.diffuse; // Set the diffuse color
-        specularC = material.specular; // Set the specular color
+        // Set material colors directly if textures are used
+        ambientC = material.ambient;
+        diffuseC = material.diffuse;
+        specularC = material.specular;
     }
 }
 
