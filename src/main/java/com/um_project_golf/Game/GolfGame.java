@@ -83,14 +83,17 @@ public class GolfGame implements ILogic {
         Model tree = loader.loadAssimpModel("src/main/resources/Models/tree/Tree.obj");
         Model wolf = loader.loadAssimpModel("src/main/resources/Models/Wolf_dae/wolf.dae");
         Model skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
+        Model ball = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
         //cube.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block_TEX.png")), 1f);
         //skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull/Skull.jpg")), 1f);
         tree.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/tree/Tree.jpg")), 1f);
         wolf.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Wolf_dae/Material__wolf_col_tga_diffuse.jpeg.001.jpg")), 1f);
         skyBox.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skybox/DayLight.png")), 1f);
+        ball.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")), 1f);
         tree.getMaterial().setDisableCulling(true);
         wolf.getMaterial().setDisableCulling(true);
         skyBox.getMaterial().setDisableCulling(true);
+        ball.getMaterial().setDisableCulling(true);
 
         TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("Texture/rock.png"));
         TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("Texture/sand.png"));
@@ -114,6 +117,7 @@ public class GolfGame implements ILogic {
 
         scene.addEntity(new Entity(wolf, new Vector3f(0, terrain.getHeight(0,0), 0), new Vector3f(45, 0 , 0), 10 ));
         //scene.addEntity(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
+        scene.addEntity(new Entity(ball, new Vector3f(0, terrain.getHeight(0, 0), 0), new Vector3f(50, 0, 0), 10));
 
         //GUI
         vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
