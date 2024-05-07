@@ -23,6 +23,7 @@ module com.example.um_project_golf {
 
     opens com.um_project_golf to javafx.fxml;
     opens com.um_project_golf.Core to javafx.fxml;
+    opens com.um_project_golf.Phase1 to javafx.graphics;
     exports com.um_project_golf.Core;
     exports com.um_project_golf.Game;
     exports com.um_project_golf.Core.Entity;
