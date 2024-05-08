@@ -14,6 +14,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.nanovg.NVGPaint;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 
+import static org.lwjgl.nanovg.NanoVG.*;
 import static org.lwjgl.nanovg.NanoVGGL3.*;
 
 /**
@@ -36,16 +38,18 @@ public class GolfGame implements ILogic {
     private final ObjectLoader loader;
     private final WindowManager window;
     private final SceneManager scene;
-    private Button button;
     private long vg;
+    List<Button> buttons;
 
     private final Camera camera;
     private Terrain terrain;
     private final HeightMap heightMap;
+    private BlendMapTerrain blendMapTerrain;
 
     Vector3f cameraInc;
-    private boolean canMove = true;
+    private boolean canMove = false;
     private boolean isJumping = false;
+    private boolean isGuiVisible = true;
     private float lastY;
 
     /**
@@ -60,7 +64,7 @@ public class GolfGame implements ILogic {
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
         heightMap = new HeightMap();
-        button = new Button();
+        buttons = new ArrayList<>();
     }
 
     /**
@@ -84,12 +88,14 @@ public class GolfGame implements ILogic {
         Model wolf = loader.loadAssimpModel("src/main/resources/Models/Wolf_dae/wolf.dae");
         Model skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
         Model ball = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
+
         //cube.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block_TEX.png")), 1f);
         //skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull/Skull.jpg")), 1f);
         tree.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/tree/Tree.jpg")), 1f);
         wolf.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Wolf_dae/Material__wolf_col_tga_diffuse.jpeg.001.jpg")), 1f);
         skyBox.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skybox/DayLight.png")), 1f);
         ball.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")), 1f);
+
         tree.getMaterial().setDisableCulling(true);
         wolf.getMaterial().setDisableCulling(true);
         skyBox.getMaterial().setDisableCulling(true);
@@ -102,25 +108,18 @@ public class GolfGame implements ILogic {
         TerrainTexture fairway = new TerrainTexture(loader.loadTexture("Texture/fairway.png"));
         TerrainTexture snow = new TerrainTexture(loader.loadTexture("Texture/snow.png"));
         TerrainTexture mold = new TerrainTexture(loader.loadTexture("Texture/mold.png"));
-        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
         TerrainTexture water = new TerrainTexture(loader.loadTexture("Texture/water.png"));
 
-        List<TerrainTexture> textures = new ArrayList<>();
-        textures.add(sand);
-        textures.add(grass);
-        textures.add(fairway);
-        textures.add(dryGrass);
-        textures.add(mold);
-        textures.add(rock);
-        textures.add(snow);
 
+        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
 
-        BlendMapTerrain blendMapTerrain = new BlendMapTerrain(textures);
-
+        List<TerrainTexture> textures = new ArrayList<>(List.of(sand, grass, fairway, dryGrass, mold, rock, snow));
         List<TerrainTexture> waterTextures = new ArrayList<>();
         for (TerrainTexture texture : textures) {
             waterTextures.add(water);
         }
+
+        blendMapTerrain = new BlendMapTerrain(textures);
         BlendMapTerrain blueTerrain = new BlendMapTerrain(waterTextures);
 
         terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap, false);
@@ -137,37 +136,7 @@ public class GolfGame implements ILogic {
         //scene.addEntity(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
         scene.addEntity(new Entity(ball, new Vector3f(0, terrain.getHeight(0, 0), 0), new Vector3f(50, 0, 0), 10));
 
-        //GUI
-        vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
-        Runnable terrainChanger = () -> {
-            try {
-                heightMap.createHeightMap();
-                TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
-                scene.getTerrains().remove(terrain);
-                scene.getTerrains().remove(ocean);
-                SimplexNoise.shufflePermutation();
-                terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap2, false);
-                scene.addTerrain(terrain);
-                scene.addTerrain(ocean);
-                scene.getEntities().removeIf(entity -> entity.getModel().equals(tree));
-                try {
-                    createTrees(tree);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                renderer.processTerrain(terrain);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        // Initialize the button with the NanoVG context
-        button.createButton(100, 100, 500, 500, "Change Terrain", terrainChanger, vg);
-
-
-
         //TODO: Allow multiple textures for the same model
-
         float lightIntensity =10f;
 
         //point light
@@ -175,7 +144,7 @@ public class GolfGame implements ILogic {
         Vector3f lightColor = new Vector3f(1, 1, 1);
         PointLight pointLight = new PointLight(lightColor, lightPosition, lightIntensity, 0,0,1);
 
-        //spot light 1
+        //spotlight 1
         Vector3f coneDir = new Vector3f(0, -50, 0);
         float cutoff = (float) Math.cos(Math.toRadians(140));
         lightIntensity = 2;
@@ -204,25 +173,32 @@ public class GolfGame implements ILogic {
         float moveSpeed = Consts.CAMERA_MOVEMENT_SPEED  / EngineManager.getFps();
         float gravity = -9.81f;
 
+        if (window.is_keyPressed(GLFW.GLFW_KEY_ESCAPE)) {
+            createGUIs(scene.getTerrains().get(1), blendMapTerrain , scene.getEntities().get(2).getModel());
+            canMove = false;
+            isGuiVisible = true;
+        }
 
-        if(window.is_keyPressed(GLFW.GLFW_KEY_W)) {
-            cameraInc.z = -moveSpeed;
-        }
-        if(window.is_keyPressed(GLFW.GLFW_KEY_S)) {
-            cameraInc.z = moveSpeed;
-        }
-        if(window.is_keyPressed(GLFW.GLFW_KEY_A)) {
-            cameraInc.x = -moveSpeed;
-        }
-        if(window.is_keyPressed(GLFW.GLFW_KEY_D)) {
-            cameraInc.x = moveSpeed;
-        }
-        if(window.is_keyPressed(GLFW.GLFW_KEY_SPACE)) {
-            cameraInc.y = Consts.JUMP_FORCE / EngineManager.getFps();
-            isJumping = true;
-        }
-        if(window.is_keyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
-            cameraInc.y = -Consts.JUMP_FORCE / EngineManager.getFps();
+        if (canMove) {
+            if(window.is_keyPressed(GLFW.GLFW_KEY_W)) {
+                cameraInc.z = -moveSpeed;
+            }
+            if(window.is_keyPressed(GLFW.GLFW_KEY_S)) {
+                cameraInc.z = moveSpeed;
+            }
+            if(window.is_keyPressed(GLFW.GLFW_KEY_A)) {
+                cameraInc.x = -moveSpeed;
+            }
+            if(window.is_keyPressed(GLFW.GLFW_KEY_D)) {
+                cameraInc.x = moveSpeed;
+            }
+            if(window.is_keyPressed(GLFW.GLFW_KEY_SPACE)) {
+                cameraInc.y = Consts.JUMP_FORCE / EngineManager.getFps();
+                isJumping = true;
+            }
+            if(window.is_keyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
+                cameraInc.y = -Consts.JUMP_FORCE / EngineManager.getFps();
+            }
         }
 //
 //        if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
@@ -267,7 +243,14 @@ public class GolfGame implements ILogic {
     @Override
     public void update(MouseInput mouseInput) {
 
-        button.update();
+        for (Button button : buttons) {
+            button.update();
+        }
+
+        if (Launcher.getWindow().isResized()) {
+            buttons.clear();
+            createGUIs(scene.getTerrains().get(1), blendMapTerrain , scene.getEntities().get(2).getModel());
+        }
 
         camera.movePosition(
                 cameraInc.x * Consts.CAMERA_MOVEMENT_SPEED,
@@ -275,9 +258,13 @@ public class GolfGame implements ILogic {
                 cameraInc.z * Consts.CAMERA_MOVEMENT_SPEED
         );
 
-        if (mouseInput.isRightButtonPressed()) {
-            Vector2f rotVec = mouseInput.getDisplVec();
-            camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
+        if (canMove) {
+            if (mouseInput.isRightButtonPressed()) {
+                Vector2f rotVec = mouseInput.getDisplVec();
+                camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
+            }
+        } else {
+            camera.moveRotation(0, 0.5f, 0);
         }
 
         if (isJumping && camera.getPosition().y <= lastY) {
@@ -307,6 +294,35 @@ public class GolfGame implements ILogic {
         for (Terrain terrain : scene.getTerrains()) {
             renderer.processTerrain(terrain);
         }
+    }
+
+    /**
+     * Renders the game.
+     * It renders the entity and the camera.
+     */
+    @Override
+    public void render() {
+        renderer.clear();
+
+        renderer.render(camera, scene);
+
+        // Render your UI elements like buttons
+        if (isGuiVisible) {  // Add this line
+            for (Button button : buttons) {
+                button.render();
+            }
+        }
+    }
+
+    /**
+     * Cleans up the game.
+     * It cleans up the renderer and loader.
+     */
+    @Override
+    public void cleanUp() {
+        renderer.cleanup();
+        loader.cleanUp();
+        nvgDelete(vg);
     }
 
     private void daytimeCycle() {
@@ -402,38 +418,85 @@ public class GolfGame implements ILogic {
             }
         }
         Random rnd = new Random();
-//        for (int i = 0; i < Math.max(Consts.SIZE_X, Consts.SIZE_Z) * 0.9; i++) {
-//            Vector3f position = positions.get(rnd.nextInt(positions.size()));
-//            scene.addEntity(new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f));
-//        }
+        for (int i = 0; i < Math.max(Consts.SIZE_X, Consts.SIZE_Z) * 0.1; i++) {
+            Vector3f position = positions.get(rnd.nextInt(positions.size()));
+            scene.addEntity(new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f));
+        }
     }
 
-    /**
-     * Renders the game.
-     * It renders the entity and the camera.
-     */
-    @Override
-    public void render() {
-        renderer.clear();
+    private void createGUIs(Terrain ocean, BlendMapTerrain blendMapTerrain, Model tree) {
+        vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
 
+        float width = window.getWidth();
+        float height = window.getHeight();
 
-        renderer.render(camera, scene);
+        Runnable terrainChanger = () -> {
+            try {
+                System.out.println("Changing terrain");
+                heightMap.createHeightMap();
+                TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
+                scene.getTerrains().remove(terrain);
+                scene.getTerrains().remove(ocean);
+                SimplexNoise.shufflePermutation();
+                terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap2, false);
+                scene.addTerrain(terrain);
+                scene.addTerrain(ocean);
+                scene.getEntities().removeIf(entity -> entity.getModel().equals(tree));
+                try {
+                    createTrees(tree);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                renderer.processTerrain(terrain);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
 
-        // Disable depth testing for UI eleme
-        // Render your UI elements like buttons
-        button.render();
+        Runnable startGame = () -> {
+            System.out.println("Allowing movement");
+            canMove = true;
+            isGuiVisible = false;
+        };
 
-        // Re-enable depth testing if there are later 3D renderings
+        Runnable quit = () -> {
+            System.out.println("Quitting game");
+            GLFW.glfwSetWindowShouldClose(Launcher.getWindow().getWindow(), true);;
+        };
+
+        //TODO: remove hardcoded values
+
+        float heightButton = 300;
+        float widthButton = 2000;
+        float centerButtonX = (width - widthButton) / 2;
+        float centerButtonY = (height - heightButton) / 2 + 200;
+
+        createTitle();
+
+        // Initialize the button with the NanoVG context
+        Button change = new Button(100, 100, 500, 500, "Change Terrain", 80, terrainChanger, vg, "icon.iconset/icon_512x512@2x.png");
+        buttons.add(change);
+
+        Button start = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", 100, startGame, vg, "Texture/buttons.png");
+        buttons.add(start);
+
+        Button exit = new Button(centerButtonX, centerButtonY + heightButton , widthButton, heightButton, "Exit", 100, quit, vg, "Texture/buttons.png");
+        buttons.add(exit);
     }
 
-    /**
-     * Cleans up the game.
-     * It cleans up the renderer and loader.
-     */
-    @Override
-    public void cleanUp() {
-        renderer.cleanup();
-        loader.cleanUp();
-        nvgDelete(vg);
+    private void createTitle(){
+        float titleWidth = 1000;
+        float titleHeight = 1000;
+        float titleX = (window.getWidth() - titleWidth) / 2;
+        float titleY = 50;
+
+        int img = nvgCreateImage(vg, "Texture/title.png", 0);
+
+        nvgBeginPath(vg);
+        nvgRect(vg, titleX, titleY, titleWidth, titleHeight);  // Set the position and size where the image should be drawn
+
+        NVGPaint imgPaint = nvgImagePattern(vg, titleX, titleY, titleWidth, titleHeight, 0, img, 1, NVGPaint.create());
+        nvgFillPaint(vg, imgPaint);
+        nvgFill(vg);
     }
 }
