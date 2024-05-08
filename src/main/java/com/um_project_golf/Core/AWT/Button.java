@@ -11,22 +11,31 @@ import org.lwjgl.system.MemoryStack;
 import static org.lwjgl.nanovg.NanoVG.*;
 
 public class Button {
-    private float x, y;  // Button position
-    private float width, height;  // Button dimensions
-    private String text; // Button text
-    private Runnable action;  // Action to be performed when the button is clicked
-    private long vg;  // NanoVG context
+    private final float x, y;  // Button position
+    private final float width, height;  // Button dimensions
+    private final String text; // Button text
+    private final Runnable action;  // Action to be performed when the button is clicked
+    private final long vg;  // NanoVG context
+    private final String imagePath;  // Image path for the button
+    private final float fontSize;  // Font size for the button text
+
+    private double scaledMouseX, scaledMouseY;  // Scaled mouse position
+    private final boolean debugMode = false;  // Debug mode for button interaction
+    private boolean isPressed = false;
+
 
     private final WindowManager window = Launcher.getWindow();
 
-    public void createButton(float x, float y, float width, float height, String text, Runnable action, long vg) {
+    public Button(float x, float y, float width, float height, String text, float fontSize, Runnable action, long vg, String imagePath) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.text = text;
+        this.fontSize = fontSize;
         this.action = action;
         this.vg = vg;
+        this.imagePath = imagePath;
     }
 
     public void render() {
@@ -35,7 +44,7 @@ public class Button {
             nvgBeginFrame(vg, window.getWidth(), window.getHeight(), 1);
 
             // Load an image to use as texture
-            int img = nvgCreateImage(vg, "icon.iconset/icon_512x512@2x.png", 0);
+            int img = nvgCreateImage(vg, imagePath, 0);
             NVGPaint imgPaint = nvgImagePattern(vg, x, y, width, height, 0, img, 1, NVGPaint.create());
 
             nvgBeginPath(vg);
@@ -56,7 +65,7 @@ public class Button {
                 System.out.println("Font loading failed");
             }
 
-            nvgFontSize(vg, 80);
+            nvgFontSize(vg, fontSize);
             nvgFontFace(vg, "golf");
             nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
             nvgFillColor(vg, textColor);
@@ -77,19 +86,52 @@ public class Button {
         }
     }
 
-
     public void update() {
-        // Check if the mouse is over the button and the left mouse button is pressed
-        if (isMouseOver() && GLFW.glfwGetMouseButton(GLFW.glfwGetCurrentContext(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS) {
-            action.run(); // Run the action
+        updateMouseScaling();
+        processButtonInteraction();
+    }
+
+    private void updateMouseScaling() {
+        double[] mouseX = new double[1];
+        double[] mouseY = new double[1];
+        GLFW.glfwGetCursorPos(GLFW.glfwGetCurrentContext(), mouseX, mouseY);
+
+        int[] framebufferWidth = new int[1];
+        int[] framebufferHeight = new int[1];
+        GLFW.glfwGetFramebufferSize(Launcher.getWindow().getWindow(), framebufferWidth, framebufferHeight);
+
+        int[] windowWidth = new int[1], windowHeight = new int[1];
+        GLFW.glfwGetWindowSize(Launcher.getWindow().getWindow(), windowWidth, windowHeight);
+
+        double scaleX = framebufferWidth[0] / (double) windowWidth[0];
+        // Scaling factors for mouse position
+        double scaleY = framebufferHeight[0] / (double) windowHeight[0];
+
+        scaledMouseX = mouseX[0] * scaleX;
+        scaledMouseY = mouseY[0] * scaleY;
+    }
+
+    private void processButtonInteraction() {
+        boolean mouseOver = isMouseOver(scaledMouseX, scaledMouseY);
+        boolean mouseButtonDown = GLFW.glfwGetMouseButton(GLFW.glfwGetCurrentContext(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
+
+        if (mouseOver && mouseButtonDown) {
+            if (!isPressed) {
+                action.run();  // Run the action only on the transition to press
+                isPressed = true; // Set isPressed to true after the action has run
+            }
+        } else {
+            isPressed = false;  // Reset isPressed when not over the button or button not pressed
+        }
+
+        if (debugMode) {
+            System.out.println("Mouse is over the button: " + mouseOver);
+            System.out.println("Button pressed: " + mouseButtonDown);
         }
     }
 
-    private boolean isMouseOver() {
-        double[] mouseX = new double[1]; // Mouse x position
-        double[] mouseY = new double[1]; // Mouse y position
-        GLFW.glfwGetCursorPos(GLFW.glfwGetCurrentContext(), mouseX, mouseY); // Get the mouse position
-
-        return mouseX[0] >= x && mouseX[0] <= x + width && mouseY[0] >= y && mouseY[0] <= y + height; // Check if the mouse is over the button
+    private boolean isMouseOver(double scaledMouseX, double scaledMouseY) {
+        return scaledMouseX >= x && scaledMouseX <= x + width && scaledMouseY >= y && scaledMouseY <= y + height;
     }
+
 }

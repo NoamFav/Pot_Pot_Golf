@@ -62,8 +62,9 @@ public class WindowManager {
         boolean maximized = false; // Set the maximized to false.
         if (width == 0 || height == 0) { // If the width or height is 0
             maximized = true; // Set the maximized to true.
-            width = 1920; // Set the width to 1920.
-            height = 1080; // Set the height to 1080.
+            // TODO update to get the screen resolution without crashing everything (it's not working)
+            width = 3840; // Set the width to 1920.
+            height = 2160; // Set the height to 1080.
             GLFW.glfwWindowHint(GLFW.GLFW_MAXIMIZED, GLFW.GLFW_TRUE); // Set the window hint to maximized.
         }
 
@@ -82,11 +83,11 @@ public class WindowManager {
             this.setResized(true); // Set the resized to true.
         });
 
-        GLFW.glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> { // Set the key callback.
-            if (key == GLFW.GLFW_KEY_ESCAPE && action == GLFW.GLFW_RELEASE) { // If the key is escape and the action is release
-                GLFW.glfwSetWindowShouldClose(window, true); // Set the window should close to true.
-            }
-        });
+//        GLFW.glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> { // Set the key callback.
+//            if (key == GLFW.GLFW_KEY_ESCAPE && action == GLFW.GLFW_RELEASE) { // If the key is escape and the action is release
+//                GLFW.glfwSetWindowShouldClose(window, true); // Set the window should close to true.
+//            }
+//        });
 
         if (maximized) { // If the window is maximized
             GLFW.glfwMaximizeWindow(window); // Maximize the window.
