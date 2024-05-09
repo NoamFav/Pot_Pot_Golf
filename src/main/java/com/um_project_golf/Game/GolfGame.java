@@ -2,6 +2,7 @@ package com.um_project_golf.Game;
 
 import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.AWT.Button;
+import com.um_project_golf.Core.AWT.Title;
 import com.um_project_golf.Core.Entity.*;
 import com.um_project_golf.Core.Entity.Terrain.*;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
@@ -14,7 +15,6 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.nanovg.NVGPaint;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static org.lwjgl.nanovg.NanoVG.*;
 import static org.lwjgl.nanovg.NanoVGGL3.*;
 
 /**
@@ -39,12 +38,14 @@ public class GolfGame implements ILogic {
     private final WindowManager window;
     private final SceneManager scene;
     private long vg;
-    List<Button> buttons;
+    private final List<Button> buttons;
+    private Title title;
 
     private final Camera camera;
     private Terrain terrain;
     private final HeightMap heightMap;
     private BlendMapTerrain blendMapTerrain;
+    private AudioManager audioManager;
 
     Vector3f cameraInc;
     private boolean canMove = false;
@@ -75,9 +76,12 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void init() throws Exception {
+        System.out.println("Initializing game");
+
         heightMap.createHeightMap();
         scene.setDefaultTexture(new Texture(loader.loadTexture("Texture/Default.png")));
         window.setAntiAliasing(true);
+        window.setResized(false);
 
         renderer.init();
         window.setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
@@ -158,6 +162,12 @@ public class GolfGame implements ILogic {
 
         //scene.setPointLights(new PointLight[]{pointLight});
         //scene.setSpotLights(new SpotLight[]{spotLight, spotLight2});
+        createGUIs(ocean, blueTerrain, tree);
+        isGuiVisible = true;
+        canMove = false;
+
+        audioManager = new AudioManager("src/main/resources/SoundTrack/wii.wav");
+        audioManager.playSound();
     }
 
     /**
@@ -174,9 +184,8 @@ public class GolfGame implements ILogic {
         float gravity = -9.81f;
 
         if (window.is_keyPressed(GLFW.GLFW_KEY_ESCAPE)) {
-            createGUIs(scene.getTerrains().get(1), blendMapTerrain , scene.getEntities().get(2).getModel());
-            canMove = false;
-            isGuiVisible = true;
+            isGuiVisible = true;  // Toggle GUI visibility
+            canMove = false;  // Disable movement
         }
 
         if (canMove) {
@@ -247,9 +256,9 @@ public class GolfGame implements ILogic {
             button.update();
         }
 
-        if (Launcher.getWindow().isResized()) {
-            buttons.clear();
-            createGUIs(scene.getTerrains().get(1), blendMapTerrain , scene.getEntities().get(2).getModel());
+        if (window.isResized()) {
+            window.setResized(false);
+            recreateGUIs();
         }
 
         camera.movePosition(
@@ -264,7 +273,7 @@ public class GolfGame implements ILogic {
                 camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
             }
         } else {
-            camera.moveRotation(0, 0.5f, 0);
+            camera.moveRotation(0, 0.1f, 0);
         }
 
         if (isJumping && camera.getPosition().y <= lastY) {
@@ -311,6 +320,7 @@ public class GolfGame implements ILogic {
             for (Button button : buttons) {
                 button.render();
             }
+            title.render();
         }
     }
 
@@ -322,7 +332,15 @@ public class GolfGame implements ILogic {
     public void cleanUp() {
         renderer.cleanup();
         loader.cleanUp();
+        audioManager.cleanup();
+        if (title != null) {
+            title.cleanup();  // Clean up the title resources
+        }
+        for (Button button : buttons) {
+            button.cleanup();
+        }
         nvgDelete(vg);
+
     }
 
     private void daytimeCycle() {
@@ -425,6 +443,9 @@ public class GolfGame implements ILogic {
     }
 
     private void createGUIs(Terrain ocean, BlendMapTerrain blendMapTerrain, Model tree) {
+
+        System.out.println("Creating GUIs from: " + Thread.currentThread().getStackTrace()[2]);
+
         vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
 
         float width = window.getWidth();
@@ -464,39 +485,39 @@ public class GolfGame implements ILogic {
             GLFW.glfwSetWindowShouldClose(Launcher.getWindow().getWindow(), true);;
         };
 
-        //TODO: remove hardcoded values
+        float titleWidth = window.getWidthConverted(1200);
+        float titleHeight = window.getHeightConverted(1200);
+        float titleX = (window.getWidth() - titleWidth) / 2;
+        float titleY = window.getHeightConverted(10);
 
-        float heightButton = 300;
-        float widthButton = 2000;
+        title = new Title("Texture/title.png", titleX, titleY, titleWidth, titleHeight, vg);
+
+        float heightButton = window.getHeightConverted(300);
+        float widthButton = window.getWidthConverted(2000);
         float centerButtonX = (width - widthButton) / 2;
-        float centerButtonY = (height - heightButton) / 2 + 200;
-
-        createTitle();
-
-        // Initialize the button with the NanoVG context
-        Button change = new Button(100, 100, 500, 500, "Change Terrain", 80, terrainChanger, vg, "icon.iconset/icon_512x512@2x.png");
-        buttons.add(change);
+        float centerButtonY = titleHeight + titleY;
 
         Button start = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", 100, startGame, vg, "Texture/buttons.png");
         buttons.add(start);
 
-        Button exit = new Button(centerButtonX, centerButtonY + heightButton , widthButton, heightButton, "Exit", 100, quit, vg, "Texture/buttons.png");
+        Button changeTerrain = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Change Terrain", 100, terrainChanger, vg, "Texture/buttons.png");
+        buttons.add(changeTerrain);
+
+        Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2 , widthButton, heightButton, "Exit", 100, quit, vg, "Texture/buttons.png");
         buttons.add(exit);
     }
 
-    private void createTitle(){
-        float titleWidth = 1000;
-        float titleHeight = 1000;
-        float titleX = (window.getWidth() - titleWidth) / 2;
-        float titleY = 50;
+    private void recreateGUIs() {
+        buttons.clear();
 
-        int img = nvgCreateImage(vg, "Texture/title.png", 0);
+        if (vg != 0) {
+            nvgDelete(vg); // Properly delete the old NanoVG context if needed
+        }
 
-        nvgBeginPath(vg);
-        nvgRect(vg, titleX, titleY, titleWidth, titleHeight);  // Set the position and size where the image should be drawn
+        createGUIs(scene.getTerrains().get(1), blendMapTerrain, scene.getEntities().get(2).getModel());
+    }
 
-        NVGPaint imgPaint = nvgImagePattern(vg, titleX, titleY, titleWidth, titleHeight, 0, img, 1, NVGPaint.create());
-        nvgFillPaint(vg, imgPaint);
-        nvgFill(vg);
+    private void setUpMusic() {
+
     }
 }

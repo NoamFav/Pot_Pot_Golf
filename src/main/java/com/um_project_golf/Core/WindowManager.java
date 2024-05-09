@@ -19,7 +19,10 @@ public class WindowManager {
     private int width, height; // The width and height of the window.
     private long window; // The window of the window manager.
 
-    private boolean resized, vSync, antiAliasing; // The resized, vSync and antiAliasing of the window.
+    private boolean firstResize, resized, vSync, antiAliasing; // The resized, vSync and antiAliasing of the window.
+
+    private final float referenceWidth = 3840;
+    private final float referenceHeight = 2160;
 
     private final Matrix4f projectionMatrix; // The projection matrix of the window manager.
 
@@ -198,6 +201,10 @@ public class WindowManager {
      * @return True if the window is resized, false otherwise.
      */
     public boolean isResized() {
+        if (firstResize) {
+            firstResize = false;
+            return false;
+        }
         return resized;
     }
 
@@ -283,4 +290,15 @@ public class WindowManager {
         float aspectRatio = (float) width / (float) height; // Calculate the aspect ratio.
         return matrix.setPerspective(Consts.FOV, aspectRatio, Consts.Z_NEAR, Consts.Z_FAR); // Set the perspective.
     }
+
+    public float getWidthConverted(float value) {
+        float scaleFactor = width / referenceWidth;
+        return value * scaleFactor;
+    }
+
+    public float getHeightConverted(float value) {
+        float scaleFactor = height / referenceHeight;
+        return value * scaleFactor;
+    }
+
 }

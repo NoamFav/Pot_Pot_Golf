@@ -18,6 +18,7 @@ public class Button {
     private final long vg;  // NanoVG context
     private final String imagePath;  // Image path for the button
     private final float fontSize;  // Font size for the button text
+    private int imgId = -1;  // Store the image ID
 
     private double scaledMouseX, scaledMouseY;  // Scaled mouse position
     private final boolean debugMode = false;  // Debug mode for button interaction
@@ -36,6 +37,14 @@ public class Button {
         this.action = action;
         this.vg = vg;
         this.imagePath = imagePath;
+        initImage();  // Load the image once when the Button object is created
+    }
+
+    private void initImage() {
+        imgId = nvgCreateImage(vg, imagePath, 0);
+        if (imgId == 0) {
+            System.err.println("Failed to load image: " + imagePath);
+        }
     }
 
     public void render() {
@@ -44,8 +53,7 @@ public class Button {
             nvgBeginFrame(vg, window.getWidth(), window.getHeight(), 1);
 
             // Load an image to use as texture
-            int img = nvgCreateImage(vg, imagePath, 0);
-            NVGPaint imgPaint = nvgImagePattern(vg, x, y, width, height, 0, img, 1, NVGPaint.create());
+            NVGPaint imgPaint = nvgImagePattern(vg, x, y, width, height, 0, imgId, 1, NVGPaint.create());
 
             nvgBeginPath(vg);
             nvgRect(vg, x, y, width, height);
@@ -132,6 +140,13 @@ public class Button {
 
     private boolean isMouseOver(double scaledMouseX, double scaledMouseY) {
         return scaledMouseX >= x && scaledMouseX <= x + width && scaledMouseY >= y && scaledMouseY <= y + height;
+    }
+
+    public void cleanup() {
+        if (imgId > 0) {
+            nvgDeleteImage(vg, imgId);
+            imgId = -1;
+        }
     }
 
 }
