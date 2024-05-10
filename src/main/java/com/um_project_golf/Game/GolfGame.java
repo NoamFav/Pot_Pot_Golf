@@ -163,7 +163,7 @@ public class GolfGame implements ILogic {
 
         //scene.setPointLights(new PointLight[]{pointLight});
         //scene.setSpotLights(new SpotLight[]{spotLight, spotLight2});
-        createGUIs(blueTerrain, tree);
+        createGUIs(blendMapTerrain, tree);
         isGuiVisible = true;
         canMove = false;
 
