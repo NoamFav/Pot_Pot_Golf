@@ -43,7 +43,6 @@ public class GolfGame implements ILogic {
 
     private final Camera camera;
     private Terrain terrain;
-    private Terrain ocean;
     private final HeightMap heightMap;
     private BlendMapTerrain blendMapTerrain;
     private AudioManager audioManager;
@@ -128,7 +127,7 @@ public class GolfGame implements ILogic {
         BlendMapTerrain blueTerrain = new BlendMapTerrain(waterTextures);
 
         terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap, false);
-        ocean = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blueTerrain, blendMap, true);
+        Terrain ocean = new Terrain(new Vector3f(-Consts.SIZE_X / 2, -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blueTerrain, blendMap, true);
         scene.addTerrain(terrain);
         scene.addTerrain(ocean);
         ocean.getModel().getMaterial().setDisableCulling(true);
@@ -163,7 +162,7 @@ public class GolfGame implements ILogic {
 
         //scene.setPointLights(new PointLight[]{pointLight});
         //scene.setSpotLights(new SpotLight[]{spotLight, spotLight2});
-        createGUIs(blueTerrain, tree);
+        createGUIs(blendMapTerrain, tree);
         isGuiVisible = true;
         canMove = false;
 
@@ -481,7 +480,7 @@ public class GolfGame implements ILogic {
 
         Runnable quit = () -> {
             System.out.println("Quitting game");
-            GLFW.glfwSetWindowShouldClose(Launcher.getWindow().getWindow(), true);;
+            GLFW.glfwSetWindowShouldClose(Launcher.getWindow().getWindow(), true);
         };
 
         float titleWidth = window.getWidthConverted(1200);
