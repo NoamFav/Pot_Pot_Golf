@@ -137,7 +137,6 @@ public class TerrainRenderer implements IRenderer{
      */
     @Override
     public void prepare(Object terrain, Camera camera) {
-
         for (int i = 0; i < ((Terrain) terrain).getBlendMapTerrain().getTextures().size(); i++) { // For each texture
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + i); // Activates the texture
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMapTerrain().getTextures().get(i).getId()); // Binds the texture
