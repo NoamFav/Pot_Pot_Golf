@@ -67,14 +67,28 @@ void setupColor(Material material, vec2 textCoords) {
         vec4 backgroundTextureColor = texture(textures[6], tiledCoords) * backgroundTextureAmount;
 
         // Apply textures with controlled blend factors
-        vec4 rTextureColor = texture(textures[0], tiledCoords) * blendMapColor.r;
-        vec4 gTextureColor = texture(textures[1], tiledCoords) * blendMapColor.g;
-        vec4 bTextureColor = texture(textures[2], tiledCoords) * blendMapColor.b;
+        bool isyellow = blendMapColor.r > 0.2 && blendMapColor.g > 0.2 && blendMapColor.b < 0.2;
+        bool iscyan = blendMapColor.g > 0.2 && blendMapColor.b > 0.2 && blendMapColor.r < 0.2;
+        bool ismagenta = blendMapColor.r > 0.2 && blendMapColor.b > 0.2 && blendMapColor.g < 0.2;
 
-        // Ensure special colors are visible by using non-diluted factors
-        vec4 yellowTextureColor = texture(textures[3], tiledCoords) * (blendMapColor.r * blendMapColor.g);
-        vec4 cyanTextureColor = texture(textures[4], tiledCoords) * (blendMapColor.g * blendMapColor.b);
-        vec4 magentaTextureColor = texture(textures[5], tiledCoords) * (blendMapColor.r * blendMapColor.b);
+        vec4 yellowTextureColor = vec4(0);
+        vec4 cyanTextureColor = vec4(0);
+        vec4 magentaTextureColor = vec4( 0);
+        vec4 rTextureColor = vec4(0);
+        vec4 gTextureColor = vec4(0);
+        vec4 bTextureColor = vec4(0);
+
+        if (isyellow) {
+            yellowTextureColor = texture(textures[3], tiledCoords) * (blendMapColor.r + blendMapColor.g);
+        } else if (iscyan) {
+            cyanTextureColor = texture(textures[4], tiledCoords) * (blendMapColor.g + blendMapColor.b);
+        } else if (ismagenta) {
+            magentaTextureColor = texture(textures[5], tiledCoords) * (blendMapColor.r + blendMapColor.b);
+        } else {
+            rTextureColor = texture(textures[0], tiledCoords) * blendMapColor.r;
+            gTextureColor = texture(textures[1], tiledCoords) * blendMapColor.g;
+            bTextureColor = texture(textures[2], tiledCoords) * blendMapColor.b;
+        }
 
         // Calculate the ambient color with controlled blending
         ambientC = backgroundTextureColor + rTextureColor + gTextureColor + bTextureColor
