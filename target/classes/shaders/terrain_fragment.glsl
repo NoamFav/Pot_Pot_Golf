@@ -2,7 +2,7 @@
 
 const int MAX_POINT_LIGHTS = 5; // Maximum number of point lights
 const int MAX_SPOT_LIGHTS = 5; // Maximum number of spot lights
-const int MAX_TEXTURES = 10; // Maximum number of textures
+const int MAX_TEXTURES = 7; // Maximum number of textures
 
 in vec2 fragTextureCoord; // Texture coordinates from the vertex shader
 in vec3 fragNormal; // Normal vector from the vertex shader

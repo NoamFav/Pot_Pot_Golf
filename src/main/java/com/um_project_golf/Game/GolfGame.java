@@ -458,11 +458,8 @@ public class GolfGame implements ILogic {
                 heightMap.createHeightMap();
                 TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
                 scene.getTerrains().remove(terrain);
-                scene.getTerrains().remove(ocean);
                 SimplexNoise.shufflePermutation();
                 terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap2, false);
-                ocean = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap2, true);
-                scene.addTerrain(ocean);
                 scene.addTerrain(terrain);
                 scene.getEntities().removeIf(entity -> entity.getModel().equals(tree));
                 try {
@@ -471,7 +468,6 @@ public class GolfGame implements ILogic {
                     throw new RuntimeException(e);
                 }
                 renderer.processTerrain(terrain);
-                renderer.processTerrain(ocean);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
