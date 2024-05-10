@@ -43,6 +43,7 @@ public class GolfGame implements ILogic {
 
     private final Camera camera;
     private Terrain terrain;
+    private Terrain ocean;
     private final HeightMap heightMap;
     private BlendMapTerrain blendMapTerrain;
     private AudioManager audioManager;
@@ -127,7 +128,7 @@ public class GolfGame implements ILogic {
         BlendMapTerrain blueTerrain = new BlendMapTerrain(waterTextures);
 
         terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap, false);
-        Terrain ocean = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blueTerrain, blendMap, true);
+        ocean = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blueTerrain, blendMap, true);
         scene.addTerrain(terrain);
         scene.addTerrain(ocean);
         ocean.getModel().getMaterial().setDisableCulling(true);
@@ -162,7 +163,7 @@ public class GolfGame implements ILogic {
 
         //scene.setPointLights(new PointLight[]{pointLight});
         //scene.setSpotLights(new SpotLight[]{spotLight, spotLight2});
-        createGUIs(ocean, blueTerrain, tree);
+        createGUIs(blueTerrain, tree);
         isGuiVisible = true;
         canMove = false;
 
@@ -442,7 +443,7 @@ public class GolfGame implements ILogic {
         }
     }
 
-    private void createGUIs(Terrain ocean, BlendMapTerrain blendMapTerrain, Model tree) {
+    private void createGUIs(BlendMapTerrain blendMapTerrain, Model tree) {
 
         System.out.println("Creating GUIs from: " + Thread.currentThread().getStackTrace()[2]);
 
@@ -460,8 +461,9 @@ public class GolfGame implements ILogic {
                 scene.getTerrains().remove(ocean);
                 SimplexNoise.shufflePermutation();
                 terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap2, false);
-                scene.addTerrain(terrain);
+                ocean = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap2, true);
                 scene.addTerrain(ocean);
+                scene.addTerrain(terrain);
                 scene.getEntities().removeIf(entity -> entity.getModel().equals(tree));
                 try {
                     createTrees(tree);
@@ -469,6 +471,7 @@ public class GolfGame implements ILogic {
                     throw new RuntimeException(e);
                 }
                 renderer.processTerrain(terrain);
+                renderer.processTerrain(ocean);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -514,7 +517,7 @@ public class GolfGame implements ILogic {
             nvgDelete(vg); // Properly delete the old NanoVG context if needed
         }
 
-        createGUIs(scene.getTerrains().get(1), blendMapTerrain, scene.getEntities().get(2).getModel());
+        createGUIs(blendMapTerrain, scene.getEntities().get(2).getModel());
     }
 
     private void setUpMusic() {
