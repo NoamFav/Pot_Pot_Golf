@@ -60,7 +60,7 @@ public class HeightMap {
                 float fairway = 12 + (float) (Math.random() * 2.5f); // Generate a random blue value
                 float dryGrass = 17 + (float) (Math.random() * 2.5f); // Generate a random blue value
                 float mold = 20 + (float) (Math.random() * 2.5f); // Generate a random blue value
-                float rock = 22 + (float) (Math.random() * 2.5f); // Generate a random blue value
+                float rock = 25 + (float) (Math.random() * 2.5f); // Generate a random blue value
                 if (heightValue < sand) { // If the height value is less than the sand value
                     color = Color.RED; // Set the color to red
                 } else if (heightValue < grass) { // If the height value is less than the grass value
@@ -68,11 +68,11 @@ public class HeightMap {
                 } else if (heightValue < fairway) { // If the height value is less than the fairway value
                     color = Color.BLUE; // Set the color to green
                 } else if (heightValue < dryGrass) { // If the height value is less than the dry grass value
-                    color = new Color(255, 255, 0); // Set the color to yellow
+                    color = new Color(63, 0, 0); // Set the color to yellow
                 } else if (heightValue < mold) { // If the height value is less than the rock value
-                    color = new Color(0, 255, 255); // Set the color to cyan
+                    color = new Color(0, 63, 0); // Set the color to cyan
                 } else if (heightValue < rock){ // If the height value is greater than the rock value
-                    color = new Color(255,0, 255); // Set the color to black
+                    color = new Color(0, 0, 63); // Set the color to magenta
                 } else {
                     color = Color.BLACK; // Set the color to white
                 }
