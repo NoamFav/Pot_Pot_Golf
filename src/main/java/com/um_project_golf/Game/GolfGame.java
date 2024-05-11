@@ -167,7 +167,7 @@ public class GolfGame implements ILogic {
         canMove = false;
 
         audioManager = new AudioManager("src/main/resources/SoundTrack/wii.wav");
-        audioManager.playSound();
+        //audioManager.playSound();
     }
 
     /**
