@@ -2,6 +2,7 @@ package com.um_project_golf.Game;
 
 import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.AWT.Button;
+import com.um_project_golf.Core.AWT.Title;
 import com.um_project_golf.Core.Entity.*;
 import com.um_project_golf.Core.Entity.Terrain.*;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
@@ -36,16 +37,22 @@ public class GolfGame implements ILogic {
     private final ObjectLoader loader;
     private final WindowManager window;
     private final SceneManager scene;
-    private Button button;
     private long vg;
+    private final List<Button> menuButtons;
+    private final List<Button> inGameMenuButtons;
+    private Title title;
 
     private final Camera camera;
     private Terrain terrain;
     private final HeightMap heightMap;
+    private BlendMapTerrain blendMapTerrain;
+    private AudioManager audioManager;
 
     Vector3f cameraInc;
-    private boolean canMove = true;
+    private boolean canMove = false;
     private boolean isJumping = false;
+    private boolean isGuiVisible = true;
+    private boolean isOnMenu = true;
     private float lastY;
 
     /**
@@ -60,7 +67,8 @@ public class GolfGame implements ILogic {
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
         heightMap = new HeightMap();
-        button = new Button();
+        menuButtons = new ArrayList<>();
+        inGameMenuButtons = new ArrayList<>();
     }
 
     /**
@@ -71,9 +79,12 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void init() throws Exception {
+        System.out.println("Initializing game");
+
         heightMap.createHeightMap();
         scene.setDefaultTexture(new Texture(loader.loadTexture("Texture/Default.png")));
         window.setAntiAliasing(true);
+        window.setResized(false);
 
         renderer.init();
         window.setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
@@ -84,32 +95,45 @@ public class GolfGame implements ILogic {
         Model wolf = loader.loadAssimpModel("src/main/resources/Models/Wolf_dae/wolf.dae");
         Model skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
         Model ball = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
+
         //cube.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block_TEX.png")), 1f);
         //skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull/Skull.jpg")), 1f);
         tree.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/tree/Tree.jpg")), 1f);
         wolf.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Wolf_dae/Material__wolf_col_tga_diffuse.jpeg.001.jpg")), 1f);
         skyBox.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skybox/DayLight.png")), 1f);
         ball.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")), 1f);
+
         tree.getMaterial().setDisableCulling(true);
         wolf.getMaterial().setDisableCulling(true);
         skyBox.getMaterial().setDisableCulling(true);
         ball.getMaterial().setDisableCulling(true);
 
-        TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("Texture/rock.png"));
-        TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("Texture/sand.png"));
-        TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("Texture/grass.png"));
-        TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("Texture/dryGrass.png"));
-        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
-        TerrainTexture blue = new TerrainTexture(loader.loadTexture("Texture/water.png"));
+        TerrainTexture rock = new TerrainTexture(loader.loadTexture("Texture/rock.png"));
+        TerrainTexture sand = new TerrainTexture(loader.loadTexture("Texture/sand.png"));
+        TerrainTexture grass = new TerrainTexture(loader.loadTexture("Texture/grass.png"));
+        TerrainTexture dryGrass = new TerrainTexture(loader.loadTexture("Texture/dryGrass.png"));
+        TerrainTexture fairway = new TerrainTexture(loader.loadTexture("Texture/fairway.png"));
+        TerrainTexture snow = new TerrainTexture(loader.loadTexture("Texture/snow.png"));
+        TerrainTexture mold = new TerrainTexture(loader.loadTexture("Texture/mold.png"));
+        TerrainTexture water = new TerrainTexture(loader.loadTexture("Texture/water.png"));
 
-        BlendMapTerrain blendMapTerrain = new BlendMapTerrain(backgroundTexture, rTexture, gTexture, bTexture);
-        BlendMapTerrain blueTerrain = new BlendMapTerrain(blue, blue, blue, blue);
+
+        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
+
+        List<TerrainTexture> textures = new ArrayList<>(List.of(sand, grass, fairway, dryGrass, mold, rock, snow));
+        List<TerrainTexture> waterTextures = new ArrayList<>();
+        for (TerrainTexture texture : textures) {
+            waterTextures.add(water);
+        }
+
+        blendMapTerrain = new BlendMapTerrain(textures);
+        BlendMapTerrain blueTerrain = new BlendMapTerrain(waterTextures);
 
         terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap, false);
-        Terrain water = new Terrain(new Vector3f(-Consts.SIZE_X/2 , -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blueTerrain, blendMap, true);
+        Terrain ocean = new Terrain(new Vector3f(-Consts.SIZE_X / 2, -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blueTerrain, blendMap, true);
         scene.addTerrain(terrain);
-        scene.addTerrain(water);
-        water.getModel().getMaterial().setDisableCulling(true);
+        scene.addTerrain(ocean);
+        ocean.getModel().getMaterial().setDisableCulling(true);
 
         createTrees(tree);
 
@@ -119,35 +143,7 @@ public class GolfGame implements ILogic {
         //scene.addEntity(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
         scene.addEntity(new Entity(ball, new Vector3f(0, terrain.getHeight(0, 0), 0), new Vector3f(50, 0, 0), 10));
 
-        //GUI
-        vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
-        Runnable terrainChanger = () -> {
-            try {
-                heightMap.createHeightMap();
-                TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
-                scene.getTerrains().remove(terrain);
-                SimplexNoise.shufflePermutation();
-                terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap2, false);
-                scene.addTerrain(terrain);
-                scene.getEntities().removeIf(entity -> entity.getModel().equals(tree));
-                try {
-                    createTrees(tree);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                renderer.processTerrain(terrain);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        // Initialize the button with the NanoVG context
-        button.createButton(100, 100, 500, 500, "Change Terrain", terrainChanger, vg);
-
-
-
         //TODO: Allow multiple textures for the same model
-
         float lightIntensity =10f;
 
         //point light
@@ -155,7 +151,7 @@ public class GolfGame implements ILogic {
         Vector3f lightColor = new Vector3f(1, 1, 1);
         PointLight pointLight = new PointLight(lightColor, lightPosition, lightIntensity, 0,0,1);
 
-        //spot light 1
+        //spotlight 1
         Vector3f coneDir = new Vector3f(0, -50, 0);
         float cutoff = (float) Math.cos(Math.toRadians(140));
         lightIntensity = 2;
@@ -169,6 +165,16 @@ public class GolfGame implements ILogic {
 
         //scene.setPointLights(new PointLight[]{pointLight});
         //scene.setSpotLights(new SpotLight[]{spotLight, spotLight2});
+
+        vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+        createMenu(blendMapTerrain, tree);
+        createInGameMenu();
+        isGuiVisible = true;
+        canMove = false;
+        isOnMenu = true;
+
+        audioManager = new AudioManager("src/main/resources/SoundTrack/wii.wav");
+        audioManager.playSound();
     }
 
     /**
@@ -184,33 +190,39 @@ public class GolfGame implements ILogic {
         float moveSpeed = Consts.CAMERA_MOVEMENT_SPEED  / EngineManager.getFps();
         float gravity = -9.81f;
 
-
-        if(window.is_keyPressed(GLFW.GLFW_KEY_W)) {
-            cameraInc.z = -moveSpeed;
-        }
-        if(window.is_keyPressed(GLFW.GLFW_KEY_S)) {
-            cameraInc.z = moveSpeed;
-        }
-        if(window.is_keyPressed(GLFW.GLFW_KEY_A)) {
-            cameraInc.x = -moveSpeed;
-        }
-        if(window.is_keyPressed(GLFW.GLFW_KEY_D)) {
-            cameraInc.x = moveSpeed;
-        }
-        if(window.is_keyPressed(GLFW.GLFW_KEY_SPACE)) {
-            cameraInc.y = Consts.JUMP_FORCE / EngineManager.getFps();
-            isJumping = true;
-        }
-        if(window.is_keyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
-            cameraInc.y = -Consts.JUMP_FORCE / EngineManager.getFps();
+        if (window.is_keyPressed(GLFW.GLFW_KEY_ESCAPE)) {
+            isGuiVisible = true;  // Toggle GUI visibility
+            canMove = false;  // Disable movement
         }
 
-        if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
-            scene.getPointLights()[0].getPosition().x += 0.1f;
+        if (canMove) {
+            if(window.is_keyPressed(GLFW.GLFW_KEY_W)) {
+                cameraInc.z = -moveSpeed;
+            }
+            if(window.is_keyPressed(GLFW.GLFW_KEY_S)) {
+                cameraInc.z = moveSpeed;
+            }
+            if(window.is_keyPressed(GLFW.GLFW_KEY_A)) {
+                cameraInc.x = -moveSpeed;
+            }
+            if(window.is_keyPressed(GLFW.GLFW_KEY_D)) {
+                cameraInc.x = moveSpeed;
+            }
+            if(window.is_keyPressed(GLFW.GLFW_KEY_SPACE)) {
+                cameraInc.y = Consts.JUMP_FORCE / EngineManager.getFps();
+                isJumping = true;
+            }
+            if(window.is_keyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
+                cameraInc.y = -Consts.JUMP_FORCE / EngineManager.getFps();
+            }
         }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT)) {
-            scene.getPointLights()[0].getPosition().x -= 0.1f;
-        }
+//
+//        if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
+//            scene.getPointLights()[0].getPosition().x += 0.1f;
+//        }
+//        if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT)) {
+//            scene.getPointLights()[0].getPosition().x -= 0.1f;
+       // }
 
 //        if (window.is_keyPressed(GLFW.GLFW_KEY_I)) {
 //            scene.getSpotLights()[0].getPointLight().getPosition().z = lightPos + 0.1f;
@@ -247,7 +259,22 @@ public class GolfGame implements ILogic {
     @Override
     public void update(MouseInput mouseInput) {
 
-        button.update();
+        if (isGuiVisible) {
+            if (isOnMenu) {
+                for (Button button : menuButtons) {
+                    button.update();
+                }
+            } else {
+                for (Button button : inGameMenuButtons) {
+                    button.update();
+                }
+            }
+        }
+
+        if (window.isResized()) {
+            window.setResized(false);
+            recreateGUIs();
+        }
 
         camera.movePosition(
                 cameraInc.x * Consts.CAMERA_MOVEMENT_SPEED,
@@ -255,9 +282,13 @@ public class GolfGame implements ILogic {
                 cameraInc.z * Consts.CAMERA_MOVEMENT_SPEED
         );
 
-        if (mouseInput.isRightButtonPressed()) {
-            Vector2f rotVec = mouseInput.getDisplVec();
-            camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
+        if (canMove) {
+            if (mouseInput.isRightButtonPressed()) {
+                Vector2f rotVec = mouseInput.getDisplVec();
+                camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
+            }
+        } else if (isOnMenu && isGuiVisible) {
+            camera.moveRotation(0, 0.1f, 0);
         }
 
         if (isJumping && camera.getPosition().y <= lastY) {
@@ -287,6 +318,50 @@ public class GolfGame implements ILogic {
         for (Terrain terrain : scene.getTerrains()) {
             renderer.processTerrain(terrain);
         }
+    }
+
+    /**
+     * Renders the game.
+     * It renders the entity and the camera.
+     */
+    @Override
+    public void render() {
+        renderer.clear();
+
+        renderer.render(camera, scene);
+
+        // Render your UI elements like menuButtons
+        if (isGuiVisible) {  // Add this line
+            if (isOnMenu) {
+                for (Button button : menuButtons) {
+                    button.render();
+                }
+                title.render();
+            } else {
+                for (Button button : inGameMenuButtons) {
+                    button.render();
+                }
+            }
+        }
+    }
+
+    /**
+     * Cleans up the game.
+     * It cleans up the renderer and loader.
+     */
+    @Override
+    public void cleanUp() {
+        renderer.cleanup();
+        loader.cleanUp();
+        audioManager.cleanup();
+        if (title != null) {
+            title.cleanup();  // Clean up the title resources
+        }
+        for (Button button : menuButtons) {
+            button.cleanup();
+        }
+        nvgDelete(vg);
+
     }
 
     private void daytimeCycle() {
@@ -381,40 +456,140 @@ public class GolfGame implements ILogic {
                 }
             }
         }
-
         Random rnd = new Random();
-        for (int i = 0; i < Math.max(Consts.SIZE_X, Consts.SIZE_Z) * 0.9; i++) {
+        for (int i = 0; i < Math.max(Consts.SIZE_X, Consts.SIZE_Z) * 0.1; i++) {
             Vector3f position = positions.get(rnd.nextInt(positions.size()));
             scene.addEntity(new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f));
         }
     }
 
-    /**
-     * Renders the game.
-     * It renders the entity and the camera.
-     */
-    @Override
-    public void render() {
-        renderer.clear();
+    private void createMenu(BlendMapTerrain blendMapTerrain, Model tree) {
 
+        camera.setPosition(new Vector3f(Consts.SIZE_X/4, 50, Consts.SIZE_Z/4));
+        camera.setRotation(20, 0, 0);
 
-        renderer.render(camera, scene);
+        System.out.println("Creating GUIs from: " + Thread.currentThread().getStackTrace()[2]);
 
-        // Disable depth testing for UI eleme
-        // Render your UI elements like buttons
-        button.render();
+        float width = window.getWidth();
+        float height = window.getHeight();
 
-        // Re-enable depth testing if there are later 3D renderings
+        Runnable terrainChanger = () -> {
+            try {
+                System.out.println("Changing terrain");
+                heightMap.createHeightMap();
+                TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
+                scene.getTerrains().remove(terrain);
+                SimplexNoise.shufflePermutation();
+                terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap2, false);
+                scene.addTerrain(terrain);
+                scene.getEntities().removeIf(entity -> entity.getModel().equals(tree));
+                try {
+                    createTrees(tree);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                renderer.processTerrain(terrain);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        Runnable startGame = () -> {
+            System.out.println("Allowing movement");
+            camera.setPosition(getGoodPosition());
+            canMove = true;
+            isGuiVisible = false;
+            isOnMenu = false;
+        };
+
+        Runnable quit = () -> {
+            System.out.println("Quitting game");
+            GLFW.glfwSetWindowShouldClose(Launcher.getWindow().getWindow(), true);
+        };
+
+        float titleWidth = window.getWidthConverted(1200);
+        float titleHeight = window.getHeightConverted(1200);
+        float titleX = (window.getWidth() - titleWidth) / 2;
+        float titleY = window.getHeightConverted(10);
+
+        title = new Title("Texture/title.png", titleX, titleY, titleWidth, titleHeight, vg);
+
+        float heightButton = window.getHeightConverted(300);
+        float widthButton = window.getWidthConverted(2000);
+        float centerButtonX = (width - widthButton) / 2;
+        float centerButtonY = titleHeight + titleY;
+
+        Button start = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", 100, startGame, vg, "Texture/buttons.png");
+        menuButtons.add(start);
+
+        Button changeTerrain = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Change Terrain", 100, terrainChanger, vg, "Texture/buttons.png");
+        menuButtons.add(changeTerrain);
+
+        Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2 , widthButton, heightButton, "Exit", 100, quit, vg, "Texture/buttons.png");
+        menuButtons.add(exit);
     }
 
-    /**
-     * Cleans up the game.
-     * It cleans up the renderer and loader.
-     */
-    @Override
-    public void cleanUp() {
-        renderer.cleanup();
-        loader.cleanUp();
-        nvgDelete(vg);
+    private void createInGameMenu() {
+        System.out.println("Creating GUIs from: " + Thread.currentThread().getStackTrace()[2]);
+
+        Runnable resume = () -> {
+            System.out.println("Resuming game");
+            canMove = true;
+            isGuiVisible = false;
+        };
+
+        Runnable backToMenu = () -> {
+            System.out.println("Returning to menu");
+            camera.setPosition(new Vector3f(Consts.SIZE_X/4, 50, Consts.SIZE_Z/4));
+            camera.setRotation(20, 0, 0);
+            canMove = false;
+            isGuiVisible = true;
+            isOnMenu = true;
+        };
+
+        Runnable quit = () -> {
+            System.out.println("Quitting game");
+            GLFW.glfwSetWindowShouldClose(Launcher.getWindow().getWindow(), true);
+        };
+
+        float heightButton = window.getHeightConverted(300);
+        float widthButton = window.getWidthConverted(2000);
+        float centerButtonX = (window.getWidth() - widthButton) / 2;
+        float centerButtonY = (window.getHeight() - heightButton * 3) / 2;
+
+        Button resumeButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Resume", 100, resume, vg, "Texture/inGameMenu.png");
+        inGameMenuButtons.add(resumeButton);
+
+        Button backToMenuButton = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Back to Menu", 100, backToMenu, vg, "Texture/inGameMenu.png");
+        inGameMenuButtons.add(backToMenuButton);
+
+        Button exitButton = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Exit", 100, quit, vg, "Texture/inGameMenu.png");
+        inGameMenuButtons.add(exitButton);
+    }
+
+    public Vector3f getGoodPosition() {
+        for (int i = 0; i < 500; i++) {
+            float x = (float) (Math.random() * 200 - 100);
+            float z = (float) (Math.random() * 200 - 100);
+            float y = terrain.getHeight(x, z);
+            if (y > 0 && y < 15) {
+                return new Vector3f(x, y, z);
+            }
+        }
+        return new Vector3f(0, 0, 0);
+    }
+
+    private void recreateGUIs() {
+        menuButtons.clear();
+
+        if (isOnMenu) {
+            createMenu(blendMapTerrain, scene.getEntities().get(2).getModel());
+        } else {
+            createInGameMenu();
+        }
+    }
+
+    private void setUpMusic() {
+
     }
 }
