@@ -38,7 +38,8 @@ public class GolfGame implements ILogic {
     private final WindowManager window;
     private final SceneManager scene;
     private long vg;
-    private final List<Button> buttons;
+    private final List<Button> menuButtons;
+    private final List<Button> inGameMenuButtons;
     private Title title;
 
     private final Camera camera;
@@ -51,6 +52,7 @@ public class GolfGame implements ILogic {
     private boolean canMove = false;
     private boolean isJumping = false;
     private boolean isGuiVisible = true;
+    private boolean isOnMenu = true;
     private float lastY;
 
     /**
@@ -65,7 +67,8 @@ public class GolfGame implements ILogic {
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
         heightMap = new HeightMap();
-        buttons = new ArrayList<>();
+        menuButtons = new ArrayList<>();
+        inGameMenuButtons = new ArrayList<>();
     }
 
     /**
@@ -162,12 +165,16 @@ public class GolfGame implements ILogic {
 
         //scene.setPointLights(new PointLight[]{pointLight});
         //scene.setSpotLights(new SpotLight[]{spotLight, spotLight2});
-        createGUIs(blendMapTerrain, tree);
+
+        vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+        createMenu(blendMapTerrain, tree);
+        createInGameMenu();
         isGuiVisible = true;
         canMove = false;
+        isOnMenu = true;
 
         audioManager = new AudioManager("src/main/resources/SoundTrack/wii.wav");
-        //audioManager.playSound();
+        audioManager.playSound();
     }
 
     /**
@@ -252,8 +259,16 @@ public class GolfGame implements ILogic {
     @Override
     public void update(MouseInput mouseInput) {
 
-        for (Button button : buttons) {
-            button.update();
+        if (isGuiVisible) {
+            if (isOnMenu) {
+                for (Button button : menuButtons) {
+                    button.update();
+                }
+            } else {
+                for (Button button : inGameMenuButtons) {
+                    button.update();
+                }
+            }
         }
 
         if (window.isResized()) {
@@ -272,7 +287,7 @@ public class GolfGame implements ILogic {
                 Vector2f rotVec = mouseInput.getDisplVec();
                 camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
             }
-        } else {
+        } else if (isOnMenu && isGuiVisible) {
             camera.moveRotation(0, 0.1f, 0);
         }
 
@@ -315,12 +330,18 @@ public class GolfGame implements ILogic {
 
         renderer.render(camera, scene);
 
-        // Render your UI elements like buttons
+        // Render your UI elements like menuButtons
         if (isGuiVisible) {  // Add this line
-            for (Button button : buttons) {
-                button.render();
+            if (isOnMenu) {
+                for (Button button : menuButtons) {
+                    button.render();
+                }
+                title.render();
+            } else {
+                for (Button button : inGameMenuButtons) {
+                    button.render();
+                }
             }
-            title.render();
         }
     }
 
@@ -336,7 +357,7 @@ public class GolfGame implements ILogic {
         if (title != null) {
             title.cleanup();  // Clean up the title resources
         }
-        for (Button button : buttons) {
+        for (Button button : menuButtons) {
             button.cleanup();
         }
         nvgDelete(vg);
@@ -442,11 +463,12 @@ public class GolfGame implements ILogic {
         }
     }
 
-    private void createGUIs(BlendMapTerrain blendMapTerrain, Model tree) {
+    private void createMenu(BlendMapTerrain blendMapTerrain, Model tree) {
+
+        camera.setPosition(new Vector3f(Consts.SIZE_X/4, 50, Consts.SIZE_Z/4));
+        camera.setRotation(20, 0, 0);
 
         System.out.println("Creating GUIs from: " + Thread.currentThread().getStackTrace()[2]);
-
-        vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
 
         float width = window.getWidth();
         float height = window.getHeight();
@@ -474,8 +496,10 @@ public class GolfGame implements ILogic {
 
         Runnable startGame = () -> {
             System.out.println("Allowing movement");
+            camera.setPosition(getGoodPosition());
             canMove = true;
             isGuiVisible = false;
+            isOnMenu = false;
         };
 
         Runnable quit = () -> {
@@ -496,23 +520,73 @@ public class GolfGame implements ILogic {
         float centerButtonY = titleHeight + titleY;
 
         Button start = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", 100, startGame, vg, "Texture/buttons.png");
-        buttons.add(start);
+        menuButtons.add(start);
 
         Button changeTerrain = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Change Terrain", 100, terrainChanger, vg, "Texture/buttons.png");
-        buttons.add(changeTerrain);
+        menuButtons.add(changeTerrain);
 
         Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2 , widthButton, heightButton, "Exit", 100, quit, vg, "Texture/buttons.png");
-        buttons.add(exit);
+        menuButtons.add(exit);
+    }
+
+    private void createInGameMenu() {
+        System.out.println("Creating GUIs from: " + Thread.currentThread().getStackTrace()[2]);
+
+        Runnable resume = () -> {
+            System.out.println("Resuming game");
+            canMove = true;
+            isGuiVisible = false;
+        };
+
+        Runnable backToMenu = () -> {
+            System.out.println("Returning to menu");
+            camera.setPosition(new Vector3f(Consts.SIZE_X/4, 50, Consts.SIZE_Z/4));
+            camera.setRotation(20, 0, 0);
+            canMove = false;
+            isGuiVisible = true;
+            isOnMenu = true;
+        };
+
+        Runnable quit = () -> {
+            System.out.println("Quitting game");
+            GLFW.glfwSetWindowShouldClose(Launcher.getWindow().getWindow(), true);
+        };
+
+        float heightButton = window.getHeightConverted(300);
+        float widthButton = window.getWidthConverted(2000);
+        float centerButtonX = (window.getWidth() - widthButton) / 2;
+        float centerButtonY = (window.getHeight() - heightButton * 3) / 2;
+
+        Button resumeButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Resume", 100, resume, vg, "Texture/inGameMenu.png");
+        inGameMenuButtons.add(resumeButton);
+
+        Button backToMenuButton = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Back to Menu", 100, backToMenu, vg, "Texture/inGameMenu.png");
+        inGameMenuButtons.add(backToMenuButton);
+
+        Button exitButton = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Exit", 100, quit, vg, "Texture/inGameMenu.png");
+        inGameMenuButtons.add(exitButton);
+    }
+
+    public Vector3f getGoodPosition() {
+        for (int i = 0; i < 500; i++) {
+            float x = (float) (Math.random() * 200 - 100);
+            float z = (float) (Math.random() * 200 - 100);
+            float y = terrain.getHeight(x, z);
+            if (y > 0 && y < 15) {
+                return new Vector3f(x, y, z);
+            }
+        }
+        return new Vector3f(0, 0, 0);
     }
 
     private void recreateGUIs() {
-        buttons.clear();
+        menuButtons.clear();
 
-        if (vg != 0) {
-            nvgDelete(vg); // Properly delete the old NanoVG context if needed
+        if (isOnMenu) {
+            createMenu(blendMapTerrain, scene.getEntities().get(2).getModel());
+        } else {
+            createInGameMenu();
         }
-
-        createGUIs(blendMapTerrain, scene.getEntities().get(2).getModel());
     }
 
     private void setUpMusic() {
