@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * The class responsible for rendering the entities.
  */
-public class EntityRenderer implements IRenderer{
+public class EntityRenderer implements IRenderer<Entity> {
 
     ShaderManager shader; // The shader manager of the entity render.
     private final Map<Model, List<Entity>> entities; // The entities to render.
@@ -146,9 +146,9 @@ public class EntityRenderer implements IRenderer{
      * @param camera The camera of the game.
      */
     @Override
-    public void prepare(Object entity, Camera camera) {
+    public void prepare(Entity entity, Camera camera) {
         shader.setUniform("textureSampler", 0); // Set the texture sampler.
-        shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix((Entity) entity)); // Set the transformation matrix.
+        shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix(entity)); // Set the transformation matrix.
         shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera)); // Set the view matrix.
     }
 

@@ -1,5 +1,7 @@
 package com.um_project_golf.Core;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
@@ -15,12 +17,12 @@ import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class AudioManager {
+    private static final Logger log = LogManager.getLogger(AudioManager.class);
     private long device;
     private long context;
     private int buffer;
     private int source;
-    private String path;
-    private float targetSampleRate = 44100;  // Default sample rate
+    private final String path;
 
     public AudioManager(String path) {
         this.path = path;
@@ -50,6 +52,8 @@ public class AudioManager {
         float actualSampleRate = loadAndBufferAudio(path);
 
         // Calculate the correct pitch
+        // Default sample rate
+        float targetSampleRate = 44100;
         float pitch = actualSampleRate / targetSampleRate;
 
         // Set up source input
@@ -78,7 +82,7 @@ public class AudioManager {
 
             return sampleRate;
         } catch (UnsupportedAudioFileException | IOException e) {
-            e.printStackTrace();
+            log.error("Failed to load audio file: {}", filePath, e);
         }
         return 0;
     }

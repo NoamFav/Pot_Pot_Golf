@@ -21,7 +21,7 @@ public class Button {
     private int imgId = -1;  // Store the image ID
 
     private double scaledMouseX, scaledMouseY;  // Scaled mouse position
-    private final boolean debugMode = false;  // Debug mode for button interaction
+    private boolean debugMode = false;  // Debug mode for button interaction
     private boolean isPressed = false;
 
 
@@ -147,6 +147,14 @@ public class Button {
             nvgDeleteImage(vg, imgId);
             imgId = -1;
         }
+    }
+
+    public void setDebugMode(boolean debugMode) {
+        this.debugMode = debugMode;
+    }
+
+    public boolean getDebugMode() {
+        return debugMode;
     }
 
 }

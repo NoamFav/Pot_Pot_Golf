@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * The class responsible for rendering the entities.
  */
-public class TerrainRenderer implements IRenderer{
+public class TerrainRenderer implements IRenderer<Terrain> {
 
     ShaderManager shader; // The shader of the entity render.
     private final List<Terrain> terrains; // The list of entities to render.
@@ -136,16 +136,16 @@ public class TerrainRenderer implements IRenderer{
      * @param camera The camera of the game.
      */
     @Override
-    public void prepare(Object terrain, Camera camera) {
-        for (int i = 0; i < ((Terrain) terrain).getBlendMapTerrain().getTextures().size(); i++) { // For each texture
+    public void prepare(Terrain terrain, Camera camera) {
+        for (int i = 0; i < (terrain).getBlendMapTerrain().getTextures().size(); i++) { // For each texture
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + i); // Activates the texture
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMapTerrain().getTextures().get(i).getId()); // Binds the texture
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, (terrain).getBlendMapTerrain().getTextures().get(i).getId()); // Binds the texture
         }
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + Consts.MAX_TEXTURES); // Activates the texture. (Blend Map)
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((Terrain) terrain).getBlendMap().getId()); // Binds the texture.
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, (terrain).getBlendMap().getId()); // Binds the texture.
 
-        shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix((Terrain) terrain)); // Sets the transformation matrix.
+        shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix(terrain)); // Sets the transformation matrix.
         shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera)); // Sets the view matrix.
     }
 
