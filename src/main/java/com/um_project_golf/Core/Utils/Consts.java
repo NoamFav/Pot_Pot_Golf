@@ -11,7 +11,11 @@ import org.joml.Vector4f;
  */
 public class Consts {
 
+    public static final int MAX_TEXTURES = 7;
     public static String Title = "UM Project Golf";
+
+    public static final float REFERENCE_WIDTH = 3840;
+    public static final float REFERENCE_HEIGHT = 2160;
 
     public static final double SCALE = 0.005; // Used for scaling the terrain with simplex noise
     public static final int OCTAVES = 10; // Number of octaves used in simplex noise (higher = more detail)

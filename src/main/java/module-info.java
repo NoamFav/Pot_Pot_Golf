@@ -20,6 +20,7 @@ module com.example.um_project_golf {
     requires lwjgl3.awt;
     requires java.desktop;
     requires org.lwjgl.nanovg;
+    requires org.lwjgl.openal;
 
     opens com.um_project_golf to javafx.fxml;
     opens com.um_project_golf.Core to javafx.fxml;
