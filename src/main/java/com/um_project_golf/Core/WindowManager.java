@@ -21,9 +21,6 @@ public class WindowManager {
 
     private boolean firstResize, resized, vSync, antiAliasing; // The resized, vSync and antiAliasing of the window.
 
-    private final float referenceWidth = 3840;
-    private final float referenceHeight = 2160;
-
     private final Matrix4f projectionMatrix; // The projection matrix of the window manager.
 
     /**
@@ -292,12 +289,12 @@ public class WindowManager {
     }
 
     public float getWidthConverted(float value) {
-        float scaleFactor = width / referenceWidth;
+        float scaleFactor = width / Consts.REFERENCE_WIDTH;
         return value * scaleFactor;
     }
 
     public float getHeightConverted(float value) {
-        float scaleFactor = height / referenceHeight;
+        float scaleFactor = height / Consts.REFERENCE_HEIGHT;
         return value * scaleFactor;
     }
 
