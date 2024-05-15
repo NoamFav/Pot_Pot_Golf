@@ -58,37 +58,47 @@ void setupColor(Material material, vec2 textCoords) {
         vec4 blendMapColor = texture(blendMap, textCoords); // Get the blend map color
         vec2 tiledCoords = textCoords * 100.0; // Tile the texture coordinates
 
-        // Normalize blend map colors by ensuring they do not exceed 1.0 in total
-        //float maxColorWeight = max(blendMapColor.r + blendMapColor.g + blendMapColor.b, 1.0);
-        //blendMapColor.rgb /= maxColorWeight;
+        // Normalize blend map colors to ensure they do not exceed 1.0 in total
+        float totalBlend = blendMapColor.r + blendMapColor.g + blendMapColor.b;
+        if (totalBlend > 1.0) {
+            blendMapColor.rgb /= totalBlend;
+        }
 
         // Recalculate the background texture amount
-        float backgroundTextureAmount = 1.0 - (blendMapColor.r + blendMapColor.g + blendMapColor.b);
+        float backgroundTextureAmount = 1.0 - totalBlend;
         vec4 backgroundTextureColor = texture(textures[6], tiledCoords) * backgroundTextureAmount;
 
-        // Apply textures with controlled blend factors
-        bool isDarkRed = blendMapColor.r > 0.1 && blendMapColor.r < 0.4 && blendMapColor.g < 0.1 && blendMapColor.b < 0.1;
-        bool isDarkGreen = blendMapColor.g > 0.1 && blendMapColor.g < 0.4 && blendMapColor.r < 0.1 && blendMapColor.b < 0.1;
-        bool isDarkBlue = blendMapColor.b > 0.1 && blendMapColor.b < 0.4 && blendMapColor.r < 0.1 && blendMapColor.g < 0.1;
-
-        float darkRedTextureAmount = max(0.0, blendMapColor.r - 0.05) / 0.20; // Adjust base and range
-        float darkGreenTextureAmount = max(0.0, blendMapColor.g - 0.05) / 0.20;
-        float darkBlueTextureAmount = max(0.0, blendMapColor.b - 0.05) / 0.20;
-
-        vec4 darkRedTextureColor = vec4(0);
-        vec4 darkGreenTextureColor = vec4(0);
-        vec4 darkBlueTextureColor = vec4( 0);
+        // Initialize texture colors
         vec4 rTextureColor = vec4(0);
         vec4 gTextureColor = vec4(0);
         vec4 bTextureColor = vec4(0);
+        vec4 darkRedTextureColor = vec4(0);
+        vec4 darkGreenTextureColor = vec4(0);
+        vec4 darkBlueTextureColor = vec4(0);
 
-        if (isDarkRed || isDarkGreen || isDarkBlue){
-            darkRedTextureColor = texture(textures[3], tiledCoords) * darkRedTextureAmount * .6;
-            darkGreenTextureColor = texture(textures[4], tiledCoords) * darkGreenTextureAmount * .6;
-            darkBlueTextureColor = texture(textures[5], tiledCoords) * darkBlueTextureAmount * .6;
+        float base = 0.1;
+        float range = 0.3;
+        float factor = 1.8;
+
+        // Apply textures with blend factors
+        if (blendMapColor.r > 0.1 && blendMapColor.r < 0.4 && blendMapColor.g < 0.1 && blendMapColor.b < 0.1) {
+            float darkRedTextureAmount = (blendMapColor.r - base) / range; // Adjust base and range
+            darkRedTextureColor = texture(textures[3], tiledCoords) * darkRedTextureAmount * factor;
         } else {
             rTextureColor = texture(textures[0], tiledCoords) * blendMapColor.r;
+        }
+
+        if (blendMapColor.g > 0.1 && blendMapColor.g < 0.4 && blendMapColor.r < 0.1 && blendMapColor.b < 0.1) {
+            float darkGreenTextureAmount = (blendMapColor.g - base) / range; // Adjust base and range
+            darkGreenTextureColor = texture(textures[4], tiledCoords) * darkGreenTextureAmount * factor;
+        } else {
             gTextureColor = texture(textures[1], tiledCoords) * blendMapColor.g;
+        }
+
+        if (blendMapColor.b > 0.1 && blendMapColor.b < 0.4 && blendMapColor.r < 0.1 && blendMapColor.g < 0.1) {
+            float darkBlueTextureAmount = (blendMapColor.b - base) / range; // Adjust base and range
+            darkBlueTextureColor = texture(textures[5], tiledCoords) * darkBlueTextureAmount * factor;
+        } else {
             bTextureColor = texture(textures[2], tiledCoords) * blendMapColor.b;
         }
 
