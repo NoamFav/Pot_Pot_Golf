@@ -38,11 +38,13 @@ public class PhysicsEngine {
         this.heightMap = heightMap;
     }
 
-    // public void runImprovedEuler(double[] initialState, double stepSize, double totalTime) { // initialState = [x, y, vx, vy]
+    // public double[] runImprovedEulerFunction(double[] initialState, double stepSize, double totalTime) { // initialState = [x, y, vx, vy]
     //     System.out.println("Initial position: x: " + initialState[0] + ", y: " + initialState[1]);
     //     double[] currentState = initialState;
     //     currentState = SimpleRK2.simpleImprovedEuler(0, currentState, totalTime, stepSize, (t, y) -> this.equationsOfMotion(t, y));
     //     System.out.println("x: " + currentState[0] + ", y: " + currentState[1]);
+    //     double[] result = {currentState[0], currentState[1]};
+    //     return result;
     // }
     public Vector3f runImprovedEuler(double[] initialState, double stepSize, double totalTime) { // initialState = [x, y, vx, vy]
         double[] currentState = initialState;
@@ -106,11 +108,12 @@ public class PhysicsEngine {
                 }
             }
         }
+
         // System.out.println("vx:" + vx);
         // System.out.println("vy:" + vy);
         // System.out.println("ax:" + dxdt[2]);
         // System.out.println("ay:" + dxdt[3]);
-
+  
         return dxdt;
     }
 
@@ -126,30 +129,44 @@ public class PhysicsEngine {
         return (this.heightFunction.apply(x, y - 2 * stepSize) - 8 * this.heightFunction.apply(x, y - stepSize) + 8 * this.heightFunction.apply(x, y + stepSize) - this.heightFunction.apply(x, y + 2 * stepSize)) / (12 * stepSize);
     }
     private double dh_dxCentredDifferenceMap(double x, double y) {
-        double stepSize = 0.001;
+        double stepSize = 0.0001;
         return (this.heightMap.getHeight(new Vector3f((float) (x - 2 * stepSize), 0, (float) y)) - 8 * this.heightMap.getHeight(new Vector3f((float)(x - stepSize), 0, (float) y)) + 8 * this.heightMap.getHeight(new Vector3f((float) (x + stepSize), 0, (float) y)) - this.heightMap.getHeight(new Vector3f((float)(x + 2 * stepSize), 0, (float) y))) / (12 * stepSize);
     }
 
     private double dh_dyCentredDifferenceMap(double x, double y) {
-        double stepSize = 0.001;
+        double stepSize = 0.0001;
         return (this.heightMap.getHeight(new Vector3f((float) x, 0, (float) (y - 2 * stepSize))) - 8 * this.heightMap.getHeight(new Vector3f((float)x, 0, (float) (y - stepSize))) + 8 * this.heightMap.getHeight(new Vector3f((float) x, 0, (float) (y + stepSize))) - this.heightMap.getHeight(new Vector3f((float) x, 0, (float) (y + 2 * stepSize)))) / (12 * stepSize);
     }
     public static void main(String[] args) {
+
+        // Testing with height map
+        HeightMap testMap = new HeightMap();
+        testMap.createHeightMap();
+        double[] initialState = {0, 0, 1, 1}; // initialState = [x, z, vx, vz]
+        double h = 0.1; // Time step
+        double totalTime = 5; // Total time
+        PhysicsEngine engine = new PhysicsEngine(testMap,0.08, 0.2, 0.1, 0.3);
+        Vector3f finalPosition;
+        for (int i = 0; i < 50; i++) {
+        finalPosition = engine.runImprovedEuler(initialState, h, totalTime);
+        initialState[0] = finalPosition.x;
+        initialState[1] = finalPosition.z;
+        //System.out.println("Before:" + finalPosition.x + ", " + finalPosition.y  + ", " + finalPosition.z);
+        System.out.println(finalPosition.x + ", " + finalPosition.y  + ", " + finalPosition.z);
+        }
+
+        // testing with BiFunction
         // BiFunction<Double, Double, Double> height = (x,y) -> 0.4 * (0.9 - Math.exp(- (x * x + y * y) / 8.0));
         // PhysicsEngine engine = new PhysicsEngine(height, 0.08, 0.2, 0.1, 0.3);
         // double[] initialState = {0, 0, 2, 2}; 
         // double h = 0.1; // Time step
         // double totalTime = 5; // Total time
-        // engine.runImprovedEuler(initialState, h, totalTime);
-
-
-        HeightMap testMap = new HeightMap();
-        testMap.createHeightMap();
-        PhysicsEngine engine = new PhysicsEngine(testMap, 0.08, 0.2, 0.1, 0.3);
-        double[] initialState = {0, 0, 1, 1}; 
-        double h = 0.1; // Time step
-        double totalTime = 5; // Total time
-        System.out.println(engine.runImprovedEuler(initialState, h, totalTime).x + ", " + engine.runImprovedEuler(initialState, h, totalTime).y  + ", " + engine.runImprovedEuler(initialState, h, totalTime).z);
+        // double[] result;
+        // for (int i = 0; i < 50; i++) {
+        //     result = engine.runImprovedEulerFunction(initialState, h, totalTime);
+        //     initialState[0] = result[0];
+        //     initialState[1] = result[1];
+        // }
     }
     
 }
