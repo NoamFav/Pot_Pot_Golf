@@ -140,8 +140,8 @@ public class GolfGame implements ILogic {
 
         createTrees(tree);
 
-        // golfBall = new Entity(ball, new Vector3f(0, heightMap.getHeight(new Vector3f(0, 0, 0)), 0), new Vector3f(50, 0, 0), 50);
-        golfBall = new Entity(ball, new Vector3f(0, terrain.getHeight(0, 0), 0), new Vector3f(50, 0, 0), 100);
+        golfBall = new Entity(ball, new Vector3f(0, heightMap.getHeight(new Vector3f(0, 0, 0)), 0), new Vector3f(50, 0, 0), 50);
+        // golfBall = new Entity(ball, new Vector3f(0, terrain.getHeight(0, 0), 0), new Vector3f(50, 0, 0), 10);
         System.out.println(golfBall.getPos().x + "," + golfBall.getPos().y + "," + golfBall.getPos().z);
         scene.addEntity(golfBall);
 
@@ -189,8 +189,7 @@ public class GolfGame implements ILogic {
             try {
                 double[] initialState = {golfBall.getPos().x, golfBall.getPos().z, 1, 1}; // initialState = [x, z, vx, vz]
                 double h = 0.1; // Time step
-                double totalTime = 1; // Total time
-                Vector3f finalPosition = engine.runImprovedEuler(initialState, h, totalTime);
+                Vector3f finalPosition = engine.runImprovedEuler(initialState, h);
                 checkCollisionBall(finalPosition);
                 System.out.println("Position:" + finalPosition.x + ", " + finalPosition.y  + ", " + finalPosition.z);
                 golfBall.setPos(finalPosition.x, finalPosition.y, finalPosition.z);
@@ -201,9 +200,6 @@ public class GolfGame implements ILogic {
             }
         };
 
-//        for (int i = 0; i < 50; i++) {
-//            hitGolfBall.run();
-//        }
 
         // Initialize the hit button with the NanoVG context
         //hitButton.createButton(100, 700, 250, 250, "Hit Ball", hitGolfBall, vg);
@@ -437,7 +433,7 @@ public class GolfGame implements ILogic {
     private void checkCollision() {
         Vector3f newPosition = camera.getPosition();
 
-        //terrainCollision(newPosition);
+        terrainCollision(newPosition);
         borderCollision(newPosition);
 
         camera.setPosition(newPosition);
@@ -461,7 +457,7 @@ public class GolfGame implements ILogic {
         // Retrieve the terrain height using the clamped indices
         // float terrainHeight = heightMap.getHeight(newPosition) + golfBall.getScale();
         float terrainHeight = heightMap.getHeight(newPosition);
-        System.out.println("Terrain height: " + terrainHeight);
+        //System.out.println("Terrain height: " + terrainHeight);
         if (newPosition.y < terrainHeight) {
             newPosition.y = terrainHeight;
         }
@@ -469,25 +465,25 @@ public class GolfGame implements ILogic {
     private void borderCollisionBall(Vector3f newPosition) {
         if (newPosition.x < -Consts.SIZE_X / 2) {
             newPosition.x = -Consts.SIZE_X / 2;
-            System.out.println("1");
+            //System.out.println("1");
             //cameraInc.x = 0;
         } else if (newPosition.x > Consts.SIZE_X / 2) {
             newPosition.x = Consts.SIZE_X / 2;
             //cameraInc.x = 0;
-            System.out.println("2");
+            //System.out.println("2");
         }
         if (newPosition.z < -Consts.SIZE_Z / 2) {
             newPosition.z = -Consts.SIZE_Z / 2;
-            System.out.println("3");
+            //System.out.println("3");
             //cameraInc.z = 0;
         } else if (newPosition.z > Consts.SIZE_Z / 2) {
             newPosition.z = Consts.SIZE_Z / 2;
-            System.out.println("4");
+            //System.out.println("4");
             //cameraInc.z = 0;
         }
         if (newPosition.y > Consts.MAX_HEIGHT) {
             newPosition.y = Consts.MAX_HEIGHT;
-            System.out.println("5");
+            //System.out.println("5");
             //cameraInc.y = 0;
         }
     }
