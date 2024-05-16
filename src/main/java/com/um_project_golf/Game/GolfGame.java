@@ -53,6 +53,7 @@ public class GolfGame implements ILogic {
     private boolean isJumping = false;
     private boolean isGuiVisible = true;
     private boolean isOnMenu = true;
+    private boolean isSoundPlaying = false;
     private float lastY;
 
     /**
@@ -175,6 +176,7 @@ public class GolfGame implements ILogic {
 
         audioManager = new AudioManager("src/main/resources/SoundTrack/wii.wav");
         audioManager.playSound();
+        isSoundPlaying = true;
     }
 
     /**
@@ -502,10 +504,22 @@ public class GolfGame implements ILogic {
             isOnMenu = false;
         };
 
+        Runnable sound = () -> {
+            System.out.println("Playing sound");
+            if (isSoundPlaying) {
+                audioManager.stopSound();
+            } else {
+                audioManager.playSound();
+            }
+            isSoundPlaying = !isSoundPlaying;
+        };
+
         Runnable quit = () -> {
             System.out.println("Quitting game");
             GLFW.glfwSetWindowShouldClose(Launcher.getWindow().getWindow(), true);
         };
+
+
 
         float titleWidth = window.getWidthConverted(1200);
         float titleHeight = window.getHeightConverted(1200);
@@ -524,6 +538,9 @@ public class GolfGame implements ILogic {
 
         Button changeTerrain = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Change Terrain", 100, terrainChanger, vg, "Texture/buttons.png");
         menuButtons.add(changeTerrain);
+
+        Button soundButton = new Button(window.getWidthConverted(window.getWidth()-300), window.getHeightConverted(20), window.getWidthConverted(300), heightButton, "Sound", 100, sound, vg, "Texture/buttons.png");
+        menuButtons.add(soundButton);
 
         Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2 , widthButton, heightButton, "Exit", 100, quit, vg, "Texture/buttons.png");
         menuButtons.add(exit);
@@ -547,6 +564,16 @@ public class GolfGame implements ILogic {
             isOnMenu = true;
         };
 
+        Runnable sound = () -> {
+            System.out.println("Playing sound");
+            if (isSoundPlaying) {
+                audioManager.stopSound();
+            } else {
+                audioManager.playSound();
+            }
+            isSoundPlaying = !isSoundPlaying;
+        };
+
         Runnable quit = () -> {
             System.out.println("Quitting game");
             GLFW.glfwSetWindowShouldClose(Launcher.getWindow().getWindow(), true);
@@ -563,7 +590,10 @@ public class GolfGame implements ILogic {
         Button backToMenuButton = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Back to Menu", 100, backToMenu, vg, "Texture/inGameMenu.png");
         inGameMenuButtons.add(backToMenuButton);
 
-        Button exitButton = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Exit", 100, quit, vg, "Texture/inGameMenu.png");
+        Button soundButton = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Sound", 100, sound, vg, "Texture/inGameMenu.png");
+        inGameMenuButtons.add(soundButton);
+
+        Button exitButton = new Button(centerButtonX, centerButtonY + heightButton * 3, widthButton, heightButton, "Exit", 100, quit, vg, "Texture/inGameMenu.png");
         inGameMenuButtons.add(exitButton);
     }
 

@@ -65,6 +65,10 @@ public class AudioManager {
         AL10.alSourcePlay(source);
     }
 
+    public void stopSound() {
+        AL10.alSourceStop(source);
+    }
+
     private float loadAndBufferAudio(String filePath) {
         File file = new File(filePath);
         try {
