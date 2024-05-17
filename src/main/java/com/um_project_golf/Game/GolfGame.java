@@ -10,6 +10,7 @@ import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
 import com.um_project_golf.Core.MouseInput;
 import com.um_project_golf.Core.Rendering.RenderManager;
+import com.um_project_golf.Core.Utils.ButtonTimer;
 import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -37,9 +38,12 @@ public class GolfGame implements ILogic {
     private final ObjectLoader loader;
     private final WindowManager window;
     private final SceneManager scene;
+    private final ButtonTimer timer;
+    private MouseInput mouseInputs;
     private long vg;
     private final List<Button> menuButtons;
     private final List<Button> inGameMenuButtons;
+    private Button infoButton;
     private Title title;
 
     private final Camera camera;
@@ -54,7 +58,9 @@ public class GolfGame implements ILogic {
     private boolean isGuiVisible = true;
     private boolean isOnMenu = true;
     private boolean isSoundPlaying = false;
+    private boolean wasPressed = false;
     private float lastY;
+
 
     /**
      * The constructor of the game.
@@ -65,6 +71,7 @@ public class GolfGame implements ILogic {
         window = Launcher.getWindow();
         loader = new ObjectLoader();
         scene = new SceneManager(-90);
+        timer = new ButtonTimer();
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
         heightMap = new HeightMap();
@@ -79,8 +86,10 @@ public class GolfGame implements ILogic {
      * @throws Exception If the game fails to initialize.
      */
     @Override
-    public void init() throws Exception {
+    public void init(MouseInput mouseInput) throws Exception {
         System.out.println("Initializing game");
+
+        mouseInputs = mouseInput;
 
         heightMap.createHeightMap();
         scene.setDefaultTexture(new Texture(loader.loadTexture("Texture/Default.png")));
@@ -174,6 +183,8 @@ public class GolfGame implements ILogic {
         canMove = false;
         isOnMenu = true;
 
+        infoButton = new Button(10, 10, 1000, 300, "Info", 70, () -> {}, vg, "Texture/buttons.png");
+
         audioManager = new AudioManager("src/main/resources/SoundTrack/wii.wav");
         audioManager.playSound();
         isSoundPlaying = true;
@@ -218,6 +229,32 @@ public class GolfGame implements ILogic {
                 cameraInc.y = -Consts.JUMP_FORCE / EngineManager.getFps();
             }
         }
+
+        if (mouseInputs.isLeftButtonPressed()) {
+            if (!wasPressed) { // If the button was not previously pressed
+                timer.startTimer();
+                wasPressed = true; // Update the tracked state
+            } else {
+                // Continuously update the button text with the current time pressed
+                String time = timer.getFormattedTime();
+                String velocity = secondToVelocity(timer.getTime());
+                infoButton.setText(time + " - velocity: " + velocity + " m/s");
+            }
+        } else {
+            if (wasPressed) { // If the button was previously pressed
+                wasPressed = false; // Update the tracked state
+            }
+        }
+
+        if (canMove) {
+            if (mouseInputs.isRightButtonPressed()) {
+                Vector2f rotVec = mouseInputs.getDisplayVec();
+                camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
+            }
+        } else if (isOnMenu && isGuiVisible) {
+            camera.moveRotation(0, 0.1f, 0);
+        }
+
 //
 //        if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
 //            scene.getPointLights()[0].getPosition().x += 0.1f;
@@ -255,11 +292,9 @@ public class GolfGame implements ILogic {
     /**
      * Updates the game state.
      * It moves the camera and the entity based on the input of the user.
-     *
-     * @param mouseInput The mouse input of the user.
      */
     @Override
-    public void update(MouseInput mouseInput) {
+    public void update() {
 
         if (isGuiVisible) {
             if (isOnMenu) {
@@ -272,6 +307,7 @@ public class GolfGame implements ILogic {
                 }
             }
         }
+        infoButton.update();
 
         if (window.isResized()) {
             window.setResized(false);
@@ -283,15 +319,6 @@ public class GolfGame implements ILogic {
                 (cameraInc.y * Consts.CAMERA_MOVEMENT_SPEED),
                 cameraInc.z * Consts.CAMERA_MOVEMENT_SPEED
         );
-
-        if (canMove) {
-            if (mouseInput.isRightButtonPressed()) {
-                Vector2f rotVec = mouseInput.getDisplVec();
-                camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
-            }
-        } else if (isOnMenu && isGuiVisible) {
-            camera.moveRotation(0, 0.1f, 0);
-        }
 
         if (isJumping && camera.getPosition().y <= lastY) {
             isJumping = false;
@@ -345,6 +372,7 @@ public class GolfGame implements ILogic {
                 }
             }
         }
+        infoButton.render();
     }
 
     /**
@@ -360,6 +388,9 @@ public class GolfGame implements ILogic {
             title.cleanup();  // Clean up the title resources
         }
         for (Button button : menuButtons) {
+            button.cleanup();
+        }
+        for (Button button : inGameMenuButtons) {
             button.cleanup();
         }
         nvgDelete(vg);
@@ -619,7 +650,13 @@ public class GolfGame implements ILogic {
         }
     }
 
-    private void setUpMusic() {
+    private String secondToVelocity(long ms) {
+        float second = (float) ms / 1000;
+        float velocity = cappedExponantialFunc(second, 3, 1, 74);
+        return String.valueOf(velocity);
+    }
 
+    private float cappedExponantialFunc(float s, float C, float k, float max) {
+        return (float) Math.min(C*(Math.exp(k*s)-1), max);
     }
 }

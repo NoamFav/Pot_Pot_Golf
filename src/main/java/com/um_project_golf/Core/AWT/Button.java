@@ -13,7 +13,7 @@ import static org.lwjgl.nanovg.NanoVG.*;
 public class Button {
     private final float x, y;  // Button position
     private final float width, height;  // Button dimensions
-    private final String text; // Button text
+    private String text; // Button text
     private final Runnable action;  // Action to be performed when the button is clicked
     private final long vg;  // NanoVG context
     private final String imagePath;  // Image path for the button
@@ -155,6 +155,10 @@ public class Button {
 
     public boolean getDebugMode() {
         return debugMode;
+    }
+
+    public void setText(String text){
+        this.text = text;
     }
 
 }
