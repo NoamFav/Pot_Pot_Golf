@@ -70,7 +70,7 @@ public class Button {
 
             int fontId = nvgCreateFont(vg, "golf", "src/main/resources/fonts/golf.ttf");
             if (fontId == -1) {
-                System.out.println("Font loading failed");
+                throw new RuntimeException("Could not add font");
             }
 
             nvgFontSize(vg, fontSize);
