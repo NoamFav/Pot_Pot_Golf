@@ -2,6 +2,7 @@ package com.um_project_golf.Game;
 
 import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.AWT.Button;
+import com.um_project_golf.Core.AWT.TextField;
 import com.um_project_golf.Core.AWT.Title;
 import com.um_project_golf.Core.Entity.*;
 import com.um_project_golf.Core.Entity.Terrain.*;
@@ -44,6 +45,7 @@ public class GolfGame implements ILogic {
     private final List<Button> menuButtons;
     private final List<Button> inGameMenuButtons;
     private Button infoButton;
+    private TextField textField;
     private Title title;
 
     private final Camera camera;
@@ -185,6 +187,19 @@ public class GolfGame implements ILogic {
 
         infoButton = new Button(10, 10, 1000, 300, "Info", 70, () -> {}, vg, "Texture/buttons.png");
 
+        textField = new TextField(10, 300, 1000, 300, "Enter text here", 70, vg, "Texture/buttons.png");
+        GLFW.glfwSetKeyCallback(window.getWindow(), (window, key, scancode, action, mods) -> textField.handleKeyInput(key, action, mods));
+
+        GLFW.glfwSetMouseButtonCallback(window.getWindow(), (window, button, action, mods) -> {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_1 && action == GLFW.GLFW_PRESS) {
+                double[] xPos = new double[1];
+                double[] yPos = new double[1];
+                GLFW.glfwGetCursorPos(window, xPos, yPos);
+                textField.handleMouseClick((float) xPos[0], (float) yPos[0]);
+            }
+        });
+
+
         audioManager = new AudioManager("src/main/resources/SoundTrack/wii.wav");
         audioManager.playSound();
         isSoundPlaying = true;
@@ -308,6 +323,7 @@ public class GolfGame implements ILogic {
             }
         }
         infoButton.update();
+        textField.update();
 
         if (window.isResized()) {
             window.setResized(false);
@@ -373,6 +389,7 @@ public class GolfGame implements ILogic {
             }
         }
         infoButton.render();
+        textField.render();
     }
 
     /**
@@ -393,6 +410,8 @@ public class GolfGame implements ILogic {
         for (Button button : inGameMenuButtons) {
             button.cleanup();
         }
+        infoButton.cleanup();
+        textField.cleanup();
         nvgDelete(vg);
 
     }
@@ -658,5 +677,13 @@ public class GolfGame implements ILogic {
 
     private float cappedExponantialFunc(float s, float C, float k, float max) {
         return (float) Math.min(C*(Math.exp(k*s)-1), max);
+    }
+
+    public boolean isCanMove() {
+        return canMove;
+    }
+
+    public void setCanMove(boolean canMove) {
+        this.canMove = canMove;
     }
 }
