@@ -21,7 +21,7 @@ public class TextField {
     private boolean focused;  // Whether the TextField is focused
 
     private double scaledMouseX, scaledMouseY;  // Scaled mouse position
-    private final WindowManager window = Launcher.getWindow();
+    private final WindowManager window = Launcher.getWindow(); // Window manager
 
     public TextField(float x, float y, float width, float height, String prompt, float fontSize, long vg, String imagePath) {
         this.x = x;
