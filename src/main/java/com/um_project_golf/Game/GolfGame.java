@@ -3,6 +3,7 @@ package com.um_project_golf.Game;
 import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.AWT.Button;
 import com.um_project_golf.Core.AWT.TextField;
+import com.um_project_golf.Core.AWT.TextPane;
 import com.um_project_golf.Core.AWT.Title;
 import com.um_project_golf.Core.Entity.*;
 import com.um_project_golf.Core.Entity.Terrain.*;
@@ -12,6 +13,7 @@ import com.um_project_golf.Core.Lighting.SpotLight;
 import com.um_project_golf.Core.MouseInput;
 import com.um_project_golf.Core.Rendering.RenderManager;
 import com.um_project_golf.Core.Utils.ButtonTimer;
+import com.um_project_golf.Core.Utils.CollisionsDetector;
 import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -42,25 +44,30 @@ public class GolfGame implements ILogic {
     private final ButtonTimer timer;
     private MouseInput mouseInputs;
     private long vg;
+
     private final List<Button> menuButtons;
     private final List<Button> inGameMenuButtons;
     private Button infoButton;
     private TextField textField;
     private Title title;
+    private TextPane pane;
 
     private final Camera camera;
     private Terrain terrain;
     private final HeightMap heightMap;
     private BlendMapTerrain blendMapTerrain;
     private AudioManager audioManager;
-
+    private final CollisionsDetector collisionsDetector;
     Vector3f cameraInc;
+
     private boolean canMove = false;
     private boolean isJumping = false;
     private boolean isGuiVisible = true;
     private boolean isOnMenu = true;
     private boolean isSoundPlaying = false;
     private boolean wasPressed = false;
+    private static boolean debugMode = false;
+
     private float lastY;
 
 
@@ -75,6 +82,7 @@ public class GolfGame implements ILogic {
         scene = new SceneManager(-90);
         timer = new ButtonTimer();
         camera = new Camera();
+        collisionsDetector = new CollisionsDetector();
         cameraInc = new Vector3f(0, 0, 0);
         heightMap = new HeightMap();
         menuButtons = new ArrayList<>();
@@ -341,7 +349,7 @@ public class GolfGame implements ILogic {
         }
         lastY = camera.getPosition().y;
 
-        checkCollision();
+        collisionsDetector.checkCollision(camera, cameraInc, heightMap);
 
         scene.increaseSpotAngle(0.01f);
         if(scene.getSpotAngle() > 4) {
@@ -382,14 +390,18 @@ public class GolfGame implements ILogic {
                     button.render();
                 }
                 title.render();
+                pane.render();
             } else {
                 for (Button button : inGameMenuButtons) {
                     button.render();
                 }
             }
         }
-        infoButton.render();
-        textField.render();
+        if (debugMode){
+            textField.render();
+        } else {
+            infoButton.render();
+        }
     }
 
     /**
@@ -412,8 +424,8 @@ public class GolfGame implements ILogic {
         }
         infoButton.cleanup();
         textField.cleanup();
+        pane.cleanup();
         nvgDelete(vg);
-
     }
 
     private void daytimeCycle() {
@@ -443,53 +455,6 @@ public class GolfGame implements ILogic {
 //        scene.getDirectionalLight().getDirection().y = (float) Math.cos(angle);
     }
 
-    private void checkCollision() {
-        Vector3f newPosition = camera.getPosition();
-
-        terrainCollision(newPosition);
-        borderCollision(newPosition);
-
-        camera.setPosition(newPosition);
-    }
-
-    private void borderCollision(Vector3f newPosition) {
-        float outOfBounds = 1;
-        if (camera.getPosition().x < -Consts.SIZE_X / 2) {
-            newPosition.x = -Consts.SIZE_X / 2;
-            cameraInc.x = 0;
-        } else if (camera.getPosition().x > Consts.SIZE_X / 2) {
-            newPosition.x = Consts.SIZE_X / 2;
-            cameraInc.x = 0;
-        }
-        if (camera.getPosition().z < -Consts.SIZE_Z / 2) {
-            newPosition.z = -Consts.SIZE_Z / 2;
-            cameraInc.z = 0;
-        } else if (camera.getPosition().z > Consts.SIZE_Z / 2) {
-            newPosition.z = Consts.SIZE_Z / 2;
-            cameraInc.z = 0;
-        }
-        if (camera.getPosition().y > Consts.MAX_HEIGHT) {
-            newPosition.y = Consts.MAX_HEIGHT;
-            cameraInc.y = 0;
-        }
-    }
-
-    private void terrainCollision(Vector3f newPosition) {
-        // Correct the translation so -1000 maps to index 0
-
-        // Retrieve the terrain height using the clamped indices
-        float terrainHeight = heightMap.getHeight(newPosition) + Consts.PLAYER_HEIGHT;
-        if (newPosition.y <= terrainHeight) {
-            newPosition.y = terrainHeight;
-        }
-    }
-
-    private void entityCollision(Vector3f newPosition) {
-        //TODO: Implement entity collision
-        // Check if the new position is inside an entityOpenSafari
-        // Implement a hit box for the entity
-    }
-
     private void createTrees(Model tree) throws IOException {
         BufferedImage heightmapImage = ImageIO.read(new File("Texture/heightmap.png"));
 
@@ -513,6 +478,18 @@ public class GolfGame implements ILogic {
             Vector3f position = positions.get(rnd.nextInt(positions.size()));
             scene.addEntity(new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f));
         }
+    }
+
+    public Vector3f getGoodPosition() {
+        for (int i = 0; i < 500; i++) {
+            float x = (float) (Math.random() * 200 - 100);
+            float z = (float) (Math.random() * 200 - 100);
+            float y = terrain.getHeight(x, z);
+            if (y > 0 && y < 15) {
+                return new Vector3f(x, y, z);
+            }
+        }
+        return new Vector3f(0, 0, 0);
     }
 
     private void createMenu(BlendMapTerrain blendMapTerrain, Model tree) {
@@ -569,7 +546,10 @@ public class GolfGame implements ILogic {
             GLFW.glfwSetWindowShouldClose(Launcher.getWindow().getWindow(), true);
         };
 
-
+        Runnable enableDebugMode = () -> {
+            System.out.println("Enabling debug mode");
+            debugMode = !debugMode;
+        };
 
         float titleWidth = window.getWidthConverted(1200);
         float titleHeight = window.getHeightConverted(1200);
@@ -589,11 +569,21 @@ public class GolfGame implements ILogic {
         Button changeTerrain = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Change Terrain", 100, terrainChanger, vg, "Texture/buttons.png");
         menuButtons.add(changeTerrain);
 
-        Button soundButton = new Button(window.getWidthConverted(window.getWidth()-300), window.getHeightConverted(20), window.getWidthConverted(300), heightButton, "Sound", 100, sound, vg, "Texture/buttons.png");
+        Button soundButton = new Button(window.getWidth() - window.getWidthConverted(300), window.getHeightConverted(20), window.getWidthConverted(300), heightButton, "Sound", 100, sound, vg, "Texture/buttons.png");
         menuButtons.add(soundButton);
 
         Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2 , widthButton, heightButton, "Exit", 100, quit, vg, "Texture/buttons.png");
         menuButtons.add(exit);
+
+        Button debugButton = new Button(window.getWidth()-widthButton/4, window.getHeightConverted(30), widthButton/4, heightButton, "Debug Mode", 100, enableDebugMode, vg, "Texture/inGameMenu.png");
+        menuButtons.add(debugButton);
+
+        float paneWidth = window.getWidthConverted(500);
+        float paneHeight = window.getHeightConverted(500);
+        float paneX = (window.getWidth() - paneWidth);
+        float paneY = window.getHeight() - paneHeight - window.getHeightConverted(10);
+
+        pane = new TextPane(paneX, paneY, paneWidth, paneHeight, "Pane test", 70,  vg, "Texture/inGameMenu.png");
     }
 
     private void createInGameMenu() {
@@ -647,18 +637,6 @@ public class GolfGame implements ILogic {
         inGameMenuButtons.add(exitButton);
     }
 
-    public Vector3f getGoodPosition() {
-        for (int i = 0; i < 500; i++) {
-            float x = (float) (Math.random() * 200 - 100);
-            float z = (float) (Math.random() * 200 - 100);
-            float y = terrain.getHeight(x, z);
-            if (y > 0 && y < 15) {
-                return new Vector3f(x, y, z);
-            }
-        }
-        return new Vector3f(0, 0, 0);
-    }
-
     private void recreateGUIs() {
         menuButtons.clear();
 
@@ -671,15 +649,15 @@ public class GolfGame implements ILogic {
 
     private String secondToVelocity(long ms) {
         float second = (float) ms / 1000;
-        float velocity = cappedExponantialFunc(second, 3, 1, 74);
+        float velocity = cappedExponentialFunc(second, 3, 1, 74);
         return String.valueOf(velocity);
     }
 
-    private float cappedExponantialFunc(float s, float C, float k, float max) {
+    private float cappedExponentialFunc(float s, float C, float k, float max) {
         return (float) Math.min(C*(Math.exp(k*s)-1), max);
     }
 
-    public boolean isCanMove() {
+    public boolean canMove() {
         return canMove;
     }
 
