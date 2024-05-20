@@ -1,4 +1,4 @@
-package com.um_project_golf.RuleBasedBot;
+package com.um_project_golf.GolfBots;
 
 import java.util.function.Function;
 

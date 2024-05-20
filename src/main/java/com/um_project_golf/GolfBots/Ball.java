@@ -1,4 +1,6 @@
-package com.um_project_golf.RuleBasedBot;
+package com.um_project_golf.GolfBots;
+
+import org.joml.Vector3f;
 
 class Ball {
     private double positionX;
@@ -46,8 +48,9 @@ class Ball {
     }
 
     // Placeholder for updating the ball's position
-    public void updatePosition() {
-
+    public void updatePosition(Vector3f newPosition) {
+        positionX = newPosition.x;
+        positionY = newPosition.y;
     }
 
     // Placeholder for calculating the distance to the flag

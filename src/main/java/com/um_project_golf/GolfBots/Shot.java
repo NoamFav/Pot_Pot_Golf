@@ -1,4 +1,4 @@
-package com.um_project_golf.RuleBasedBot;
+package com.um_project_golf.GolfBots;
 
 class Shot {
     private double velocityX;
