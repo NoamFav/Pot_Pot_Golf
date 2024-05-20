@@ -59,7 +59,9 @@ public class TextPane {
 
         nvgFontSize(vg, fontSize);
         nvgFontFace(vg, "golf");  // Make sure you have a font loaded
+        nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
         nvgFillColor(vg, textColor);
+        nvgText(vg, x + width / 2, y + height / 2, text);
 
         String displayText = text;
 
