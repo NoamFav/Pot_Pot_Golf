@@ -55,6 +55,9 @@ public class GolfGame implements ILogic {
     private boolean isOnMenu = true;
     private float lastY;
 
+    private Entity golfBall;
+    private Button hitButton;
+
     /**
      * The constructor of the game.
      * It initializes the renderer, window, loader and camera.
@@ -137,11 +140,16 @@ public class GolfGame implements ILogic {
 
         createTrees(tree);
 
+        golfBall = new Entity(ball, new Vector3f(0, heightMap.getHeight(new Vector3f(0, 0, 0)), 0), new Vector3f(50, 0, 0), 50);
+        // golfBall = new Entity(ball, new Vector3f(0, terrain.getHeight(0, 0), 0), new Vector3f(50, 0, 0), 10);
+        System.out.println(golfBall.getPos().x + "," + golfBall.getPos().y + "," + golfBall.getPos().z);
+        scene.addEntity(golfBall);
+
         scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
 
         scene.addEntity(new Entity(wolf, new Vector3f(0, terrain.getHeight(0,0), 0), new Vector3f(45, 0 , 0), 10 ));
         //scene.addEntity(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
-        scene.addEntity(new Entity(ball, new Vector3f(0, terrain.getHeight(0, 0), 0), new Vector3f(50, 0, 0), 10));
+        //scene.addEntity(new Entity(ball, new Vector3f(0, terrain.getHeight(0, 0), 0), new Vector3f(50, 0, 0), 10));
 
         //TODO: Allow multiple textures for the same model
         float lightIntensity =10f;
@@ -175,6 +183,27 @@ public class GolfGame implements ILogic {
 
         audioManager = new AudioManager("src/main/resources/SoundTrack/wii.wav");
         audioManager.playSound();
+
+        PhysicsEngine engine = new PhysicsEngine(heightMap,0.08, 0.2, 0.1, 0.3);
+        Runnable hitGolfBall = () -> {
+            try {
+                double[] initialState = {golfBall.getPos().x, golfBall.getPos().z, 1, 1}; // initialState = [x, z, vx, vz]
+                double h = 0.1; // Time step
+                Vector3f finalPosition = engine.runImprovedEuler(initialState, h);
+                checkCollisionBall(finalPosition);
+                System.out.println("Position:" + finalPosition.x + ", " + finalPosition.y  + ", " + finalPosition.z);
+                golfBall.setPos(finalPosition.x, finalPosition.y, finalPosition.z);
+                //camera.setPosition(new Vector3f(finalPosition.x, finalPosition.y, finalPosition.z));
+            } catch (Exception e) {
+                System.out.println("Exception");
+                throw new RuntimeException(e);
+            }
+        };
+
+
+        // Initialize the hit button with the NanoVG context
+        //hitButton.createButton(100, 700, 250, 250, "Hit Ball", hitGolfBall, vg);
+        hitButton = new Button(100, 100, 500, 250, "Hit Ball", 100, hitGolfBall, vg, "Texture/buttons.png");
     }
 
     /**
@@ -215,6 +244,9 @@ public class GolfGame implements ILogic {
             if(window.is_keyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
                 cameraInc.y = -Consts.JUMP_FORCE / EngineManager.getFps();
             }
+            if(window.is_keyPressed(GLFW.GLFW_KEY_T)) {
+                golfBall.setPos(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
+            }
         }
 //
 //        if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
@@ -222,7 +254,7 @@ public class GolfGame implements ILogic {
 //        }
 //        if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT)) {
 //            scene.getPointLights()[0].getPosition().x -= 0.1f;
-       // }
+        // }
 
 //        if (window.is_keyPressed(GLFW.GLFW_KEY_I)) {
 //            scene.getSpotLights()[0].getPointLight().getPosition().z = lightPos + 0.1f;
@@ -258,6 +290,8 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void update(MouseInput mouseInput) {
+
+        hitButton.update();
 
         if (isGuiVisible) {
             if (isOnMenu) {
@@ -330,6 +364,8 @@ public class GolfGame implements ILogic {
 
         renderer.render(camera, scene);
 
+        hitButton.render();
+
         // Render your UI elements like menuButtons
         if (isGuiVisible) {  // Add this line
             if (isOnMenu) {
@@ -360,6 +396,9 @@ public class GolfGame implements ILogic {
         for (Button button : menuButtons) {
             button.cleanup();
         }
+
+        hitButton.cleanup();
+
         nvgDelete(vg);
 
     }
@@ -398,6 +437,55 @@ public class GolfGame implements ILogic {
         borderCollision(newPosition);
 
         camera.setPosition(newPosition);
+    }
+
+    private void checkCollisionBall(Vector3f position) {
+        // For the golf ball:
+
+        // Check for collision with terrain
+        terrainCollisionBall(position);
+        // Check for collision with border
+        borderCollisionBall(position);
+
+        // Update the position of the golf ball
+        golfBall.setPos(position.x, position.y, position.z);
+    }
+
+    private void terrainCollisionBall(Vector3f newPosition) {
+        // Correct the translation so -1000 maps to index 0
+
+        // Retrieve the terrain height using the clamped indices
+        // float terrainHeight = heightMap.getHeight(newPosition) + golfBall.getScale();
+        float terrainHeight = heightMap.getHeight(newPosition);
+        //System.out.println("Terrain height: " + terrainHeight);
+        if (newPosition.y < terrainHeight) {
+            newPosition.y = terrainHeight;
+        }
+    }
+    private void borderCollisionBall(Vector3f newPosition) {
+        if (newPosition.x < -Consts.SIZE_X / 2) {
+            newPosition.x = -Consts.SIZE_X / 2;
+            //System.out.println("1");
+            //cameraInc.x = 0;
+        } else if (newPosition.x > Consts.SIZE_X / 2) {
+            newPosition.x = Consts.SIZE_X / 2;
+            //cameraInc.x = 0;
+            //System.out.println("2");
+        }
+        if (newPosition.z < -Consts.SIZE_Z / 2) {
+            newPosition.z = -Consts.SIZE_Z / 2;
+            //System.out.println("3");
+            //cameraInc.z = 0;
+        } else if (newPosition.z > Consts.SIZE_Z / 2) {
+            newPosition.z = Consts.SIZE_Z / 2;
+            //System.out.println("4");
+            //cameraInc.z = 0;
+        }
+        if (newPosition.y > Consts.MAX_HEIGHT) {
+            newPosition.y = Consts.MAX_HEIGHT;
+            //System.out.println("5");
+            //cameraInc.y = 0;
+        }
     }
 
     private void borderCollision(Vector3f newPosition) {
@@ -593,3 +681,4 @@ public class GolfGame implements ILogic {
 
     }
 }
+

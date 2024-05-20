@@ -1,8 +1,12 @@
-package com.um_project_golf.RuleBasedBot;
+package com.um_project_golf.GolfBots;
+
+import com.um_project_golf.Core.Entity.Terrain.HeightMap;
+import com.um_project_golf.Core.PhysicsEngine;
+import org.joml.Vector3f;
 
 import java.util.function.Function;
 
-public class GolfBot {
+public class RuleBasedBot {
 
     private static double startingPositionX = 0;
     private static double startingPositionY = 0;
@@ -61,14 +65,27 @@ public class GolfBot {
 
     // Placeholder for simulating the ball's movement
     public static void simulateBallMovement(Ball ball) {
-        // Placeholder for physics engine simulation
+        // Testing with height map
+        HeightMap testMap = new HeightMap();
+        testMap.createHeightMap();
+        double[] initialState = {startingPositionX, startingPositionY, ball.getVelocityX(), ball.getVelocityY()}; // initialState = [x, z, vx, vz]
+        double h = 0.1; // Time step
+        //double totalTime = 5; // Total time
+        PhysicsEngine engine = new PhysicsEngine(testMap, 0.08, 0.2, 0.1, 0.3);
+        Vector3f finalPosition = null;
+        finalPosition.set(startingPositionX,startingPositionY,0.0);
+        for (int i = 0; i < 50; i++) {
+            finalPosition = engine.runImprovedEuler(initialState, h);
+            initialState[0] = finalPosition.x;
+            initialState[1] = finalPosition.z;
+            System.out.println(finalPosition.x + ", " + finalPosition.y + ", " + finalPosition.z);
+        }
         // Update ball position based on velocity and physics rules
-        ball.updatePosition();
+        ball.updatePosition(finalPosition);
     }
 
     // Placeholder for checking if the ball is in the hole
     public static boolean isInHole(Ball ball, Green green) {
-        // Placeholder for hole-checking logic
         // Check if the ball is within the hole radius of the flag
         double distanceToFlag = ball.distanceToFlag(green);
         return distanceToFlag <= green.getFlagRadius();
