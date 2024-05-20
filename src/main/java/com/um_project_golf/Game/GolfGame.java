@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Random;
 
 import static org.lwjgl.nanovg.NanoVGGL3.*;
@@ -54,8 +55,10 @@ public class GolfGame implements ILogic {
 
     private final Camera camera;
     private Terrain terrain;
+    private Terrain ocean;
     private final HeightMap heightMap;
     private BlendMapTerrain blendMapTerrain;
+    private BlendMapTerrain blueTerrain;
     private AudioManager audioManager;
     private final CollisionsDetector collisionsDetector;
     Vector3f cameraInc;
@@ -66,7 +69,7 @@ public class GolfGame implements ILogic {
     private boolean isOnMenu = true;
     private boolean isSoundPlaying = false;
     private boolean wasPressed = false;
-    private static boolean debugMode = false;
+    public static boolean debugMode = false;
 
     private float lastY;
 
@@ -147,10 +150,10 @@ public class GolfGame implements ILogic {
         }
 
         blendMapTerrain = new BlendMapTerrain(textures);
-        BlendMapTerrain blueTerrain = new BlendMapTerrain(waterTextures);
+        blueTerrain = new BlendMapTerrain(waterTextures);
 
         terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap, false);
-        Terrain ocean = new Terrain(new Vector3f(-Consts.SIZE_X / 2, -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blueTerrain, blendMap, true);
+        ocean = new Terrain(new Vector3f(-Consts.SIZE_X / 2, -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blueTerrain, blendMap, true);
         scene.addTerrain(terrain);
         scene.addTerrain(ocean);
         ocean.getModel().getMaterial().setDisableCulling(true);
@@ -159,9 +162,9 @@ public class GolfGame implements ILogic {
 
         scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
 
-        scene.addEntity(new Entity(wolf, new Vector3f(0, terrain.getHeight(0,0), 0), new Vector3f(45, 0 , 0), 10 ));
+        scene.addEntity(new Entity(wolf, new Vector3f(0, Terrain.getHeight(0,0), 0), new Vector3f(45, 0 , 0), 10 ));
         //scene.addEntity(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
-        scene.addEntity(new Entity(ball, new Vector3f(0, terrain.getHeight(0, 0), 0), new Vector3f(50, 0, 0), 10));
+        scene.addEntity(new Entity(ball, new Vector3f(0, Terrain.getHeight(0, 0), 0), new Vector3f(50, 0, 0), 10));
 
         //TODO: Allow multiple textures for the same model
         float lightIntensity =10f;
@@ -330,8 +333,11 @@ public class GolfGame implements ILogic {
                 }
             }
         }
-        infoButton.update();
-        textField.update();
+        if (debugMode) {
+            textField.update();
+        } else {
+            infoButton.update();
+        }
 
         if (window.isResized()) {
             window.setResized(false);
@@ -387,7 +393,13 @@ public class GolfGame implements ILogic {
         if (isGuiVisible) {  // Add this line
             if (isOnMenu) {
                 for (Button button : menuButtons) {
-                    button.render();
+                    if (!Objects.equals(button.getText(), "Change Terrain")) {
+                        button.render();
+                    } else {
+                        if (!debugMode) {
+                            button.render();
+                        }
+                    }
                 }
                 title.render();
                 pane.render();
@@ -484,7 +496,7 @@ public class GolfGame implements ILogic {
         for (int i = 0; i < 500; i++) {
             float x = (float) (Math.random() * 200 - 100);
             float z = (float) (Math.random() * 200 - 100);
-            float y = terrain.getHeight(x, z);
+            float y = Terrain.getHeight(x, z);
             if (y > 0 && y < 15) {
                 return new Vector3f(x, y, z);
             }
@@ -507,17 +519,8 @@ public class GolfGame implements ILogic {
                 System.out.println("Changing terrain");
                 heightMap.createHeightMap();
                 TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
-                scene.getTerrains().remove(terrain);
                 SimplexNoise.shufflePermutation();
-                terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap2, false);
-                scene.addTerrain(terrain);
-                scene.getEntities().removeIf(entity -> entity.getModel().equals(tree));
-                try {
-                    createTrees(tree);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                renderer.processTerrain(terrain);
+                terrainSwitch(blendMapTerrain, tree, blendMap2);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -549,6 +552,14 @@ public class GolfGame implements ILogic {
         Runnable enableDebugMode = () -> {
             System.out.println("Enabling debug mode");
             debugMode = !debugMode;
+            try {
+                heightMap.createHeightMap();
+                TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
+                terrainSwitch(blendMapTerrain, tree, blendMap2);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
         };
 
         float titleWidth = window.getWidthConverted(1200);
@@ -575,7 +586,7 @@ public class GolfGame implements ILogic {
         Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2 , widthButton, heightButton, "Exit", 100, quit, vg, "Texture/buttons.png");
         menuButtons.add(exit);
 
-        Button debugButton = new Button(window.getWidth()-widthButton/4, window.getHeightConverted(30), widthButton/4, heightButton, "Debug Mode", 100, enableDebugMode, vg, "Texture/inGameMenu.png");
+        Button debugButton = new Button( window.getWidthConverted(30), window.getHeight() - heightButton, widthButton/4, heightButton, "Debug Mode", 70, enableDebugMode, vg, "Texture/inGameMenu.png");
         menuButtons.add(debugButton);
 
         float paneWidth = window.getWidthConverted(500);
@@ -584,6 +595,22 @@ public class GolfGame implements ILogic {
         float paneY = window.getHeight() - paneHeight - window.getHeightConverted(10);
 
         pane = new TextPane(paneX, paneY, paneWidth, paneHeight, "Pane test", 70,  vg, "Texture/inGameMenu.png");
+    }
+
+    private void terrainSwitch(BlendMapTerrain blendMapTerrain, Model tree, TerrainTexture blendMap2) {
+        scene.getTerrains().remove(terrain);
+        scene.getTerrains().remove(ocean);
+        terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap2, false);
+        ocean = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blueTerrain, blendMap2, true);
+        scene.addTerrain(terrain);
+        scene.addTerrain(ocean);
+        scene.getEntities().removeIf(entity -> entity.getModel().equals(tree));
+        try {
+            createTrees(tree);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        renderer.processTerrain(terrain);
     }
 
     private void createInGameMenu() {

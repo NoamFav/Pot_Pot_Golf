@@ -2,6 +2,7 @@ package com.um_project_golf.Core.Entity.Terrain;
 
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GolfGame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joml.Vector3f;
@@ -52,8 +53,15 @@ public class HeightMap {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // Create a new image
 
         for (int x = 0; x < width; x++) { // Loop through the heightmap
-            for (int y = 0; y < height; y++) { // Loop through the heightmap
-                float heightValue = heightmap[x][y]; // Get the height value of the vertex
+            for (int z = 0; z < height; z++) { // Loop through the heightmap
+                float heightValue;
+                if (GolfGame.debugMode) {
+                    heightValue = Terrain.getHeight(x, z); // Calculate the height of the vertex
+                } else {
+                    heightValue = heightmap[x][z]; // Calculate the height of the vertex
+                }
+
+                // Get the height value of the vertex
                 Color color; // Create a new color
                 float sand = 2.5f + (float) (Math.random() * 2.5f); // Generate a random red value
                 float grass = 7 + (float) (Math.random() * 2.5f); // Generate a random green value
@@ -78,7 +86,7 @@ public class HeightMap {
                 }
 
 
-                image.setRGB(x, y, color.getRGB()); // Set the color of the pixel in the image
+                image.setRGB(x, z, color.getRGB()); // Set the color of the pixel in the image
             }
         }
 
@@ -107,7 +115,13 @@ public class HeightMap {
 //                "), Scaled Indices: (" + heightX + ", " + heightZ +
 //                "), Height: " + SceneManager.getHeightMap()[heightX][heightZ]);
 
+        float height;
+        if (GolfGame.debugMode) {
+            height = Terrain.getHeight(position.x, position.z); // Calculate the height of the vertex
+        } else {
+            height = SceneManager.getHeightMap()[heightX][heightZ]; // Calculate the height of the vertex
+        }
 
-        return SceneManager.getHeightMap()[heightX][heightZ]; // Return the height of the vertex
+        return height; // Return the height of the vertex
     }
 }
