@@ -9,7 +9,7 @@ import org.joml.Vector3f;
 public class Entity {
     public Object getRotation; // get the rotation of the entity
     private final Model model; // model of the entity
-    private final Vector3f pos, rotation; // position and rotation of the entity
+    private final Vector3f position, rotation; // position and rotation of the entity
     private final float scale; // scale of the entity
 
     /**
@@ -17,13 +17,13 @@ public class Entity {
      * It initializes the model, position, rotation, and scale of the entity.
      *
      * @param model The model of the entity.
-     * @param pos The position of the entity.
+     * @param position The position of the entity.
      * @param rotation The rotation of the entity.
      * @param scale The scale of the entity.
      */
-    public Entity(Model model, Vector3f pos, Vector3f rotation, float scale) {
+    public Entity(Model model, Vector3f position, Vector3f rotation, float scale) {
         this.model = model;
-        this.pos = pos;
+        this.position = position;
         this.rotation = rotation;
         this.scale = scale;
     }
@@ -35,8 +35,8 @@ public class Entity {
      * @param y The y-axis position.
      * @param z The z-axis position.
      */
-    public void increasePos(float x, float y, float z) {
-        this.pos.add(x, y, z); // add the x, y, and z values to the position
+    public void increasePosition(float x, float y, float z) {
+        this.position.add(x, y, z); // add the x, y, and z values to the position
     }
 
     /**
@@ -46,8 +46,8 @@ public class Entity {
      * @param y The y-axis position.
      * @param z The z-axis position.
      */
-    public void setPos(float x, float y, float z) {
-        this.pos.set(x, y, z); // set the x, y, and z values to the position
+    public void setPosition(float x, float y, float z) {
+        this.position.set(x, y, z); // set the x, y, and z values to the position
     }
 
     /**
@@ -76,8 +76,8 @@ public class Entity {
         return model;
     }
 
-    public Vector3f getPos() {
-        return pos;
+    public Vector3f getPosition() {
+        return position;
     }
 
     public Vector3f getRotation() {

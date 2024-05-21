@@ -90,7 +90,7 @@ public class MouseInput {
      *
      * @return The displacement vector of the mouse.
      */
-    public Vector2f getDisplVec() {
+    public Vector2f getDisplayVec() {
         return displVec;
     }
 

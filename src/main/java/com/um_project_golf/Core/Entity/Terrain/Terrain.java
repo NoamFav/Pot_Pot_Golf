@@ -6,6 +6,7 @@ import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Texture;
 import com.um_project_golf.Core.ObjectLoader;
 import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GolfGame;
 import org.joml.Vector3f;
 
 /**
@@ -72,7 +73,12 @@ public class Terrain {
 
                 float x = j / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_X; // Calculate the x position of the vertex
                 float z = i / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_Z; // Calculate the z position of the vertex
-                float height = heightmap[j][i]; // Get the height of the vertex
+                float height;
+                if (GolfGame.debugMode) {
+                    height = getHeight(x, z); // Calculate the height of the vertex
+                } else {
+                    height = heightmap[j][i]; // Calculate the height of the vertex
+                }
 
                 vertices[vertexPointer * 3] = x; // Set the x position of the vertex
                 vertices[vertexPointer * 3 + 1] = isWater ? 0 : height; // Set the y position of the vertex
@@ -144,7 +150,7 @@ public class Terrain {
      * @param z The z position of the terrain.
      * @return The height of the terrain at the given position.
      */
-    public float getHeight(float x, float z) {
+    public static float getHeight(float x, float z) {
         double x1 = Math.sin(x / 10) * 10 + Math.cos(z / 10) * 10; // Calculate the height of the terrain
         return (float) (x1); // Return the height of the terrain
     }
