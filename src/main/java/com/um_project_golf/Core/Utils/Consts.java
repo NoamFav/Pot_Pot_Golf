@@ -55,7 +55,7 @@ public class Consts {
 
     // For examination purposes:
     public static final BiFunction<Float, Float, Float> HEIGHT_FUNCTION = (x, z) -> (float) (Math.sin((x - z) / 7) + 0.5); // Height function for the terrain
-    public static final float MAX_TERRAIN_HEIGHT = 10; // Height of the water
+    public static final float MAX_TERRAIN_HEIGHT = 10; // Height of the terrain (meters)
     public static final float GRAVITY = 9.81f; // Gravity constant (m/s^2)
     public static final float BALL_MASS = 0.0459f; // Mass of the ball (kg)
 
