@@ -52,11 +52,17 @@ public class HeightMap {
         int height = heightmap[0].length; // Get the height of the heightmap
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // Create a new image
 
+
+
         for (int x = 0; x < width; x++) { // Loop through the heightmap
             for (int z = 0; z < height; z++) { // Loop through the heightmap
                 float heightValue;
+
+                float hx = x / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_X; // Calculate the x position of the vertex
+                float hz = z / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_Z;
+
                 if (GolfGame.debugMode) {
-                    heightValue = Terrain.getHeight(x, z); // Calculate the height of the vertex
+                    heightValue = Terrain.getHeight(hx, hz); // Calculate the height of the vertex
                 } else {
                     heightValue = heightmap[x][z]; // Calculate the height of the vertex
                 }

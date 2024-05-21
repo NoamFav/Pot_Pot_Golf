@@ -166,7 +166,6 @@ public class GolfGame implements ILogic {
         //scene.addEntity(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
         scene.addEntity(new Entity(ball, new Vector3f(0, Terrain.getHeight(0, 0), 0), new Vector3f(50, 0, 0), 10));
 
-        //TODO: Allow multiple textures for the same model
         float lightIntensity =10f;
 
         //point light
