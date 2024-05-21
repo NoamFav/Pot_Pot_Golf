@@ -195,9 +195,14 @@ public class GolfGame implements ILogic {
         canMove = false;
         isOnMenu = true;
 
-        infoButton = new Button(10, 10, 1000, 300, "Info", 70, () -> {}, vg, "Texture/buttons.png");
+        float width = window.getWidthConverted(1000);
+        float height = window.getHeightConverted(300);
+        float x = window.getWidthConverted(10);
+        float y = window.getHeightConverted(10);
 
-        textField = new TextField(10, 300, 1000, 300, "Enter text here", 70, vg, "Texture/buttons.png");
+        infoButton = new Button(x, y, width, height, "Info", 70, () -> {}, vg, "Texture/buttons.png");
+
+        textField = new TextField(x, y * 30, width, height, "Enter text here", 70, vg, "Texture/buttons.png");
         GLFW.glfwSetKeyCallback(window.getWindow(), (window, key, scancode, action, mods) -> textField.handleKeyInput(key, action, mods));
 
         GLFW.glfwSetMouseButtonCallback(window.getWindow(), (window, button, action, mods) -> {
@@ -572,20 +577,21 @@ public class GolfGame implements ILogic {
         float widthButton = window.getWidthConverted(2000);
         float centerButtonX = (width - widthButton) / 2;
         float centerButtonY = titleHeight + titleY;
+        float font = window.getHeightConverted(100);
 
-        Button start = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", 100, startGame, vg, "Texture/buttons.png");
+        Button start = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", font, startGame, vg, "Texture/buttons.png");
         menuButtons.add(start);
 
-        Button changeTerrain = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Change Terrain", 100, terrainChanger, vg, "Texture/buttons.png");
+        Button changeTerrain = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Change Terrain", font, terrainChanger, vg, "Texture/buttons.png");
         menuButtons.add(changeTerrain);
 
-        Button soundButton = new Button(window.getWidth() - window.getWidthConverted(300), window.getHeightConverted(20), window.getWidthConverted(300), heightButton, "Sound", 100, sound, vg, "Texture/buttons.png");
+        Button soundButton = new Button(window.getWidth() - window.getWidthConverted(300), window.getHeightConverted(20), window.getWidthConverted(300), heightButton, "Sound", font, sound, vg, "Texture/buttons.png");
         menuButtons.add(soundButton);
 
-        Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2 , widthButton, heightButton, "Exit", 100, quit, vg, "Texture/buttons.png");
+        Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2 , widthButton, heightButton, "Exit", font, quit, vg, "Texture/buttons.png");
         menuButtons.add(exit);
 
-        Button debugButton = new Button( window.getWidthConverted(30), window.getHeight() - heightButton, widthButton/4, heightButton, "Debug Mode", 70, enableDebugMode, vg, "Texture/inGameMenu.png");
+        Button debugButton = new Button( window.getWidthConverted(30), window.getHeight() - heightButton, widthButton/4, heightButton, "Debug Mode", font * 0.7f, enableDebugMode, vg, "Texture/inGameMenu.png");
         menuButtons.add(debugButton);
 
         float paneWidth = window.getWidthConverted(500);
@@ -593,7 +599,7 @@ public class GolfGame implements ILogic {
         float paneX = (window.getWidth() - paneWidth);
         float paneY = window.getHeight() - paneHeight - window.getHeightConverted(10);
 
-        pane = new TextPane(paneX, paneY, paneWidth, paneHeight, "Pane test", 70,  vg, "Texture/inGameMenu.png");
+        pane = new TextPane(paneX, paneY, paneWidth, paneHeight, "Pane test", font * 0.7f,  vg, "Texture/inGameMenu.png");
     }
 
     private void terrainSwitch(BlendMapTerrain blendMapTerrain, Model tree, TerrainTexture blendMap2) {
@@ -649,28 +655,36 @@ public class GolfGame implements ILogic {
         float widthButton = window.getWidthConverted(2000);
         float centerButtonX = (window.getWidth() - widthButton) / 2;
         float centerButtonY = (window.getHeight() - heightButton * 3) / 2;
+        float font = window.getHeightConverted(100);
 
-        Button resumeButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Resume", 100, resume, vg, "Texture/inGameMenu.png");
+        Button resumeButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Resume", font, resume, vg, "Texture/inGameMenu.png");
         inGameMenuButtons.add(resumeButton);
 
-        Button backToMenuButton = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Back to Menu", 100, backToMenu, vg, "Texture/inGameMenu.png");
+        Button backToMenuButton = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Back to Menu", font, backToMenu, vg, "Texture/inGameMenu.png");
         inGameMenuButtons.add(backToMenuButton);
 
-        Button soundButton = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Sound", 100, sound, vg, "Texture/inGameMenu.png");
+        Button soundButton = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Sound", font, sound, vg, "Texture/inGameMenu.png");
         inGameMenuButtons.add(soundButton);
 
-        Button exitButton = new Button(centerButtonX, centerButtonY + heightButton * 3, widthButton, heightButton, "Exit", 100, quit, vg, "Texture/inGameMenu.png");
+        Button exitButton = new Button(centerButtonX, centerButtonY + heightButton * 3, widthButton, heightButton, "Exit", font, quit, vg, "Texture/inGameMenu.png");
         inGameMenuButtons.add(exitButton);
     }
 
     private void recreateGUIs() {
         menuButtons.clear();
 
-        if (isOnMenu) {
-            createMenu(blendMapTerrain, scene.getEntities().get(2).getModel());
-        } else {
-            createInGameMenu();
-        }
+        createMenu(blendMapTerrain, scene.getEntities().get(2).getModel());
+        createInGameMenu();
+
+        float width = window.getWidthConverted(1000);
+        float height = window.getHeightConverted(300);
+        float x = window.getWidthConverted(10);
+        float y = window.getHeightConverted(10);
+        float font = window.getHeightConverted(70);
+
+        infoButton = new Button(x, y, width, height, "Info", font, () -> {}, vg, "Texture/buttons.png");
+
+        textField = new TextField(x, y * 30, width, height, "Enter text here", font, vg, "Texture/buttons.png");
     }
 
     private String secondToVelocity(long ms) {
