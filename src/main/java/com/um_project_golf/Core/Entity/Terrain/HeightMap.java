@@ -35,7 +35,7 @@ public class HeightMap {
                 float z = i / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_Z; // Calculate the z position of the vertex
 
                 // Calculate the height of the vertex using simplex noise
-                float height = (float) (SimplexNoise.octaveSimplexNoise(x * Consts.SCALE, z * Consts.SCALE, 0, Consts.OCTAVES, Consts.PERSISTENCE, Consts.AMPLITUDE) * (Consts.MAX_HEIGHT/2));
+                float height = (float) (SimplexNoise.octaveSimplexNoise(x * Consts.SCALE, z * Consts.SCALE, 0, Consts.OCTAVES, Consts.PERSISTENCE, Consts.AMPLITUDE) * Consts.MAX_TERRAIN_HEIGHT);
                 heightmap[j][i] = height; // Set the height of the vertex in the heightmap array
             }
         }
@@ -69,8 +69,8 @@ public class HeightMap {
 
                 // Get the height value of the vertex
                 Color color; // Create a new color
-                float sand = 2.5f + (float) (Math.random() * 2.5f); // Generate a random red value
-                float grass = 7 + (float) (Math.random() * 2.5f); // Generate a random green value
+                float sand = .5f + (float) (Math.random() * 1.5f); // Generate a random red value
+                float grass = 4 + (float) (Math.random() * 1.5f); // Generate a random green value
                 float fairway = 12 + (float) (Math.random() * 2.5f); // Generate a random blue value
                 float dryGrass = 17 + (float) (Math.random() * 2.5f); // Generate a random blue value
                 float mold = 20 + (float) (Math.random() * 2.5f); // Generate a random blue value
