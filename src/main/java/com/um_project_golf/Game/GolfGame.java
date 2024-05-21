@@ -46,6 +46,8 @@ public class GolfGame implements ILogic {
     private MouseInput mouseInputs;
     private long vg;
 
+    private String imageButton = "Texture/buttons.png";
+
     private final List<Button> menuButtons;
     private final List<Button> inGameMenuButtons;
     private Button infoButton;
@@ -200,9 +202,9 @@ public class GolfGame implements ILogic {
         float x = window.getWidthConverted(10);
         float y = window.getHeightConverted(10);
 
-        infoButton = new Button(x, y, width, height, "Info", 70, () -> {}, vg, "Texture/buttons.png");
+        infoButton = new Button(x, y, width, height, "Info", 70, () -> {}, vg, imageButton);
 
-        textField = new TextField(x, y * 30, width, height, "Enter text here", 70, vg, "Texture/buttons.png");
+        textField = new TextField(x, y * 30, width, height, "Enter text here", 70, vg, imageButton);
         GLFW.glfwSetKeyCallback(window.getWindow(), (window, key, scancode, action, mods) -> textField.handleKeyInput(key, action, mods));
 
         GLFW.glfwSetMouseButtonCallback(window.getWindow(), (window, button, action, mods) -> {
@@ -215,7 +217,7 @@ public class GolfGame implements ILogic {
         });
 
 
-        audioManager = new AudioManager("src/main/resources/SoundTrack/wii.wav");
+        audioManager = new AudioManager("src/main/resources/SoundTrack/kavinsky.wav");
         audioManager.playSound();
         isSoundPlaying = true;
     }
@@ -554,6 +556,7 @@ public class GolfGame implements ILogic {
         };
 
         Runnable enableDebugMode = () -> {
+            audioManager.stopSound();
             System.out.println("Enabling debug mode");
             debugMode = !debugMode;
             try {
@@ -563,7 +566,14 @@ public class GolfGame implements ILogic {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+            recreateGUIs();
 
+            if (debugMode) {
+                audioManager = new AudioManager("src/main/resources/SoundTrack/nothing2.wav");
+            } else {
+                audioManager = new AudioManager("src/main/resources/SoundTrack/nothing.wav");
+            }
+            audioManager.playSound();
         };
 
         float titleWidth = window.getWidthConverted(1200);
@@ -579,19 +589,19 @@ public class GolfGame implements ILogic {
         float centerButtonY = titleHeight + titleY;
         float font = window.getHeightConverted(100);
 
-        Button start = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", font, startGame, vg, "Texture/buttons.png");
+        Button start = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", font, startGame, vg, imageButton);
         menuButtons.add(start);
 
-        Button changeTerrain = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Change Terrain", font, terrainChanger, vg, "Texture/buttons.png");
+        Button changeTerrain = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Change Terrain", font, terrainChanger, vg, imageButton);
         menuButtons.add(changeTerrain);
 
-        Button soundButton = new Button(window.getWidth() - window.getWidthConverted(300), window.getHeightConverted(20), window.getWidthConverted(300), heightButton, "Sound", font, sound, vg, "Texture/buttons.png");
+        Button soundButton = new Button(window.getWidth() - window.getWidthConverted(300), window.getHeightConverted(20), window.getWidthConverted(300), heightButton, "Sound", font, sound, vg, imageButton);
         menuButtons.add(soundButton);
 
-        Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2 , widthButton, heightButton, "Exit", font, quit, vg, "Texture/buttons.png");
+        Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2 , widthButton, heightButton, "Exit", font, quit, vg, imageButton);
         menuButtons.add(exit);
 
-        Button debugButton = new Button( window.getWidthConverted(30), window.getHeight() - heightButton, widthButton/4, heightButton, "Debug Mode", font * 0.7f, enableDebugMode, vg, "Texture/inGameMenu.png");
+        Button debugButton = new Button( window.getWidthConverted(30), window.getHeight() - heightButton, widthButton/4, heightButton, "Debug Mode", font * 0.7f, enableDebugMode, vg, imageButton);
         menuButtons.add(debugButton);
 
         float paneWidth = window.getWidthConverted(500);
@@ -599,7 +609,7 @@ public class GolfGame implements ILogic {
         float paneX = (window.getWidth() - paneWidth);
         float paneY = window.getHeight() - paneHeight - window.getHeightConverted(10);
 
-        pane = new TextPane(paneX, paneY, paneWidth, paneHeight, "Pane test", font * 0.7f,  vg, "Texture/inGameMenu.png");
+        pane = new TextPane(paneX, paneY, paneWidth, paneHeight, "Pane test", font * 0.7f,  vg, imageButton);
     }
 
     private void terrainSwitch(BlendMapTerrain blendMapTerrain, Model tree, TerrainTexture blendMap2) {
@@ -682,9 +692,9 @@ public class GolfGame implements ILogic {
         float y = window.getHeightConverted(10);
         float font = window.getHeightConverted(70);
 
-        infoButton = new Button(x, y, width, height, "Info", font, () -> {}, vg, "Texture/buttons.png");
+        infoButton = new Button(x, y, width, height, "Info", font, () -> {}, vg, imageButton);
 
-        textField = new TextField(x, y * 30, width, height, "Enter text here", font, vg, "Texture/buttons.png");
+        textField = new TextField(x, y * 30, width, height, "Enter text here", font, vg, imageButton);
     }
 
     private String secondToVelocity(long ms) {
