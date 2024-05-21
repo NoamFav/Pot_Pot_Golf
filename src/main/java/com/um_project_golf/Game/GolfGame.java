@@ -25,10 +25,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.*;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Random;
 
 import static org.lwjgl.nanovg.NanoVGGL3.*;
 
@@ -46,7 +44,7 @@ public class GolfGame implements ILogic {
     private MouseInput mouseInputs;
     private long vg;
 
-    private String imageButton = "Texture/buttons.png";
+    private final String imageButton = "Texture/buttons.png";
 
     private final List<Button> menuButtons;
     private final List<Button> inGameMenuButtons;
@@ -361,7 +359,7 @@ public class GolfGame implements ILogic {
         }
         lastY = camera.getPosition().y;
 
-        collisionsDetector.checkCollision(camera, cameraInc, heightMap);
+        collisionsDetector.checkCollision(camera, cameraInc, heightMap, scene);
 
         scene.increaseSpotAngle(0.01f);
         if(scene.getSpotAngle() > 4) {
@@ -478,10 +476,12 @@ public class GolfGame implements ILogic {
 
         List<Vector3f> positions = new ArrayList<>();
 
+        // Populate positions based on the heightmap image
         for (int x = 0; x < heightmapImage.getWidth(); x++) {
             for (int z = 0; z < heightmapImage.getHeight(); z++) {
                 Color pixelColor = new Color(heightmapImage.getRGB(x, z));
 
+                // Check for green or blue pixels
                 if (pixelColor.equals(Color.GREEN) || pixelColor.equals(Color.BLUE)) {
                     float terrainX = x / (float) heightmapImage.getWidth() * Consts.SIZE_X - Consts.SIZE_X / 2;
                     float terrainZ = z / (float) heightmapImage.getHeight() * Consts.SIZE_Z - Consts.SIZE_Z / 2;
@@ -491,11 +491,31 @@ public class GolfGame implements ILogic {
                 }
             }
         }
-        Random rnd = new Random();
-        for (int i = 0; i < Math.max(Consts.SIZE_X, Consts.SIZE_Z) * 0.1; i++) {
-            Vector3f position = positions.get(rnd.nextInt(positions.size()));
-            scene.addEntity(new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f));
+
+        // Ensure we have valid positions
+        if (positions.isEmpty()) {
+            System.out.println("No valid positions found for trees.");
+            return;
         }
+
+        float[][] treePositions = new float[Consts.NUMBER_OF_TREES][3];
+        Random rnd = new Random();
+        Vector3f zero = new Vector3f(0, 0, 0);
+
+        // Populate tree positions and add entities to the scene
+        for (int i = 0; i < Consts.NUMBER_OF_TREES; i++) {
+            Vector3f position = positions.get(rnd.nextInt(positions.size()));
+            if (position != zero) {
+                scene.addEntity(new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f));
+                treePositions[i] = new float[]{position.x, position.y, position.z};
+            } else {
+                System.out.println("Position is null at index: " + i);
+            }
+        }
+
+        scene.setTreePositions(treePositions);
+        System.out.println("Tree positions count: " + treePositions.length);
+        System.out.println("Tree positions: " + Arrays.deepToString(treePositions));
     }
 
     public Vector3f getGoodPosition() {

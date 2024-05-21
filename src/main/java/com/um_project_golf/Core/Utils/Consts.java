@@ -25,6 +25,9 @@ public class Consts {
     public static final double PERSISTENCE = 0.4; // Used to determine how much each octave contributes to the overall shape (higher = more detail)
     public static final double AMPLITUDE = 1; // Used for increasing the height of the terrain (higher = more height)
 
+    public static final float TREE_SIZE = 1.5f;
+    public static final int NUMBER_OF_TREES = 25; // Density of the trees (higher = more trees)
+
     public static final long NANOSECOND = 1000000000L;  // 1 second in nanoseconds
     public static final float FRAME_CAP = 5000f; // Maximum frame rate
     public static final float FRAMERATE = 1.0f / FRAME_CAP; // maximum frame rate in seconds
@@ -39,7 +42,7 @@ public class Consts {
     public static final float Z_FAR = 10000.0f; // Far plane (Used for freeing up resources)
     public static final float SPECULAR_POWER = 10f; // Specular power (Higher = more shiny)
 
-    private static final int POWER = 10; // Power of 2 for the terrain size
+    private static final int POWER = 9; // Power of 2 for the terrain size
     public static final float SIZE_X = (float) Math.pow(2, POWER); // Size of the terrain in the x direction
     public static final float SIZE_Z = (float) Math.pow(2, POWER); // Size of the terrain in the z direction
     public static final int VERTEX_COUNT = (int) Math.pow(2, POWER + 2); // Number of vertices in the terrain (Higher = more detail but also more performance heavy)
