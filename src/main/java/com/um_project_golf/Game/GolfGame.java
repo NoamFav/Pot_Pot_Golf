@@ -1,16 +1,15 @@
 package com.um_project_golf.Game;
 
-import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.AWT.Button;
 import com.um_project_golf.Core.AWT.TextField;
 import com.um_project_golf.Core.AWT.TextPane;
 import com.um_project_golf.Core.AWT.Title;
+import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.Entity.*;
 import com.um_project_golf.Core.Entity.Terrain.*;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
-import com.um_project_golf.Core.MouseInput;
 import com.um_project_golf.Core.Rendering.RenderManager;
 import com.um_project_golf.Core.Utils.ButtonTimer;
 import com.um_project_golf.Core.Utils.CollisionsDetector;
@@ -25,8 +24,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static org.lwjgl.nanovg.NanoVGGL3.*;
 
@@ -50,6 +49,7 @@ public class GolfGame implements ILogic {
     private final List<Button> inGameMenuButtons;
     private Button infoButton;
     private TextField textField;
+    private TextField textField2;
     private Title title;
     private TextPane pane;
 
@@ -202,8 +202,12 @@ public class GolfGame implements ILogic {
 
         infoButton = new Button(x, y, width, height, "Info", 70, () -> {}, vg, imageButton);
 
-        textField = new TextField(x, y * 30, width, height, "Enter text here", 70, vg, imageButton);
-        GLFW.glfwSetKeyCallback(window.getWindow(), (window, key, scancode, action, mods) -> textField.handleKeyInput(key, action, mods));
+        textField = new TextField(x, y * 30, width, height, "Enter text here X", 70, vg, imageButton);
+        textField2 = new TextField(x, y * 30 + height, width, height , "Enter text here Y", 70, vg, imageButton);
+        GLFW.glfwSetKeyCallback(window.getWindow(), (window, key, scancode, action, mods) -> {
+            textField.handleKeyInput(key, action, mods);
+            textField2.handleKeyInput(key, action, mods);
+        });
 
         GLFW.glfwSetMouseButtonCallback(window.getWindow(), (window, button, action, mods) -> {
             if (button == GLFW.GLFW_MOUSE_BUTTON_1 && action == GLFW.GLFW_PRESS) {
@@ -211,6 +215,7 @@ public class GolfGame implements ILogic {
                 double[] yPos = new double[1];
                 GLFW.glfwGetCursorPos(window, xPos, yPos);
                 textField.handleMouseClick((float) xPos[0], (float) yPos[0]);
+                textField2.handleMouseClick((float) xPos[0], (float) yPos[0]);
             }
         });
 
@@ -339,6 +344,7 @@ public class GolfGame implements ILogic {
         }
         if (debugMode) {
             textField.update();
+            textField2.update();
         } else {
             infoButton.update();
         }
@@ -415,6 +421,7 @@ public class GolfGame implements ILogic {
         }
         if (debugMode){
             textField.render();
+            textField2.render();
         } else {
             infoButton.render();
         }
