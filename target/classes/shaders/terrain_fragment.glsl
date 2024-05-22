@@ -56,7 +56,7 @@ vec4 specularC;
 void setupColor(Material material, vec2 textCoords) {
     if (material.hasTexture == 0) { // If the material has no other textures
         vec4 blendMapColor = texture(blendMap, textCoords); // Get the blend map color
-        vec2 tiledCoords = textCoords * 100.0; // Tile the texture coordinates
+        vec2 tiledCoords = textCoords * 400.0; // Tile the texture coordinates
 
         // Normalize blend map colors by ensuring they do not exceed 1.0 in total
         float maxColorWeight = max(blendMapColor.r + blendMapColor.g + blendMapColor.b, 1.0);
