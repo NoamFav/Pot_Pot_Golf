@@ -25,6 +25,7 @@ public class SceneManager {
     private float spotInc = 1; // The spot increment.
 
     private static float[][] heightMap; // The height map.
+    private static float[][] treePositions; // The tree positions.
 
     public SceneManager(float lightAngle) {
         entities = new ArrayList<>();
@@ -139,5 +140,13 @@ public class SceneManager {
 
     public static Texture getDefaultTexture() {
         return defaultTexture;
+    }
+
+    public float[][] getTreePositions() {
+        return treePositions;
+    }
+
+    public void setTreePositions(float[][] treePositions) {
+        SceneManager.treePositions = treePositions;
     }
 }
