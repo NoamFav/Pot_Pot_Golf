@@ -1,10 +1,10 @@
 package com.um_project_golf.Core.Utils;
 
+import javafx.util.Pair;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.util.function.BiFunction;
-import javafx.util.Pair;
 
 /**
  * The consts class.
@@ -42,7 +42,7 @@ public class Consts {
     public static final float Z_FAR = 10000.0f; // Far plane (Used for freeing up resources)
     public static final float SPECULAR_POWER = 10f; // Specular power (Higher = more shiny)
 
-    private static final int POWER = 9; // Power of 2 for the terrain size
+    private static final int POWER = 10; // Power of 2 for the terrain size
     public static final float SIZE_X = (float) Math.pow(2, POWER); // Size of the terrain in the x direction
     public static final float SIZE_Z = (float) Math.pow(2, POWER); // Size of the terrain in the z direction
     public static final int VERTEX_COUNT = (int) Math.pow(2, POWER + 2); // Number of vertices in the terrain (Higher = more detail but also more performance heavy)
@@ -51,14 +51,27 @@ public class Consts {
 
     public static final float PLAYER_HEIGHT = 1.75f; // Height of the player (meters)
     public static final float MOUSE_SENSITIVITY = 0.2f; // Mouse sensitivity (Higher = more sensitive)
-    public static final float CAMERA_MOVEMENT_SPEED = 4;  //1.1f for normal speed. Camera movement speed (Higher = faster)
+    public static final float CAMERA_MOVEMENT_SPEED = 2;  //1.1f for normal speed camera movement speed (Higher = faster)
 
     public static final Vector4f DEFAULT_COLOR = new Vector4f(1f, 1f, 1f, 1f); // Default color of the object
     public static final Vector3f AMBIENT_LIGHT = new Vector3f(0.8f, 0.8f, 0.8f); // Ambient light color (higher = brighter)
 
     // For examination purposes:
     public static final BiFunction<Float, Float, Float> HEIGHT_FUNCTION = (x, z) -> (float) (Math.sin((x - z) / 7) + 0.5); // Height function for the terrain
+
     public static final float MAX_TERRAIN_HEIGHT = 10; // Height of the terrain (meters)
+    /* The max height is only a scaling factor for the simplex noise.
+    It is not the actual height of the terrain has simplex doesn't have to be 1 at any point.
+    The terrains use octaves simplex generations, so the height is a sum of multiple simplex noise functions.
+    This means that the actual height will be lower than the max height.
+    From test, the max height tends to be around +/- 0.8,
+    so the actual height would be +/- 8 meters when left untouched.
+    Furthermore, for reducing water bodies,
+    simplifying the A* algorithm, the height is scaled to 10 meters.
+    By this: height < - 2 ? height - 2 : height + 2;
+    The height is scaled to +/- 10 meters.
+    Consider that it may be in fact superior to 10 meters by a couple centimeters. */
+
     public static final float GRAVITY = 9.81f; // Gravity constant (m/s^2)
     public static final float BALL_MASS = 0.0459f; // Mass of the ball (kg)
 
