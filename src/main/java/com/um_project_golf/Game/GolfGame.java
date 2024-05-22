@@ -24,10 +24,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.*;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Random;
 
 import static org.lwjgl.nanovg.NanoVGGL3.*;
 
@@ -44,6 +42,8 @@ public class GolfGame implements ILogic {
     private final ButtonTimer timer;
     private MouseInput mouseInputs;
     private long vg;
+
+    private final String imageButton = "Texture/buttons.png";
 
     private final List<Button> menuButtons;
     private final List<Button> inGameMenuButtons;
@@ -163,7 +163,7 @@ public class GolfGame implements ILogic {
 
         golfBall = new Entity(ball, new Vector3f(0, heightMap.getHeight(new Vector3f(0, 0, 0)), 0), new Vector3f(50, 0, 0), 50);
         // golfBall = new Entity(ball, new Vector3f(0, terrain.getHeight(0, 0), 0), new Vector3f(50, 0, 0), 10);
-        System.out.println(golfBall.getPos().x + "," + golfBall.getPos().y + "," + golfBall.getPos().z);
+        System.out.println(golfBall.getPosition().x + "," + golfBall.getPosition().y + "," + golfBall.getPosition().z);
         scene.addEntity(golfBall);
 
         scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
@@ -206,9 +206,9 @@ public class GolfGame implements ILogic {
         float x = window.getWidthConverted(10);
         float y = window.getHeightConverted(10);
 
-        infoButton = new Button(x, y, width, height, "Info", 70, () -> {}, vg, "Texture/buttons.png");
+        infoButton = new Button(x, y, width, height, "Info", 70, () -> {}, vg, imageButton);
 
-        textField = new TextField(x, y * 30, width, height, "Enter text here", 70, vg, "Texture/buttons.png");
+        textField = new TextField(x, y * 30, width, height, "Enter text here", 70, vg, imageButton);
         GLFW.glfwSetKeyCallback(window.getWindow(), (window, key, scancode, action, mods) -> textField.handleKeyInput(key, action, mods));
 
         GLFW.glfwSetMouseButtonCallback(window.getWindow(), (window, button, action, mods) -> {
@@ -221,19 +221,19 @@ public class GolfGame implements ILogic {
         });
 
 
-        audioManager = new AudioManager("src/main/resources/SoundTrack/wii.wav");
+        audioManager = new AudioManager("src/main/resources/SoundTrack/kavinsky.wav");
         audioManager.playSound();
         isSoundPlaying = true;
 
         PhysicsEngine engine = new PhysicsEngine(heightMap,0.08, 0.2, 0.1, 0.3);
         Runnable hitGolfBall = () -> {
             try {
-                double[] initialState = {golfBall.getPos().x, golfBall.getPos().z, 1, 1}; // initialState = [x, z, vx, vz]
+                double[] initialState = {golfBall.getPosition().x, golfBall.getPosition().z, 1, 1}; // initialState = [x, z, vx, vz]
                 double h = 0.1; // Time step
                 Vector3f finalPosition = engine.runImprovedEuler(initialState, h);
                 checkCollisionBall(finalPosition);
                 System.out.println("Position:" + finalPosition.x + ", " + finalPosition.y  + ", " + finalPosition.z);
-                golfBall.setPos(finalPosition.x, finalPosition.y, finalPosition.z);
+                golfBall.setPosition(finalPosition.x, finalPosition.y, finalPosition.z);
                 //camera.setPosition(new Vector3f(finalPosition.x, finalPosition.y, finalPosition.z));
             } catch (Exception e) {
                 System.out.println("Exception");
@@ -388,7 +388,7 @@ public class GolfGame implements ILogic {
         }
         lastY = camera.getPosition().y;
 
-        collisionsDetector.checkCollision(camera, cameraInc, heightMap);
+        collisionsDetector.checkCollision(camera, cameraInc, heightMap, scene);
 
         scene.increaseSpotAngle(0.01f);
         if(scene.getSpotAngle() > 4) {
@@ -521,7 +521,7 @@ public class GolfGame implements ILogic {
         borderCollisionBall(position);
 
         // Update the position of the golf ball
-        golfBall.setPos(position.x, position.y, position.z);
+        golfBall.setPosition(position.x, position.y, position.z);
     }
 
     private void terrainCollisionBall(Vector3f newPosition) {
@@ -604,10 +604,12 @@ public class GolfGame implements ILogic {
 
         List<Vector3f> positions = new ArrayList<>();
 
+        // Populate positions based on the heightmap image
         for (int x = 0; x < heightmapImage.getWidth(); x++) {
             for (int z = 0; z < heightmapImage.getHeight(); z++) {
                 Color pixelColor = new Color(heightmapImage.getRGB(x, z));
 
+                // Check for green or blue pixels
                 if (pixelColor.equals(Color.GREEN) || pixelColor.equals(Color.BLUE)) {
                     float terrainX = x / (float) heightmapImage.getWidth() * Consts.SIZE_X - Consts.SIZE_X / 2;
                     float terrainZ = z / (float) heightmapImage.getHeight() * Consts.SIZE_Z - Consts.SIZE_Z / 2;
@@ -617,11 +619,31 @@ public class GolfGame implements ILogic {
                 }
             }
         }
-        Random rnd = new Random();
-        for (int i = 0; i < Math.max(Consts.SIZE_X, Consts.SIZE_Z) * 0.1; i++) {
-            Vector3f position = positions.get(rnd.nextInt(positions.size()));
-            scene.addEntity(new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f));
+
+        // Ensure we have valid positions
+        if (positions.isEmpty()) {
+            System.out.println("No valid positions found for trees.");
+            return;
         }
+
+        float[][] treePositions = new float[Consts.NUMBER_OF_TREES][3];
+        Random rnd = new Random();
+        Vector3f zero = new Vector3f(0, 0, 0);
+
+        // Populate tree positions and add entities to the scene
+        for (int i = 0; i < Consts.NUMBER_OF_TREES; i++) {
+            Vector3f position = positions.get(rnd.nextInt(positions.size()));
+            if (position != zero) {
+                scene.addEntity(new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f));
+                treePositions[i] = new float[]{position.x, position.y, position.z};
+            } else {
+                System.out.println("Position is null at index: " + i);
+            }
+        }
+
+        scene.setTreePositions(treePositions);
+        System.out.println("Tree positions count: " + treePositions.length);
+        System.out.println("Tree positions: " + Arrays.deepToString(treePositions));
     }
 
     public Vector3f getGoodPosition() {
@@ -682,6 +704,7 @@ public class GolfGame implements ILogic {
         };
 
         Runnable enableDebugMode = () -> {
+            audioManager.stopSound();
             System.out.println("Enabling debug mode");
             debugMode = !debugMode;
             try {
@@ -691,7 +714,14 @@ public class GolfGame implements ILogic {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+            recreateGUIs();
 
+            if (debugMode) {
+                audioManager = new AudioManager("src/main/resources/SoundTrack/nothing2.wav");
+            } else {
+                audioManager = new AudioManager("src/main/resources/SoundTrack/nothing.wav");
+            }
+            audioManager.playSound();
         };
 
         float titleWidth = window.getWidthConverted(1200);
@@ -707,19 +737,19 @@ public class GolfGame implements ILogic {
         float centerButtonY = titleHeight + titleY;
         float font = window.getHeightConverted(100);
 
-        Button start = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", font, startGame, vg, "Texture/buttons.png");
+        Button start = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", font, startGame, vg, imageButton);
         menuButtons.add(start);
 
-        Button changeTerrain = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Change Terrain", font, terrainChanger, vg, "Texture/buttons.png");
+        Button changeTerrain = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Change Terrain", font, terrainChanger, vg, imageButton);
         menuButtons.add(changeTerrain);
 
-        Button soundButton = new Button(window.getWidth() - window.getWidthConverted(300), window.getHeightConverted(20), window.getWidthConverted(300), heightButton, "Sound", font, sound, vg, "Texture/buttons.png");
+        Button soundButton = new Button(window.getWidth() - window.getWidthConverted(300), window.getHeightConverted(20), window.getWidthConverted(300), heightButton, "Sound", font, sound, vg, imageButton);
         menuButtons.add(soundButton);
 
-        Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2 , widthButton, heightButton, "Exit", font, quit, vg, "Texture/buttons.png");
+        Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2 , widthButton, heightButton, "Exit", font, quit, vg, imageButton);
         menuButtons.add(exit);
 
-        Button debugButton = new Button( window.getWidthConverted(30), window.getHeight() - heightButton, widthButton/4, heightButton, "Debug Mode", font * 0.7f, enableDebugMode, vg, "Texture/inGameMenu.png");
+        Button debugButton = new Button( window.getWidthConverted(30), window.getHeight() - heightButton, widthButton/4, heightButton, "Debug Mode", font * 0.7f, enableDebugMode, vg, imageButton);
         menuButtons.add(debugButton);
 
         float paneWidth = window.getWidthConverted(500);
@@ -727,7 +757,7 @@ public class GolfGame implements ILogic {
         float paneX = (window.getWidth() - paneWidth);
         float paneY = window.getHeight() - paneHeight - window.getHeightConverted(10);
 
-        pane = new TextPane(paneX, paneY, paneWidth, paneHeight, "Pane test", font * 0.7f,  vg, "Texture/inGameMenu.png");
+        pane = new TextPane(paneX, paneY, paneWidth, paneHeight, "Pane test", font * 0.7f,  vg, imageButton);
     }
 
     private void terrainSwitch(BlendMapTerrain blendMapTerrain, Model tree, TerrainTexture blendMap2) {
@@ -810,9 +840,9 @@ public class GolfGame implements ILogic {
         float y = window.getHeightConverted(10);
         float font = window.getHeightConverted(70);
 
-        infoButton = new Button(x, y, width, height, "Info", font, () -> {}, vg, "Texture/buttons.png");
+        infoButton = new Button(x, y, width, height, "Info", font, () -> {}, vg, imageButton);
 
-        textField = new TextField(x, y * 30, width, height, "Enter text here", font, vg, "Texture/buttons.png");
+        textField = new TextField(x, y * 30, width, height, "Enter text here", font, vg, imageButton);
     }
 
     private String secondToVelocity(long ms) {

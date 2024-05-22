@@ -151,7 +151,7 @@ public class Terrain {
      * @return The height of the terrain at the given position.
      */
     public static float getHeight(float x, float z) {
-        double x1 = Math.sin(x / 10) * 10 + Math.cos(z / 10) * 10; // Calculate the height of the terrain
+        double x1 = Consts.HEIGHT_FUNCTION.apply(x,z); // Calculate the height of the terrain
         return (float) (x1); // Return the height of the terrain
     }
 
