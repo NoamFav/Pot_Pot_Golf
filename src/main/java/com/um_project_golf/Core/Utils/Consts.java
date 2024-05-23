@@ -81,8 +81,8 @@ public class Consts {
     public static final float TARGET_RADIUS = 0.15f; // Radius of the ball (meters)
     public static final float MAX_SPEED = 5f; // Maximum speed of the ball (m/s)
 
-    public static final float KINETIC_FRICTION_GRASS = 0.1f;
-    public static final float KINETIC_FRICTION_SAND = 0.2f;
+    public static final float KINETIC_FRICTION_GRASS = 0.08f;
+    public static final float KINETIC_FRICTION_SAND = 0.1f;
     public static final float STATIC_FRICTION_GRASS = 0.2f;
-    public static final float STATIC_FRICTION_SAND = 0.2f;
+    public static final float STATIC_FRICTION_SAND = 0.3f;
 }

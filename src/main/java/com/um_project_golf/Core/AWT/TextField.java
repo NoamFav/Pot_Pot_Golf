@@ -180,6 +180,10 @@ public class TextField {
         this.text = text;
     }
 
+    public String getText() {
+        return this.text;
+    }
+
     public void handleMouseClick(float mouseX, float mouseY) {
         focused = isMouseOver(mouseX, mouseY);
     }
