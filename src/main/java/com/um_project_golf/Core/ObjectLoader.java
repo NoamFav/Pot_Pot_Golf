@@ -33,9 +33,6 @@ public class ObjectLoader {
      */
     public List<Model> loadAssimpModel(String path) throws Exception {
         // Load the model using Assimp
-        // This allows us to load models in various formats (e.g. .obj, .fbx, .3ds)
-        // And even allows us to load models with multiple meshes as well as animations (Not yet implemented)
-        // TODO: Implement animations
         AIScene scene = Assimp.aiImportFile(path,
                 Assimp.aiProcess_JoinIdenticalVertices |
                         Assimp.aiProcess_Triangulate |
@@ -43,7 +40,6 @@ public class ObjectLoader {
 
         // Check if the model was loaded successfully
         if (scene == null) {
-            // If the model failed to load, throw an exception
             throw new RuntimeException("Failed to load model: " + path + "\n" + Assimp.aiGetErrorString());
         }
 
@@ -87,9 +83,14 @@ public class ObjectLoader {
 
         AIString texturePath = AIString.calloc();
         Assimp.aiGetMaterialTexture(material, Assimp.aiTextureType_DIFFUSE, 0, texturePath, (IntBuffer) null, null, null, null, null, null);
-        if (texturePath.length() > 0) {
-            int textureID = loadTexture(basePath + texturePath.dataString());
+        String fullTexturePath = basePath + texturePath.dataString();
+        texturePath.free();
+
+        if (new File(fullTexturePath).isFile()) {
+            int textureID = loadTexture(fullTexturePath);
             return new Texture(textureID);
+        } else {
+            System.out.println("Texture file does not exist or is not a file: " + fullTexturePath);
         }
 
         return null;

@@ -488,7 +488,7 @@ public class GolfGame implements ILogic {
         }
 
         scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
-        scene.addEntity(new Entity(wolf, new Vector3f(0, heightMap.getHeight(new Vector3f()), 0), new Vector3f(45, 0 , 0), 10 ));
+        scene.addEntity(new Entity(wolf, new Vector3f(0, 20, 0), new Vector3f(45, 0 , 0), 20 ));
 
         arrowEntity = new Entity(arrow, new Vector3f(0, 0, 0), new Vector3f(0,-90 ,0), 2);
         scene.addEntity(arrowEntity);
