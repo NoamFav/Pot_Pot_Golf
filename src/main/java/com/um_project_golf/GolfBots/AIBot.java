@@ -8,12 +8,8 @@ import java.util.Random;
 import java.util.function.Function;
 
 public class AIBot {
-    private static double startingPositionX = 0;
-    private static double startingPositionY = 0;
-    private static Function<Double, Double> heightProfile;
-    private static Obstacle[] obstacles;
-    private static double flagPositionX = 0;
-    private static double flagPositionY = 0;
+    private static Vector3f startingPosition;
+    private static Vector3f flagPosition;
     private static double flagRadius = 0;
     private static double minVelocityX = 0;
     private static double maxVelocityX = 100;
@@ -23,8 +19,8 @@ public class AIBot {
     private static double velocityStepY = 0.1;
     public static void main(String[] args) {
         // Initialize game elements
-        Ball ball = new Ball(startingPositionX, startingPositionY);
-        Green green = new Green(heightProfile, obstacles, flagPositionX, flagPositionY, flagRadius);
+        Ball ball = new Ball(startingPosition);
+        Green green = new Green(flagPosition, flagRadius);
 
         // Find the best shot using Hill-Climbing
         Shot bestShot = findBestShotUsingHillClimbing(ball, green);
@@ -85,12 +81,11 @@ public class AIBot {
         // Testing with height map
         HeightMap testMap = new HeightMap();
         testMap.createHeightMap();
-        double[] initialState = {startingPositionX, startingPositionY, ball.getVelocityX(), ball.getVelocityY()}; // initialState = [x, z, vx, vz]
+        double[] initialState = {startingPosition.x, startingPosition.y, ball.getVelocityX(), ball.getVelocityY()}; // initialState = [x, z, vx, vz]
         double h = 0.1; // Time step
         //double totalTime = 5; // Total time
         PhysicsEngine engine = new PhysicsEngine(testMap, 0.08, 0.2, 0.1, 0.3);
-        Vector3f finalPosition = null;
-        finalPosition.set(startingPositionX,startingPositionY,0.0);
+        Vector3f finalPosition = startingPosition;
         for (int i = 0; i < 50; i++) {
             finalPosition = engine.runImprovedEuler(initialState, h);
             initialState[0] = finalPosition.x;

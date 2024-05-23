@@ -7,18 +7,24 @@ import org.joml.Vector3f;
 import java.util.function.Function;
 
 public class RuleBasedBot {
+    private static Vector3f startingPosition;
+    private static double flagRadius = 0.5;
+    private static Vector3f flagPosition;
+    private static HeightMap testMap = new HeightMap();
 
-    private static double startingPositionX = 0;
-    private static double startingPositionY = 0;
-    private static Function<Double, Double> heightProfile;
-    private static Obstacle[] obstacles;
-    private static double flagPositionX = 0;
-    private static double flagPositionY = 0;
-    private static double flagRadius = 0;
+    public RuleBasedBot(Vector3f startingPosition, Vector3f flagPosition){
+        RuleBasedBot.startingPosition = startingPosition;
+        RuleBasedBot.flagPosition = flagPosition;
+    }
+
     public static void main(String[] args) {
+        testMap.createHeightMap();
+        float zInitial = testMap.getHeight(new Vector3f(0,0,0));
+        float zFlag = testMap.getHeight(new Vector3f());
         // Initialize game elements
-        Ball ball = new Ball(startingPositionX, startingPositionY);
-        Green green = new Green(heightProfile, obstacles, flagPositionX, flagPositionY, flagRadius);
+        RuleBasedBot bot = new RuleBasedBot(new Vector3f(0,0,zInitial),new Vector3f(3,4,zFlag));
+        Ball ball = new Ball(startingPosition);
+        Green green = new Green(flagPosition, flagRadius);
 
         // Find the best shot
         Shot bestShot = findBestShot(ball, green);
@@ -30,28 +36,31 @@ public class RuleBasedBot {
     public static Shot findBestShot(Ball ball, Green green) {
         double minDistance = Double.MAX_VALUE;
         Shot bestShot = null;
+        Vector3f bestPosition = null;
 
-        // Placeholder for iterating over possible velocities
-        for (double velocityX = 1; velocityX <= 300; velocityX += 5) {
-            for (double velocityY = 1; velocityY <= 300; velocityY += 5) {
-                // Apply the velocities to the ball
-                applyVelocities(ball, velocityX, velocityY);
+        while(!isInHole(ball,green)) {
 
-                // Simulate the ball's movement using the physics engine
-                simulateBallMovement(ball);
+            // Placeholder for iterating over possible velocities
+            for (double velocityX = 1; velocityX <= 300; velocityX += 5) {
+                for (double velocityY = 1; velocityY <= 300; velocityY += 5) {
+                    // Apply the velocities to the ball
+                    applyVelocities(ball, velocityX, velocityY);
 
-                // Check if the ball reached the hole
-                if (isInHole(ball, green)) {
+                    // Simulate the ball's movement using the physics engine
+                    simulateBallMovement(ball);
+
                     // Check if it's the best shot so far
                     if (ball.distanceToFlag(green) < minDistance) {
                         minDistance = ball.distanceToFlag(green);
                         bestShot = new Shot(velocityX, velocityY);
+                        bestPosition = ball.getPosition();
                     }
-                }
 
-                // Reset ball position for the next shot
-                ball.resetPosition(startingPositionX, startingPositionY);
+                    // Reset ball position for the next shot
+                    ball.updatePosition(startingPosition);
+                }
             }
+            ball.updatePosition(bestPosition);
         }
 
         return bestShot;
@@ -66,14 +75,11 @@ public class RuleBasedBot {
     // Placeholder for simulating the ball's movement
     public static void simulateBallMovement(Ball ball) {
         // Testing with height map
-        HeightMap testMap = new HeightMap();
-        testMap.createHeightMap();
-        double[] initialState = {startingPositionX, startingPositionY, ball.getVelocityX(), ball.getVelocityY()}; // initialState = [x, z, vx, vz]
+        double[] initialState = {startingPosition.x, startingPosition.y, ball.getVelocityX(), ball.getVelocityY()}; // initialState = [x, z, vx, vz]
         double h = 0.1; // Time step
         //double totalTime = 5; // Total time
         PhysicsEngine engine = new PhysicsEngine(testMap, 0.08, 0.2, 0.1, 0.3);
-        Vector3f finalPosition = null;
-        finalPosition.set(startingPositionX,startingPositionY,0.0);
+        Vector3f finalPosition = startingPosition;
         for (int i = 0; i < 50; i++) {
             finalPosition = engine.runImprovedEuler(initialState, h);
             initialState[0] = finalPosition.x;

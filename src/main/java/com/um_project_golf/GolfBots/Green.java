@@ -1,30 +1,22 @@
 package com.um_project_golf.GolfBots;
 
+import org.joml.Vector3f;
+
 import java.util.function.Function;
 
 class Green {
-    private Function<Double, Double> heightProfile;
-    private Obstacle[] obstacles;
-    private double flagPositionX;
-    private double flagPositionY;
+    private Vector3f flagPosition;
     private double flagRadius;
 
     // Constructor
-    public Green(Function<Double, Double> heightProfile, Obstacle[] obstacles, double flagPositionX, double flagPositionY, double flagRadius) {
-        this.heightProfile = heightProfile;
-        this.obstacles = obstacles;
-        this.flagPositionX = flagPositionX;
-        this.flagPositionY = flagPositionY;
+    public Green(Vector3f flagPosition, double flagRadius) {
+        this.flagPosition = flagPosition;
         this.flagRadius = flagRadius;
     }
 
     // Getters
-    public double getFlagPositionX() {
-        return flagPositionX;
-    }
-
-    public double getFlagPositionY() {
-        return flagPositionY;
+    public Vector3f getFlagPosition(){
+        return flagPosition;
     }
 
     public double getFlagRadius() {
