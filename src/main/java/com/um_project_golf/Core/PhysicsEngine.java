@@ -1,5 +1,7 @@
 package com.um_project_golf.Core;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiFunction;
 
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
@@ -46,7 +48,8 @@ public class PhysicsEngine {
     //     //System.out.println("height" + height);
     //     return new Vector3f((float) currentState[0], height, (float) currentState[1]);
     // }
-    public Vector3f runImprovedEuler(double[] initialState, double stepSize) { // initialState = [x, z, vx, vz]
+    public List<Vector3f> runImprovedEuler(double[] initialState, double stepSize) { // initialState = [x, z, vx, vz]
+        List<Vector3f> positions = new ArrayList<>();
         double[] currentState = initialState;
         double magnitudeVelocity;
         double magnitudeAcceleration;
@@ -54,7 +57,7 @@ public class PhysicsEngine {
 
         double[] nextStep;
         double[] acceleration;
-    
+
         do { // Repeat until the ball is completely at rest
             nextStep = SimpleRK2.simpleImprovedEuler(currentTime, currentState, currentTime + stepSize, stepSize, this::equationsOfMotion);
             acceleration = equationsOfMotion(currentTime, currentState);
@@ -62,11 +65,13 @@ public class PhysicsEngine {
             magnitudeAcceleration = Math.sqrt(acceleration[2] * acceleration[2] + acceleration[3] * acceleration[3]);
             currentState = nextStep;
             currentTime += stepSize;
+
+            assert heightMap != null;
+            float height = heightMap.getHeight(new Vector3f((float) currentState[0], 0, (float) currentState[1]));
+            positions.add(new Vector3f((float) currentState[0], height, (float) currentState[1]));
         } while (magnitudeVelocity >= 1 || magnitudeAcceleration >= 1); // While the ball is not at rest
-    
-        assert heightMap != null;
-        float height = heightMap.getHeight(new Vector3f((float) currentState[0], 0, (float) currentState[1]));
-        return new Vector3f((float) currentState[0], height, (float) currentState[1]);
+
+        return positions;
     }
     
 
@@ -130,11 +135,13 @@ public class PhysicsEngine {
     // Using five-point centred difference for numerically approximating the derivatives
     private double dh_dxCentredDifferenceFunction(double x, double z) {
         double stepSize = 0.001;
+        assert this.heightFunction != null;
         return (this.heightFunction.apply(x - 2 * stepSize, z) - 8 * this.heightFunction.apply(x - stepSize, z) + 8 * this.heightFunction.apply(x + stepSize, z) - this.heightFunction.apply(x + 2 * stepSize, z)) / (12 * stepSize);
     }
 
     private double dh_dyCentredDifferenceFunction(double x, double z) {
         double stepSize = 0.001;
+        assert this.heightFunction != null;
         return (this.heightFunction.apply(x, z - 2 * stepSize) - 8 * this.heightFunction.apply(x, z - stepSize) + 8 * this.heightFunction.apply(x, z + stepSize) - this.heightFunction.apply(x, z + 2 * stepSize)) / (12 * stepSize);
     }
 
@@ -145,9 +152,8 @@ public class PhysicsEngine {
         double h2 = this.heightMap.getHeight(new Vector3f((float) (x - stepSize), 0, (float) z));
         double h3 = this.heightMap.getHeight(new Vector3f((float) (x + stepSize), 0, (float) z));
         double h4 = this.heightMap.getHeight(new Vector3f((float) (x + 2 * stepSize), 0, (float) z));
-        double derivative = (h1 - 8 * h2 + 8 * h3 - h4) / (12 * stepSize);
 
-        return derivative;
+        return (h1 - 8 * h2 + 8 * h3 - h4) / (12 * stepSize);
     }
 
     private double dh_dyCentredDifferenceMap(double x, double z) {
@@ -157,26 +163,25 @@ public class PhysicsEngine {
         double h2 = this.heightMap.getHeight(new Vector3f((float) x, 0, (float) (z - stepSize)));
         double h3 = this.heightMap.getHeight(new Vector3f((float) x, 0, (float) (z + stepSize)));
         double h4 = this.heightMap.getHeight(new Vector3f((float) x, 0, (float) (z + 2 * stepSize)));
-        double derivative = (h1 - 8 * h2 + 8 * h3 - h4) / (12 * stepSize);
 
-        return derivative;
+        return (h1 - 8 * h2 + 8 * h3 - h4) / (12 * stepSize);
     }
 
 
-    public static void main(String[] args) {
-        // Testing with height map
-        HeightMap testMap = new HeightMap();
-        testMap.createHeightMap();
-        double[] initialState = {0, 0, 1, 1}; // initialState = [x, z, vx, vz]
-        double h = 0.1; // Time step
-        //double totalTime = 5; // Total time
-        PhysicsEngine engine = new PhysicsEngine(testMap, 0.08, 0.2, 0.1, 0.3);
-        Vector3f finalPosition;
-        for (int i = 0; i < 50; i++) {
-            finalPosition = engine.runImprovedEuler(initialState, h);
-            initialState[0] = finalPosition.x;
-            initialState[1] = finalPosition.z;
-            System.out.println(finalPosition.x + ", " + finalPosition.y + ", " + finalPosition.z);
-        }
-    }
+//    public static void main(String[] args) {
+//        // Testing with height map
+//        HeightMap testMap = new HeightMap();
+//        testMap.createHeightMap();
+//        double[] initialState = {0, 0, 1, 1}; // initialState = [x, z, vx, vz]
+//        double h = 0.1; // Time step
+//        //double totalTime = 5; // Total time
+//        PhysicsEngine engine = new PhysicsEngine(testMap, 0.08, 0.2, 0.1, 0.3);
+//        Vector3f finalPosition;
+//        for (int i = 0; i < 50; i++) {
+//            finalPosition = engine.runImprovedEuler(initialState, h);
+//            initialState[0] = finalPosition.x;
+//            initialState[1] = finalPosition.z;
+//            System.out.println(finalPosition.x + ", " + finalPosition.y + ", " + finalPosition.z);
+//        }
+//    }
 }

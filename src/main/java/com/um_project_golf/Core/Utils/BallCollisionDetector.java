@@ -9,14 +9,12 @@ import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 
 public class BallCollisionDetector {
 
-    private HeightMap heightMap;
-    private SceneManager scene;
-    private TextPane warningTextPane;
+    private final HeightMap heightMap;
+    private final SceneManager scene;
 
     public BallCollisionDetector(HeightMap heightMap, SceneManager scene, TextPane warningTextPane) {
         this.heightMap = heightMap;
         this.scene = scene;
-        this. warningTextPane = warningTextPane;
     }
 
     public void checkCollisionBall(Vector3f initialPosition, Vector3f finalPosition) {
@@ -28,7 +26,6 @@ public class BallCollisionDetector {
         // Check for collision with trees
         treeCollisionBall(finalPosition);
         // Check for collision with water
-        waterCollisionBall(initialPosition, finalPosition);
     }
 
     private void terrainCollisionBall(Vector3f newPosition) {
@@ -88,16 +85,5 @@ public class BallCollisionDetector {
         }
     }
 
-    private void waterCollisionBall(Vector3f initialPosition, Vector3f newPosition) {
-        // When water is hit, set the ball back to its intiail position before the hit.
-        // Maybe display a message on the screen?
-        if (newPosition.y <= 0) { // ball is in the water
-            newPosition.x = initialPosition.x;
-            newPosition.y = initialPosition.y;
-            newPosition.z = initialPosition.z;
-            System.out.println("Water hit");
-            warningTextPane.setText("Water hit");
-        }
-    }
 
 }
