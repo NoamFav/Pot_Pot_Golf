@@ -1,28 +1,31 @@
-package com.um_project_golf.Core.Utils;
+package com.um_project_golf.Core.Entity.Terrain;
 
+import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector2i;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.*;
+import java.util.List;
 
 public class HeightMapPathfinder {
     private int width;
     private int height;
-    private static final int SCALE = 4; // 4 units in the heightmap equal 1 meter in the real world
-    private static final int CIRCLE_RADIUS_UP = 550; // 200 meters radius, which is 200 * SCALE units in the heightmap
-    private static final int CIRCLE_RADIUS_DOWN = 410; // 200 meters radius, which is 200 * SCALE units in the heightmap
-    private static final int CIRCLE_RADIUS = (CIRCLE_RADIUS_DOWN + (int) (Math.random() * (CIRCLE_RADIUS_UP - CIRCLE_RADIUS_DOWN))) * SCALE;
-    private static final int SEARCH_RADIUS = 20 * SCALE; // 30 meters radius, which is 30 * SCALE units in the heightmap
-    private static final int BORDER_OFFSET = 20 * SCALE; // 20 meters away from the border, which is 20 * SCALE units
+    private final int SCALE = 4; // 4 units in the heightmap equal 1 meter in the real world
+    private int CIRCLE_RADIUS;
+    private final int SEARCH_RADIUS = 20 * SCALE; // 30 meters radius, which is 30 * SCALE units in the heightmap
+    private final int BORDER_OFFSET = (int) (Consts.SIZE_X/3 * SCALE); // 20 meters away from the border, which is 20 * SCALE units
+    private final int PATH_CIRCLE_RADIUS = 15 * SCALE; // 10 meters radius, which is 10 * SCALE units in the heightmap
 
     private double[][] costMap;
 
-    public List<Vector2i> getPath() {
+    public List<Vector2i> getPath(int radiusDown, int radiusUp) {
         int count = 0;
-        System.out.println("CIRCLE_RADIUS: " + CIRCLE_RADIUS / SCALE);
-        //List<Integer> radius = Arrays.asList(230, 430, 630);
+        // 200 meters radius, which is 200 * SCALE units in the heightmap
+        CIRCLE_RADIUS = (radiusDown + (int) (Math.random() * (radiusUp - radiusDown))) * SCALE;
+
 
         List<Vector2i> path = null;
         int attempts = 0;
@@ -48,14 +51,42 @@ public class HeightMapPathfinder {
             if (pathFound) {
                 System.out.println("Path found!" + " #" + count + " Start: " + path.get(0).x + ", " + path.get(0).y + " End: " + path.get(path.size() - 1).x + ", " + path.get(path.size() - 1).y);
                 count++;
+
+                // Draw the path on the heightmap image
+                drawPathOnImage(heightMapImage, path);
+                // Save the modified image
+                ImageIO.write(heightMapImage, "png", new File("Texture/heightmap.png"));
             } else {
-                System.out.println("Failed to find a valid path after 10000 attempts.");
+                System.out.println("Failed to find a valid path after 1000 attempts.");
             }
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }
-        System.out.println("Path: " + path);
         return path;
+    }
+
+    private void drawPathOnImage(BufferedImage image, List<Vector2i> path) {
+        int rgbBlue = new java.awt.Color(0, 0, 255).getRGB(); // Color blue in RGB
+        for (Vector2i point : path) {
+            drawCircleOnImage(image, point.x, point.y, PATH_CIRCLE_RADIUS, rgbBlue);
+        }
+    }
+
+    private void drawCircleOnImage(BufferedImage image, int centerX, int centerY, int radius, int rgb) {
+        int startX = Math.max(centerX - radius, 0);
+        int endX = Math.min(centerX + radius, image.getWidth() - 1);
+        int startY = Math.max(centerY - radius, 0);
+        int endY = Math.min(centerY + radius, image.getHeight() - 1);
+
+        for (int x = startX; x <= endX; x++) {
+            for (int y = startY; y <= endY; y++) {
+                int dx = x - centerX;
+                int dy = y - centerY;
+                if (dx * dx + dy * dy <= radius * radius) {
+                    image.setRGB(x, y, rgb);
+                }
+            }
+        }
     }
 
     private double[][] generateCostMap(BufferedImage image) {

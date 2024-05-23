@@ -2,13 +2,15 @@ package com.um_project_golf.Core.Entity;
 
 import org.joml.Vector3f;
 
+import java.util.List;
+
 /**
  * The entity class.
  * This class is responsible for the entities of the game.
  */
 public class Entity {
     public Object getRotation; // get the rotation of the entity
-    private final Model model; // model of the entity
+    private final List<Model> model; // model of the entity
     private final Vector3f position, rotation; // position and rotation of the entity
     private float scale; // scale of the entity
 
@@ -21,7 +23,7 @@ public class Entity {
      * @param rotation The rotation of the entity.
      * @param scale The scale of the entity.
      */
-    public Entity(Model model, Vector3f position, Vector3f rotation, float scale) {
+    public Entity(List<Model> model, Vector3f position, Vector3f rotation, float scale) {
         this.model = model;
         this.position = position;
         this.rotation = rotation;
@@ -72,7 +74,7 @@ public class Entity {
         this.rotation.set(x, y, z); // set the x, y, and z values to the rotation
     }
 
-    public Model getModel() {
+    public List<Model> getModels() {
         return model;
     }
 

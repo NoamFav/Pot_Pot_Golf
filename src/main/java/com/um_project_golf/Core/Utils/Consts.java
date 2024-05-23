@@ -20,13 +20,20 @@ public class Consts {
     public static final float REFERENCE_WIDTH = 3840;
     public static final float REFERENCE_HEIGHT = 2160;
 
+    private static final int POWER = 10; // Power of 2 for the terrain size
+    public static final float SIZE_X = (float) Math.pow(2, POWER); // Size of the terrain in the x direction
+    public static final float SIZE_Z = (float) Math.pow(2, POWER); // Size of the terrain in the z direction
+    public static final int VERTEX_COUNT = (int) Math.pow(2, POWER + 2); // Number of vertices in the terrain (Higher = more detail but also more performance heavy)
+    public static final float MAX_HEIGHT = 10000; // Maximum height of the terrain
+    public static final float TEXTURE_SCALE = 100f; // Scale of the texture on the terrain
+
     public static final double SCALE = 0.005; // Used for scaling the terrain with simplex noise
     public static final int OCTAVES = 10; // Number of octaves used in simplex noise (higher = more detail)
     public static final double PERSISTENCE = 0.4; // Used to determine how much each octave contributes to the overall shape (higher = more detail)
     public static final double AMPLITUDE = 1; // Used for increasing the height of the terrain (higher = more height)
 
     public static final float TREE_SIZE = 1.5f;
-    public static final int NUMBER_OF_TREES = 25; // Density of the trees (higher = more trees)
+    public static final int NUMBER_OF_TREES = (int) (SIZE_X); // Density of the trees (higher = more trees)
 
     public static final long NANOSECOND = 1000000000L;  // 1 second in nanoseconds
     public static final float FRAME_CAP = 5000f; // Maximum frame rate
@@ -42,16 +49,9 @@ public class Consts {
     public static final float Z_FAR = 10000.0f; // Far plane (Used for freeing up resources)
     public static final float SPECULAR_POWER = 10f; // Specular power (Higher = more shiny)
 
-    private static final int POWER = 10; // Power of 2 for the terrain size
-    public static final float SIZE_X = (float) Math.pow(2, POWER); // Size of the terrain in the x direction
-    public static final float SIZE_Z = (float) Math.pow(2, POWER); // Size of the terrain in the z direction
-    public static final int VERTEX_COUNT = (int) Math.pow(2, POWER + 2); // Number of vertices in the terrain (Higher = more detail but also more performance heavy)
-    public static final float MAX_HEIGHT = 10000; // Maximum height of the terrain
-    public static final float TEXTURE_SCALE = 100f; // Scale of the texture on the terrain
-
     public static final float PLAYER_HEIGHT = 1.75f; // Height of the player (meters)
     public static final float MOUSE_SENSITIVITY = 0.2f; // Mouse sensitivity (Higher = more sensitive)
-    public static final float CAMERA_MOVEMENT_SPEED = 6;  //1.1f for normal speed camera movement speed (Higher = faster)
+    public static final float CAMERA_MOVEMENT_SPEED = 3;  //1.1f for normal speed camera movement speed (Higher = faster)
 
     public static final Vector4f DEFAULT_COLOR = new Vector4f(1f, 1f, 1f, 1f); // Default color of the object
     public static final Vector3f AMBIENT_LIGHT = new Vector3f(0.8f, 0.8f, 0.8f); // Ambient light color (higher = brighter)

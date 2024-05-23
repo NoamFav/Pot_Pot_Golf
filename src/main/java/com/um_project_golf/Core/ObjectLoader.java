@@ -1,12 +1,14 @@
 package com.um_project_golf.Core;
 
 import com.um_project_golf.Core.Entity.Model;
+import com.um_project_golf.Core.Entity.Texture;
 import com.um_project_golf.Core.Utils.Utils;
 import org.lwjgl.opengl.*;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.assimp.*;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -27,9 +29,9 @@ public class ObjectLoader {
      * Loads a model from a file.
      *
      * @param path The path to the file.
-     * @return The merged model.
+     * @return The list of models.
      */
-    public Model loadAssimpModel(String path) {
+    public List<Model> loadAssimpModel(String path) throws Exception {
         // Load the model using Assimp
         // This allows us to load models in various formats (e.g. .obj, .fbx, .3ds)
         // And even allows us to load models with multiple meshes as well as animations (Not yet implemented)
@@ -45,22 +47,52 @@ public class ObjectLoader {
             throw new RuntimeException("Failed to load model: " + path + "\n" + Assimp.aiGetErrorString());
         }
 
-        List<Float> vertices = new ArrayList<>();
-        List<Float> textures = new ArrayList<>();
-        List<Float> normals = new ArrayList<>();
-        List<Integer> indices = new ArrayList<>();
-        int indexOffset = 0;
+        List<Model> models = new ArrayList<>();
 
-        // Process all meshes in the scene
         for (int i = 0; i < scene.mNumMeshes(); i++) {
             AIMesh mesh = AIMesh.create(Objects.requireNonNull(scene.mMeshes()).get(i)); // Get each mesh
-            processMesh(mesh, vertices, textures, normals, indices, indexOffset); // Process the mesh
-            indexOffset += mesh.mNumVertices();
+
+            List<Float> vertices = new ArrayList<>();
+            List<Float> textureCoords = new ArrayList<>();
+            List<Float> normals = new ArrayList<>();
+            List<Integer> indices = new ArrayList<>();
+            processMesh(mesh, vertices, textureCoords, normals, indices, 0); // Process the mesh
+
+            Model model = loadModel(listToArray(vertices), listToArray(textureCoords), listToArray(normals), listToIntArray(indices));
+
+            AIMaterial material = AIMaterial.create(scene.mMaterials().get(mesh.mMaterialIndex()));
+            Texture texture = loadMaterialTexture(material, path);
+            if (texture != null) {
+                model.setTexture(texture);
+            }
+
+            models.add(model);
         }
 
         Assimp.aiReleaseImport(scene); // Release the model from memory
 
-        return loadModel(listToArray(vertices), listToArray(textures), listToArray(normals), listToIntArray(indices)); // Load the merged model
+        return models; // Return the list of models
+    }
+
+    /**
+     * Loads material textures.
+     *
+     * @param material The AIMaterial to load textures from.
+     * @param modelPath The path to the model file.
+     * @return The texture.
+     * @throws Exception If the texture fails to load.
+     */
+    private Texture loadMaterialTexture(AIMaterial material, String modelPath) throws Exception {
+        String basePath = modelPath.substring(0, modelPath.lastIndexOf(File.separator) + 1);
+
+        AIString texturePath = AIString.calloc();
+        Assimp.aiGetMaterialTexture(material, Assimp.aiTextureType_DIFFUSE, 0, texturePath, (IntBuffer) null, null, null, null, null, null);
+        if (texturePath.length() > 0) {
+            int textureID = loadTexture(basePath + texturePath.dataString());
+            return new Texture(textureID);
+        }
+
+        return null;
     }
 
     /**
@@ -175,7 +207,7 @@ public class ObjectLoader {
         }
 
         int textureID = GL11.glGenTextures(); // Generate a new texture ID
-        textures.add(textureID); // Add the texture ID to the list of textures
+        this.textures.add(textureID); // Add the texture ID to the list of textures
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureID); // Bind the texture
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT); // Set the texture wrap S(x-axis)
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT); // Set the texture wrap T(y-axis)
@@ -183,7 +215,7 @@ public class ObjectLoader {
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
 
-// Set the texture filtering parameters
+        // Set the texture filtering parameters
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 

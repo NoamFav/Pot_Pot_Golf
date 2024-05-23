@@ -14,7 +14,7 @@ import com.um_project_golf.Core.Rendering.RenderManager;
 import com.um_project_golf.Core.Utils.ButtonTimer;
 import com.um_project_golf.Core.Utils.CollisionsDetector;
 import com.um_project_golf.Core.Utils.Consts;
-import com.um_project_golf.Core.Utils.HeightMapPathfinder;
+import com.um_project_golf.Core.Entity.Terrain.HeightMapPathfinder;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
@@ -56,6 +56,9 @@ public class GolfGame implements ILogic {
     private TextPane pane;
 
     private Entity arrowEntity;
+
+    private Vector2i startPoint;
+    private Vector2i endPoint;
 
     private final Camera camera;
     private Terrain terrain;
@@ -111,8 +114,8 @@ public class GolfGame implements ILogic {
         mouseInputs = mouseInput;
 
         heightMap.createHeightMap();
-        List<Vector2i> path = pathfinder.getPath();
-        System.out.println("Path: " + path);
+        List<Vector2i> path = pathfinder.getPath(410, 550); // upper and lower bounds for the radius of the path
+
         scene.setDefaultTexture(new Texture(loader.loadTexture("Texture/Default.png")));
         window.setAntiAliasing(true);
         window.setResized(false);
@@ -121,27 +124,29 @@ public class GolfGame implements ILogic {
         window.setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
 
         //Model cube = loader.loadAssimpModel("src/main/resources/Models/Minecraft_Grass_Block_OBJ/SkyBox.obj");
-        Model tree = loader.loadAssimpModel("src/main/resources/Models/tree/Tree.obj");
-        Model wolf = loader.loadAssimpModel("src/main/resources/Models/Wolf_dae/wolf.dae");
-        Model skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
-        Model ball = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
-        Model arrow = loader.loadAssimpModel("src/main/resources/Models/Arrow/Arrow5.obj");
-        Model flag = loader.loadAssimpModel("src/main/resources/Models/flag/flag.obj");
+        List<Model> tree = loader.loadAssimpModel("src/main/resources/Models/tree/Tree.obj");
+        List<Model> wolf = loader.loadAssimpModel("src/main/resources/Models/Wolf_dae/wolf.dae");
+        List<Model> skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
+        //Model ball = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
+        List<Model> arrow = loader.loadAssimpModel("src/main/resources/Models/Arrow/Arrow5.obj");
+        List<Model> flag = loader.loadAssimpModel("src/main/resources/Models/flag/flag.obj");
 
-        //cube.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block_TEX.png")), 1f);
-        tree.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/tree/Tree.jpg")), 1f);
-        wolf.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Wolf_dae/Material__wolf_col_tga_diffuse.jpeg.001.jpg")), 1f);
-        skyBox.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skybox/DayLight.png")), 1f);
-        ball.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")), 1f);
-        arrow.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Arrow/Arrow5Albedo.png")), 1f);
-        flag.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/flag/red.png")), 1f);
-
-        tree.getMaterial().setDisableCulling(true);
-        wolf.getMaterial().setDisableCulling(true);
-        skyBox.getMaterial().setDisableCulling(true);
-        ball.getMaterial().setDisableCulling(true);
-        arrow.getMaterial().setDisableCulling(true);
-        flag.getMaterial().setDisableCulling(true);
+        for (Model model : tree) {
+            model.getMaterial().setDisableCulling(true);
+        }
+        for (Model model : wolf) {
+            model.getMaterial().setDisableCulling(true);
+        }
+        for (Model model : skyBox) {
+            model.getMaterial().setDisableCulling(true);
+        }
+        //ball.getMaterial().setDisableCulling(true);
+        for (Model model : arrow) {
+            model.getMaterial().setDisableCulling(true);
+        }
+        for (Model model : flag) {
+            model.getMaterial().setDisableCulling(true);
+        }
 
         TerrainTexture rock = new TerrainTexture(loader.loadTexture("Texture/rock.png"));
         TerrainTexture sand = new TerrainTexture(loader.loadTexture("Texture/sand.png"));
@@ -172,23 +177,23 @@ public class GolfGame implements ILogic {
         createTrees(tree);
 
         scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
-        scene.addEntity(new Entity(wolf, new Vector3f(0, Terrain.getHeight(0,0), 0), new Vector3f(45, 0 , 0), 10 ));
-        scene.addEntity(new Entity(ball, new Vector3f(0, Terrain.getHeight(0, 0), 0), new Vector3f(50, 0, 0), 10));
+        scene.addEntity(new Entity(wolf, new Vector3f(0, heightMap.getHeight(new Vector3f()), 0), new Vector3f(45, 0 , 0), 10 ));
+        //scene.addEntity(new Entity(ball, new Vector3f(0, Terrain.getHeight(0, 0), 0), new Vector3f(50, 0, 0), 10));
 
         arrowEntity = new Entity(arrow, new Vector3f(0, 50, 0), new Vector3f(-90,0 ,90), 1);
         scene.addEntity(arrowEntity);
 
-        int count = 0;
-        for (Vector2i point : path) {
+        startPoint = path.get(0);
+        startPoint.x = (int) (startPoint.x / 4 - Consts.SIZE_X / 2);
+        startPoint.y = (int) (startPoint.y / 4 - Consts.SIZE_Z / 2);
 
-            if (count++ % 10 != 0) {
-                continue;
-            }
+        endPoint = path.get(path.size() - 1);
+        endPoint.x = (int) (endPoint.x / 4 - Consts.SIZE_X / 2);
+        endPoint.y = (int) (endPoint.y / 4 - Consts.SIZE_Z / 2);
 
-            float x = point.x / (float) SceneManager.getHeightMap().length * Consts.SIZE_X - Consts.SIZE_X / 2;
-            float z = point.y / (float) SceneManager.getHeightMap().length * Consts.SIZE_Z - Consts.SIZE_Z / 2;
-            scene.addEntity(new Entity(flag, new Vector3f(x, Terrain.getHeight(point.x, point.y), z), new Vector3f(0, 0, 0), 5));
-        }
+        //scene.addEntity(new Entity(flag, new Vector3f(startPoint.x, heightMap.getHeight(new Vector3f(startPoint.x, 0 , startPoint.y)), startPoint.y), new Vector3f(0, 0, 0), 3));
+        scene.addEntity(new Entity(flag, new Vector3f(endPoint.x, heightMap.getHeight(new Vector3f(startPoint.x, 0 , startPoint.y)), endPoint.y), new Vector3f(0, 0, 0), 5));
+
 
         float lightIntensity =10f;
 
@@ -229,6 +234,7 @@ public class GolfGame implements ILogic {
 
         textField = new TextField(x, y * 30, width, height, "Enter text here X", font, vg, imageButton);
         textField2 = new TextField(x, y * 30 + height, width, height , "Enter text here Y", font, vg, imageButton);
+
         GLFW.glfwSetKeyCallback(window.getWindow(), (window, key, scancode, action, mods) -> {
             textField.handleKeyInput(key, action, mods);
             textField2.handleKeyInput(key, action, mods);
@@ -503,7 +509,7 @@ public class GolfGame implements ILogic {
 //        scene.getDirectionalLight().getDirection().y = (float) Math.cos(angle);
     }
 
-    private void createTrees(Model tree) throws IOException {
+    private void createTrees(List<Model> tree) throws IOException {
         BufferedImage heightmapImage = ImageIO.read(new File("Texture/heightmap.png"));
 
         List<Vector3f> positions = new ArrayList<>();
@@ -514,7 +520,7 @@ public class GolfGame implements ILogic {
                 Color pixelColor = new Color(heightmapImage.getRGB(x, z));
 
                 // Check for green or blue pixels
-                if (pixelColor.equals(Color.GREEN) || pixelColor.equals(Color.BLUE)) {
+                if (pixelColor.equals(Color.GREEN)) {
                     float terrainX = x / (float) heightmapImage.getWidth() * Consts.SIZE_X - Consts.SIZE_X / 2;
                     float terrainZ = z / (float) heightmapImage.getHeight() * Consts.SIZE_Z - Consts.SIZE_Z / 2;
                     float terrainY = heightMap.getHeight(new Vector3f(terrainX, 0, terrainZ));
@@ -544,28 +550,21 @@ public class GolfGame implements ILogic {
                 System.out.println("Position is null at index: " + i);
             }
         }
+        System.out.println("Tree length: " + treePositions.length);
 
         scene.setTreePositions(treePositions);
     }
 
-    public Vector3f getGoodPosition() {
-        for (int i = 0; i < 500; i++) {
-            float x = (float) (Math.random() * 200 - 100);
-            float z = (float) (Math.random() * 200 - 100);
-            float y = Terrain.getHeight(x, z);
-            if (y > 0 && y < 15) {
-                return new Vector3f(x, y, z);
-            }
-        }
-        return new Vector3f(0, 0, 0);
-    }
-
-    private void createMenu(BlendMapTerrain blendMapTerrain, Model tree) {
+    /**
+     * Creates the menu.
+     *
+     * @param blendMapTerrain The terrain to create the menu for.
+     * @param tree The tree model to add to the menu.
+     */
+    private void createMenu(BlendMapTerrain blendMapTerrain, List<Model> tree) {
 
         camera.setPosition(new Vector3f(Consts.SIZE_X/4, 50, Consts.SIZE_Z/4));
         camera.setRotation(20, 0, 0);
-
-        System.out.println("Creating GUIs from: " + Thread.currentThread().getStackTrace()[2]);
 
         float width = window.getWidth();
         float height = window.getHeight();
@@ -584,7 +583,8 @@ public class GolfGame implements ILogic {
 
         Runnable startGame = () -> {
             System.out.println("Allowing movement");
-            camera.setPosition(getGoodPosition());
+
+            camera.setPosition(new Vector3f(startPoint.x, heightMap.getHeight(new Vector3f(startPoint.x, 0, startPoint.y)), startPoint.y));
             camera.setRotation(0, 0, 0);
             canMove = true;
             isGuiVisible = false;
@@ -663,14 +663,21 @@ public class GolfGame implements ILogic {
         pane = new TextPane(paneX, paneY, paneWidth, paneHeight, "Pane test", font * 0.7f,  vg, imageButton);
     }
 
-    private void terrainSwitch(BlendMapTerrain blendMapTerrain, Model tree, TerrainTexture blendMap2) {
+    /**
+     * Switches the terrain of the game.
+     *
+     * @param blendMapTerrain The new terrain to switch to.
+     * @param tree The tree model to add to the new terrain.
+     * @param blendMap2 The new blend map to use.
+     */
+    private void terrainSwitch(BlendMapTerrain blendMapTerrain, List<Model> tree, TerrainTexture blendMap2) {
         scene.getTerrains().remove(terrain);
         scene.getTerrains().remove(ocean);
         terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap2, false);
         ocean = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blueTerrain, blendMap2, true);
         scene.addTerrain(terrain);
         scene.addTerrain(ocean);
-        scene.getEntities().removeIf(entity -> entity.getModel().equals(tree));
+        scene.getEntities().removeIf(entity -> entity.getModels().equals(tree));
         try {
             createTrees(tree);
         } catch (IOException e) {
@@ -679,8 +686,10 @@ public class GolfGame implements ILogic {
         renderer.processTerrain(terrain);
     }
 
+    /**
+     * Creates the in-game menu.
+     */
     private void createInGameMenu() {
-        System.out.println("Creating GUIs from: " + Thread.currentThread().getStackTrace()[2]);
 
         Runnable resume = () -> {
             System.out.println("Resuming game");
@@ -731,10 +740,13 @@ public class GolfGame implements ILogic {
         inGameMenuButtons.add(exitButton);
     }
 
+    /**
+     * Recreates the GUIs.
+     */
     private void recreateGUIs() {
         menuButtons.clear();
 
-        createMenu(blendMapTerrain, scene.getEntities().get(2).getModel());
+        createMenu(blendMapTerrain, scene.getEntities().get(2).getModels());
         createInGameMenu();
 
         float width = window.getWidthConverted(1000);
