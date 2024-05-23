@@ -468,24 +468,13 @@ public class GolfGame implements ILogic {
         List<Model> arrow = loader.loadAssimpModel("src/main/resources/Models/Arrow/Arrow5.obj");
         List<Model> flag = loader.loadAssimpModel("src/main/resources/Models/flag/flag.obj");
 
-        for (Model model : tree) {
-            model.getMaterial().setDisableCulling(true);
-        }
-        for (Model model : wolf) {
-            model.getMaterial().setDisableCulling(true);
-        }
-        for (Model model : skyBox) {
-            model.getMaterial().setDisableCulling(true);
-        }
-        for (Model model : arrow) {
-            model.getMaterial().setDisableCulling(true);
-        }
-        for (Model model : flag) {
-            model.getMaterial().setDisableCulling(true);
-        }
-        for (Model model : ball) {
-            model.getMaterial().setDisableCulling(true);
-        }
+        for (Model model : tree) model.getMaterial().setDisableCulling(true);
+
+        for (Model model : wolf) model.getMaterial().setDisableCulling(true);
+        for (Model model : skyBox) model.getMaterial().setDisableCulling(true);
+        for (Model model : arrow) model.getMaterial().setDisableCulling(true);
+        for (Model model : flag) model.getMaterial().setDisableCulling(true);
+        for (Model model : ball) model.getMaterial().setDisableCulling(true);
 
         scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
         scene.addEntity(new Entity(wolf, new Vector3f(0, 20, 0), new Vector3f(45, 0 , 0), 20 ));

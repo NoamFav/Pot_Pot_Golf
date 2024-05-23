@@ -8,10 +8,12 @@ import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.assimp.*;
 
-import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -79,18 +81,26 @@ public class ObjectLoader {
      * @throws Exception If the texture fails to load.
      */
     private Texture loadMaterialTexture(AIMaterial material, String modelPath) throws Exception {
-        String basePath = modelPath.substring(0, modelPath.lastIndexOf(File.separator) + 1);
+        Path basePath = Paths.get(modelPath).getParent();
 
         AIString texturePath = AIString.calloc();
         Assimp.aiGetMaterialTexture(material, Assimp.aiTextureType_DIFFUSE, 0, texturePath, (IntBuffer) null, null, null, null, null, null);
-        String fullTexturePath = basePath + texturePath.dataString();
+        String textureFilePath = texturePath.dataString();
         texturePath.free();
 
-        if (new File(fullTexturePath).isFile()) {
-            int textureID = loadTexture(fullTexturePath);
+        if (textureFilePath.isEmpty()) {
+            System.out.println("Texture path not found or empty in material.");
+            return null;
+        }
+
+        Path resolvedPath = basePath.resolve(textureFilePath).normalize();
+        System.out.println("Resolved texture path: " + resolvedPath);
+
+        if (Files.exists(resolvedPath) && Files.isRegularFile(resolvedPath)) {
+            int textureID = loadTexture(resolvedPath.toString());
             return new Texture(textureID);
         } else {
-            System.out.println("Texture file does not exist or is not a file: " + fullTexturePath);
+            System.out.println("Texture file does not exist or is not a regular file: " + resolvedPath);
         }
 
         return null;
