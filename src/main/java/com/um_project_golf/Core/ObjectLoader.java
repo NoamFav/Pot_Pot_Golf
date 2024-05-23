@@ -27,7 +27,7 @@ public class ObjectLoader {
      * Loads a model from a file.
      *
      * @param path The path to the file.
-     * @return The model loaded.
+     * @return The merged model.
      */
     public Model loadAssimpModel(String path) {
         // Load the model using Assimp
@@ -39,34 +39,41 @@ public class ObjectLoader {
                         Assimp.aiProcess_Triangulate |
                         Assimp.aiProcess_FixInfacingNormals);
 
-
         // Check if the model was loaded successfully
         if (scene == null) {
             // If the model failed to load, throw an exception
             throw new RuntimeException("Failed to load model: " + path + "\n" + Assimp.aiGetErrorString());
         }
 
-        // Process the first mesh (for simplicity)
-        AIMesh mesh = AIMesh.create(Objects.requireNonNull(scene.mMeshes()).get(0)); // Get the first mesh
-        Model model = processMesh(mesh); // Process the mesh
+        List<Float> vertices = new ArrayList<>();
+        List<Float> textures = new ArrayList<>();
+        List<Float> normals = new ArrayList<>();
+        List<Integer> indices = new ArrayList<>();
+        int indexOffset = 0;
+
+        // Process all meshes in the scene
+        for (int i = 0; i < scene.mNumMeshes(); i++) {
+            AIMesh mesh = AIMesh.create(Objects.requireNonNull(scene.mMeshes()).get(i)); // Get each mesh
+            processMesh(mesh, vertices, textures, normals, indices, indexOffset); // Process the mesh
+            indexOffset += mesh.mNumVertices();
+        }
 
         Assimp.aiReleaseImport(scene); // Release the model from memory
 
-        return model;
+        return loadModel(listToArray(vertices), listToArray(textures), listToArray(normals), listToIntArray(indices)); // Load the merged model
     }
 
     /**
-     * Processes a mesh.
+     * Processes a mesh and appends its data to the provided lists.
      *
      * @param mesh The mesh to process.
-     * @return The model processed.
+     * @param vertices The list to append vertices to.
+     * @param textures The list to append texture coordinates to.
+     * @param normals The list to append normals to.
+     * @param indices The list to append indices to.
+     * @param indexOffset The current index offset.
      */
-    private Model processMesh(AIMesh mesh) {
-        List<Float> vertices = new ArrayList<>(); // List of vertices
-        List<Float> textures = new ArrayList<>(); // List of texture coordinates
-        List<Float> normals = new ArrayList<>(); // List of normals
-        List<Integer> indices = new ArrayList<>(); // List of indices
-
+    private void processMesh(AIMesh mesh, List<Float> vertices, List<Float> textures, List<Float> normals, List<Integer> indices, int indexOffset) {
         for (int i = 0; i < mesh.mNumVertices(); i++) { // Loop through the vertices
             AIVector3D vertex = mesh.mVertices().get(i); // Get the vertex
             vertices.add(vertex.x()); // Add the x-coordinate of the vertex
@@ -80,13 +87,10 @@ public class ObjectLoader {
 
             if (mesh.mTextureCoords(0) != null) { // Check if the mesh has texture coordinates
                 AIVector3D texCoord = Objects.requireNonNull(mesh.mTextureCoords(0)).get(i); // Get the texture coordinate
-                // Add the x-coordinate of the texture coordinate
-                textures.add(texCoord.x());
-                // Invert the y-coordinate of the texture coordinate
+                textures.add(texCoord.x()); // Add the x-coordinate of the texture coordinate
                 textures.add(1 - texCoord.y()); // Invert the y-coordinate because OpenGL uses a different coordinate system
             } else {
-                // If the mesh does not have texture coordinates, add default texture coordinates
-                textures.add(0.0f);
+                textures.add(0.0f); // If the mesh does not have texture coordinates, add default texture coordinates
                 textures.add(0.0f);
             }
         }
@@ -94,11 +98,9 @@ public class ObjectLoader {
         for (int i = 0; i < mesh.mNumFaces(); i++) { // Loop through the faces
             AIFace face = mesh.mFaces().get(i); // Get the face
             for (int j = 0; j < face.mNumIndices(); j++) { // Loop through the indices
-                indices.add(face.mIndices().get(j)); // Add the index
+                indices.add(face.mIndices().get(j) + indexOffset); // Add the index with the current offset
             }
         }
-
-        return loadModel(listToArray(vertices), listToArray(textures), listToArray(normals), listToIntArray(indices)); // Load the model
     }
 
     /**
@@ -157,7 +159,7 @@ public class ObjectLoader {
     public int loadTexture(String filename) throws Exception {
         int width, height; // The width and height of the texture
         ByteBuffer buffer; // The buffer of the texture
-        try(MemoryStack stack = MemoryStack.stackPush()) { // Push the memory stack
+        try (MemoryStack stack = MemoryStack.stackPush()) { // Push the memory stack
             IntBuffer w = stack.mallocInt(1); // The width of the texture
             IntBuffer h = stack.mallocInt(1); // The height of the texture
             IntBuffer c = stack.mallocInt(1); // The number of components, of the texture
@@ -178,9 +180,11 @@ public class ObjectLoader {
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT); // Set the texture wrap S(x-axis)
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT); // Set the texture wrap T(y-axis)
 
-        // Set the texture min filter (minification)
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+
+// Set the texture filtering parameters
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
-        // Set the texture mag filter (magnification)
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1); // Set the pixel storei (alignment)
@@ -249,7 +253,7 @@ public class ObjectLoader {
             GL30.glDeleteVertexArrays(vao); // Delete the VAO
         }
         for (int vbo : vbos) { // Loop through the VBOs
-            GL30.glDeleteBuffers(vbo); // Delete the VBO
+            GL15.glDeleteBuffers(vbo); // Delete the VBO
         }
         for (int texture : textures) { // Loop through the textures
             GL11.glDeleteTextures(texture); // Delete the texture
