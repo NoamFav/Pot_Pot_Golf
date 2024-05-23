@@ -193,21 +193,13 @@ public class GolfGame implements ILogic {
             if(window.is_keyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
                 cameraInc.y = -Consts.JUMP_FORCE / EngineManager.getFps();
             }
+            if (window.is_keyPressed(GLFW.GLFW_KEY_UP)) {
+                camera.setPosition(startPoint);
+            }
+            if (window.is_keyPressed(GLFW.GLFW_KEY_DOWN)) {
+                camera.setPosition(endPoint);
+            }
         }
-
-        if (window.is_keyPressed(GLFW.GLFW_KEY_UP)) {
-            arrowEntity.increaseRotation(0, 0, 1f);
-        }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_DOWN)) {
-            arrowEntity.increaseRotation(0, 0, -1f);
-        }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
-            arrowEntity.increaseRotation(1, 0, 0);
-        }
-        if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT)) {
-            arrowEntity.increaseRotation(-1, 0, 0);
-        }
-
         /*
         if (mouseInputs.isLeftButtonPressed()) {
             if (!wasPressed) { // If the button was not previously pressed
@@ -296,6 +288,7 @@ public class GolfGame implements ILogic {
         if (window.isResized()) {
             window.setResized(false);
             recreateGUIs();
+            mouseInputs.init();
         }
 
         camera.movePosition(
@@ -483,13 +476,15 @@ public class GolfGame implements ILogic {
         scene.addEntity(arrowEntity);
 
         startPoint = new Vector3f(path.get(0).x, 0, path.get(0).y);
+        System.out.println("Start point: " + startPoint);
         startPoint.x = (int) (startPoint.x / 4 - Consts.SIZE_X / 2);
         startPoint.z = (int) (startPoint.z / 4 - Consts.SIZE_Z / 2);
         startPoint.y = heightMap.getHeight(new Vector3f(startPoint.x, 0 , startPoint.z));
 
-        endPoint = new Vector3f(path.get(path.size() - 1).x, 0, path.get(path.size() - 1).y);
-        endPoint.x = (int) (endPoint.x / 4 - Consts.SIZE_X / 2);
-        endPoint.z = (int) (endPoint.y / 4 - Consts.SIZE_Z / 2);
+        endPoint = new Vector3f(path.get(path.size() - 1).x ,  0, path.get(path.size() - 1).y);
+        System.out.println("End point: " + endPoint);
+        endPoint.x = (int) (endPoint.x / 4) - Consts.SIZE_X / 2;
+        endPoint.z = (int) (endPoint.z / 4) - Consts.SIZE_Z / 2;
         endPoint.y = heightMap.getHeight(new Vector3f(endPoint.x, 0 , endPoint.z));
 
         System.out.println("Start point: " + startPoint);
@@ -647,20 +642,21 @@ public class GolfGame implements ILogic {
         float x = window.getWidthConverted(10);
         float y = window.getHeightConverted(10);
         float font = window.getHeightConverted(70);
+        float textFieldFont = window.getHeightConverted(50);
 
         //infoButton = new Button(x, y, width, height, "Info", 70, () -> {}, vg, imageButton);
         numberOfShots = 0;
         infoTextPane = new TextPane(x, y, width, height / 2, "Position: (" + (int) golfBall.getPosition().x + ", " + (int) golfBall.getPosition().z + "). Number of shots: " + numberOfShots, 40, vg, imageButton);
-        warningTextPane = new TextPane(x, y + height / 2, width, height / 2, "", 40, vg, imageButton);
+        warningTextPane = new TextPane(x, y + height / 2, width, height / 2, "", textFieldFont * .2f, vg, imageButton);
         ballCollisionDetector = new BallCollisionDetector(heightMap, scene, warningTextPane);
         //infoButton = new Button(x, y, width, height, "Info", font, () -> {}, vg, imageButton);
 
         // Creating text-fields and text panes for entering the velocities
-        vxTextPane = new TextPane(x * 4, y * 30, width / 5, height / 2, "vx: ", 70, vg, imageButton);
-        vxTextField = new TextField(x * 25, y * 30, width / 3, height / 2, "Enter vx", 50, vg, imageButton);
+        vxTextPane = new TextPane(x * 4, y * 30, width / 5, height / 2, "vx: ", font, vg, imageButton);
+        vxTextField = new TextField(x * 25, y * 30, width / 3, height / 2, "Enter vx", textFieldFont, vg, imageButton);
 
-        vzTextPane = new TextPane(x * 4, y * 30 + height / 2, width / 5, height / 2, "vz: ", 70, vg, imageButton);
-        vzTextField = new TextField(x * 25, y * 30 + height / 2, width / 3, height / 2, "Enter vz", 50, vg, imageButton);
+        vzTextPane = new TextPane(x * 4, y * 30 + height / 2, width / 5, height / 2, "vz: ", font, vg, imageButton);
+        vzTextField = new TextField(x * 25, y * 30 + height / 2, width / 3, height / 2, "Enter vz", textFieldFont, vg, imageButton);
 
         GLFW.glfwSetKeyCallback(window.getWindow(), (window, key, scancode, action, mods) -> {
             vxTextField.handleKeyInput(key, action, mods);
@@ -895,18 +891,11 @@ public class GolfGame implements ILogic {
      */
     private void recreateGUIs() {
         menuButtons.clear();
+        inGameMenuButtons.clear();
 
         createMenu(blendMapTerrain);
         createInGameMenu();
-
-        float width = window.getWidthConverted(1000);
-        float height = window.getHeightConverted(300);
-        float x = window.getWidthConverted(10);
-        float y = window.getHeightConverted(10);
-        float font = window.getHeightConverted(70);
-
-        //infoButton = new Button(x, y, width, height, "Info", font, () -> {}, vg, imageButton);
-
+        createDefaultGui();
     }
 
     /**

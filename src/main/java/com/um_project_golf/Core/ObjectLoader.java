@@ -58,7 +58,7 @@ public class ObjectLoader {
 
             Model model = loadModel(listToArray(vertices), listToArray(textureCoords), listToArray(normals), listToIntArray(indices));
 
-            AIMaterial material = AIMaterial.create(scene.mMaterials().get(mesh.mMaterialIndex()));
+            AIMaterial material = AIMaterial.create(Objects.requireNonNull(scene.mMaterials()).get(mesh.mMaterialIndex()));
             Texture texture = loadMaterialTexture(material, path);
             if (texture != null) {
                 model.setTexture(texture);
@@ -89,18 +89,14 @@ public class ObjectLoader {
         texturePath.free();
 
         if (textureFilePath.isEmpty()) {
-            System.out.println("Texture path not found or empty in material.");
             return null;
         }
 
         Path resolvedPath = basePath.resolve(textureFilePath).normalize();
-        System.out.println("Resolved texture path: " + resolvedPath);
 
         if (Files.exists(resolvedPath) && Files.isRegularFile(resolvedPath)) {
             int textureID = loadTexture(resolvedPath.toString());
             return new Texture(textureID);
-        } else {
-            System.out.println("Texture file does not exist or is not a regular file: " + resolvedPath);
         }
 
         return null;
