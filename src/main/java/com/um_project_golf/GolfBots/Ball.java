@@ -3,34 +3,16 @@ package com.um_project_golf.GolfBots;
 import org.joml.Vector3f;
 
 class Ball {
-    private double positionX;
-    private double positionY;
+    private Vector3f position;
     private double velocityX;
     private double velocityY;
 
     // Constructor
-    public Ball(double positionX, double positionY) {
-        this.positionX = positionX;
-        this.positionY = positionY;
+    public Ball(Vector3f position) {
+        this.position = position;
     }
 
     // Getters and setters
-    public double getPositionX() {
-        return positionX;
-    }
-
-    public void setPositionX(double positionX) {
-        this.positionX = positionX;
-    }
-
-    public double getPositionY() {
-        return positionY;
-    }
-
-    public void setPositionY(double positionY) {
-        this.positionY = positionY;
-    }
-
     public double getVelocityX() {
         return velocityX;
     }
@@ -49,22 +31,21 @@ class Ball {
 
     // Placeholder for updating the ball's position
     public void updatePosition(Vector3f newPosition) {
-        positionX = newPosition.x;
-        positionY = newPosition.y;
+        position = newPosition;
+    }
+    public Vector3f getPosition(){
+        return position;
     }
 
     // Placeholder for calculating the distance to the flag
     public double distanceToFlag(Green green) {
-        // Placeholder for distance calculation
-        // Example: Calculate distance to the flag based on current ball position and flag position
-        return Math.sqrt(Math.pow(green.getFlagPositionX() - positionX, 2) + Math.pow(green.getFlagPositionY() - positionY, 2));
-    }
+        double dx = green.getFlagPosition().x - position.x;
+        double dy = green.getFlagPosition().y - position.y;
+        double dz = green.getFlagPosition().z - position.z;
 
-    // Placeholder for resetting the ball's position
-    public void resetPosition(double positionX, double positionY) {
-        this.positionX = positionX;
-        this.positionY = positionY;
-        this.velocityX = 0;
-        this.velocityY = 0;
+        // Calculate the distance using the 3D distance formula
+        double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+        return distance;
     }
 }
