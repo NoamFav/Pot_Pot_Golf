@@ -64,6 +64,8 @@ public class TextField {
             nvgFontFace(vg, "golf");  // Make sure you have a font loaded
             nvgFillColor(vg, textColor);
 
+            text = text.replaceAll("[^0-9.-]", "");
+
             String displayText = text.isEmpty() ? prompt : text;
             nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
             nvgText(vg, x + width / 2, y + height / 2, displayText);
@@ -128,7 +130,7 @@ public class TextField {
                 if (key == GLFW.GLFW_KEY_BACKSPACE && !text.isEmpty()) {
                     text = text.substring(0, text.length() - 1);
                 } else if (key == GLFW.GLFW_KEY_ENTER) {
-                    focused = false;  // Unfocused on Enter
+                    focused = false;  // Unfocus on Enter
                 } else {
                     int codePoint = glfwKeyToChar(key, mods);
                     if (codePoint != -1) {
@@ -143,32 +145,22 @@ public class TextField {
         // Handle printable characters
         if (key >= GLFW.GLFW_KEY_A && key <= GLFW.GLFW_KEY_Z) {
             String keyName = GLFW.glfwGetKeyName(key, 0);
-            assert keyName != null;
-            char character = keyName.charAt(0);
-            if ((mods & GLFW.GLFW_MOD_SHIFT) != 0) {
-                character = Character.toUpperCase(character);
+            if (keyName != null) {
+                char character = keyName.charAt(0);
+                if ((mods & GLFW.GLFW_MOD_SHIFT) != 0) {
+                    character = Character.toUpperCase(character);
+                } else {
+                    character = Character.toLowerCase(character);
+                }
+                return character;
             }
-            text += character;
+        } else if (key >= GLFW.GLFW_KEY_0 && key <= GLFW.GLFW_KEY_9) {
+            return (char) ('0' + (key - GLFW.GLFW_KEY_0));
+        } else if (key == GLFW.GLFW_KEY_MINUS) {
+            return '-';
+        } else if (key == GLFW.GLFW_KEY_PERIOD) {
+            return '.';
         }
-        if (key >= GLFW.GLFW_KEY_0 && key <= GLFW.GLFW_KEY_9) {
-            return (char) key;
-        }
-        if (key == GLFW.GLFW_KEY_SPACE) return ' ';
-
-        // Handle special characters based on key and shift state
-        if (key == GLFW.GLFW_KEY_SEMICOLON && (mods & GLFW.GLFW_MOD_SHIFT) != 0) return ':';
-        if (key == GLFW.GLFW_KEY_SEMICOLON) return ';';
-        if (key == GLFW.GLFW_KEY_EQUAL && (mods & GLFW.GLFW_MOD_SHIFT) != 0) return '+';
-        if (key == GLFW.GLFW_KEY_EQUAL) return '=';
-        if (key == GLFW.GLFW_KEY_COMMA) return ',';
-        if (key == GLFW.GLFW_KEY_MINUS) return '-';
-        if (key == GLFW.GLFW_KEY_PERIOD) return '.';
-        if (key == GLFW.GLFW_KEY_SLASH) return '/';
-        if (key == GLFW.GLFW_KEY_GRAVE_ACCENT) return '`';
-        if (key == GLFW.GLFW_KEY_LEFT_BRACKET) return '[';
-        if (key == GLFW.GLFW_KEY_BACKSLASH) return '\\';
-        if (key == GLFW.GLFW_KEY_RIGHT_BRACKET) return ']';
-        if (key == GLFW.GLFW_KEY_APOSTROPHE) return '\'';
         return -1; // Non-printable character
     }
 
