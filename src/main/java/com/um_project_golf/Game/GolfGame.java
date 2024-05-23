@@ -14,7 +14,9 @@ import com.um_project_golf.Core.Rendering.RenderManager;
 import com.um_project_golf.Core.Utils.ButtonTimer;
 import com.um_project_golf.Core.Utils.CollisionsDetector;
 import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Core.Utils.HeightMapPathfinder;
 import org.joml.Vector2f;
+import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
@@ -53,6 +55,8 @@ public class GolfGame implements ILogic {
     private Title title;
     private TextPane pane;
 
+    private Entity arrowEntity;
+
     private final Camera camera;
     private Terrain terrain;
     private Terrain ocean;
@@ -60,6 +64,7 @@ public class GolfGame implements ILogic {
     private BlendMapTerrain blendMapTerrain;
     private BlendMapTerrain blueTerrain;
     private AudioManager audioManager;
+    private final HeightMapPathfinder pathfinder;
     private final CollisionsDetector collisionsDetector;
     Vector3f cameraInc;
 
@@ -85,6 +90,7 @@ public class GolfGame implements ILogic {
         scene = new SceneManager(-90);
         timer = new ButtonTimer();
         camera = new Camera();
+        pathfinder = new HeightMapPathfinder();
         collisionsDetector = new CollisionsDetector();
         cameraInc = new Vector3f(0, 0, 0);
         heightMap = new HeightMap();
@@ -105,6 +111,8 @@ public class GolfGame implements ILogic {
         mouseInputs = mouseInput;
 
         heightMap.createHeightMap();
+        List<Vector2i> path = pathfinder.getPath();
+        System.out.println("Path: " + path);
         scene.setDefaultTexture(new Texture(loader.loadTexture("Texture/Default.png")));
         window.setAntiAliasing(true);
         window.setResized(false);
@@ -113,23 +121,27 @@ public class GolfGame implements ILogic {
         window.setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
 
         //Model cube = loader.loadAssimpModel("src/main/resources/Models/Minecraft_Grass_Block_OBJ/SkyBox.obj");
-        //Model skull = loader.loadAssimpModel("src/main/resources/Models/Skull/skulls.obj");
         Model tree = loader.loadAssimpModel("src/main/resources/Models/tree/Tree.obj");
         Model wolf = loader.loadAssimpModel("src/main/resources/Models/Wolf_dae/wolf.dae");
         Model skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
         Model ball = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
+        Model arrow = loader.loadAssimpModel("src/main/resources/Models/Arrow/Arrow5.obj");
+        Model flag = loader.loadAssimpModel("src/main/resources/Models/flag/flag.obj");
 
         //cube.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Minecraft_Grass_Block_OBJ/Grass_Block_TEX.png")), 1f);
-        //skull.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skull/Skull.jpg")), 1f);
         tree.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/tree/Tree.jpg")), 1f);
         wolf.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Wolf_dae/Material__wolf_col_tga_diffuse.jpeg.001.jpg")), 1f);
         skyBox.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Skybox/DayLight.png")), 1f);
         ball.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")), 1f);
+        arrow.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Arrow/Arrow5Albedo.png")), 1f);
+        flag.setTexture(new Texture(loader.loadTexture("src/main/resources/Models/flag/red.png")), 1f);
 
         tree.getMaterial().setDisableCulling(true);
         wolf.getMaterial().setDisableCulling(true);
         skyBox.getMaterial().setDisableCulling(true);
         ball.getMaterial().setDisableCulling(true);
+        arrow.getMaterial().setDisableCulling(true);
+        flag.getMaterial().setDisableCulling(true);
 
         TerrainTexture rock = new TerrainTexture(loader.loadTexture("Texture/rock.png"));
         TerrainTexture sand = new TerrainTexture(loader.loadTexture("Texture/sand.png"));
@@ -139,7 +151,6 @@ public class GolfGame implements ILogic {
         TerrainTexture snow = new TerrainTexture(loader.loadTexture("Texture/snow.png"));
         TerrainTexture mold = new TerrainTexture(loader.loadTexture("Texture/mold.png"));
         TerrainTexture water = new TerrainTexture(loader.loadTexture("Texture/water.png"));
-
 
         TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
 
@@ -161,10 +172,23 @@ public class GolfGame implements ILogic {
         createTrees(tree);
 
         scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
-
         scene.addEntity(new Entity(wolf, new Vector3f(0, Terrain.getHeight(0,0), 0), new Vector3f(45, 0 , 0), 10 ));
-        //scene.addEntity(new Entity(cube, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1 ));
         scene.addEntity(new Entity(ball, new Vector3f(0, Terrain.getHeight(0, 0), 0), new Vector3f(50, 0, 0), 10));
+
+        arrowEntity = new Entity(arrow, new Vector3f(0, 50, 0), new Vector3f(-90,0 ,90), 1);
+        scene.addEntity(arrowEntity);
+
+        int count = 0;
+        for (Vector2i point : path) {
+
+            if (count++ % 10 != 0) {
+                continue;
+            }
+
+            float x = point.x / (float) SceneManager.getHeightMap().length * Consts.SIZE_X - Consts.SIZE_X / 2;
+            float z = point.y / (float) SceneManager.getHeightMap().length * Consts.SIZE_Z - Consts.SIZE_Z / 2;
+            scene.addEntity(new Entity(flag, new Vector3f(x, Terrain.getHeight(point.x, point.y), z), new Vector3f(0, 0, 0), 5));
+        }
 
         float lightIntensity =10f;
 
@@ -199,11 +223,12 @@ public class GolfGame implements ILogic {
         float height = window.getHeightConverted(300);
         float x = window.getWidthConverted(10);
         float y = window.getHeightConverted(10);
+        float font = window.getHeightConverted(70);
 
-        infoButton = new Button(x, y, width, height, "Info", 70, () -> {}, vg, imageButton);
+        infoButton = new Button(x, y, width, height, "Info", font, () -> {}, vg, imageButton);
 
-        textField = new TextField(x, y * 30, width, height, "Enter text here X", 70, vg, imageButton);
-        textField2 = new TextField(x, y * 30 + height, width, height , "Enter text here Y", 70, vg, imageButton);
+        textField = new TextField(x, y * 30, width, height, "Enter text here X", font, vg, imageButton);
+        textField2 = new TextField(x, y * 30 + height, width, height , "Enter text here Y", font, vg, imageButton);
         GLFW.glfwSetKeyCallback(window.getWindow(), (window, key, scancode, action, mods) -> {
             textField.handleKeyInput(key, action, mods);
             textField2.handleKeyInput(key, action, mods);
@@ -221,8 +246,6 @@ public class GolfGame implements ILogic {
 
 
         audioManager = new AudioManager("src/main/resources/SoundTrack/kavinsky.wav");
-        audioManager.playSound();
-        isSoundPlaying = true;
     }
 
     /**
@@ -272,8 +295,9 @@ public class GolfGame implements ILogic {
             } else {
                 // Continuously update the button text with the current time pressed
                 String time = timer.getFormattedTime();
-                String velocity = secondToVelocity(timer.getTime());
+                float velocity = secondToVelocity(timer.getTime());
                 infoButton.setText(time + " - velocity: " + velocity + " m/s");
+                arrowEntity.setScale(velocity);
             }
         } else {
             if (wasPressed) { // If the button was previously pressed
@@ -285,6 +309,7 @@ public class GolfGame implements ILogic {
             if (mouseInputs.isRightButtonPressed()) {
                 Vector2f rotVec = mouseInputs.getDisplayVec();
                 camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
+                arrowEntity.increaseRotation(0, 0, - rotVec.y * Consts.MOUSE_SENSITIVITY);
             }
         } else if (isOnMenu && isGuiVisible) {
             camera.moveRotation(0, 0.1f, 0);
@@ -521,8 +546,6 @@ public class GolfGame implements ILogic {
         }
 
         scene.setTreePositions(treePositions);
-        System.out.println("Tree positions count: " + treePositions.length);
-        System.out.println("Tree positions: " + Arrays.deepToString(treePositions));
     }
 
     public Vector3f getGoodPosition() {
@@ -562,6 +585,7 @@ public class GolfGame implements ILogic {
         Runnable startGame = () -> {
             System.out.println("Allowing movement");
             camera.setPosition(getGoodPosition());
+            camera.setRotation(0, 0, 0);
             canMove = true;
             isGuiVisible = false;
             isOnMenu = false;
@@ -724,10 +748,9 @@ public class GolfGame implements ILogic {
         textField = new TextField(x, y * 30, width, height, "Enter text here", font, vg, imageButton);
     }
 
-    private String secondToVelocity(long ms) {
+    private float secondToVelocity(long ms) {
         float second = (float) ms / 1000;
-        float velocity = cappedExponentialFunc(second, 3, 1, 74);
-        return String.valueOf(velocity);
+        return cappedExponentialFunc(second, 3, 1, 74);
     }
 
     private float cappedExponentialFunc(float s, float C, float k, float max) {

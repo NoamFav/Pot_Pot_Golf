@@ -51,7 +51,7 @@ public class Consts {
 
     public static final float PLAYER_HEIGHT = 1.75f; // Height of the player (meters)
     public static final float MOUSE_SENSITIVITY = 0.2f; // Mouse sensitivity (Higher = more sensitive)
-    public static final float CAMERA_MOVEMENT_SPEED = 2;  //1.1f for normal speed camera movement speed (Higher = faster)
+    public static final float CAMERA_MOVEMENT_SPEED = 6;  //1.1f for normal speed camera movement speed (Higher = faster)
 
     public static final Vector4f DEFAULT_COLOR = new Vector4f(1f, 1f, 1f, 1f); // Default color of the object
     public static final Vector3f AMBIENT_LIGHT = new Vector3f(0.8f, 0.8f, 0.8f); // Ambient light color (higher = brighter)

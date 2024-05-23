@@ -1,97 +1,61 @@
 package com.um_project_golf.Core.Utils;
 
-import com.um_project_golf.Core.Entity.Terrain.HeightMap;
+import org.joml.Vector2i;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.*;
 
-class Point {
-    int x, y;
-    Point(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-}
-
-class Node implements Comparable<Node> {
-    Point point;
-    double cost;
-    double priority;
-    Node parent;
-
-    Node(Point point, double cost, double priority, Node parent) {
-        this.point = point;
-        this.cost = cost;
-        this.priority = priority;
-        this.parent = parent;
-    }
-
-    @Override
-    public int compareTo(Node other) {
-        return Double.compare(this.priority, other.priority);
-    }
-}
-
 public class HeightMapPathfinder {
     private int width;
     private int height;
-    private static final int SCALE = 4; // 4 units in the heightmap equals 1 meter in the real world
+    private static final int SCALE = 4; // 4 units in the heightmap equal 1 meter in the real world
     private static final int CIRCLE_RADIUS_UP = 550; // 200 meters radius, which is 200 * SCALE units in the heightmap
     private static final int CIRCLE_RADIUS_DOWN = 410; // 200 meters radius, which is 200 * SCALE units in the heightmap
     private static final int CIRCLE_RADIUS = (CIRCLE_RADIUS_DOWN + (int) (Math.random() * (CIRCLE_RADIUS_UP - CIRCLE_RADIUS_DOWN))) * SCALE;
     private static final int SEARCH_RADIUS = 20 * SCALE; // 30 meters radius, which is 30 * SCALE units in the heightmap
-    private static final int BORDER_OFFSET = 20 * SCALE; // 20 meters away from border, which is 20 * SCALE units
+    private static final int BORDER_OFFSET = 20 * SCALE; // 20 meters away from the border, which is 20 * SCALE units
 
     private double[][] costMap;
 
-    public static void main(String[] args) {
-        HeightMapPathfinder pathfinder = new HeightMapPathfinder();
-        pathfinder.getPath();
-    }
-
-    public void getPath() {
+    public List<Vector2i> getPath() {
         int count = 0;
         System.out.println("CIRCLE_RADIUS: " + CIRCLE_RADIUS / SCALE);
         //List<Integer> radius = Arrays.asList(230, 430, 630);
-        for (int i = 0; i < 50; i++) {
-            try {
-                HeightMap heightMap = new HeightMap();
-                heightMap.createHeightMap();
-                BufferedImage heightMapImage = ImageIO.read(new File("Texture/heightmap.png"));
-                width = heightMapImage.getWidth();
-                height = heightMapImage.getHeight();
-                costMap = generateCostMap(heightMapImage);
 
-                List<Point> path = null;
-                int attempts = 0;
-                boolean pathFound = false;
+        List<Vector2i> path = null;
+        int attempts = 0;
+        boolean pathFound = false;
+        try {
+            BufferedImage heightMapImage = ImageIO.read(new File("Texture/heightmap.png"));
+            width = heightMapImage.getWidth();
+            height = heightMapImage.getHeight();
+            costMap = generateCostMap(heightMapImage);
 
-                while (attempts < 1000 && !pathFound) {
-                    Point startPoint = findValidStartPoint();
-                    Point endPoint = findValidEndPointOnCircle(startPoint);
+            while (attempts < 1000 && !pathFound) {
+                Vector2i startPoint = findValidStartPoint();
+                Vector2i endPoint = findValidEndPointOnCircle(startPoint);
 
-                    if (endPoint != null) {
-                        path = findPath(startPoint, endPoint);
-                        pathFound = !path.isEmpty();
-                    }
-
-                    attempts++;
+                if (endPoint != null) {
+                    path = findPath(startPoint, endPoint);
+                    pathFound = !path.isEmpty();
                 }
 
-                if (pathFound) {
-                    System.out.println("Path found!" + " #" + count + " Start: " + path.get(0).x + ", " + path.get(0).y + " End: " + path.get(path.size() - 1).x + ", " + path.get(path.size() - 1).y);
-                    count++;
-                } else {
-                    System.out.println("Failed to find a valid path after 10000 attempts.");
-                }
-            } catch (Exception e) {
-                e.printStackTrace(System.err);
+                attempts++;
             }
+
+            if (pathFound) {
+                System.out.println("Path found!" + " #" + count + " Start: " + path.get(0).x + ", " + path.get(0).y + " End: " + path.get(path.size() - 1).x + ", " + path.get(path.size() - 1).y);
+                count++;
+            } else {
+                System.out.println("Failed to find a valid path after 10000 attempts.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
         }
-        System.out.println("Number of successful paths: " + count);
-        System.out.println("Number of failed paths: " + (50 - count));
+        System.out.println("Path: " + path);
+        return path;
     }
 
     private double[][] generateCostMap(BufferedImage image) {
@@ -114,30 +78,30 @@ public class HeightMapPathfinder {
         return costMap;
     }
 
-    private Point findValidStartPoint() {
+    private Vector2i findValidStartPoint() {
         Random rand = new Random();
-        Point point;
+        Vector2i point;
         do {
             int x = BORDER_OFFSET + rand.nextInt(width - 2 * BORDER_OFFSET);
             int y = BORDER_OFFSET + rand.nextInt(height - 2 * BORDER_OFFSET);
-            point = new Point(x, y);
+            point = new Vector2i(x, y);
         } while (!isValidStartPoint(point));
         return point;
     }
 
-    private boolean isValidStartPoint(Point point) {
+    private boolean isValidStartPoint(Vector2i point) {
         return point.x >= BORDER_OFFSET && point.x < width - BORDER_OFFSET &&
                 point.y >= BORDER_OFFSET && point.y < height - BORDER_OFFSET &&
                 costMap[point.x][point.y] < Double.POSITIVE_INFINITY;
     }
 
-    private Point findValidEndPointOnCircle(Point center) {
+    private Vector2i findValidEndPointOnCircle(Vector2i center) {
         Random rand = new Random();
         for (int attempts = 0; attempts < 360; attempts++) {
             double angle = rand.nextDouble() * 2 * Math.PI;
             int x = center.x + (int) (CIRCLE_RADIUS * Math.cos(angle));
             int y = center.y + (int) (CIRCLE_RADIUS * Math.sin(angle));
-            Point point = new Point(x, y);
+            Vector2i point = new Vector2i(x, y);
             if (isValidEndPoint(point)) {
                 return point;
             }
@@ -145,7 +109,7 @@ public class HeightMapPathfinder {
         return null; // No valid endpoint found
     }
 
-    private boolean isValidEndPoint(Point point) {
+    private boolean isValidEndPoint(Vector2i point) {
         if (point.x < 0 || point.x >= width || point.y < 0 || point.y >= height) {
             return false;
         }
@@ -165,7 +129,7 @@ public class HeightMapPathfinder {
         return true;
     }
 
-    private List<Point> findPath(Point start, Point end) {
+    private List<Vector2i> findPath(Vector2i start, Vector2i end) {
         PriorityQueue<Node> openSet = new PriorityQueue<>();
         boolean[][] closedSet = new boolean[width][height];
         openSet.add(new Node(start, 0, heuristic(start, end), null));
@@ -178,7 +142,7 @@ public class HeightMapPathfinder {
             }
             closedSet[current.point.x][current.point.y] = true;
 
-            for (Point neighbor : getNeighbors(current.point)) {
+            for (Vector2i neighbor : getNeighbors(current.point)) {
                 if (closedSet[neighbor.x][neighbor.y]) {
                     continue;
                 }
@@ -188,29 +152,48 @@ public class HeightMapPathfinder {
             }
             attempts++;
         }
-        return new ArrayList<>(); // return empty path if no path found
+        return new ArrayList<>(); // return an empty path if no path found
     }
 
-    private double heuristic(Point a, Point b) {
+    private double heuristic(Vector2i a, Vector2i b) {
         return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
     }
 
-    private List<Point> getNeighbors(Point point) {
-        List<Point> neighbors = new ArrayList<>();
-        if (point.x > 0) neighbors.add(new Point(point.x - 1, point.y));
-        if (point.x < width - 1) neighbors.add(new Point(point.x + 1, point.y));
-        if (point.y > 0) neighbors.add(new Point(point.x, point.y - 1));
-        if (point.y < height - 1) neighbors.add(new Point(point.x, point.y + 1));
+    private List<Vector2i> getNeighbors(Vector2i point) {
+        List<Vector2i> neighbors = new ArrayList<>();
+        if (point.x > 0) neighbors.add(new Vector2i(point.x - 1, point.y));
+        if (point.x < width - 1) neighbors.add(new Vector2i(point.x + 1, point.y));
+        if (point.y > 0) neighbors.add(new Vector2i(point.x, point.y - 1));
+        if (point.y < height - 1) neighbors.add(new Vector2i(point.x, point.y + 1));
         return neighbors;
     }
 
-    private List<Point> reconstructPath(Node node) {
-        List<Point> path = new ArrayList<>();
+    private List<Vector2i> reconstructPath(Node node) {
+        List<Vector2i> path = new ArrayList<>();
         while (node != null) {
             path.add(node.point);
             node = node.parent;
         }
         Collections.reverse(path);
         return path;
+    }
+
+    static class Node implements Comparable<Node> {
+        Vector2i point;
+        double cost;
+        double priority;
+        Node parent;
+
+        Node(Vector2i point, double cost, double priority, Node parent) {
+            this.point = point;
+            this.cost = cost;
+            this.priority = priority;
+            this.parent = parent;
+        }
+
+        @Override
+        public int compareTo(Node other) {
+            return Double.compare(this.priority, other.priority);
+        }
     }
 }

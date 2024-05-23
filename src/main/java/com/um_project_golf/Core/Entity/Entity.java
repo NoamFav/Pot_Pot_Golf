@@ -10,7 +10,7 @@ public class Entity {
     public Object getRotation; // get the rotation of the entity
     private final Model model; // model of the entity
     private final Vector3f position, rotation; // position and rotation of the entity
-    private final float scale; // scale of the entity
+    private float scale; // scale of the entity
 
     /**
      * The constructor of the entity.
@@ -86,5 +86,9 @@ public class Entity {
 
     public float getScale() {
         return scale;
+    }
+
+    public void setScale(float scale) {
+        this.scale = scale;
     }
 }
