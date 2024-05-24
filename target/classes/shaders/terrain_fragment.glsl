@@ -56,11 +56,11 @@ vec4 specularC;
 void setupColor(Material material, vec2 textCoords) {
     if (material.hasTexture == 0) { // If the material has no other textures
         vec4 blendMapColor = texture(blendMap, textCoords); // Get the blend map color
-        vec2 tiledCoords = textCoords * 100.0; // Tile the texture coordinates
+        vec2 tiledCoords = textCoords * 400.0; // Tile the texture coordinates
 
         // Normalize blend map colors by ensuring they do not exceed 1.0 in total
-        //float maxColorWeight = max(blendMapColor.r + blendMapColor.g + blendMapColor.b, 1.0);
-        //blendMapColor.rgb /= maxColorWeight;
+        float maxColorWeight = max(blendMapColor.r + blendMapColor.g + blendMapColor.b, 1.0);
+        blendMapColor.rgb /= maxColorWeight;
 
         // Recalculate the background texture amount
         float backgroundTextureAmount = 1.0 - (blendMapColor.r + blendMapColor.g + blendMapColor.b);
@@ -71,21 +71,22 @@ void setupColor(Material material, vec2 textCoords) {
         bool isDarkGreen = blendMapColor.g > 0.1 && blendMapColor.g < 0.4 && blendMapColor.r < 0.1 && blendMapColor.b < 0.1;
         bool isDarkBlue = blendMapColor.b > 0.1 && blendMapColor.b < 0.4 && blendMapColor.r < 0.1 && blendMapColor.g < 0.1;
 
-        float darkRedTextureAmount = max(0.0, blendMapColor.r - 0.05) / 0.20; // Adjust base and range
-        float darkGreenTextureAmount = max(0.0, blendMapColor.g - 0.05) / 0.20;
-        float darkBlueTextureAmount = max(0.0, blendMapColor.b - 0.05) / 0.20;
+        float darkRedTextureAmount = max(0.0, blendMapColor.r - 0.05) / 0.35; // Adjust base and range
+        float darkGreenTextureAmount = max(0.0, blendMapColor.g - 0.05) / 0.35;
+        float darkBlueTextureAmount = max(0.0, blendMapColor.b - 0.05) / 0.35;
+        float factor = 1.0;
 
         vec4 darkRedTextureColor = vec4(0);
         vec4 darkGreenTextureColor = vec4(0);
-        vec4 darkBlueTextureColor = vec4( 0);
+        vec4 darkBlueTextureColor = vec4(0);
         vec4 rTextureColor = vec4(0);
         vec4 gTextureColor = vec4(0);
         vec4 bTextureColor = vec4(0);
 
         if (isDarkRed || isDarkGreen || isDarkBlue){
-            darkRedTextureColor = texture(textures[3], tiledCoords) * darkRedTextureAmount * .6;
-            darkGreenTextureColor = texture(textures[4], tiledCoords) * darkGreenTextureAmount * .6;
-            darkBlueTextureColor = texture(textures[5], tiledCoords) * darkBlueTextureAmount * .6;
+            darkRedTextureColor = texture(textures[3], tiledCoords) * darkRedTextureAmount * factor;
+            darkGreenTextureColor = texture(textures[4], tiledCoords) * darkGreenTextureAmount * factor;
+            darkBlueTextureColor = texture(textures[5], tiledCoords) * darkBlueTextureAmount * factor;
         } else {
             rTextureColor = texture(textures[0], tiledCoords) * blendMapColor.r;
             gTextureColor = texture(textures[1], tiledCoords) * blendMapColor.g;
@@ -104,6 +105,7 @@ void setupColor(Material material, vec2 textCoords) {
         specularC = material.specular;
     }
 }
+
 
 vec4 calcLightColor(vec3 light_color, float light_intensity, vec3 position, vec3 to_light_dir, vec3 normal) { // Calculate the color of the light
     vec4 diffuseColor = vec4(0, 0, 0, 0); // Initialize the diffuse color

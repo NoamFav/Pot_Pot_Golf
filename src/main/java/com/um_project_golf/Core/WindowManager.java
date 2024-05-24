@@ -77,6 +77,9 @@ public class WindowManager {
             throw new RuntimeException("Failed to create the GLFW window"); // Throw a runtime exception.
         }
 
+        // Get the video mode of the primary monitor.
+
+
         GLFW.glfwSetFramebufferSizeCallback(window, (window, width, height) -> { // Set the framebuffer size callback.
             this.width = width; // Set the width to the width.
             this.height = height; // Set the height to the height.

@@ -2,7 +2,7 @@
   <profile version="1.0">
     <option name="myName" value="Project Default" />
     <inspection_tool class="AutoCloseableResource" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="METHOD_MATCHER_CONFIG" value="java.util.Formatter,format,java.io.Writer,append,com.google.common.base.Preconditions,checkNotNull,org.hibernate.Session,close,java.io.PrintWriter,printf,java.io.PrintStream,printf,org.lwjgl.glfw.GLFW,glfwSetErrorCallback|glfwSetKeyCallback|glfwSetFramebufferSizeCallback|glfwSetMouseButtonCallback|glfwSetCursorEnterCallback|glfwSetCursorPosCallback|glfwSetWindowFocusCallback,org.lwjgl.nanovg.NanoVG,nvgImagePattern" />
+      <option name="METHOD_MATCHER_CONFIG" value="java.util.Formatter,format,java.io.Writer,append,com.google.common.base.Preconditions,checkNotNull,org.hibernate.Session,close,java.io.PrintWriter,printf,java.io.PrintStream,printf,org.lwjgl.glfw.GLFW,glfwSetErrorCallback|glfwSetKeyCallback|glfwSetFramebufferSizeCallback|glfwSetMouseButtonCallback|glfwSetCursorEnterCallback|glfwSetCursorPosCallback|glfwSetWindowFocusCallback,org.lwjgl.nanovg.NanoVG,nvgImagePattern,org.lwjgl.assimp.Assimp,aiImportFile" />
     </inspection_tool>
     <inspection_tool class="ClassEscapesItsScope" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="checkPackageLocal" value="true" />
@@ -12,14 +12,15 @@
     </inspection_tool>
     <inspection_tool class="DuplicatedCode" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <Languages>
-        <language minSize="97" name="Java" />
+        <language minSize="131" name="Java" />
       </Languages>
     </inspection_tool>
     <inspection_tool class="ExtractMethodRecommender" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="minLength" value="564" />
+      <option name="minLength" value="2461" />
       <option name="maxParameters" value="2" />
     </inspection_tool>
     <inspection_tool class="ReassignedVariable" enabled="false" level="TEXT ATTRIBUTES" enabled_by_default="false" />
+    <inspection_tool class="SameParameterValue" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="UnusedAssignment" enabled="false" level="WARNING" enabled_by_default="false">
       <option name="REPORT_PREFIX_EXPRESSIONS" value="false" />
       <option name="REPORT_POSTFIX_EXPRESSIONS" value="true" />

@@ -2,6 +2,7 @@ package com.um_project_golf.Core.Entity.Terrain;
 
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GolfGame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joml.Vector3f;
@@ -34,12 +35,27 @@ public class HeightMap {
                 float z = i / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_Z; // Calculate the z position of the vertex
 
                 // Calculate the height of the vertex using simplex noise
-                float height = (float) (SimplexNoise.octaveSimplexNoise(x * Consts.SCALE, z * Consts.SCALE, 0, Consts.OCTAVES, Consts.PERSISTENCE, Consts.AMPLITUDE) * (Consts.MAX_HEIGHT/2));
-                heightmap[j][i] = height; // Set the height of the vertex in the heightmap array
+                float height = (float) (SimplexNoise.octaveSimplexNoise(x * Consts.SCALE, z * Consts.SCALE, 0, Consts.OCTAVES, Consts.PERSISTENCE, Consts.AMPLITUDE) * Consts.MAX_TERRAIN_HEIGHT);
+                heightmap[j][i] = height + 1.9f; // Set the height of the vertex in the heightmap array
             }
         }
         SceneManager.setHeightMap(heightmap); // Set the heightmap in the SceneManager
         createHeightmapImage(heightmap); // Create an image of the heightmap
+
+        float minHeight = Float.MAX_VALUE;
+        float maxHeight = Float.MIN_VALUE;
+
+        for (int i = 0; i < Consts.VERTEX_COUNT; i++) {
+            for (int j = 0; j < Consts.VERTEX_COUNT; j++) {
+                if (heightmap[i][j] < minHeight) {
+                    minHeight = heightmap[i][j];
+                }
+                if (heightmap[i][j] > maxHeight) {
+                    maxHeight = heightmap[i][j];
+                }
+            }
+        }
+        System.out.println("Min height: " + minHeight + ", Max height: " + maxHeight);
     }
 
     /**
@@ -51,13 +67,26 @@ public class HeightMap {
         int height = heightmap[0].length; // Get the height of the heightmap
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // Create a new image
 
+
+
         for (int x = 0; x < width; x++) { // Loop through the heightmap
-            for (int y = 0; y < height; y++) { // Loop through the heightmap
-                float heightValue = heightmap[x][y]; // Get the height value of the vertex
+            for (int z = 0; z < height; z++) { // Loop through the heightmap
+                float heightValue;
+
+                float hx = x / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_X; // Calculate the x position of the vertex
+                float hz = z / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_Z;
+
+                if (GolfGame.debugMode) {
+                    heightValue = Terrain.getHeight(hx, hz); // Calculate the height of the vertex
+                } else {
+                    heightValue = heightmap[x][z]; // Calculate the height of the vertex
+                }
+
+                // Get the height value of the vertex
                 Color color; // Create a new color
-                float sand = 2.5f + (float) (Math.random() * 2.5f); // Generate a random red value
-                float grass = 7 + (float) (Math.random() * 2.5f); // Generate a random green value
-                float fairway = 12 + (float) (Math.random() * 2.5f); // Generate a random blue value
+                float sand = .5f;// (float) (Math.random() * 1.5f); // Generate a random red value
+                float grass = 10; //(float) (Math.random() * 1.5f); // Generate a random green value
+                float fairway = 11; //+ (float) (Math.random() * 2.5f); // Generate a random blue value
                 float dryGrass = 17 + (float) (Math.random() * 2.5f); // Generate a random blue value
                 float mold = 20 + (float) (Math.random() * 2.5f); // Generate a random blue value
                 float rock = 25 + (float) (Math.random() * 2.5f); // Generate a random blue value
@@ -78,7 +107,7 @@ public class HeightMap {
                 }
 
 
-                image.setRGB(x, y, color.getRGB()); // Set the color of the pixel in the image
+                image.setRGB(x, z, color.getRGB()); // Set the color of the pixel in the image
             }
         }
 
@@ -107,7 +136,13 @@ public class HeightMap {
 //                "), Scaled Indices: (" + heightX + ", " + heightZ +
 //                "), Height: " + SceneManager.getHeightMap()[heightX][heightZ]);
 
+        float height;
+        if (GolfGame.debugMode) {
+            height = Terrain.getHeight(position.x, position.z); // Calculate the height of the vertex
+        } else {
+            height = SceneManager.getHeightMap()[heightX][heightZ]; // Calculate the height of the vertex
+        }
 
-        return SceneManager.getHeightMap()[heightX][heightZ]; // Return the height of the vertex
+        return height; // Return the height of the vertex
     }
 }

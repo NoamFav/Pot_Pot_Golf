@@ -2,6 +2,7 @@ package com.um_project_golf.Core.Rendering;
 
 import com.um_project_golf.Core.Camera;
 import com.um_project_golf.Core.Entity.Entity;
+import com.um_project_golf.Core.Entity.Model;
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.Terrain;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
@@ -114,13 +115,15 @@ public class RenderManager {
      * @param entity The entity to process.
      */
     public void processEntity(Entity entity) {
-        List<Entity> batch = entityRenderer.getEntities().get(entity.getModel()); // Get the batch.
-        if (batch != null) { // If the batch is not null.
-            batch.add(entity); // Add the entity to the batch.
-        } else { // If the batch is null.
-            List<Entity> newBatch = new ArrayList<>(); // Create a new batch.
-            newBatch.add(entity); // Add the entity to the new batch.
-            entityRenderer.getEntities().put(entity.getModel(), newBatch); // Put the new batch in the entities.
+        for (Model subModel : entity.getModels()) { // Loop through each sub-model of the entity
+            List<Entity> batch = entityRenderer.getEntities().get(subModel); // Get the batch for the sub-model
+            if (batch != null) { // If the batch is not null
+                batch.add(entity); // Add the entity to the batch
+            } else { // If the batch is null
+                List<Entity> newBatch = new ArrayList<>(); // Create a new batch
+                newBatch.add(entity); // Add the entity to the new batch
+                entityRenderer.getEntities().put(subModel, newBatch); // Put the new batch in the entities map
+            }
         }
     }
 

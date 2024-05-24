@@ -76,14 +76,19 @@ public class EntityRenderer implements IRenderer<Entity> {
         shader.bind(); // Bind the shader.
         shader.setUniform("projectionMatrix", Launcher.getWindow().updateProjectionMatrix()); // Update the projection matrix.
         RenderManager.renderLight(pointLights, spotLights, directionalLight, shader); // Render the lights.
-        for(Model model : entities.keySet()) { // For each model in the entities.
+
+        for (Model model : entities.keySet()) { // For each model in the entities.
             bind(model); // Bind the model.
             List<Entity> batch = entities.get(model); // Get the entities.
-            for(Entity ent : batch) { // For each entity in the batch.
-                prepare(ent, camera); // Prepare the entity.
-                GL11.glDrawElements(GL11.GL_TRIANGLES, ent.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0); // Draw the elements.
+
+            for (Entity entity : batch) { // For each entity in the batch.
+                for (Model subModel : entity.getModels()) { // For each sub-model in the entity.
+                    bind(subModel); // Bind the sub-model.
+                    prepare(entity, camera); // Prepare the entity.
+                    GL11.glDrawElements(GL11.GL_TRIANGLES, subModel.getVertexCount(), GL11.GL_UNSIGNED_INT, 0); // Draw the elements.
+                    unbind(); // Unbind the sub-model.
+                }
             }
-            unbind(); // Unbind the model.
         }
         entities.clear(); // Clear the entities.
         shader.unbind(); // Unbind the shader.
