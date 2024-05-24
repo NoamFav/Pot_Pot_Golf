@@ -47,7 +47,7 @@ public class GolfGame implements ILogic {
     private final SceneManager scene;
     private MouseInput mouseInputs;
     private AudioManager audioManager;
-    private final HeightMapPathfinder pathfinder;
+    private HeightMapPathfinder pathfinder;
     private final CollisionsDetector collisionsDetector;
     private long vg;
 
@@ -78,6 +78,7 @@ public class GolfGame implements ILogic {
     private boolean isSoundPlaying = false;
     //private boolean wasPressed = false;
     private boolean isAnimating;
+    private boolean hasStartPoint = false;
     public static boolean debugMode = false;
 
     private float lastY;
@@ -140,15 +141,15 @@ public class GolfGame implements ILogic {
 
         mouseInputs = mouseInput;
 
-        heightMap.createHeightMap();
-        path = pathfinder.getPath(410, 550); // upper and lower bounds for the radius of the path
-
         scene.setDefaultTexture(new Texture(loader.loadTexture("Texture/Default.png")));
         window.setAntiAliasing(true);
         window.setResized(false);
 
         renderer.init();
         window.setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
+
+        heightMap.createHeightMap();
+        path = pathfinder.getPath(410, 550, 15); // upper and lower bounds for the radius of the path
 
         modelAndEntityCreation();
         terrainCreation();
@@ -213,6 +214,43 @@ public class GolfGame implements ILogic {
             if (window.is_keyPressed(GLFW.GLFW_KEY_F) && treeAnimationState == AnimationState.IDLE) {
                 treeAnimationState = AnimationState.GOING_UP;
                 treeAnimationTime = 0f;
+            }
+        }
+
+        if (debugMode && canMove) {
+            if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
+                if (!hasStartPoint) { // Ensure start point is only set once
+                    scene.getEntities().removeAll(trees);
+                    heightMap.createHeightMap();
+                    startPoint = new Vector3f(camera.getPosition()); // Create a new instance to avoid reference issues
+                    golfBall.setPosition(startPoint.x, startPoint.y - Consts.PLAYER_HEIGHT, startPoint.z);
+                    hasStartPoint = true;
+                    System.out.println("Start point set: " + startPoint); // Print with more decimal places for clarity
+                }
+            }
+            if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT) && hasStartPoint) {
+                endPoint = new Vector3f(camera.getPosition()); // Create a new instance to avoid reference issues
+
+                Vector2i start = new Vector2i((int) startPoint.x, (int) startPoint.z);
+                start.x = (int) ((start.x + Consts.SIZE_X / 2) * 4);
+                start.y = (int) ((start.y + Consts.SIZE_Z / 2) * 4);
+
+                Vector2i end = new Vector2i((int) endPoint.x, (int) endPoint.z);
+                end.x = (int) ((end.x + Consts.SIZE_X / 2) * 4);
+                end.y = (int) ((end.y + Consts.SIZE_Z / 2) * 4);
+
+                System.out.println("Start point: " + start);
+                System.out.println("End point: " + end);
+
+                path = pathfinder.getPathDebug(start, end, 5);
+                try {
+                    TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
+                    terrainSwitch(blendMapTerrain, tree, blendMap2);
+                    createTrees(tree);
+                } catch (Exception ignore) {
+                }
+                endFlag.setPosition(endPoint.x, endPoint.y - Consts.PLAYER_HEIGHT, endPoint.z);
+                hasStartPoint = false;
             }
         }
 
@@ -452,9 +490,12 @@ public class GolfGame implements ILogic {
         List<Model> ball = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
         List<Model> arrow = loader.loadAssimpModel("src/main/resources/Models/Arrow/Arrow5.obj");
         List<Model> flag = loader.loadAssimpModel("src/main/resources/Models/flag/flag.obj");
+        List<Model> tree2 = loader.loadAssimpModel("src/main/resources/Models/tree2/tree3-N.obj");
+        List<Model> tree3 = loader.loadAssimpModel("src/main/resources/Models/sakura/sakura-A.obj");
 
         for (Model model : tree) model.getMaterial().setDisableCulling(true);
-
+        for (Model model : tree2) model.getMaterial().setDisableCulling(true);
+        for (Model model : tree3) model.getMaterial().setDisableCulling(true);
         for (Model model : wolf) model.getMaterial().setDisableCulling(true);
         for (Model model : skyBox) model.getMaterial().setDisableCulling(true);
         for (Model model : arrow) model.getMaterial().setDisableCulling(true);
@@ -463,6 +504,9 @@ public class GolfGame implements ILogic {
 
         scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
         scene.addEntity(new Entity(wolf, new Vector3f(0, 20, 0), new Vector3f(45, 0 , 0), 20 ));
+
+        scene.addEntity(new Entity(tree2, new Vector3f(0, 10, 0), new Vector3f(0, 0, 0), 5));
+        scene.addEntity(new Entity(tree3, new Vector3f(10, 10, 0), new Vector3f(0, 0, 0), 5));
 
         arrowEntity = new Entity(arrow, new Vector3f(0, 0, 0), new Vector3f(0,-90 ,0), 2);
         scene.addEntity(arrowEntity);
@@ -763,10 +807,10 @@ public class GolfGame implements ILogic {
 
         Runnable terrainChanger = () -> {
             try {
+                trees.clear();
                 System.out.println("Changing terrain");
                 heightMap.createHeightMap();
-
-                path = pathfinder.getPath(410, 550);
+                path = pathfinder.getPath(410, 550, 15);
                 startPoint = new Vector3f(path.get(0).x, 0, path.get(0).y);
                 startPoint.x = (int) (startPoint.x / 4 - Consts.SIZE_X / 2);
                 startPoint.z = (int) (startPoint.z / 4 - Consts.SIZE_Z / 2);
@@ -816,6 +860,7 @@ public class GolfGame implements ILogic {
         };
 
         Runnable enableDebugMode = () -> {
+            trees.clear();
             audioManager.stopSound();
             System.out.println("Enabling debug mode");
             debugMode = !debugMode;
@@ -826,7 +871,14 @@ public class GolfGame implements ILogic {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+
+            endPoint = new Vector3f(0, 0, 0);
+            startPoint = new Vector3f(0, 0, 0);
+            golfBall.setPosition(startPoint.x, heightMap.getHeight(new Vector3f(0,0,0)), startPoint.z);
+            endFlag.setPosition(endPoint.x, heightMap.getHeight(new Vector3f(0,0,0)), endPoint.z);
+
             recreateGUIs();
+            mouseInputs.init();
 
             if (debugMode) {
                 audioManager = new AudioManager("src/main/resources/SoundTrack/nothing2.wav");
@@ -957,7 +1009,9 @@ public class GolfGame implements ILogic {
         scene.addTerrain(ocean);
         scene.getEntities().removeIf(entity -> entity.getModels().equals(tree));
         try {
-            createTrees(tree);
+            if (!debugMode) {
+                createTrees(tree);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

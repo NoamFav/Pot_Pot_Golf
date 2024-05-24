@@ -1,6 +1,7 @@
 package com.um_project_golf.Core.Entity.Terrain;
 
 import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GolfGame;
 import org.joml.Vector2i;
 
 import javax.imageio.ImageIO;
@@ -17,15 +18,15 @@ public class HeightMapPathfinder {
     private int CIRCLE_RADIUS;
     private final int SEARCH_RADIUS = 20 * SCALE; // 30 meters radius, which is 30 * SCALE units in the heightmap
     private final int BORDER_OFFSET = (int) (Consts.SIZE_X/3 * SCALE); // 20 meters away from the border, which is 20 * SCALE units
-    private final int PATH_CIRCLE_RADIUS = 15 * SCALE; // 10 meters radius, which is 10 * SCALE units in the heightmap
+    private int PATH_CIRCLE_RADIUS; // 10 meters radius, which is 10 * SCALE units in the heightmap
 
     private double[][] costMap;
 
-    public List<Vector2i> getPath(int radiusDown, int radiusUp) {
+    public List<Vector2i> getPath(int radiusDown, int radiusUp, int radiusEnd) {
         int count = 0;
         // 200 meters radius, which is 200 * SCALE units in the heightmap
         CIRCLE_RADIUS = (radiusDown + (int) (Math.random() * (radiusUp - radiusDown))) * SCALE;
-
+        PATH_CIRCLE_RADIUS = radiusEnd * SCALE;
 
         List<Vector2i> path = null;
         int attempts = 0;
@@ -44,6 +45,46 @@ public class HeightMapPathfinder {
                     path = findPath(startPoint, endPoint);
                     pathFound = !path.isEmpty();
                 }
+
+                attempts++;
+            }
+
+            if (pathFound) {
+                System.out.println("Path found!" + " #" + count + " Start: " + path.get(0).x + ", " + path.get(0).y + " End: " + path.get(path.size() - 1).x + ", " + path.get(path.size() - 1).y);
+                count++;
+
+                // Draw the path on the heightmap image
+                drawPathOnImage(heightMapImage, path);
+                // Save the modified image
+                ImageIO.write(heightMapImage, "png", new File("Texture/heightmap.png"));
+            } else {
+                System.out.println("Failed to find a valid path after 1000 attempts.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        }
+        return path;
+    }
+
+    public List<Vector2i> getPathDebug(Vector2i start, Vector2i end, int radiusEnd) {
+        int count = 0;
+        // 200 meters radius, which is 200 * SCALE units in the heightmap
+        CIRCLE_RADIUS = (int) (Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2)) * SCALE);
+        PATH_CIRCLE_RADIUS = radiusEnd * SCALE;
+
+        List<Vector2i> path = null;
+        int attempts = 0;
+        boolean pathFound = false;
+        try {
+            BufferedImage heightMapImage = ImageIO.read(new File("Texture/heightmap.png"));
+            width = heightMapImage.getWidth();
+            height = heightMapImage.getHeight();
+            costMap = generateCostMap(heightMapImage);
+
+            while (attempts < 1000 && !pathFound) {
+
+                path = findPath(start, end);
+                pathFound = !path.isEmpty();
 
                 attempts++;
             }
@@ -160,7 +201,7 @@ public class HeightMapPathfinder {
         return true;
     }
 
-    private List<Vector2i> findPath(Vector2i start, Vector2i end) {
+    public List<Vector2i> findPath(Vector2i start, Vector2i end) {
         PriorityQueue<Node> openSet = new PriorityQueue<>();
         boolean[][] closedSet = new boolean[width][height];
         openSet.add(new Node(start, 0, heuristic(start, end), null));
