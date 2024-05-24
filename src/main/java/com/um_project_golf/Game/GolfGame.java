@@ -12,7 +12,6 @@ import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
 import com.um_project_golf.Core.Rendering.RenderManager;
 import com.um_project_golf.Core.Utils.BallCollisionDetector;
-import com.um_project_golf.Core.Utils.ButtonTimer;
 import com.um_project_golf.Core.Utils.CollisionsDetector;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.Entity.Terrain.HeightMapPathfinder;
@@ -38,11 +37,14 @@ import static org.lwjgl.nanovg.NanoVGGL3.*;
  */
 public class GolfGame implements ILogic {
 
+    private enum AnimationState {
+        IDLE, GOING_UP, GOING_DOWN
+    }
+
     private final RenderManager renderer;
     private final ObjectLoader loader;
     private final WindowManager window;
     private final SceneManager scene;
-    private final ButtonTimer timer;
     private MouseInput mouseInputs;
     private AudioManager audioManager;
     private final HeightMapPathfinder pathfinder;
@@ -80,8 +82,15 @@ public class GolfGame implements ILogic {
 
     private float lastY;
 
+    private AnimationState treeAnimationState = AnimationState.IDLE;
+    private float treeAnimationTime = 0f;
+    private Entity animatedTree; // The tree to be animated
+
     private List<Model> tree;
+    private final List<Entity> trees;
+    private final List<Float> treeHeights;
     private Entity golfBall;
+    private Entity endFlag;
     private Entity arrowEntity;
     private BallCollisionDetector ballCollisionDetector;
 
@@ -108,7 +117,6 @@ public class GolfGame implements ILogic {
         window = Launcher.getWindow();
         loader = new ObjectLoader();
         scene = new SceneManager(-90);
-        timer = new ButtonTimer();
         camera = new Camera();
         pathfinder = new HeightMapPathfinder();
         collisionsDetector = new CollisionsDetector();
@@ -116,6 +124,8 @@ public class GolfGame implements ILogic {
         heightMap = new HeightMap();
         menuButtons = new ArrayList<>();
         inGameMenuButtons = new ArrayList<>();
+        trees = new ArrayList<>();
+        treeHeights = new ArrayList<>();
     }
 
     /**
@@ -199,24 +209,12 @@ public class GolfGame implements ILogic {
             if (window.is_keyPressed(GLFW.GLFW_KEY_DOWN)) {
                 camera.setPosition(endPoint);
             }
+
+            if (window.is_keyPressed(GLFW.GLFW_KEY_F) && treeAnimationState == AnimationState.IDLE) {
+                treeAnimationState = AnimationState.GOING_UP;
+                treeAnimationTime = 0f;
+            }
         }
-        /*
-        if (mouseInputs.isLeftButtonPressed()) {
-            if (!wasPressed) { // If the button was not previously pressed
-                timer.startTimer();
-                wasPressed = true; // Update the tracked state
-            } else {
-                // Continuously update the button text with the current time pressed
-                String time = timer.getFormattedTime();
-                float velocity = secondToVelocity(timer.getTime());
-                infoButton.setText(time + " - velocity: " + velocity + " m/s");
-                arrowEntity.setScale(velocity);
-            }
-        } else {
-            if (wasPressed) { // If the button was previously pressed
-                wasPressed = false; // Update the tracked state
-            }
-        } */
 
         if (canMove) {
             if (mouseInputs.isRightButtonPressed()) {
@@ -226,14 +224,6 @@ public class GolfGame implements ILogic {
         } else if (isOnMenu && isGuiVisible) {
             camera.moveRotation(0, 0.1f, 0);
         }
-
-//
-//        if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
-//            scene.getPointLights()[0].getPosition().x += 0.1f;
-//        }
-//        if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT)) {
-//            scene.getPointLights()[0].getPosition().x -= 0.1f;
-       // }
 
 //        if (window.is_keyPressed(GLFW.GLFW_KEY_I)) {
 //            scene.getSpotLights()[0].getPointLight().getPosition().z = lightPos + 0.1f;
@@ -307,6 +297,8 @@ public class GolfGame implements ILogic {
         }
 
         daytimeCycle();
+
+        updateTreeAnimations();
 
         if (isAnimating) {
             float timeStep = 0.1f;
@@ -491,7 +483,8 @@ public class GolfGame implements ILogic {
         System.out.println("End point: " + endPoint);
 
         //scene.addEntity(new Entity(flag, new Vector3f(startPoint.x, heightMap.getHeight(new Vector3f(startPoint.x, 0 , startPoint.y)), startPoint.y), new Vector3f(0, 0, 0), 3));
-        scene.addEntity(new Entity(flag, endPoint, new Vector3f(0, 0, 0), 5));
+        endFlag = new Entity(flag, endPoint, new Vector3f(0, 0, 0), 5);
+        scene.addEntity(endFlag);
 
         golfBall = new Entity(ball,startPoint, new Vector3f(50, 0, 0), 5);
         scene.addEntity(golfBall);
@@ -581,6 +574,52 @@ public class GolfGame implements ILogic {
         arrowEntity.setRotation(rotation.x, yRotation - 90, rotation.z);
     }
 
+    private void updateTreeAnimations() {
+        if (trees.isEmpty() || treeAnimationState == AnimationState.IDLE) {
+            return;
+        }
+
+        treeAnimationTime += 0.1f; // Adjust the time increment as needed
+
+        // Total duration of the animation (5 seconds up and 5 seconds down)
+        float treeAnimationDuration = 10f;
+        float t = treeAnimationTime / (treeAnimationDuration / 2);
+        if (t > 1f) t = 1f;
+
+        for (int i = 0; i < trees.size(); i++) {
+            Entity tree = trees.get(i);
+            float baseHeight = treeHeights.get(i);
+            float treeHeightOffset = 10f;
+
+            switch (treeAnimationState) {
+                case GOING_UP:
+                    System.out.println("Going up");
+                    if (treeAnimationTime <= treeAnimationDuration / 2) {
+                        float newY = baseHeight + treeHeightOffset * t;
+                        float newRotation = -90 + 180 * t;
+                        tree.setPosition(tree.getPosition().x, newY, tree.getPosition().z);
+                        tree.setRotation(newRotation, tree.getRotation().y, tree.getRotation().z);
+                    } else {
+                        treeAnimationState = AnimationState.GOING_DOWN;
+                        treeAnimationTime = 0f;
+                    }
+                    break;
+
+                case GOING_DOWN:
+                    System.out.println("Going down");
+                    if (treeAnimationTime <= treeAnimationDuration / 2) {
+                        float newY = baseHeight + treeHeightOffset * (1 - t);
+                        float newRotation = 90 + 180f * t;
+                        tree.setPosition(tree.getPosition().x, newY, tree.getPosition().z);
+                        tree.setRotation(newRotation, tree.getRotation().y, tree.getRotation().z);
+                    } else {
+                        treeAnimationState = AnimationState.IDLE;
+                    }
+                    break;
+            }
+        }
+    }
+
     private boolean isNotValidFloat(String str) {
         try {
             Float.parseFloat(str);
@@ -625,7 +664,10 @@ public class GolfGame implements ILogic {
         for (int i = 0; i < Consts.NUMBER_OF_TREES; i++) {
             Vector3f position = positions.get(rnd.nextInt(positions.size()));
             if (position != zero) {
-                scene.addEntity(new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f));
+                Entity aTree = new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f);
+                scene.addEntity(aTree);
+                trees.add(aTree);
+                treeHeights.add(position.y);
                 treePositions[i] = new float[]{position.x, position.y, position.z};
             } else {
                 System.out.println("Position is null at index: " + i);
@@ -732,13 +774,14 @@ public class GolfGame implements ILogic {
 
                 endPoint = new Vector3f(path.get(path.size() - 1).x, 0, path.get(path.size() - 1).y);
                 endPoint.x = (int) (endPoint.x / 4 - Consts.SIZE_X / 2);
-                endPoint.z = (int) (endPoint.y / 4 - Consts.SIZE_Z / 2);
+                endPoint.z = (int) (endPoint.z / 4 - Consts.SIZE_Z / 2);
                 endPoint.y = heightMap.getHeight(new Vector3f(endPoint.x, 0 , endPoint.z));
 
                 TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
                 SimplexNoise.shufflePermutation();
                 terrainSwitch(blendMapTerrain, tree, blendMap2);
                 golfBall.setPosition(startPoint.x, startPoint.y, startPoint.z);
+                endFlag.setPosition(endPoint.x, endPoint.y, endPoint.z);
                 numberOfShots = 0;
                 infoTextPane.setText("Position: (" + (int) golfBall.getPosition().x + ", " + (int) golfBall.getPosition().z + "). Number of shots: " + numberOfShots);
             } catch (Exception e) {
