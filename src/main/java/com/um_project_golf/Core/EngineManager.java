@@ -32,7 +32,7 @@ public class EngineManager {
         gameLogic = Launcher.getGolfGame();
         mouseInput = new MouseInput();
         window.init();
-        gameLogic.init();
+        gameLogic.init(mouseInput);
         mouseInput.init();
     }
 
@@ -126,7 +126,7 @@ public class EngineManager {
      * Updates the game.
      */
     public void update() {
-        gameLogic.update(mouseInput);
+        gameLogic.update();
     }
 
     /**
@@ -157,5 +157,4 @@ public class EngineManager {
     public static void setFps(int fps) {
         EngineManager.fps = fps;
     }
-
 }

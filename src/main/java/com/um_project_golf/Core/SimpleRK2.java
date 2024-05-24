@@ -2,7 +2,7 @@ package com.um_project_golf.Core;
 
 import java.util.function.BiFunction;
 
-public class SimpleRK2 {
+public class SimpleRK2 {    
 
     public static double[] simpleImprovedEuler(double t0, double[] y0, double tFinal, double stepSize, BiFunction<Double, double[], double[]> function) {
         double t = t0;
