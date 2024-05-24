@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 public class RuleBasedBot {
     private static Vector3f startingPosition;
-    private static double flagRadius = 0.5;
+    private static double flagRadius = 1;
     private static Vector3f flagPosition;
     private static HeightMap testMap = new HeightMap();
 
@@ -19,10 +19,10 @@ public class RuleBasedBot {
 
     public static void main(String[] args) {
         testMap.createHeightMap();
-        float zInitial = testMap.getHeight(new Vector3f(0,0,0));
-        float zFlag = testMap.getHeight(new Vector3f());
+        float yInitial = testMap.getHeight(new Vector3f(1,0,0));
+        float yFlag = testMap.getHeight(new Vector3f(4,0,1));
         // Initialize game elements
-        RuleBasedBot bot = new RuleBasedBot(new Vector3f(0,0,zInitial),new Vector3f(3,4,zFlag));
+        RuleBasedBot bot = new RuleBasedBot(new Vector3f(1,yInitial,0),new Vector3f(4,yFlag,1));
         Ball ball = new Ball(startingPosition);
         Green green = new Green(flagPosition, flagRadius);
 
@@ -37,14 +37,16 @@ public class RuleBasedBot {
         double minDistance = Double.MAX_VALUE;
         Shot bestShot = null;
         Vector3f bestPosition = null;
+        int count = 0;
+        System.out.println("start");
 
         while(!isInHole(ball,green)) {
 
             // Placeholder for iterating over possible velocities
-            for (double velocityX = 1; velocityX <= 300; velocityX += 5) {
-                for (double velocityY = 1; velocityY <= 300; velocityY += 5) {
+            for (double velocityX = -5; velocityX <= 5; velocityX += 0.1) {
+                for (double velocityZ = -5; velocityZ <= 5; velocityZ += 0.1) {
                     // Apply the velocities to the ball
-                    applyVelocities(ball, velocityX, velocityY);
+                    applyVelocities(ball, velocityX, velocityZ);
 
                     // Simulate the ball's movement using the physics engine
                     simulateBallMovement(ball);
@@ -52,14 +54,16 @@ public class RuleBasedBot {
                     // Check if it's the best shot so far
                     if (ball.distanceToFlag(green) < minDistance) {
                         minDistance = ball.distanceToFlag(green);
-                        bestShot = new Shot(velocityX, velocityY);
+                        bestShot = new Shot(velocityX, velocityZ);
                         bestPosition = ball.getPosition();
                     }
 
                     // Reset ball position for the next shot
                     ball.updatePosition(startingPosition);
                 }
+                System.out.println("2");
             }
+            System.out.println("Can't make a hole in one");
             ball.updatePosition(bestPosition);
         }
 
@@ -67,15 +71,15 @@ public class RuleBasedBot {
     }
 
     // Placeholder for applying velocities to the ball
-    public static void applyVelocities(Ball ball, double velocityX, double velocityY) {
+    public static void applyVelocities(Ball ball, double velocityX, double velocityZ) {
         ball.setVelocityX(velocityX);
-        ball.setVelocityY(velocityY);
+        ball.setVelocityZ(velocityZ);
     }
 
     // Placeholder for simulating the ball's movement
     public static void simulateBallMovement(Ball ball) {
         // Testing with height map
-        double[] initialState = {startingPosition.x, startingPosition.y, ball.getVelocityX(), ball.getVelocityY()}; // initialState = [x, z, vx, vz]
+        double[] initialState = {startingPosition.x, startingPosition.z, ball.getVelocityX(), ball.getVelocityZ()}; // initialState = [x, z, vx, vz]
         double h = 0.1; // Time step
         //double totalTime = 5; // Total time
         PhysicsEngine engine = new PhysicsEngine(testMap, 0.08, 0.2, 0.1, 0.3);
@@ -84,7 +88,6 @@ public class RuleBasedBot {
             finalPosition = engine.runImprovedEuler(initialState, h);
             initialState[0] = finalPosition.x;
             initialState[1] = finalPosition.z;
-            System.out.println(finalPosition.x + ", " + finalPosition.y + ", " + finalPosition.z);
         }
         // Update ball position based on velocity and physics rules
         ball.updatePosition(finalPosition);

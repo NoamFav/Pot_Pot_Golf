@@ -5,7 +5,7 @@ import org.joml.Vector3f;
 class Ball {
     private Vector3f position;
     private double velocityX;
-    private double velocityY;
+    private double velocityZ;
 
     // Constructor
     public Ball(Vector3f position) {
@@ -21,12 +21,12 @@ class Ball {
         this.velocityX = velocityX;
     }
 
-    public double getVelocityY() {
-        return velocityY;
+    public double getVelocityZ() {
+        return velocityZ;
     }
 
-    public void setVelocityY(double velocityY) {
-        this.velocityY = velocityY;
+    public void setVelocityZ(double velocityZ) {
+        this.velocityZ = velocityZ;
     }
 
     // Placeholder for updating the ball's position

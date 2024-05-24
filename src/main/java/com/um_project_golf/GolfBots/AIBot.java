@@ -13,10 +13,10 @@ public class AIBot {
     private static double flagRadius = 0;
     private static double minVelocityX = 0;
     private static double maxVelocityX = 100;
-    private static double minVelocityY = 0;
-    private static double maxVelocityY = 0;
+    private static double minVelocityZ = 0;
+    private static double maxVelocityZ = 0;
     private static double velocityStepX = 0.1;
-    private static double velocityStepY = 0.1;
+    private static double velocityStepZ = 0.1;
     public static void main(String[] args) {
         // Initialize game elements
         Ball ball = new Ball(startingPosition);
@@ -34,8 +34,8 @@ public class AIBot {
 
         // Initialize with a random shot
         double velocityX = minVelocityX + (maxVelocityX - minVelocityX) * random.nextDouble();
-        double velocityY = minVelocityY + (maxVelocityY - minVelocityY) * random.nextDouble();
-        Shot currentShot = new Shot(velocityX, velocityY);
+        double velocityZ = minVelocityZ + (maxVelocityZ - minVelocityZ) * random.nextDouble();
+        Shot currentShot = new Shot(velocityX, velocityZ);
 
         boolean improvement = true;
 
@@ -46,10 +46,10 @@ public class AIBot {
 
             // Generate neighboring shots by adjusting velocity slightly
             for (double dX = -velocityStepX; dX <= velocityStepX; dX += velocityStepX) {
-                for (double dY = -velocityStepY; dY <= velocityStepY; dY += velocityStepY) {
-                    if (dX == 0 && dY == 0) continue; // Skip the current shot
+                for (double dZ = -velocityStepZ; dZ <= velocityStepZ; dZ += velocityStepZ) {
+                    if (dX == 0 && dZ == 0) continue; // Skip the current shot
 
-                    Shot neighborShot = new Shot(currentShot.getVelocityX() + dX, currentShot.getVelocityY() + dY);
+                    Shot neighborShot = new Shot(currentShot.getVelocityX() + dX, currentShot.getVelocityZ() + dZ);
                     double neighborDistance = evaluateShot(neighborShot, ball, green);
 
                     if (neighborDistance < bestNeighborDistance) {
@@ -67,21 +67,21 @@ public class AIBot {
     }
 
     public static double evaluateShot(Shot shot, Ball ball, Green green) {
-        applyVelocities(ball, shot.getVelocityX(), shot.getVelocityY());
+        applyVelocities(ball, shot.getVelocityX(), shot.getVelocityZ());
         simulateBallMovement(ball);
         return ball.distanceToFlag(green);
     }
 
-    public static void applyVelocities(Ball ball, double velocityX, double velocityY) {
+    public static void applyVelocities(Ball ball, double velocityX, double velocityZ) {
         ball.setVelocityX(velocityX);
-        ball.setVelocityY(velocityY);
+        ball.setVelocityZ(velocityZ);
     }
 
     public static void simulateBallMovement(Ball ball) {
         // Testing with height map
         HeightMap testMap = new HeightMap();
         testMap.createHeightMap();
-        double[] initialState = {startingPosition.x, startingPosition.y, ball.getVelocityX(), ball.getVelocityY()}; // initialState = [x, z, vx, vz]
+        double[] initialState = {startingPosition.x, startingPosition.z, ball.getVelocityX(), ball.getVelocityZ()}; // initialState = [x, z, vx, vz]
         double h = 0.1; // Time step
         //double totalTime = 5; // Total time
         PhysicsEngine engine = new PhysicsEngine(testMap, 0.08, 0.2, 0.1, 0.3);
