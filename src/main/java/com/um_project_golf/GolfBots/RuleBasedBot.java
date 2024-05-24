@@ -34,14 +34,12 @@ public class RuleBasedBot {
     }
 
     public static Shot findBestShot(Ball ball, Green green) {
-        double minDistance = Double.MAX_VALUE;
         Shot bestShot = null;
         Vector3f bestPosition = null;
         int count = 0;
         System.out.println("start");
 
-        while(!isInHole(ball,green)) {
-
+        while (!isInHole(ball,green)) {
             // Placeholder for iterating over possible velocities
             for (double velocityX = -5; velocityX <= 5; velocityX += 0.1) {
                 for (double velocityZ = -5; velocityZ <= 5; velocityZ += 0.1) {
@@ -51,11 +49,11 @@ public class RuleBasedBot {
                     // Simulate the ball's movement using the physics engine
                     simulateBallMovement(ball);
 
-                    // Check if it's the best shot so far
-                    if (ball.distanceToFlag(green) < minDistance) {
-                        minDistance = ball.distanceToFlag(green);
+                    // Check if it's in hole
+                    if (isInHole(ball, green)) {
                         bestShot = new Shot(velocityX, velocityZ);
                         bestPosition = ball.getPosition();
+                        break;
                     }
 
                     // Reset ball position for the next shot
