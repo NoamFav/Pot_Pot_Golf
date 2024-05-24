@@ -2,12 +2,12 @@ package com.um_project_golf.GolfBots;
 
 class Shot {
     private double velocityX;
-    private double velocityY;
+    private double velocityZ;
 
     // Constructor
-    public Shot(double velocityX, double velocityY) {
+    public Shot(double velocityX, double velocityZ) {
         this.velocityX = velocityX;
-        this.velocityY = velocityY;
+        this.velocityZ = velocityZ;
     }
 
     // Getters
@@ -15,12 +15,12 @@ class Shot {
         return velocityX;
     }
 
-    public double getVelocityY() {
-        return velocityY;
+    public double getVelocityZ() {
+        return velocityZ;
     }
 
     @Override
     public String toString() {
-        return "VelocityX: " + velocityX + ", VelocityY: " + velocityY;
+        return "VelocityX: " + velocityX + ", VelocityZ: " + velocityZ;
     }
 }
