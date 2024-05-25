@@ -37,9 +37,7 @@ import static org.lwjgl.nanovg.NanoVGGL3.*;
  */
 public class GolfGame implements ILogic {
 
-    private enum AnimationState {
-        IDLE, GOING_UP, GOING_DOWN
-    }
+    private enum AnimationState {IDLE, GOING_UP, GOING_DOWN}
 
     private final RenderManager renderer;
     private final ObjectLoader loader;
@@ -47,7 +45,7 @@ public class GolfGame implements ILogic {
     private final SceneManager scene;
     private MouseInput mouseInputs;
     private AudioManager audioManager;
-    private HeightMapPathfinder pathfinder;
+    private final HeightMapPathfinder pathfinder;
     private final CollisionsDetector collisionsDetector;
     private long vg;
 
@@ -492,6 +490,7 @@ public class GolfGame implements ILogic {
         List<Model> flag = loader.loadAssimpModel("src/main/resources/Models/flag/flag.obj");
         List<Model> tree2 = loader.loadAssimpModel("src/main/resources/Models/tree2/tree3-N.obj");
         List<Model> tree3 = loader.loadAssimpModel("src/main/resources/Models/sakura/sakura-A.obj");
+        List<Model> cloud = loader.loadAssimpModel("src/main/resources/Models/cloud/cloud lowpoly(big) -A.obj");
 
         for (Model model : tree) model.getMaterial().setDisableCulling(true);
         for (Model model : tree2) model.getMaterial().setDisableCulling(true);
@@ -501,12 +500,14 @@ public class GolfGame implements ILogic {
         for (Model model : arrow) model.getMaterial().setDisableCulling(true);
         for (Model model : flag) model.getMaterial().setDisableCulling(true);
         for (Model model : ball) model.getMaterial().setDisableCulling(true);
+        for (Model model : cloud) model.getMaterial().setDisableCulling(true);
 
         scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
+        scene.addEntity(new Entity(cloud, new Vector3f(0, 30, 0), new Vector3f(0, 0 , 0), 1 ));
         scene.addEntity(new Entity(wolf, new Vector3f(0, 20, 0), new Vector3f(45, 0 , 0), 20 ));
 
-        scene.addEntity(new Entity(tree2, new Vector3f(0, 10, 0), new Vector3f(0, 0, 0), 5));
-        scene.addEntity(new Entity(tree3, new Vector3f(10, 10, 0), new Vector3f(0, 0, 0), 5));
+        //scene.addEntity(new Entity(tree2, new Vector3f(0, 10, 0), new Vector3f(0, 0, 0), 5));
+        //scene.addEntity(new Entity(tree3, new Vector3f(10, 10, 0), new Vector3f(0, 0, 0), 5));
 
         arrowEntity = new Entity(arrow, new Vector3f(0, 0, 0), new Vector3f(0,-90 ,0), 2);
         scene.addEntity(arrowEntity);
