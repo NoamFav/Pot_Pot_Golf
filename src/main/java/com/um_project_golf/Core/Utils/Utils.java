@@ -1,5 +1,6 @@
 package com.um_project_golf.Core.Utils;
 
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.MemoryUtil;
 
 import java.io.InputStream;
@@ -20,7 +21,7 @@ public class Utils {
      * @param data The data to store.
      * @return The float buffer.
      */
-    public static FloatBuffer storeDataInFloatBuffer(float[] data) {
+    public static @NotNull FloatBuffer storeDataInFloatBuffer(float @NotNull [] data) {
         FloatBuffer buffer = MemoryUtil.memAllocFloat(data.length); // Allocate memory for the float buffer
         buffer.put(data).flip(); // Put the data into the buffer and flip it
         return buffer; // Return the buffer
@@ -32,7 +33,7 @@ public class Utils {
      * @param data The data to store.
      * @return The int buffer.
      */
-    public static IntBuffer storeDataInIntBuffer(int[] data) {
+    public static @NotNull IntBuffer storeDataInIntBuffer(int @NotNull [] data) {
         IntBuffer buffer = MemoryUtil.memAllocInt(data.length); // Allocate memory for the int buffer
         buffer.put(data).flip(); // Put the data into the buffer and flip it
         return buffer; // Return the buffer

@@ -10,6 +10,9 @@ import org.lwjgl.system.MemoryStack;
 
 import static org.lwjgl.nanovg.NanoVG.*;
 
+/**
+ * The Button class is used to render a button on the screen
+ */
 public class Button {
     private final float x, y;  // Button position
     private final float width, height;  // Button dimensions
@@ -26,6 +29,19 @@ public class Button {
 
     private final WindowManager window = Launcher.getWindow();
 
+    /**
+     * Create a new Button object
+     *
+     * @param x         The x position of the button
+     * @param y         The y position of the button
+     * @param width     The width of the button
+     * @param height    The height of the button
+     * @param text      The text to display on the button
+     * @param fontSize  The font size of the text
+     * @param action    The action to perform when the button is clicked
+     * @param vg        The NanoVG context
+     * @param imagePath The path to the image to use for the button
+     */
     public Button(float x, float y, float width, float height, String text, float fontSize, Runnable action, long vg, String imagePath) {
         this.x = x;
         this.y = y;
@@ -39,6 +55,10 @@ public class Button {
         initImage();  // Load the image once when the Button object is created
     }
 
+    /**
+     * initialize the image for the button
+     * This method is called once when the Button object is created
+     */
     private void initImage() {
         imgId = nvgCreateImage(vg, imagePath, 0);
         if (imgId == 0) {
@@ -46,6 +66,9 @@ public class Button {
         }
     }
 
+    /**
+     * Render the button
+     */
     public void render() {
         try (MemoryStack ignored = MemoryStack.stackPush()) {
             // Start new frame for NanoVG
@@ -93,6 +116,9 @@ public class Button {
         }
     }
 
+    /**
+     * Update the button
+     */
     public void update() {
         updateMouseScaling();
         processButtonInteraction();
@@ -118,6 +144,9 @@ public class Button {
         scaledMouseY = mouseY[0] * scaleY;
     }
 
+    /**
+     * Process the button interaction
+     */
     private void processButtonInteraction() {
         boolean mouseOver = isMouseOver(scaledMouseX, scaledMouseY);
         boolean mouseButtonDown = GLFW.glfwGetMouseButton(GLFW.glfwGetCurrentContext(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
@@ -132,10 +161,20 @@ public class Button {
         }
     }
 
-    private boolean isMouseOver(double scaledMouseX, double scaledMouseY) {
+    /**
+     * Check if the mouse is over the button
+     *
+     * @param scaledMouseX The scaled x position of the mouse
+     * @param scaledMouseY The scaled y position of the mouse
+     * @return True if the mouse is over the button, false otherwise
+     */
+    private boolean isMouseOver( double scaledMouseX, double scaledMouseY) {
         return scaledMouseX >= x && scaledMouseX <= x + width && scaledMouseY >= y && scaledMouseY <= y + height;
     }
 
+    /**
+     * Clean up the button
+     */
     public void cleanup() {
         if (imgId > 0) {
             nvgDeleteImage(vg, imgId);
@@ -143,6 +182,7 @@ public class Button {
         }
     }
 
+    @SuppressWarnings("unused")
     public void setText(String text){
         this.text = text;
     }

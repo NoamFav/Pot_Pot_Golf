@@ -10,6 +10,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.URL;
 import java.util.*;
@@ -34,7 +35,7 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(@NotNull Stage primaryStage) {
 
         AnchorPane root = new AnchorPane();
         root.setPrefWidth(900);
@@ -58,17 +59,7 @@ public class Main extends Application {
         solverChoiceBox.setPrefHeight(18);
         solverChoiceBox.valueProperty().setValue("Euler solver");
 
-        Slider equationNumSlider = new Slider(1, 10, 1);
-        equationNumSlider.setLayoutX(220);
-        equationNumSlider.setLayoutY(88);
-        equationNumSlider.setPrefWidth(283);
-        equationNumSlider.setPrefHeight(39);
-        equationNumSlider.setShowTickLabels(true);
-        equationNumSlider.setShowTickMarks(true);
-        equationNumSlider.setBlockIncrement(1);
-        equationNumSlider.setMajorTickUnit(1);
-        equationNumSlider.setMinorTickCount(0);
-        equationNumSlider.setSnapToTicks(true);
+        Slider equationNumSlider = getSlider();
 
 
         Label titleLabel = new Label("Group 14");
@@ -364,6 +355,21 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         primaryStage.setTitle("Group 14 - phase 1");
         primaryStage.show();
+    }
+
+    private static @NotNull Slider getSlider() {
+        Slider equationNumSlider = new Slider(1, 10, 1);
+        equationNumSlider.setLayoutX(220);
+        equationNumSlider.setLayoutY(88);
+        equationNumSlider.setPrefWidth(283);
+        equationNumSlider.setPrefHeight(39);
+        equationNumSlider.setShowTickLabels(true);
+        equationNumSlider.setShowTickMarks(true);
+        equationNumSlider.setBlockIncrement(1);
+        equationNumSlider.setMajorTickUnit(1);
+        equationNumSlider.setMinorTickCount(0);
+        equationNumSlider.setSnapToTicks(true);
+        return equationNumSlider;
     }
 
     private void handleInput(AnchorPane root) {

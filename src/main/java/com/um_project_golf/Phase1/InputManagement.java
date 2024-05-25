@@ -2,6 +2,8 @@ package com.um_project_golf.Phase1;
 
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,8 +29,9 @@ public class InputManagement
      */
     public record Token(Type type, String value) //defines the token into a type and a value
     {
+        @Contract(pure = true)
         @Override
-        public String toString() {
+        public @NotNull String toString() {
             return type + ": " + value;
         }
     }
@@ -41,14 +44,14 @@ public class InputManagement
                 .collect(Collectors.toList());
     }
 
-    public List<List<Token>> getFunctions(List<String> equations)
+    public List<List<Token>> getFunctions(@NotNull List<String> equations)
     {
         return equations.stream()
                 .map(this::tokenize) //convert each equation to a list of tokens
                 .map(InputManagement::insertImplicitOnes) //inserts implicit ones where necessary
                 .collect(Collectors.toList());
     }
-    private List<List<Token>> replaceVar(List<List<Token>> equations, HashMap<String, Double> variables)
+    private List<List<Token>> replaceVar(@NotNull List<List<Token>> equations, HashMap<String, Double> variables)
     {
         return equations.stream()
                 .map(tokens -> changeVar(variables, tokens)) //apply variable changes to each list of tokens
@@ -56,7 +59,7 @@ public class InputManagement
     }
 
     //constructs the functions and replaces the variables with their values
-    public List<List<Token>> constructCompleteFunctions(List<String> equations, HashMap<String, Double> variables)
+    public List<List<Token>> constructCompleteFunctions(@NotNull List<String> equations, HashMap<String, Double> variables)
     {
         return equations.stream()
                 .map(this::tokenize) //convert each equation to a list of tokens
@@ -65,7 +68,7 @@ public class InputManagement
                 .collect(Collectors.toList());
     }
 
-    private List<Token> changeVar(HashMap<String, Double> variables, List<Token> tokens)
+    private List<Token> changeVar(HashMap<String, Double> variables, @NotNull List<Token> tokens)
     {
         return tokens.stream()
                 .map(token -> {
@@ -78,7 +81,7 @@ public class InputManagement
     }
 
     //tokenizes the equation by grouping the characters into types
-    private List<Token> tokenize(String equation)
+    private @NotNull List<Token> tokenize(@NotNull String equation)
     {
         List<Token> tokens = new ArrayList<>();
         StringBuilder currentNumber = new StringBuilder();
@@ -170,7 +173,7 @@ public class InputManagement
         }
     }
 
-    public static List<Token> insertImplicitOnes(List<Token> tokens)
+    public static @NotNull List<Token> insertImplicitOnes(@NotNull List<Token> tokens)
     {
         List<Token> modifiedTokens = new ArrayList<>();
         for (Token currentToken : tokens)
@@ -188,7 +191,7 @@ public class InputManagement
         return modifiedTokens;
     }
 
-    public double doPEMDAS(List<Token> tokens) //does the PEMDAS (Parentheses, Exponents, Multiplication and Division, Addition and Subtraction) operations in order
+    public double doPEMDAS(@NotNull List<Token> tokens) //does the PEMDAS (Parentheses, Exponents, Multiplication and Division, Addition and Subtraction) operations in order
     {
         for (int i = 0; i < tokens.size(); i++) //iterates through the list of tokens to find parentheses
         {
@@ -245,7 +248,7 @@ public class InputManagement
         };
     }
 
-    private double calculate(Token previousToken, Token nextToken, String operator) //calculates the result of the operation based on the operator
+    private double calculate(@NotNull Token previousToken, @NotNull Token nextToken, @NotNull String operator) //calculates the result of the operation based on the operator
     {
         double previousValue = Double.parseDouble(previousToken.value);
         double nextValue = Double.parseDouble(nextToken.value);
@@ -260,7 +263,7 @@ public class InputManagement
         };
     }
 
-    public List<Expression> constructExpression(List<String> equationsString, HashMap<String,Double> variables) //constructs the expression from the list of tokens
+    public List<Expression> constructExpression(@NotNull List<String> equationsString, HashMap<String,Double> variables) //constructs the expression from the list of tokens
     {
         return equationsString.stream()
                 .map(equation -> {
@@ -274,7 +277,7 @@ public class InputManagement
                 .collect(Collectors.toList());
     }
 
-    public HashMap<String, Expression> constructCompleteExpression(HashMap<String, String> equations, HashMap<String, Double> variables) {
+    public HashMap<String, Expression> constructCompleteExpression(@NotNull HashMap<String, String> equations, HashMap<String, Double> variables) {
         HashMap<String, Expression> expressions = new HashMap<>();
         for (Map.Entry<String, String> entry : equations.entrySet()) {
             String variableName = entry.getKey();
@@ -294,7 +297,7 @@ public class InputManagement
         return expressions;
     }
 
-    public List<Double> solveHard(List<Expression> equations, HashMap<String, Double> variables) //solves the equations
+    public List<Double> solveHard(@NotNull List<Expression> equations, HashMap<String, Double> variables) //solves the equations
     {
         return equations.stream()
                 .map(equation -> {

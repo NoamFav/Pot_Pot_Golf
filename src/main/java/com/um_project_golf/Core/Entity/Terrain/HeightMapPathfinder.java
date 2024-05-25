@@ -1,6 +1,9 @@
 package com.um_project_golf.Core.Entity.Terrain;
 
 import com.um_project_golf.Core.Utils.Consts;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
 import javax.imageio.ImageIO;
@@ -9,20 +12,30 @@ import java.io.File;
 import java.util.*;
 import java.util.List;
 
+/**
+ * The class responsible for finding a path on the heightmap.
+ */
 public class HeightMapPathfinder {
     private int width;
     private int height;
     private final int SCALE = 4; // 4 units in the heightmap equal 1 meter in the real world
-    private int CIRCLE_RADIUS;
-    private final int SEARCH_RADIUS = 20 * SCALE; // 30 meters radius, which is 30 * SCALE units in the heightmap
-    private final int BORDER_OFFSET = (int) (Consts.SIZE_X/3 * SCALE); // 20 meters away from the border, which is 20 * SCALE units
-    private int PATH_CIRCLE_RADIUS; // 10 meters radius, which is 10 * SCALE units in the heightmap
+    private int CIRCLE_RADIUS; // Radius of the circle around the start point
+    @SuppressWarnings("FieldCanBeLocal") private final int SEARCH_RADIUS = 20 * SCALE; // Radius of the search area around a point
+    private final int BORDER_OFFSET = (int) (Consts.SIZE_X/3 * SCALE); // Offset from the border of the heightmap
+    private int PATH_CIRCLE_RADIUS; // Radius of the circle around the end point
 
     private double[][] costMap;
 
+    /**
+     * Generate a path on the heightmap from a random start point to a random end point
+     *
+     * @param radiusDown The minimum radius of the circle around the start point
+     * @param radiusUp   The maximum radius of the circle around the start point
+     * @param radiusEnd  The radius of the circle around the end point
+     * @return The path as a list of points
+     */
     public List<Vector2i> getPath(int radiusDown, int radiusUp, int radiusEnd) {
         int count = 0;
-        // 200 meters radius, which is 200 * SCALE units in the heightmap
         CIRCLE_RADIUS = (radiusDown + (int) (Math.random() * (radiusUp - radiusDown))) * SCALE;
         PATH_CIRCLE_RADIUS = radiusEnd * SCALE;
 
@@ -40,7 +53,7 @@ public class HeightMapPathfinder {
                 Vector2i endPoint = findValidEndPointOnCircle(startPoint);
 
                 if (endPoint != null) {
-                    path = findPath(startPoint, endPoint);
+                    path = findPathAStart(startPoint, endPoint);
                     pathFound = !path.isEmpty();
                 }
 
@@ -63,9 +76,17 @@ public class HeightMapPathfinder {
         return path;
     }
 
-    public List<Vector2i> getPathDebug(Vector2i start, Vector2i end, int radiusEnd) {
+    /**
+     * Generate a path on the heightmap from a given start point to a given end point
+     * This method is used for debugging purposes when the start and end points are known
+     *
+     * @param start    The start point
+     * @param end      The end point
+     * @param radiusEnd The radius of the circle around the end point
+     * @return The path as a list of points
+     */
+    public List<Vector2i> getPathDebug(@NotNull Vector2i start, @NotNull Vector2i end, int radiusEnd) {
         int count = 0;
-        // 200 meters radius, which is 200 * SCALE units in the heightmap
         CIRCLE_RADIUS = (int) (Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2)) * SCALE);
         PATH_CIRCLE_RADIUS = radiusEnd * SCALE;
 
@@ -80,7 +101,7 @@ public class HeightMapPathfinder {
 
             while (attempts < 1000 && !pathFound) {
 
-                path = findPath(start, end);
+                path = findPathAStart(start, end);
                 pathFound = !path.isEmpty();
 
                 attempts++;
@@ -102,14 +123,29 @@ public class HeightMapPathfinder {
         return path;
     }
 
-    private void drawPathOnImage(BufferedImage image, List<Vector2i> path) {
+    /**
+     * Draw the path on the heightmap image
+     *
+     * @param image The heightmap image
+     * @param path The path to draw
+     */
+    private void drawPathOnImage(BufferedImage image, @NotNull List<Vector2i> path) {
         int rgbBlue = new java.awt.Color(0, 0, 255).getRGB(); // Color blue in RGB
         for (Vector2i point : path) {
             drawCircleOnImage(image, point.x, point.y, PATH_CIRCLE_RADIUS, rgbBlue);
         }
     }
 
-    private void drawCircleOnImage(BufferedImage image, int centerX, int centerY, int radius, int rgb) {
+    /**
+     * Draw a circle on the heightmap image
+     *
+     * @param image The heightmap image
+     * @param centerX The x coordinate of the center of the circle
+     * @param centerY The y coordinate of the center of the circle
+     * @param radius The radius of the circle
+     * @param rgb The color of the circle in RGB
+     */
+    private void drawCircleOnImage(@NotNull BufferedImage image, int centerX, int centerY, int radius, int rgb) {
         int startX = Math.max(centerX - radius, 0);
         int endX = Math.min(centerX + radius, image.getWidth() - 1);
         int startY = Math.max(centerY - radius, 0);
@@ -126,7 +162,13 @@ public class HeightMapPathfinder {
         }
     }
 
-    private double[][] generateCostMap(BufferedImage image) {
+    /**
+     * Generate a cost map from the heightmap image
+     *
+     * @param image The heightmap image
+     * @return The cost map
+     */
+    private double[] @NotNull [] generateCostMap(BufferedImage image) {
         double[][] costMap = new double[width][height];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -146,6 +188,11 @@ public class HeightMapPathfinder {
         return costMap;
     }
 
+    /**
+     * Find a valid start point on the heightmap
+     *
+     * @return The start point
+     */
     private Vector2i findValidStartPoint() {
         Random rand = new Random();
         Vector2i point;
@@ -157,13 +204,26 @@ public class HeightMapPathfinder {
         return point;
     }
 
-    private boolean isValidStartPoint(Vector2i point) {
+    /**
+     * Check if a point is a valid start point
+     *
+     * @param point The point to check
+     * @return True if the point is a valid start point, false otherwise
+     */
+    @Contract(pure = true)
+    private boolean isValidStartPoint(@NotNull Vector2i point) {
         return point.x >= BORDER_OFFSET && point.x < width - BORDER_OFFSET &&
                 point.y >= BORDER_OFFSET && point.y < height - BORDER_OFFSET &&
                 costMap[point.x][point.y] < Double.POSITIVE_INFINITY;
     }
 
-    private Vector2i findValidEndPointOnCircle(Vector2i center) {
+    /**
+     * Find a valid end point on the circle around the start point
+     *
+     * @param center The center of the circle
+     * @return The end point
+     */
+    private @Nullable Vector2i findValidEndPointOnCircle(Vector2i center) {
         Random rand = new Random();
         for (int attempts = 0; attempts < 360; attempts++) {
             double angle = rand.nextDouble() * 2 * Math.PI;
@@ -177,7 +237,14 @@ public class HeightMapPathfinder {
         return null; // No valid endpoint found
     }
 
-    private boolean isValidEndPoint(Vector2i point) {
+    /**
+     * Check if a point is a valid end point
+     *
+     * @param point The point to check
+     * @return True if the point is a valid end point, false otherwise
+     */
+    @Contract(pure = true)
+    private boolean isValidEndPoint(@NotNull Vector2i point) {
         if (point.x < 0 || point.x >= width || point.y < 0 || point.y >= height) {
             return false;
         }
@@ -197,7 +264,14 @@ public class HeightMapPathfinder {
         return true;
     }
 
-    public List<Vector2i> findPath(Vector2i start, Vector2i end) {
+    /**
+     * Find a path from the start point to the end point using A* algorithm
+     *
+     * @param start The start point
+     * @param end   The end point
+     * @return The path as a list of points
+     */
+    public List<Vector2i> findPathAStart(Vector2i start, Vector2i end) {
         PriorityQueue<Node> openSet = new PriorityQueue<>();
         boolean[][] closedSet = new boolean[width][height];
         openSet.add(new Node(start, 0, heuristic(start, end), null));
@@ -223,11 +297,24 @@ public class HeightMapPathfinder {
         return new ArrayList<>(); // return an empty path if no path found
     }
 
-    private double heuristic(Vector2i a, Vector2i b) {
+    /**
+     * Calculate the heuristic cost between two points
+     *
+     * @param a The first point
+     * @param b The second point
+     * @return The heuristic cost
+     */
+    private double heuristic(@NotNull Vector2i a, @NotNull Vector2i b) {
         return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
     }
 
-    private List<Vector2i> getNeighbors(Vector2i point) {
+    /**
+     * Get the neighbors of a point
+     *
+     * @param point The point
+     * @return The neighbors of the point
+     */
+    private @NotNull List<Vector2i> getNeighbors(@NotNull Vector2i point) {
         List<Vector2i> neighbors = new ArrayList<>();
         if (point.x > 0) neighbors.add(new Vector2i(point.x - 1, point.y));
         if (point.x < width - 1) neighbors.add(new Vector2i(point.x + 1, point.y));
@@ -236,7 +323,13 @@ public class HeightMapPathfinder {
         return neighbors;
     }
 
-    private List<Vector2i> reconstructPath(Node node) {
+    /**
+     * Reconstruct the path from the end node to the start node
+     *
+     * @param node The end node
+     * @return The path as a list of points
+     */
+    private @NotNull List<Vector2i> reconstructPath(Node node) {
         List<Vector2i> path = new ArrayList<>();
         while (node != null) {
             path.add(node.point);
@@ -246,12 +339,24 @@ public class HeightMapPathfinder {
         return path;
     }
 
+    /**
+     * Node class for the A* algorithm
+     * Nested class to keep the Node class private
+     */
     static class Node implements Comparable<Node> {
         Vector2i point;
         double cost;
         double priority;
         Node parent;
 
+        /**
+         * Create a new Node object
+         *
+         * @param point    The point
+         * @param cost     The cost
+         * @param priority The priority
+         * @param parent   The parent node
+         */
         Node(Vector2i point, double cost, double priority, Node parent) {
             this.point = point;
             this.cost = cost;
@@ -259,8 +364,14 @@ public class HeightMapPathfinder {
             this.parent = parent;
         }
 
+        /**
+         * Compare two nodes based on their priority
+         *
+         * @param other The other node
+         * @return The result of the comparison
+         */
         @Override
-        public int compareTo(Node other) {
+        public int compareTo(@NotNull Node other) {
             return Double.compare(this.priority, other.priority);
         }
     }

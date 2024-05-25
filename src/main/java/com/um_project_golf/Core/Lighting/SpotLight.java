@@ -1,5 +1,6 @@
 package com.um_project_golf.Core.Lighting;
 
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 public class SpotLight {
@@ -15,7 +16,7 @@ public class SpotLight {
         this.cutOff = cutOff;
     }
 
-    public SpotLight(SpotLight spotLight) {
+    public SpotLight(@NotNull SpotLight spotLight) {
         this.pointLight = spotLight.getPointLight();
         this.coneDirection = spotLight.getConeDirection();
         this.cutOff = spotLight.getCutOff();

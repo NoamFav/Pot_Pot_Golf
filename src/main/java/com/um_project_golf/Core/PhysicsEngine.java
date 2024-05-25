@@ -2,12 +2,18 @@ package com.um_project_golf.Core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 import com.um_project_golf.Core.Utils.Consts;
 
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
+/**
+ * The physics engine class.
+ * This class is responsible for handling the physics of the game.
+ */
 public class PhysicsEngine {
 
     private static final double g = Consts.GRAVITY; // gravitational constant
@@ -16,23 +22,46 @@ public class PhysicsEngine {
     private final double muS_grass; // static friction grass
     private final double muK_sand; // kinetic friction sand
     private final double muS_sand; // static friction sand
-   // private final BiFunction<Double, Double, Double> heightFunction;
+    private final BiFunction<Double, Double, Double> heightFunction;
     private final HeightMap heightMap;
-    private final float sandLevel = 0.5f; // get this value from the constant file
+    @SuppressWarnings("FieldCanBeLocal") private static final double sandLevel = 0.5; // get this value from the constant file
 
-    // // Physics engine with height function
-    // public PhysicsEngine(BiFunction<Double, Double, Double> height, double muK_grass, double muS_grass, double muK_sand, double muS_sand) {
-    //     this.heightFunction = height;
-    //     this.muK_grass = muK_grass;
-    //     this.muS_grass = muS_grass;
-    //     this.muK_sand = muK_sand;
-    //     this.muS_sand = muS_sand;
-    //     this.heightMap = null;
-    // }
+    /**
+     * Create a new physics engine.
+     * This constructor is deprecated and should not be used.
+     * This constructor is kept for backward compatibility.
+     * It uses the height function to calculate the height of the ball.
+     * Which is already done by the height map.
+     *
+     * @param height The height function
+     * @param muK_grass The kinetic friction of grass
+     * @param muS_grass The static friction of grass
+     * @param muK_sand The kinetic friction of sand
+     * @param muS_sand The static friction of sand
+     */
+    @Deprecated
+    @SuppressWarnings("unused")
+    public PhysicsEngine(BiFunction<Double, Double, Double> height, double muK_grass, double muS_grass, double muK_sand, double muS_sand) {
+        this.heightFunction = height;
+        this.muK_grass = muK_grass;
+        this.muS_grass = muS_grass;
+        this.muK_sand = muK_sand;
+        this.muS_sand = muS_sand;
+        this.heightMap = null;
+    }
 
-    // Physics engine with a height map
+
+    /**
+     * Create a new physics engine.
+     *
+     * @param heightMap The height map
+     * @param muK_grass The kinetic friction of grass
+     * @param muS_grass The static friction of grass
+     * @param muK_sand The kinetic friction of sand
+     * @param muS_sand The static friction of sand
+     */
     public PhysicsEngine(HeightMap heightMap, double muK_grass, double muS_grass, double muK_sand, double muS_sand) {
-        //this.heightFunction = null;
+        this.heightFunction = null;
         this.muK_grass = muK_grass;
         this.muS_grass = muS_grass;
         this.muK_sand = muK_sand;
@@ -40,14 +69,35 @@ public class PhysicsEngine {
         this.heightMap = heightMap;
     }
 
-    // public Vector3f runImprovedEuler(double[] initialState, double stepSize, double totalTime) {
-    //     double[] currentState = initialState;
-    //     currentState = SimpleRK2.simpleImprovedEuler(0, currentState, totalTime, stepSize, this::equationsOfMotion);
-    //     assert heightMap != null;
-    //     float height = heightMap.getHeight(new Vector3f((float) currentState[0], 0, (float) currentState[1]));
-    //     //System.out.println("height" + height);
-    //     return new Vector3f((float) currentState[0], height, (float) currentState[1]);
-    // }
+    /**
+     * Run the improved Euler method.
+     * This method is deprecated and should not be used.
+     * This method is kept for backward compatibility.
+     * It uses the height function to calculate the height of the ball.
+     * Which is already done by the height map.
+     *
+     * @param initialState The initial state
+     * @param stepSize The step size
+     * @return The final position
+     */
+    @Deprecated
+    @SuppressWarnings("unused")
+    public Vector3f runImprovedEuler(double[] initialState, double stepSize, double totalTime) {
+        double[] currentState = initialState;
+        currentState = SimpleRK2.simpleImprovedEuler(0, currentState, totalTime, stepSize, this::equationsOfMotion);
+        assert heightMap != null;
+        float height = heightMap.getHeight(new Vector3f((float) currentState[0], 0, (float) currentState[1]));
+        //System.out.println("height" + height);
+        return new Vector3f((float) currentState[0], height, (float) currentState[1]);
+    }
+
+    /**
+     * Run the improved Euler method.
+     *
+     * @param initialState The initial state
+     * @param stepSize The step size
+     * @return The final position
+     */
     public List<Vector3f> runImprovedEuler(double[] initialState, double stepSize) { // initialState = [x, z, vx, vz]
         List<Vector3f> positions = new ArrayList<>();
         double[] currentState = initialState;
@@ -73,9 +123,16 @@ public class PhysicsEngine {
 
         return positions;
     }
-    
 
-    private double[] equationsOfMotion(double t, double[] x) { // x = [x, z, vx, vz]
+    /**
+     * Provide the equations of motion.
+     * Uses the height map to calculate the equations of motion.
+     *
+     * @param t  The time
+     * @param x The state
+     * @return The derivatives
+     */
+    private double @NotNull [] equationsOfMotion(double t, double @NotNull [] x) { // x = [x, z, vx, vz]
         double[] dxdt = new double[4];
         double vx = x[2];
         double vz = x[3];
@@ -87,6 +144,7 @@ public class PhysicsEngine {
         double kineticFriction;
         double staticFriction;
 
+        assert heightMap != null;
         if (heightMap.getHeight(new Vector3f((float) x[0], 0, (float) x[1])) < sandLevel) { // if the ball is on sand
             kineticFriction = this.muK_sand;
             staticFriction = this.muS_sand;
@@ -100,6 +158,8 @@ public class PhysicsEngine {
 
         dh_dxValue = dh_dxCentredDifferenceMap(x[0], x[1]);
         dh_dzValue = dh_dyCentredDifferenceMap(x[0], x[1]);
+
+        //use the commented code below if you want to use the height function instead of the height map (not recommended)
         // if (heightFunction != null) {
         //     dh_dxValue = dh_dxCentredDifferenceFunction(x[0], x[1]);
         //     dh_dzValue = dh_dyCentredDifferenceFunction(x[0], x[1]);
@@ -149,20 +209,51 @@ public class PhysicsEngine {
         return dxdt; // dxdt = [vx, vz, ax, az]
     }
 
-    // // Using five-point centred difference for numerically approximating the derivatives
-    // private double dh_dxCentredDifferenceFunction(double x, double z) {
-    //     double stepSize = 0.001;
-    //     assert this.heightFunction != null;
-    //     return (this.heightFunction.apply(x - 2 * stepSize, z) - 8 * this.heightFunction.apply(x - stepSize, z) + 8 * this.heightFunction.apply(x + stepSize, z) - this.heightFunction.apply(x + 2 * stepSize, z)) / (12 * stepSize);
-    // }
+    /**
+     * Calculate the centred difference of the height function in the x-direction.
+     * This method is deprecated and should not be used.
+     * This method is kept for backward compatibility.
+     * It uses the height function to calculate the height of the ball.
+     * Which is already done by the height map.
+     *
+     * @param x The x coordinate
+     * @param z The z coordinate
+     * @return The derivative
+     */
+    @Deprecated
+    @SuppressWarnings("unused")
+    private double dh_dxCentredDifferenceFunction(double x, double z) {
+        double stepSize = 0.001;
+        assert this.heightFunction != null;
+        return (this.heightFunction.apply(x - 2 * stepSize, z) - 8 * this.heightFunction.apply(x - stepSize, z) + 8 * this.heightFunction.apply(x + stepSize, z) - this.heightFunction.apply(x + 2 * stepSize, z)) / (12 * stepSize);
+    }
 
-    // private double dh_dyCentredDifferenceFunction(double x, double z) {
-    //     double stepSize = 0.001;
-    //     assert this.heightFunction != null;
-    //     return (this.heightFunction.apply(x, z - 2 * stepSize) - 8 * this.heightFunction.apply(x, z - stepSize) + 8 * this.heightFunction.apply(x, z + stepSize) - this.heightFunction.apply(x, z + 2 * stepSize)) / (12 * stepSize);
-    // }
+    /**
+     * Calculate the centred difference of the height function in the y-direction.
+     * This method is deprecated and should not be used.
+     * This method is kept for backward compatibility.
+     * It uses the height function to calculate the height of the ball.
+     * Which is already done by the height map.
+     *
+     * @param x The x coordinate
+     * @param z The z coordinate
+     * @return The derivative
+     */
+    @Deprecated
+    @SuppressWarnings("unused")
+    private double dh_dyCentredDifferenceFunction(double x, double z) {
+        double stepSize = 0.001;
+        assert this.heightFunction != null;
+        return (this.heightFunction.apply(x, z - 2 * stepSize) - 8 * this.heightFunction.apply(x, z - stepSize) + 8 * this.heightFunction.apply(x, z + stepSize) - this.heightFunction.apply(x, z + 2 * stepSize)) / (12 * stepSize);
+    }
 
-    // Using five-point centred difference for numerically approximating the derivatives
+    /**
+     * Calculate the centred difference of the height map in the x-direction.
+     *
+     * @param x The x coordinate
+     * @param z The z coordinate
+     * @return The derivative
+     */
     private double dh_dxCentredDifferenceMap(double x, double z) {
         float stepSize = Consts.SIZE_X / (Consts.VERTEX_COUNT - 1);
         assert heightMap != null;
@@ -174,6 +265,13 @@ public class PhysicsEngine {
         return (h1 - 8 * h2 + 8 * h3 - h4) / (12 * stepSize);
     }
 
+    /**
+     * Calculate the centred difference of the height map in the y-direction.
+     *
+     * @param x The x coordinate
+     * @param z The z coordinate
+     * @return The derivative
+     */
     private double dh_dyCentredDifferenceMap(double x, double z) {
         float stepSize = Consts.SIZE_Z / (Consts.VERTEX_COUNT - 1);
         assert heightMap != null;
@@ -184,22 +282,4 @@ public class PhysicsEngine {
 
         return (h1 - 8 * h2 + 8 * h3 - h4) / (12 * stepSize);
     }
-
-
-//    public static void main(String[] args) {
-//        // Testing with height map
-//        HeightMap testMap = new HeightMap();
-//        testMap.createHeightMap();
-//        double[] initialState = {0, 0, 1, 1}; // initialState = [x, z, vx, vz]
-//        double h = 0.1; // Time step
-//        //double totalTime = 5; // Total time
-//        PhysicsEngine engine = new PhysicsEngine(testMap, 0.08, 0.2, 0.1, 0.3);
-//        Vector3f finalPosition;
-//        for (int i = 0; i < 50; i++) {
-//            finalPosition = engine.runImprovedEuler(initialState, h);
-//            initialState[0] = finalPosition.x;
-//            initialState[1] = finalPosition.z;
-//            System.out.println(finalPosition.x + ", " + finalPosition.y + ", " + finalPosition.z);
-//        }
-//    }
 }

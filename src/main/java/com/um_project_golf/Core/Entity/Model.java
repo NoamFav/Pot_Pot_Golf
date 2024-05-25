@@ -1,5 +1,7 @@
 package com.um_project_golf.Core.Entity;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * The model class.
  * This class is responsible for the models of the game.
@@ -31,6 +33,7 @@ public class Model {
      * @param vertexCount The vertex count of the model.
      * @param texture The texture of the model.
      */
+    @SuppressWarnings("unused")
     public Model(int id, int vertexCount, Texture texture) {
         this.id = id;
         this.vertexCount = vertexCount;
@@ -45,7 +48,8 @@ public class Model {
      * @param model The model to copy.
      * @param texture The texture of the model.
      */
-    public Model(Model model, Texture texture) {
+    @SuppressWarnings("unused")
+    public Model(@NotNull Model model, Texture texture) {
         this.id = model.getId();
         this.vertexCount = model.getVertexCount();
         this.material = model.getMaterial();

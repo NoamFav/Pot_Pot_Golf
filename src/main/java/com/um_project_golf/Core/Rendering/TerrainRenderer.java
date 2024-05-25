@@ -11,6 +11,7 @@ import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.Utils.Transformation;
 import com.um_project_golf.Core.Utils.Utils;
 import com.um_project_golf.Game.Launcher;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.*;
 
 import java.util.ArrayList;
@@ -98,7 +99,7 @@ public class TerrainRenderer implements IRenderer<Terrain> {
      * @param model The model to bind.
      */
     @Override
-    public void bind(Model model) {
+    public void bind(@NotNull Model model) {
         GL30.glBindVertexArray(model.getId()); // Binds the VAO.
 
         GL20.glEnableVertexAttribArray(0); // Enables the vertex array.
@@ -136,7 +137,7 @@ public class TerrainRenderer implements IRenderer<Terrain> {
      * @param camera The camera of the game.
      */
     @Override
-    public void prepare(Terrain terrain, Camera camera) {
+    public void prepare(@NotNull Terrain terrain, Camera camera) {
         for (int i = 0; i < (terrain).getBlendMapTerrain().getTextures().size(); i++) { // For each texture
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + i); // Activates the texture
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, (terrain).getBlendMapTerrain().getTextures().get(i).getId()); // Binds the texture
