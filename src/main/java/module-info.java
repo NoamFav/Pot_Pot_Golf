@@ -21,6 +21,7 @@ module com.example.um_project_golf {
     requires java.desktop;
     requires org.lwjgl.nanovg;
     requires org.lwjgl.openal;
+    requires org.jetbrains.annotations;
 
     opens com.um_project_golf to javafx.fxml;
     opens com.um_project_golf.Core to javafx.fxml;

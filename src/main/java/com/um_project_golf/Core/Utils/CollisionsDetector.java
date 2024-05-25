@@ -33,7 +33,6 @@ public class CollisionsDetector {
     }
 
     private void borderCollision(Vector3f position) {
-        float outOfBounds = 1;
         if (camera.getPosition().x < -Consts.SIZE_X / 2) {
             position.x = -Consts.SIZE_X / 2;
             cameraInc.x = 0;

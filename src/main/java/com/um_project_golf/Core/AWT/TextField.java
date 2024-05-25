@@ -42,7 +42,7 @@ public class TextField {
     }
 
     public void render() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
+        try (MemoryStack ignored = MemoryStack.stackPush()) {
             // Start new frame for NanoVG
             nvgBeginFrame(vg, window.getWidth(), window.getHeight(), 1);
 
@@ -130,7 +130,7 @@ public class TextField {
                 if (key == GLFW.GLFW_KEY_BACKSPACE && !text.isEmpty()) {
                     text = text.substring(0, text.length() - 1);
                 } else if (key == GLFW.GLFW_KEY_ENTER) {
-                    focused = false;  // Unfocus on Enter
+                    focused = false;  // Unfocused on Enter
                 } else {
                     int codePoint = glfwKeyToChar(key, mods);
                     if (codePoint != -1) {
@@ -166,10 +166,6 @@ public class TextField {
 
     public void cleanup() {
         nvgDeleteImage(vg, bgImage);
-    }
-
-    public void setText(String text) {
-        this.text = text;
     }
 
     public String getText() {

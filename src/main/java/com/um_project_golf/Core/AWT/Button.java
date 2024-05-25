@@ -21,7 +21,6 @@ public class Button {
     private int imgId = -1;  // Store the image ID
 
     private double scaledMouseX, scaledMouseY;  // Scaled mouse position
-    private boolean debugMode = false;  // Debug mode for button interaction
     private boolean isPressed = false;
 
 
@@ -48,7 +47,7 @@ public class Button {
     }
 
     public void render() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
+        try (MemoryStack ignored = MemoryStack.stackPush()) {
             // Start new frame for NanoVG
             nvgBeginFrame(vg, window.getWidth(), window.getHeight(), 1);
 
@@ -131,11 +130,6 @@ public class Button {
         } else {
             isPressed = false;  // Reset isPressed when not over the button or button not pressed
         }
-
-        if (debugMode) {
-            System.out.println("Mouse is over the button: " + mouseOver);
-            System.out.println("Button pressed: " + mouseButtonDown);
-        }
     }
 
     private boolean isMouseOver(double scaledMouseX, double scaledMouseY) {
@@ -147,14 +141,6 @@ public class Button {
             nvgDeleteImage(vg, imgId);
             imgId = -1;
         }
-    }
-
-    public void setDebugMode(boolean debugMode) {
-        this.debugMode = debugMode;
-    }
-
-    public boolean getDebugMode() {
-        return debugMode;
     }
 
     public void setText(String text){

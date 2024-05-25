@@ -21,7 +21,6 @@ public class ButtonTimer {
      */
     public void stopTimer() {
         System.out.println("Timer stopped");
-        long endTime = System.nanoTime();
     }
 
     /**

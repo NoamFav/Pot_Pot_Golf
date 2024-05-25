@@ -12,8 +12,6 @@ import com.um_project_golf.Core.ShaderManager;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.WindowManager;
 import com.um_project_golf.Game.Launcher;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
@@ -24,7 +22,6 @@ import java.util.List;
  */
 public class RenderManager {
 
-    private static final Logger log = LogManager.getLogger(RenderManager.class); // The logger of the render manager.
     private final WindowManager window;
     private EntityRenderer entityRenderer;
     private TerrainRenderer terrainRenderer;

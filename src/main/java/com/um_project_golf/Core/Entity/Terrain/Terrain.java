@@ -66,7 +66,6 @@ public class Terrain {
         int[] indices = new int[6 * (Consts.VERTEX_COUNT - 1) * (Consts.VERTEX_COUNT - 1)]; // The indices
         int vertexPointer = 0; // The vertex pointer
         float[][] heightmap = SceneManager.getHeightMap(); // The heightmap
-        float scale = Consts.TEXTURE_SCALE; // The scale of the texture
 
         for(int i = 0; i < Consts.VERTEX_COUNT; i++){ // Loop through the heightmap array
             for(int j = 0; j < Consts.VERTEX_COUNT; j++){ // Loop through the heightmap array
