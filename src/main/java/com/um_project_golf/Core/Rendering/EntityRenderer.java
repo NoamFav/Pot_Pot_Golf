@@ -12,6 +12,7 @@ import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.Utils.Transformation;
 import com.um_project_golf.Core.Utils.Utils;
 import com.um_project_golf.Game.Launcher;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -108,7 +109,7 @@ public class EntityRenderer implements IRenderer<Entity> {
      * @param model The model to bind.
      */
     @Override
-    public void bind(Model model) {
+    public void bind(@NotNull Model model) {
         shader.setUniform("material", model.getMaterial()); // Set the material uniform.
 
         GL30.glBindVertexArray(model.getId()); // Bind the vertex array.

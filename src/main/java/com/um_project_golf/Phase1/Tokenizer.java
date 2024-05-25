@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
@@ -16,7 +17,7 @@ public class Tokenizer extends Application {
     Label label = new Label("Output:");
     HashMap<String, Double> variables = new HashMap<>();
 
-    public void start(Stage primaryStage) {
+    public void start(@NotNull Stage primaryStage) {
         Pane pane = new Pane();
         Scene scene = new Scene(pane, 800, 600);
         textField.setPromptText("enter variable (x = 5) press enter to tokenize");
@@ -50,7 +51,7 @@ public class Tokenizer extends Application {
                     return;
                 }
                 variables.put(token[0].trim(), Double.parseDouble(token[1].trim()));
-                label.setText("Output: " + variables.toString());
+                label.setText("Output: " + variables);
             } catch (NumberFormatException e) {
                 label.setText("Output: Invalid input");
             }

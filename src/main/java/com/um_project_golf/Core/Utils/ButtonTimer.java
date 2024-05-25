@@ -11,6 +11,7 @@ public class ButtonTimer {
     /**
      * Start the timer.
      */
+    @Deprecated
     public void startTimer() {
         System.out.println("Timer started");
         startTime = System.nanoTime();
@@ -19,6 +20,7 @@ public class ButtonTimer {
     /**
      * Stop the timer.
      */
+    @Deprecated
     public void stopTimer() {
         System.out.println("Timer stopped");
     }
@@ -32,6 +34,12 @@ public class ButtonTimer {
         return (System.nanoTime() - startTime) / 1_000_000; // Convert nanoseconds to milliseconds
     }
 
+    /**
+     * Get the current elapsed time of the timer in a formatted string.
+     *
+     * @return The elapsed time of the timer in a formatted string.
+     */
+    @Deprecated
     public String getFormattedTime() {
         long elapsedTime = System.nanoTime() - startTime;
         double seconds = elapsedTime / 1_000_000_000.0; // Convert nanoseconds to seconds

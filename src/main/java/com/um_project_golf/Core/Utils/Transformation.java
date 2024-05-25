@@ -3,6 +3,7 @@ package com.um_project_golf.Core.Utils;
 import com.um_project_golf.Core.Camera;
 import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.Terrain.Terrain;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -18,7 +19,7 @@ public class Transformation {
      * @param entity The entity to create the transformation matrix.
      * @return The transformation matrix.
      */
-    public static Matrix4f createTransformationMatrix(Entity entity) {
+    public static @NotNull Matrix4f createTransformationMatrix(@NotNull Entity entity) {
         Matrix4f matrix = new Matrix4f(); // Create a new matrix.
         matrix.identity().translate(entity.getPosition()) // Translate the matrix.
                 .rotateX((float) Math.toRadians(entity.getRotation().x)) // Rotate the matrix on the x-axis.
@@ -28,7 +29,13 @@ public class Transformation {
         return matrix; // Return the matrix.
     }
 
-    public static Matrix4f createTransformationMatrix(Terrain terrain) {
+    /**
+     * Creates a transformation matrix.
+     *
+     * @param terrain The terrain to create the transformation matrix.
+     * @return The transformation matrix.
+     */
+    public static @NotNull Matrix4f createTransformationMatrix(@NotNull Terrain terrain) {
         Matrix4f matrix = new Matrix4f(); // Create a new matrix.
         matrix.identity().translate(terrain.getPosition()).scale(1); // Translate and scale the matrix.
         return matrix; // Return the matrix.
@@ -40,7 +47,7 @@ public class Transformation {
      * @param camera The camera to create the view matrix.
      * @return The view matrix.
      */
-    public static Matrix4f getViewMatrix(Camera camera) {
+    public static @NotNull Matrix4f getViewMatrix(@NotNull Camera camera) {
        Vector3f cameraPosition = camera.getPosition(); // Get the camera position.
        Vector3f rotation = camera.getRotation(); // Get the camera rotation.
        Matrix4f viewMatrix = new Matrix4f(); // Create a new matrix.

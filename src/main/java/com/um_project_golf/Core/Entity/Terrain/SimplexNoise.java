@@ -1,5 +1,8 @@
 package com.um_project_golf.Core.Entity.Terrain;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Random;
 
 /**
@@ -48,7 +51,8 @@ public class SimplexNoise {
      * @param z The z coordinate.
      * @return The dot product.
      */
-    private static double dot(int[] g, double x, double y, double z) {
+    @Contract(pure = true)
+    private static double dot(int @NotNull [] g, double x, double y, double z) {
         return g[0] * x + g[1] * y + g[2] * z;
     }
 

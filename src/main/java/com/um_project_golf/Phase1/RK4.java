@@ -1,5 +1,6 @@
 package com.um_project_golf.Phase1;
 import net.objecthunter.exp4j.Expression;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -8,6 +9,7 @@ import java.util.Map;
 
 public class RK4 {
 
+    @Deprecated
     public static HashMap<String, Double> RK4Method(double tInitial, HashMap<String, Double> values, double tFinal, List<List<InputManagement.Token>> derivatives, double stepSize, List<String> equations)
     {
         int numSteps = (int) Math.ceil((tFinal - tInitial) / stepSize); // Number of steps necessary to get to the final time
@@ -64,7 +66,7 @@ public class RK4 {
 
     }
 
-    public static LinkedHashMap<Double, LinkedHashMap<String, Double>> RK4MethodHard(
+    public static @NotNull LinkedHashMap<Double, LinkedHashMap<String, Double>> RK4MethodHard(
             HashMap<String, Expression> derivatives,
             HashMap<String, Double> initialValues,
             double stepSize,
@@ -98,7 +100,7 @@ public class RK4 {
         return solutions;
     }
 
-    private static HashMap<String, Double> calculateDerivativeValues(HashMap<String, Expression> derivatives, HashMap<String, Double> values, double t) {
+    private static @NotNull HashMap<String, Double> calculateDerivativeValues(@NotNull HashMap<String, Expression> derivatives, HashMap<String, Double> values, double t) {
         HashMap<String, Double> derivativeValues = new HashMap<>();
         for (Map.Entry<String, Expression> entry : derivatives.entrySet()) {
             String varName = entry.getKey();
@@ -111,7 +113,7 @@ public class RK4 {
         return derivativeValues;
     }
 
-    private static HashMap<String, Double> updateIntermediateValues(HashMap<String, Double> currentValues, HashMap<String, Double> derivativeValues, double delta) {
+    private static @NotNull HashMap<String, Double> updateIntermediateValues(HashMap<String, Double> currentValues, @NotNull HashMap<String, Double> derivativeValues, double delta) {
         HashMap<String, Double> intermediateValues = new HashMap<>();
         for (String var : derivativeValues.keySet()) {
             if (!"t".equals(var)) { // Skip time variable 't' for direct integration

@@ -4,6 +4,7 @@ import com.um_project_golf.Core.Entity.Material;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -143,7 +144,7 @@ public class ShaderManager {
      * @param uniformName The name of the uniform.
      * @param value The value of the uniform.
      */
-    public void setUniform(String uniformName, Matrix4f value) {
+    public void setUniform(String uniformName, @NotNull Matrix4f value) {
         try(MemoryStack stack = MemoryStack.stackPush()) { // Try with resources
             GL20.glUniformMatrix4fv(uniforms.get(uniformName), false, value.get(stack.mallocFloat(16))); // Set the uniform
         }
@@ -155,7 +156,7 @@ public class ShaderManager {
      * @param uniformName The name of the uniform.
      * @param value The value of the uniform.
      */
-    public void setUniform(String uniformName, Vector4f value) {
+    public void setUniform(String uniformName, @NotNull Vector4f value) {
         GL20.glUniform4f(uniforms.get(uniformName), value.x, value.y, value.z, value.w); // Set the uniform
     }
 
@@ -165,7 +166,7 @@ public class ShaderManager {
      * @param uniformName The name of the uniform.
      * @param value The value of the uniform.
      */
-    public void setUniform(String uniformName, Vector3f value) {
+    public void setUniform(String uniformName, @NotNull Vector3f value) {
         GL20.glUniform3f(uniforms.get(uniformName), value.x, value.y, value.z); // Set the uniform
     }
 
@@ -175,6 +176,7 @@ public class ShaderManager {
      * @param uniformName The name of the uniform.
      * @param value The value of the uniform.
      */
+    @SuppressWarnings("unused")
     public void setUniform(String uniformName, boolean value) {
         GL20.glUniform1f(uniforms.get(uniformName), value ? 1 : 0); // Set the uniform
     }
@@ -205,7 +207,7 @@ public class ShaderManager {
      * @param uniformName The name of the uniform.
      * @param material The material to set.
      */
-    public void setUniform(String uniformName, Material material) {
+    public void setUniform(String uniformName, @NotNull Material material) {
         // For the uniform of the material
         setUniform(uniformName + ".ambient", material.getAmbientColor()); // Set the ambient color uniform
         setUniform(uniformName + ".diffuse", material.getDiffuseColor()); // Set the diffuse color uniform
@@ -220,7 +222,7 @@ public class ShaderManager {
      * @param uniformName The name of the uniform.
      * @param pointLight The point light to set.
      */
-    public void setUniform(String uniformName, PointLight pointLight) {
+    public void setUniform(String uniformName, @NotNull PointLight pointLight) {
         // For the uniform of the point light
         setUniform(uniformName + ".color", pointLight.getColor()); // Set the color uniform
         setUniform(uniformName + ".position", pointLight.getPosition()); // Set the position uniform
@@ -236,7 +238,7 @@ public class ShaderManager {
      * @param uniformName The name of the uniform.
      * @param directionalLight The directional light to set.
      */
-    public void setUniform(String uniformName, DirectionalLight directionalLight) {
+    public void setUniform(String uniformName, @NotNull DirectionalLight directionalLight) {
         // For the uniform of the directional light
         setUniform(uniformName + ".color", directionalLight.getColor()); // Set the color uniform
         setUniform(uniformName + ".direction", directionalLight.getDirection()); // Set the direction uniform
@@ -249,7 +251,7 @@ public class ShaderManager {
      * @param uniformName The name of the uniform.
      * @param spotLight The spotlight to set.
      */
-    public void setUniform(String uniformName, SpotLight spotLight) {
+    public void setUniform(String uniformName, @NotNull SpotLight spotLight) {
         // For the uniform of the spotlight
         setUniform(uniformName + ".pointLight", spotLight.getPointLight()); // Set the point light uniform
         setUniform(uniformName + ".coneDirection", spotLight.getConeDirection()); // Set the cone direction uniform
@@ -261,6 +263,7 @@ public class ShaderManager {
      * @param uniformName The name of the uniform.
      * @param pointLights The point lights to set.
      */
+    @SuppressWarnings("unused")
     public void setUniform(String uniformName, PointLight[] pointLights) {
         // For the uniform of the point light list
         int numLights = pointLights != null ? pointLights.length : 0; // Get the number of point lights
@@ -285,6 +288,7 @@ public class ShaderManager {
      * @param uniformName The name of the uniform.
      * @param spotLights The spotlights to set.
      */
+    @SuppressWarnings("unused")
     public void setUniform(String uniformName, SpotLight[] spotLights) {
         // For the uniform of the spotlight list
         int numLights = spotLights != null ? spotLights.length : 0; // Get the number of spotlights

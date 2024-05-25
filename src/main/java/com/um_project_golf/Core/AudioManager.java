@@ -16,6 +16,9 @@ import java.nio.ByteBuffer;
 import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
+/**
+ * The class responsible for managing the audio.
+ */
 public class AudioManager {
     private static final Logger log = LogManager.getLogger(AudioManager.class);
     private long device;

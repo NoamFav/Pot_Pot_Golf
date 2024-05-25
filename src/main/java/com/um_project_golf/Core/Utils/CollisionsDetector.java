@@ -3,11 +3,15 @@ package com.um_project_golf.Core.Utils;
 import com.um_project_golf.Core.Camera;
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.io.File;
 import java.io.PrintWriter;
 
+/**
+ * The class responsible for detecting collisions with the camera.
+ */
 public class CollisionsDetector {
 
     private Camera camera;
@@ -17,8 +21,15 @@ public class CollisionsDetector {
     private final File file = new File("output.txt");
     private final StringBuilder sb = new StringBuilder();
 
-
-    public void checkCollision(Camera camera, Vector3f cameraInc, HeightMap heightMap, SceneManager scene) {
+    /**
+     * Checks for collision with the camera.
+     *
+     * @param camera The camera.
+     * @param cameraInc The camera increment.
+     * @param heightMap The height map.
+     * @param scene The scene manager.
+     */
+    public void checkCollision(@NotNull Camera camera, Vector3f cameraInc, HeightMap heightMap, SceneManager scene) {
         this.camera = camera;
         this.cameraInc = cameraInc;
         this.heightMap = heightMap;
@@ -32,6 +43,11 @@ public class CollisionsDetector {
         camera.setPosition(position);
     }
 
+    /**
+     * Checks for collision with the border.
+     *
+     * @param position The position of the camera.
+     */
     private void borderCollision(Vector3f position) {
         if (camera.getPosition().x < -Consts.SIZE_X / 2) {
             position.x = -Consts.SIZE_X / 2;
@@ -53,6 +69,11 @@ public class CollisionsDetector {
         }
     }
 
+    /**
+     * Checks for collision with the terrain.
+     *
+     * @param position The position of the camera.
+     */
     private void terrainCollision(Vector3f position) {
         float terrainHeight = heightMap.getHeight(position) + Consts.PLAYER_HEIGHT;
         if (position.y <= terrainHeight) {
@@ -60,6 +81,11 @@ public class CollisionsDetector {
         }
     }
 
+    /**
+     * Checks for collision with entities.
+     *
+     * @param position The position of the camera.
+     */
     private void entityCollision(Vector3f position) {
         float[][] treePositions = scene.getTreePositions();
         float treeRadius = Consts.TREE_SIZE / 2; // Define the tree radius

@@ -1,20 +1,36 @@
 package com.um_project_golf.Core.Utils;
 
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 
+/**
+ * The class responsible for detecting collisions with the ball.
+ */
 public class BallCollisionDetector {
 
     private final HeightMap heightMap;
     private final SceneManager scene;
 
+    /**
+     * The constructor of the ball collision detector.
+     * It initializes the height map and scene manager.
+     *
+     * @param heightMap The height map.
+     * @param scene The scene manager.
+     */
     public BallCollisionDetector(HeightMap heightMap, SceneManager scene) {
         this.heightMap = heightMap;
         this.scene = scene;
     }
 
+    /**
+     * Checks for collision with the ball.
+     *
+     * @param finalPosition The final position of the ball.
+     */
     public void checkCollisionBall(Vector3f finalPosition) {
         // For the golf ball:
         // Check for collision with terrain
@@ -26,6 +42,11 @@ public class BallCollisionDetector {
         // Check for collision with water
     }
 
+    /**
+     * Checks for collision with the terrain.
+     *
+     * @param newPosition The new position of the ball.
+     */
     private void terrainCollisionBall(Vector3f newPosition) {
         // Correct the translation so -1000 maps to index 0
 
@@ -37,7 +58,13 @@ public class BallCollisionDetector {
             newPosition.y = terrainHeight;
         }
     }
-    private void borderCollisionBall(Vector3f newPosition) {
+
+    /**
+     * Checks for collision with the border.
+     *
+     * @param newPosition The new position of the ball.
+     */
+    private void borderCollisionBall(@NotNull Vector3f newPosition) {
         if (newPosition.x < -Consts.SIZE_X / 2) {
             newPosition.x = -Consts.SIZE_X / 2;
         } else if (newPosition.x > Consts.SIZE_X / 2) {

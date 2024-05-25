@@ -7,6 +7,7 @@ import com.um_project_golf.Core.Entity.Texture;
 import com.um_project_golf.Core.ObjectLoader;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Game.GolfGame;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 /**
@@ -122,7 +123,7 @@ public class Terrain {
      * @param normals The normals of the terrain.
      * @param vertexPointer The vertex pointer.
      */
-    private static void calcNormals(int j, float[][] heightmap, int i, float height, float[] normals, int vertexPointer) {
+    private static void calcNormals(int j, float[][] heightmap, int i, float height, float @NotNull [] normals, int vertexPointer) {
         float heightLeft = j > 0 ? heightmap[j - 1][i] : height; // Get the height of the left vertex
         float heightRight = j < Consts.VERTEX_COUNT - 1 ? heightmap[j + 1][i] : height; // Get the height of the right vertex
         float heightDown = i > 0 ? heightmap[j][i - 1] : height; // Get the height of the down vertex
