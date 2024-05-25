@@ -146,7 +146,7 @@ public class GolfGame implements ILogic {
         window.setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
 
         heightMap.createHeightMap();
-        path = pathfinder.getPath(410, 550, 15); // upper and lower bounds for the radius of the path
+        path = pathfinder.getPath(20, 30, 5); // upper and lower bounds for the radius of the path
 
         modelAndEntityCreation();
         terrainCreation();
@@ -343,13 +343,24 @@ public class GolfGame implements ILogic {
 
                 if (currentPositionIndex < ballPositions.size()) {
                     Vector3f nextPosition = ballPositions.get(currentPositionIndex);
+                    if (nextPosition == ballPositions.get(ballPositions.size() - 1)) {
+                        float isInHoleThreshold = 1.5f;
+                        if (nextPosition.x <= endPoint.x + isInHoleThreshold && nextPosition.x >= endPoint.x - isInHoleThreshold) {
+                            if (nextPosition.z <= endPoint.z + isInHoleThreshold && nextPosition.z >= endPoint.z - isInHoleThreshold) {
+                                System.out.println("Ball reached the end point!");
+                                System.out.println(endPoint);
+                                warningTextPane.setText("Ball reached the end point!");
+                                treeAnimationState = AnimationState.GOING_UP;
+                                treeAnimationTime = 0f;
+                            }
+                        }
+                    }
 
                     ballCollisionDetector.checkCollisionBall(nextPosition);
-
-                    if (nextPosition.y <= -0.3) {
+                    if (nextPosition.y <= -0.3) { // Ball in water
                         golfBall.setPosition(shotStartPosition.x, shotStartPosition.y, shotStartPosition.z);
                         isAnimating = false;
-                        warningTextPane.setText("Ball out of bounds! Resetting to last shot position.");
+                        warningTextPane.setText("Ball in water! Resetting to last shot position.");
                     } else {
                         golfBall.setPosition(nextPosition.x, nextPosition.y, nextPosition.z);
                         currentPositionIndex++;
@@ -471,7 +482,7 @@ public class GolfGame implements ILogic {
         blueTerrain = new BlendMapTerrain(waterTextures);
 
         terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap, false);
-        ocean = new Terrain(new Vector3f(-Consts.SIZE_X / 2, -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blueTerrain, blendMap, true);
+        ocean = new Terrain(new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blueTerrain, blendMap, true);
         scene.addTerrain(terrain);
         scene.addTerrain(ocean);
         ocean.getModel().getMaterial().setDisableCulling(true);
@@ -765,7 +776,7 @@ public class GolfGame implements ILogic {
     @NotNull
     @Contract(pure = true)
     private Runnable getPhysicsRunnable() {
-        PhysicsEngine engine = new PhysicsEngine(heightMap, Consts.KINETIC_FRICTION_GRASS, Consts.STATIC_FRICTION_GRASS, Consts.KINETIC_FRICTION_SAND, Consts.STATIC_FRICTION_SAND);
+        PhysicsEngine engine = new PhysicsEngine(heightMap);
 
         return () -> {
             if (isAnimating) {
@@ -783,7 +794,7 @@ public class GolfGame implements ILogic {
                     double[] initialState = {golfBall.getPosition().x, golfBall.getPosition().z, vx, vz}; // initialState = [x, z, vx, vz]
                     double h = 0.1; // Time step
                     ballPositions = engine.runImprovedEuler(initialState, h);
-                    System.out.println("Ball positions: " + ballPositions);
+
                     currentPositionIndex = 0;
                     isAnimating = true;
                     animationTimeAccumulator = 0f;

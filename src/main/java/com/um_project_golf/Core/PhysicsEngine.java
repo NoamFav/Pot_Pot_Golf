@@ -3,6 +3,8 @@ package com.um_project_golf.Core;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.io.File;
+
 
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 import com.um_project_golf.Core.Utils.Consts;
@@ -14,17 +16,26 @@ import org.joml.Vector3f;
  * The physics engine class.
  * This class is responsible for handling the physics of the game.
  */
+@SuppressWarnings("FieldCanBeLocal")
 public class PhysicsEngine {
 
     private static final double g = Consts.GRAVITY; // gravitational constant
 
-    private final double muK_grass; // kinetic friction grass
-    private final double muS_grass; // static friction grass
-    private final double muK_sand; // kinetic friction sand
-    private final double muS_sand; // static friction sand
+    private final double muK_grass = Consts.KINETIC_FRICTION_GRASS; // kinetic friction grass
+    private final double muS_grass = Consts.STATIC_FRICTION_GRASS; // static friction grass
+    private final double muK_sand = Consts.KINETIC_FRICTION_SAND; // kinetic friction sand
+    private final double muS_sand = Consts.STATIC_FRICTION_SAND; // static friction sand
     private final BiFunction<Double, Double, Double> heightFunction;
     private final HeightMap heightMap;
     @SuppressWarnings("FieldCanBeLocal") private static final double sandLevel = 0.5; // get this value from the constant file
+    private final double magnitudeVelocityThreshold = 0.05; // get this value from the constant file
+    private final double magnitudeAccelerationThreshold = 0.1; // get this value from the constant file
+
+    File file = new File("output.txt");
+
+
+
+    StringBuilder sb = new StringBuilder();
 
     /**
      * Create a new physics engine.
@@ -34,19 +45,11 @@ public class PhysicsEngine {
      * Which is already done by the height map.
      *
      * @param height The height function
-     * @param muK_grass The kinetic friction of grass
-     * @param muS_grass The static friction of grass
-     * @param muK_sand The kinetic friction of sand
-     * @param muS_sand The static friction of sand
      */
     @Deprecated
     @SuppressWarnings("unused")
-    public PhysicsEngine(BiFunction<Double, Double, Double> height, double muK_grass, double muS_grass, double muK_sand, double muS_sand) {
+    public PhysicsEngine(BiFunction<Double, Double, Double> height) {
         this.heightFunction = height;
-        this.muK_grass = muK_grass;
-        this.muS_grass = muS_grass;
-        this.muK_sand = muK_sand;
-        this.muS_sand = muS_sand;
         this.heightMap = null;
     }
 
@@ -55,18 +58,12 @@ public class PhysicsEngine {
      * Create a new physics engine.
      *
      * @param heightMap The height map
-     * @param muK_grass The kinetic friction of grass
-     * @param muS_grass The static friction of grass
-     * @param muK_sand The kinetic friction of sand
-     * @param muS_sand The static friction of sand
      */
-    public PhysicsEngine(HeightMap heightMap, double muK_grass, double muS_grass, double muK_sand, double muS_sand) {
+    public PhysicsEngine(HeightMap heightMap) {
         this.heightFunction = null;
-        this.muK_grass = muK_grass;
-        this.muS_grass = muS_grass;
-        this.muK_sand = muK_sand;
-        this.muS_sand = muS_sand;
         this.heightMap = heightMap;
+
+
     }
 
     /**
@@ -113,13 +110,14 @@ public class PhysicsEngine {
             acceleration = equationsOfMotion(currentTime, currentState);
             magnitudeVelocity = Math.sqrt(nextStep[2] * nextStep[2] + nextStep[3] * nextStep[3]);
             magnitudeAcceleration = Math.sqrt(acceleration[2] * acceleration[2] + acceleration[3] * acceleration[3]);
+            sb.append("Magnitude 2: ").append(magnitudeVelocity).append("\n");
+            sb.append("Magnitude acceleration: ").append(magnitudeAcceleration).append("\n");
             currentState = nextStep;
             currentTime += stepSize;
-
             assert heightMap != null;
             float height = heightMap.getHeight(new Vector3f((float) currentState[0], 0, (float) currentState[1]));
             positions.add(new Vector3f((float) currentState[0], height, (float) currentState[1]));
-        } while (magnitudeVelocity >= 1 || magnitudeAcceleration >= 1); // While the ball is not at rest
+        } while (magnitudeVelocity >= magnitudeVelocityThreshold || magnitudeAcceleration >= magnitudeAccelerationThreshold); // While the ball is not at rest
 
         return positions;
     }
@@ -137,6 +135,7 @@ public class PhysicsEngine {
         double vx = x[2];
         double vz = x[3];
         double magnitudeVelocity = Math.sqrt(vx * vx + vz * vz);
+        double dampingCoefficient = 0.1; // damping coefficient
 
         double dh_dxValue;
         double dh_dzValue;
@@ -146,30 +145,17 @@ public class PhysicsEngine {
 
         assert heightMap != null;
         if (heightMap.getHeight(new Vector3f((float) x[0], 0, (float) x[1])) < sandLevel) { // if the ball is on sand
-            kineticFriction = this.muK_sand;
-            staticFriction = this.muS_sand;
-            //System.out.println("sand");
-        }
-        else { // if the ball is on grass
-            kineticFriction = this.muK_grass;
-            staticFriction = this.muS_grass;
-            //System.out.println("grass");
+            kineticFriction = muK_sand;
+            staticFriction = muS_sand;
+        } else { // if the ball is on grass
+            kineticFriction = muK_grass;
+            staticFriction = muS_grass;
         }
 
         dh_dxValue = dh_dxCentredDifferenceMap(x[0], x[1]);
         dh_dzValue = dh_dyCentredDifferenceMap(x[0], x[1]);
 
-        //use the commented code below if you want to use the height function instead of the height map (not recommended)
-        // if (heightFunction != null) {
-        //     dh_dxValue = dh_dxCentredDifferenceFunction(x[0], x[1]);
-        //     dh_dzValue = dh_dyCentredDifferenceFunction(x[0], x[1]);
-        // } else {
-        //     dh_dxValue = dh_dxCentredDifferenceMap(x[0], x[1]);
-        //     dh_dzValue = dh_dyCentredDifferenceMap(x[0], x[1]);
-        // }
-
-        // the threshold for when the value of dh_dx is so small that it should be zero
-        // Since we're using numerical approximation, it is nearly impossible to become exactly zero.
+        // Threshold for numerical approximation
         if (Math.abs(dh_dxValue) < 0.00001) {
             dh_dxValue = 0;
         }
@@ -177,33 +163,53 @@ public class PhysicsEngine {
             dh_dzValue = 0;
         }
 
-        if (magnitudeVelocity >= 1) {  // if the magnitude of velocity is not very small, then the ball is not at rest
+        if (magnitudeVelocity >= magnitudeVelocityThreshold) {// Lowered threshold for velocity
             dxdt[0] = vx;
             dxdt[1] = vz;
+            sb.append("Magnitude velocity: ").append(magnitudeVelocity).append("\n");
 
             // Calculate acceleration in x-direction
-            dxdt[2] = -g * dh_dxValue - kineticFriction * g * vx / magnitudeVelocity;
+            dxdt[2] = -g * dh_dxValue - kineticFriction * g * vx / magnitudeVelocity - dampingCoefficient * vx;
             // Calculate acceleration in z-direction
-            dxdt[3] = -g * dh_dzValue - kineticFriction * g * vz / magnitudeVelocity;
+            dxdt[3] = -g * dh_dzValue - kineticFriction * g * vz / magnitudeVelocity - dampingCoefficient * vz;
+            //sb.append("Moving: ").append(Arrays.toString(dxdt)).append("\n");
 
         } else { // if the ball is at rest
-            vx = 0;
-            vz = 0;
-            dxdt[0] = vx;
-            dxdt[1] = vz;
+            dxdt[0] = 0;
+            dxdt[1] = 0;
 
             if (dh_dxValue != 0 || dh_dzValue != 0) { // if the ball is on a slope
                 double dh2 = Math.sqrt(dh_dxValue * dh_dxValue + dh_dzValue * dh_dzValue);
+                double staticFrictionForce = staticFriction * g;
+                double slopeForce = dh2 * g;
+                sb.append("dh2: ").append(dh2).append("\n");
+                sb.append("Static friction force: ").append(staticFrictionForce).append("\n");
+                sb.append("Slope force: ").append(slopeForce).append("\n");
 
-                if (staticFriction <= dh2) { // if the friction force does not overcome the downhill force,
-                    // the ball will continue to slide
-                    dxdt[2] = -g * dh_dxValue - kineticFriction * g * dh_dxValue / dh2;
-                    dxdt[3] = -g * dh_dzValue - kineticFriction * g * dh_dzValue / dh2;
+                if (staticFrictionForce < slopeForce) { // if the slope force overcomes static friction
+                    // the ball will start sliding
+                    dxdt[2] = -g * dh_dxValue - dampingCoefficient * vx;
+                    dxdt[3] = -g * dh_dzValue - dampingCoefficient * vz;
+                    //sb.append("Sliding: ").append(Arrays.toString(dxdt)).append("\n");
+                } else {
+                    dxdt[2] = 0;
+                    dxdt[3] = 0;
+                    sb.append("Stationary: Static friction holding").append("\n");
                 }
             } else {
                 dxdt[2] = 0;
                 dxdt[3] = 0;
+                sb.append("Stationary: No slope").append("\n");
             }
+        }
+
+        //sb.append("dxdt: ").append(Arrays.toString(dxdt)).append("\n");
+
+        try (java.io.FileWriter fw = new java.io.FileWriter(file, true)) {
+            fw.write(sb.toString());
+            sb.setLength(0);
+        } catch (java.io.IOException e) {
+            e.printStackTrace(System.err);
         }
 
         return dxdt; // dxdt = [vx, vz, ax, az]
