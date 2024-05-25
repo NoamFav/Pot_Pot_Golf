@@ -87,7 +87,7 @@ public class AIBot {
         PhysicsEngine engine = new PhysicsEngine(testMap, 0.08, 0.2, 0.1, 0.3);
         Vector3f finalPosition = startingPosition;
         for (int i = 0; i < 50; i++) {
-            finalPosition = engine.runImprovedEuler(initialState, h);
+            finalPosition = engine.runImprovedEuler(initialState, h).get(engine.runImprovedEuler(initialState, h).size()-1);
             initialState[0] = finalPosition.x;
             initialState[1] = finalPosition.z;
             System.out.println(finalPosition.x + ", " + finalPosition.y + ", " + finalPosition.z);
