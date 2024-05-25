@@ -2,8 +2,6 @@ package com.um_project_golf.Core.Utils;
 
 import org.joml.Vector3f;
 
-import com.um_project_golf.Core.AWT.TextPane;
-import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 
@@ -12,16 +10,16 @@ public class BallCollisionDetector {
     private final HeightMap heightMap;
     private final SceneManager scene;
 
-    public BallCollisionDetector(HeightMap heightMap, SceneManager scene, TextPane warningTextPane) {
+    public BallCollisionDetector(HeightMap heightMap, SceneManager scene) {
         this.heightMap = heightMap;
         this.scene = scene;
     }
 
-    public void checkCollisionBall(Vector3f initialPosition, Vector3f finalPosition) {
+    public void checkCollisionBall(Vector3f finalPosition) {
         // For the golf ball:
         // Check for collision with terrain
         terrainCollisionBall(finalPosition);
-        // Check for collision with border
+        // Check for collision with the border
         borderCollisionBall(finalPosition);
         // Check for collision with trees
         treeCollisionBall(finalPosition);

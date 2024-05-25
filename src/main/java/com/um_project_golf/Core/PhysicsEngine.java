@@ -2,7 +2,6 @@ package com.um_project_golf.Core;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiFunction;
 
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 import com.um_project_golf.Core.Utils.Consts;
@@ -19,7 +18,7 @@ public class PhysicsEngine {
     private final double muS_sand; // static friction sand
    // private final BiFunction<Double, Double, Double> heightFunction;
     private final HeightMap heightMap;
-    private float sandLevel = 0.5f; // get this value from the constant file
+    private final float sandLevel = 0.5f; // get this value from the constant file
 
     // // Physics engine with height function
     // public PhysicsEngine(BiFunction<Double, Double, Double> height, double muK_grass, double muS_grass, double muK_sand, double muS_sand) {
@@ -31,7 +30,7 @@ public class PhysicsEngine {
     //     this.heightMap = null;
     // }
 
-    // Physics engine with height map
+    // Physics engine with a height map
     public PhysicsEngine(HeightMap heightMap, double muK_grass, double muS_grass, double muK_sand, double muS_sand) {
         //this.heightFunction = null;
         this.muK_grass = muK_grass;
@@ -109,7 +108,7 @@ public class PhysicsEngine {
         //     dh_dzValue = dh_dyCentredDifferenceMap(x[0], x[1]);
         // }
 
-        // threshold for when the value of dh_dx is so small that it should be zero
+        // the threshold for when the value of dh_dx is so small that it should be zero
         // Since we're using numerical approximation, it is nearly impossible to become exactly zero.
         if (Math.abs(dh_dxValue) < 0.00001) {
             dh_dxValue = 0;
@@ -136,7 +135,8 @@ public class PhysicsEngine {
             if (dh_dxValue != 0 || dh_dzValue != 0) { // if the ball is on a slope
                 double dh2 = Math.sqrt(dh_dxValue * dh_dxValue + dh_dzValue * dh_dzValue);
 
-                if (staticFriction <= dh2) { // if the friction force is not does not overcome the downhill force, the ball will continue to slide
+                if (staticFriction <= dh2) { // if the friction force does not overcome the downhill force,
+                    // the ball will continue to slide
                     dxdt[2] = -g * dh_dxValue - kineticFriction * g * dh_dxValue / dh2;
                     dxdt[3] = -g * dh_dzValue - kineticFriction * g * dh_dzValue / dh2;
                 }

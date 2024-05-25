@@ -134,7 +134,7 @@ public class WindowManager {
      */
     public void cleanup() {
         GLFW.glfwDestroyWindow(window); // Destroy the window.
-        GLFW.glfwTerminate(); // Terminate GLFW. (Free the resources)
+        GLFW.glfwTerminate(); // Terminate GLFW. (Free resources)
     }
 
     /**

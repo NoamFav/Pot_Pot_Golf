@@ -1,11 +1,9 @@
 package com.um_project_golf.Core.Entity.Terrain;
 
 import com.um_project_golf.Core.Utils.Consts;
-import com.um_project_golf.Game.GolfGame;
 import org.joml.Vector2i;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.*;
@@ -51,7 +49,6 @@ public class HeightMapPathfinder {
 
             if (pathFound) {
                 System.out.println("Path found!" + " #" + count + " Start: " + path.get(0).x + ", " + path.get(0).y + " End: " + path.get(path.size() - 1).x + ", " + path.get(path.size() - 1).y);
-                count++;
 
                 // Draw the path on the heightmap image
                 drawPathOnImage(heightMapImage, path);
@@ -91,7 +88,6 @@ public class HeightMapPathfinder {
 
             if (pathFound) {
                 System.out.println("Path found!" + " #" + count + " Start: " + path.get(0).x + ", " + path.get(0).y + " End: " + path.get(path.size() - 1).x + ", " + path.get(path.size() - 1).y);
-                count++;
 
                 // Draw the path on the heightmap image
                 drawPathOnImage(heightMapImage, path);

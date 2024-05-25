@@ -63,8 +63,6 @@ public class TextPane {
         nvgFillColor(vg, textColor);
         nvgText(vg, x + width / 2, y + height / 2, text);
 
-        String displayText = text;
-
         // End the frame for NanoVG
         nvgEndFrame(vg);
 
