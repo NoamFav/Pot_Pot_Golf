@@ -356,7 +356,7 @@ public class GolfGame implements ILogic {
                         }
                     }
 
-                    //ballCollisionDetector.checkCollisionBall(nextPosition);
+                    ballCollisionDetector.checkCollisionBall(nextPosition);
                     if (nextPosition.y <= -0.3) { // Ball in water
                         golfBall.setPosition(shotStartPosition.x, shotStartPosition.y, shotStartPosition.z);
                         isAnimating = false;

@@ -171,9 +171,9 @@ public class PhysicsEngine {
             dxdt[0] = vx;
             dxdt[1] = vz;
 
-            double mass = Consts.BALL_MASS;  // Mass of the object
-            dxdt[2] = -mass * GRAVITY * dh_dxValue - kineticFriction * mass * GRAVITY * vx / magnitudeVelocity;
-            dxdt[3] = -mass * GRAVITY * dh_dzValue - kineticFriction * mass * GRAVITY * vz / magnitudeVelocity;
+
+            dxdt[2] = -GRAVITY * dh_dxValue - kineticFriction * GRAVITY * vx / magnitudeVelocity;
+            dxdt[3] = - GRAVITY * dh_dzValue - kineticFriction * GRAVITY * vz / magnitudeVelocity;
         } else {
             // Considered at rest or very slow movement on a slope
             double dh2 = Math.sqrt(dh_dxValue * dh_dxValue + dh_dzValue * dh_dzValue);
