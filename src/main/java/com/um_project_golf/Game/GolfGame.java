@@ -15,6 +15,7 @@ import com.um_project_golf.Core.Utils.BallCollisionDetector;
 import com.um_project_golf.Core.Utils.CollisionsDetector;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.Entity.Terrain.HeightMapPathfinder;
+import com.um_project_golf.GolfBots.RuleBasedBot;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
@@ -88,11 +89,13 @@ public class GolfGame implements ILogic {
     private final List<Entity> trees;
     private final List<Float> treeHeights;
     private Entity golfBall;
+    private Entity botBall;
     private Entity endFlag;
     private Entity arrowEntity;
     private BallCollisionDetector ballCollisionDetector;
 
     private Button applyButton;
+    private Button botButton;
     private TextField vxTextField;
     private TextField vzTextField;
     private TextPane vxTextPane;
@@ -100,6 +103,7 @@ public class GolfGame implements ILogic {
     private TextPane infoTextPane;
     private TextPane warningTextPane;
     private int numberOfShots;
+    private List<Model> botBallModel;
 
     private List<Vector3f> ballPositions;
     private int currentPositionIndex;
@@ -295,6 +299,7 @@ public class GolfGame implements ILogic {
             vxTextField.update();
             vzTextField.update();
             applyButton.update();
+            botButton.update();
         }
 
         if (isGuiVisible) {
@@ -421,6 +426,7 @@ public class GolfGame implements ILogic {
             warningTextPane.render();
             infoTextPane.render();
             applyButton.render();
+            botButton.render();
             vxTextField.render();
             vzTextField.render();
             vxTextPane.render();
@@ -494,6 +500,7 @@ public class GolfGame implements ILogic {
         List<Model> wolf = loader.loadAssimpModel("src/main/resources/Models/Wolf_dae/wolf.dae");
         List<Model> skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
         List<Model> ball = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
+        botBallModel = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
         List<Model> arrow = loader.loadAssimpModel("src/main/resources/Models/Arrow/Arrow5.obj");
         List<Model> flag = loader.loadAssimpModel("src/main/resources/Models/flag/flag.obj");
         List<Model> tree2 = loader.loadAssimpModel("src/main/resources/Models/tree2/tree3-N.obj");
@@ -508,6 +515,7 @@ public class GolfGame implements ILogic {
         for (Model model : arrow) model.getMaterial().setDisableCulling(true);
         for (Model model : flag) model.getMaterial().setDisableCulling(true);
         for (Model model : ball) model.getMaterial().setDisableCulling(true);
+        for (Model model : botBallModel) model.getMaterial().setDisableCulling(true);
         for (Model model : cloud) model.getMaterial().setDisableCulling(true);
 
         scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
@@ -731,7 +739,7 @@ public class GolfGame implements ILogic {
         scene.setTreePositions(treePositions);
     }
 
-    private void createDefaultGui() {
+    private void createDefaultGui(){
         float width = window.getWidthConverted(1000);
         float height = window.getHeightConverted(300);
         float x = window.getWidthConverted(10);
@@ -769,8 +777,10 @@ public class GolfGame implements ILogic {
         });
 
         Runnable applyVelocity = getPhysicsRunnable();
+        Runnable runBot = createBotBall();
 
         applyButton = new Button(x, y * 30 + height, 3 * width / 5, 2 * height / 3, "Apply Velocity", font, applyVelocity, vg, imageButton);
+        botButton = new Button (x * 30, y * 30 + height, 3 * width / 5, 2 * height / 3, "Apply Velocity", font, runBot, vg, imageButton);
     }
 
     @NotNull
@@ -802,6 +812,29 @@ public class GolfGame implements ILogic {
                     shotStartPosition = new Vector3f(golfBall.getPosition()); // Store the start position of the shot
                     infoTextPane.setText("Position: (" + (int) golfBall.getPosition().x + ", " + (int) golfBall.getPosition().z + "). Number of shots: " + numberOfShots);
                 }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
+    @NotNull
+    @Contract(pure = true)
+    public Runnable createBotBall(){
+
+        botBall = new Entity(botBallModel, new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
+        scene.addEntity(botBall);
+
+        RuleBasedBot ruleBasedBot = new RuleBasedBot(botBall, endFlag, heightMap, 1.5, scene);
+        ruleBasedBot.findBestShot();
+
+        return () -> {
+            if (isAnimating) {
+                return; // Exit if already animating
+            }
+            try {
+
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
