@@ -103,12 +103,12 @@ public class RuleBasedBot {
                     // Check if it's in hole
                     if (distanceToFlag() < minDistance) {
                         if (isInHole(green)) {
-                            bestShot = new Shot(velocityX, velocityZ);
+                            bestShot = new Shot(velocity);
                             bestPosition = ball.getPosition();
                             break;
                         }
                         minDistance = distanceToFlag();
-                        bestShot = new Shot(velocityX, velocityZ);
+                        bestShot = new Shot(velocity);
                         bestPosition = ball.getPosition();
                     }
 
