@@ -8,14 +8,20 @@ import com.um_project_golf.Core.Utils.BallCollisionDetector;
 import com.um_project_golf.Core.Utils.Consts;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 
 public class RuleBasedBot {
     private Vector3f startingPosition;
     private final double flagRadius;
     private final HeightMap testMap;
     private Entity ball;
+    private Vector3f velocityBall;
     private Entity flag;
     private SceneManager scene;
+    private HashMap<Vector3f,List<Vector3f>> fullPath;
 
 
     public RuleBasedBot(Entity ball, Entity flag, HeightMap testMap, double flagRadius, SceneManager scene){
@@ -27,8 +33,9 @@ public class RuleBasedBot {
         this.scene = scene;
     }
 
-    public Shot findBestShot() {
+    public List<List<Vector3f>> findBestShot() {
         double minDistance = Double.MAX_VALUE;
+        List<List<Vector3f>> path = new ArrayList<>();
         Shot bestShot = null;
         Vector3f bestPosition = null;
         Vector3f velocity;
@@ -50,7 +57,8 @@ public class RuleBasedBot {
                         if (isInHole()) {
                             bestShot = new Shot(velocity);
                             bestPosition = ball.getPosition();
-                            break;
+                            path.add(fullPath.get(bestPosition));
+                            return path;
                         }
                         minDistance = distanceToFlag();
                         bestShot = new Shot(velocity);
@@ -65,26 +73,27 @@ public class RuleBasedBot {
             System.out.println("Can't make a hole in one");
             ball.setPosition(bestPosition.x,bestPosition.y,bestPosition.z);
             startingPosition = bestPosition;
+            path.add(fullPath.get(bestPosition));
         }
 
-        return bestShot;
+        return path;
     }
 
     public void applyVelocities(Vector3f velocity) {
-        ball.setRotation(velocity.x, velocity.y, velocity.z);
+        velocityBall = velocity;
     }
 
     public void simulateBallMovement() {
-        BallCollisionDetector ballCollisionDetector = new BallCollisionDetector(testMap, scene);
-        double[] initialState = {ball.getPosition().x, ball.getPosition().z, ball.getRotation().x, ball.getRotation().z};
+        fullPath = new HashMap<>();
+        double[] initialState = {ball.getPosition().x, ball.getPosition().z, velocityBall.x, velocityBall.z};
         double h = 0.1; // Time step
         PhysicsEngine engine = new PhysicsEngine(testMap);
-        Vector3f finalPosition = new Vector3f(ball.getPosition());
-        for (int i = 0; i < 50; i++) {
-            finalPosition = engine.runImprovedEuler(initialState, h).get(engine.runImprovedEuler(initialState, h).size()-1);
-            initialState[0] = finalPosition.x;
-            initialState[1] = finalPosition.z;
-        }
+        List<Vector3f> positions = engine.runImprovedEuler(initialState, h);
+
+        Vector3f finalPosition = positions.get(positions.size()-1);
+
+        fullPath.put(finalPosition,positions);
+
         // Update ball position based on velocity and physics rules
         ball.setPosition(finalPosition.x,finalPosition.y,finalPosition.z);
     }
