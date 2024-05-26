@@ -10,39 +10,26 @@ import java.util.function.Function;
 
 public class AIBot {
     private Vector3f startingPosition;
-    private Vector3f flagPosition;
-    private double flagRadius = 0;
-    private double minVelocityX = 0;
-    private double maxVelocityX = 100;
-    private double minVelocityZ = 0;
-    private double maxVelocityZ = 0;
+    private double flagRadius;
+    private double minVelocityX = -5;
+    private double maxVelocityX = 5;
+    private double minVelocityZ = -5;
+    private double maxVelocityZ = 5;
     private double velocityStepX = 0.1;
     private double velocityStepZ = 0.1;
     private HeightMap testMap;
     private Entity ball;
     private Entity flag;
 
-    public AIBot(Entity ball, Entity flag, HeightMap testMap){
+    public AIBot(Entity ball, Entity flag, HeightMap testMap, double flagRadius){
         startingPosition = ball.getPosition();
-        flagPosition = flag.getPosition();
+        this.ball = ball;
+        this.flag = flag;
         this.testMap = testMap;
-    }
-    public static void main(String[] args) {
-        // Initialize game elements
-        /*
-        Ball ball = new Ball(startingPosition);
-        Green green = new Green(flagPosition, flagRadius);
-
-        // Find the best shot using Hill-Climbing
-        Shot bestShot = findBestShotUsingHillClimbing(ball, green);
-
-        // Output the best shot
-        System.out.println("Best shot: " + bestShot);
-
-         */
+        this.flagRadius = flagRadius;
     }
 
-    public Shot findBestShotUsingHillClimbing(Ball ball, Green green) {
+    public Shot findBestShotUsingHillClimbing() {
         Random random = new Random();
 
         // Initialize with a random shot
@@ -56,7 +43,46 @@ public class AIBot {
         while (improvement) {
             improvement = false;
             Shot bestNeighbor = currentShot;
-            double bestNeighborDistance = evaluateShot(bestNeighbor, green);
+            double bestNeighborDistance = evaluateShot(bestNeighbor);
+
+            applyVelocities(velocity);
+            simulateBallMovement();
+
+            if(isInHole()){
+                return currentShot;
+            } else{
+                // Generate neighboring shots by adjusting velocity slightly
+                for (double dX = -velocityStepX; dX <= velocityStepX; dX += velocityStepX) {
+                    for (double dZ = -velocityStepZ; dZ <= velocityStepZ; dZ += velocityStepZ) {
+                        if (dX == 0 && dZ == 0) continue; // Skip the current shot
+
+                        float newVelocityX = (float) (velocity.x + dX);
+                        float newVelocityZ = (float) (velocity.z + dZ);
+                        Vector3f newVelocity = new Vector3f(newVelocityX, 0,newVelocityZ);
+                        Shot neighborShot = new Shot(newVelocity);
+                        double neighborDistance = evaluateShot(neighborShot);
+
+                        applyVelocities(newVelocity);
+                        simulateBallMovement();
+
+                        if (neighborDistance < bestNeighborDistance) {
+                            currentShot = neighborShot;
+                            bestNeighborDistance = neighborDistance;
+                            velocity = newVelocity;
+                            improvement = true;
+                            if (isInHole()){
+                                return currentShot;
+                            }
+                            break;
+                        }
+                        ball.setPosition(startingPosition.x,startingPosition.y,startingPosition.z);
+                    }
+                    if(improvement){
+                        break;
+                    }
+                }
+
+            }
 
             // Generate neighboring shots by adjusting velocity slightly
             for (double dX = -velocityStepX; dX <= velocityStepX; dX += velocityStepX) {
@@ -66,23 +92,25 @@ public class AIBot {
                     float newVelocityX = (float) (currentShot.getVelocity().x + dX);
                     float newVelocityZ = (float) (currentShot.getVelocity().z + dZ);
                     Shot neighborShot = new Shot(new Vector3f(newVelocityX,0,newVelocityZ) );
-                    double neighborDistance = evaluateShot(neighborShot, green);
+                    double neighborDistance = evaluateShot(neighborShot);
 
                     if (neighborDistance < bestNeighborDistance) {
                         bestNeighbor = neighborShot;
                         bestNeighborDistance = neighborDistance;
                         improvement = true;
                     }
+                    ball.setPosition(startingPosition.x,startingPosition.y,startingPosition.z);
                 }
             }
 
             currentShot = bestNeighbor;
-        }
 
+        }
+        System.out.println("No improvement possible");
         return currentShot;
     }
 
-    public double evaluateShot(Shot shot, Green green) {
+    public double evaluateShot(Shot shot) {
         applyVelocities(shot.getVelocity());
         simulateBallMovement();
         return distanceToFlag();
@@ -93,10 +121,10 @@ public class AIBot {
     }
 
     public void simulateBallMovement() {
-        double[] initialState = {startingPosition.x, startingPosition.z, ball.getRotation().x, ball.getRotation().z};
+        double[] initialState = {ball.getPosition().x, ball.getPosition().z, ball.getRotation().x, ball.getRotation().z};
         double h = 0.1; // Time step
-        PhysicsEngine engine = new PhysicsEngine(testMap, 0.08, 0.2, 0.1, 0.3);
-        Vector3f finalPosition = new Vector3f(startingPosition);
+        PhysicsEngine engine = new PhysicsEngine(testMap);
+        Vector3f finalPosition = new Vector3f(ball.getPosition());
         for (int i = 0; i < 50; i++) {
             finalPosition = engine.runImprovedEuler(initialState, h).get(engine.runImprovedEuler(initialState, h).size()-1);
             initialState[0] = finalPosition.x;
@@ -106,9 +134,9 @@ public class AIBot {
         ball.setPosition(finalPosition.x,finalPosition.y,finalPosition.z);
     }
 
-    public boolean isInHole(Green green) {
+    public boolean isInHole() {
         double distanceToFlag = distanceToFlag();
-        return distanceToFlag <= green.getFlagRadius();
+        return distanceToFlag <= flagRadius;
     }
 
     public double distanceToFlag() {
