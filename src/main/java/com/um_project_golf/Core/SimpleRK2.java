@@ -1,10 +1,25 @@
 package com.um_project_golf.Core;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.function.BiFunction;
 
+/**
+ * Simple Runge-Kutta 2nd order method.
+ */
 public class SimpleRK2 {    
 
-    public static double[] simpleImprovedEuler(double t0, double[] y0, double tFinal, double stepSize, BiFunction<Double, double[], double[]> function) {
+    /**
+     * Simple improved Euler method.
+     *
+     * @param t0       The initial time.
+     * @param y0       The initial state.
+     * @param tFinal   The final time.
+     * @param stepSize The step size.
+     * @param function The function to evaluate the derivative.
+     * @return The final state.
+     */
+    public static double @NotNull [] simpleImprovedEuler(double t0, double @NotNull [] y0, double tFinal, double stepSize, BiFunction<Double, double[], double[]> function) {
         double t = t0;
         int numberOfSteps = (int) ((tFinal - t0) / stepSize);
         int length = y0.length;

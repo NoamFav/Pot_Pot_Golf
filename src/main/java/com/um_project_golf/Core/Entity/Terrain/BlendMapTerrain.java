@@ -21,14 +21,17 @@ public class BlendMapTerrain {
         return textures;
     }
 
+    @SuppressWarnings("unused")
     public void setTextures(List<TerrainTexture> textures) {
         this.textures = textures;
     }
 
+    @SuppressWarnings("unused")
     public void addTexture(TerrainTexture texture) {
         textures.add(texture);
     }
 
+    @SuppressWarnings("unused")
     public void removeTexture(TerrainTexture texture) {
         textures.remove(texture);
     }

@@ -1,6 +1,7 @@
 package com.um_project_golf.Core.Utils;
 
 import javafx.util.Pair;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
@@ -12,20 +13,20 @@ import java.util.function.BiFunction;
  * All key settings are stored here.
  * Made to be easily accessible and modifiable.
  */
+@SuppressWarnings("unused")
 public class Consts {
 
-    public static final int MAX_TEXTURES = 7;
-    public static String Title = "UM Project Golf";
+    public static String Title = "UM Project Golf"; // Title of the game
 
-    public static final float REFERENCE_WIDTH = 3840;
-    public static final float REFERENCE_HEIGHT = 2160;
+    public static final float REFERENCE_WIDTH = 3840; // Reference width for the game (don't change)
+    public static final float REFERENCE_HEIGHT = 2160; // Reference height for the game (don't change)
 
     private static final int POWER = 10; // Power of 2 for the terrain size
     public static final float SIZE_X = (float) Math.pow(2, POWER); // Size of the terrain in the x direction
     public static final float SIZE_Z = (float) Math.pow(2, POWER); // Size of the terrain in the z direction
     public static final int VERTEX_COUNT = (int) Math.pow(2, POWER + 2); // Number of vertices in the terrain (Higher = more detail but also more performance heavy)
     public static final float MAX_HEIGHT = 10000; // Maximum height of the terrain
-    public static final float TEXTURE_SCALE = 100f; // Scale of the texture on the terrain
+    public static final int MAX_TEXTURES = 7; // Maximum number of textures
 
     public static final double SCALE = 0.005; // Used for scaling the terrain with simplex noise
     public static final int OCTAVES = 10; // Number of octaves used in simplex noise (higher = more detail)
@@ -75,14 +76,15 @@ public class Consts {
     public static final float GRAVITY = 9.81f; // Gravity constant (m/s^2)
     public static final float BALL_MASS = 0.0459f; // Mass of the ball (kg)
 
-    public static final Pair<Float, Float> INITIAL_SPEED = new Pair<>(0f, 0f); // Position of the ball
-    public static final Pair<Float, Float> TEE_POSITION = new Pair<>(0f, 0f); // Position of the hole
-    public static final Pair<Float, Float> HOLE_POSITION = new Pair<>(0f, 0f); // Position of the hole
+    public static final Vector2f INITIAL_SPEED = new Vector2f(0f, 0f); // Position of the ball
+    public static final Vector3f TEE_POSITION = new Vector3f(0f, 0f, 0f); // Position of the hole
+    public static final Vector3f HOLE_POSITION = new Vector3f(0f, 0f, 0f); // Position of the hole
     public static final float TARGET_RADIUS = 0.15f; // Radius of the ball (meters)
     public static final float MAX_SPEED = 5f; // Maximum speed of the ball (m/s)
 
-    public static final float KINETIC_FRICTION_GRASS = 0.08f;
-    public static final float KINETIC_FRICTION_SAND = 0.1f;
+    public static final float KINETIC_FRICTION_GRASS = 0.1f;
     public static final float STATIC_FRICTION_GRASS = 0.2f;
-    public static final float STATIC_FRICTION_SAND = 0.3f;
+
+    public static final float KINETIC_FRICTION_SAND = 0.4f;
+    public static final float STATIC_FRICTION_SAND = 0.8f;
 }

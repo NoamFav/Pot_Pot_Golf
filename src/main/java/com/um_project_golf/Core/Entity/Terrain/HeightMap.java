@@ -5,6 +5,7 @@ import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Game.GolfGame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import javax.imageio.ImageIO;
@@ -62,7 +63,7 @@ public class HeightMap {
      * Create an image of the heightmap
      * @param heightmap The heightmap to create an image of
      */
-    public void createHeightmapImage(float[][] heightmap) {
+    public void createHeightmapImage(float[] @NotNull [] heightmap) {
         int width = heightmap.length; // Get the width of the heightmap
         int height = heightmap[0].length; // Get the height of the heightmap
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // Create a new image
@@ -123,7 +124,7 @@ public class HeightMap {
      * @param position The position to get the height of
      * @return The height of the terrain at the given position
      */
-    public float getHeight(Vector3f position) {
+    public float getHeight(@NotNull Vector3f position) {
         int heightX = (int) ((position.x + Consts.SIZE_X/2) * ((Consts.VERTEX_COUNT-1) / Consts.SIZE_X)); // Calculate the x index of the heightmap
         int heightZ = (int) ((position.z + Consts.SIZE_Z/2) * ((Consts.VERTEX_COUNT-1) / Consts.SIZE_Z)); // Calculate the z index of the heightmap
 

@@ -12,6 +12,7 @@ import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.Utils.Transformation;
 import com.um_project_golf.Core.Utils.Utils;
 import com.um_project_golf.Game.Launcher;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -68,7 +69,7 @@ public class EntityRenderer implements IRenderer<Entity> {
      *
      * @param camera The camera of the game.
      * @param pointLights The point lights of the game.
-     * @param spotLights The spot lights of the game.
+     * @param spotLights The spotlights of the game.
      * @param directionalLight The directional light of the game.
      */
     @Override
@@ -82,11 +83,11 @@ public class EntityRenderer implements IRenderer<Entity> {
             List<Entity> batch = entities.get(model); // Get the entities.
 
             for (Entity entity : batch) { // For each entity in the batch.
-                for (Model subModel : entity.getModels()) { // For each sub-model in the entity.
-                    bind(subModel); // Bind the sub-model.
+                for (Model subModel : entity.getModels()) { // For each submodel in the entity.
+                    bind(subModel); // Bind the submodel.
                     prepare(entity, camera); // Prepare the entity.
                     GL11.glDrawElements(GL11.GL_TRIANGLES, subModel.getVertexCount(), GL11.GL_UNSIGNED_INT, 0); // Draw the elements.
-                    unbind(); // Unbind the sub-model.
+                    unbind(); // Unbind the submodel.
                 }
             }
         }
@@ -108,7 +109,7 @@ public class EntityRenderer implements IRenderer<Entity> {
      * @param model The model to bind.
      */
     @Override
-    public void bind(Model model) {
+    public void bind(@NotNull Model model) {
         shader.setUniform("material", model.getMaterial()); // Set the material uniform.
 
         GL30.glBindVertexArray(model.getId()); // Bind the vertex array.

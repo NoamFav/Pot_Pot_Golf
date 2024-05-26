@@ -3,6 +3,8 @@ package com.um_project_golf.Core;
 import com.um_project_golf.Core.Entity.Model;
 import com.um_project_golf.Core.Entity.Texture;
 import com.um_project_golf.Core.Utils.Utils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.*;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
@@ -54,7 +56,7 @@ public class ObjectLoader {
             List<Float> textureCoords = new ArrayList<>();
             List<Float> normals = new ArrayList<>();
             List<Integer> indices = new ArrayList<>();
-            processMesh(mesh, vertices, textureCoords, normals, indices, 0); // Process the mesh
+            processMesh(mesh, vertices, textureCoords, normals, indices); // Process the mesh
 
             Model model = loadModel(listToArray(vertices), listToArray(textureCoords), listToArray(normals), listToIntArray(indices));
 
@@ -80,7 +82,7 @@ public class ObjectLoader {
      * @return The texture.
      * @throws Exception If the texture fails to load.
      */
-    private Texture loadMaterialTexture(AIMaterial material, String modelPath) throws Exception {
+    private @Nullable Texture loadMaterialTexture(AIMaterial material, String modelPath) throws Exception {
         Path basePath = Paths.get(modelPath).getParent();
 
         AIString texturePath = AIString.calloc();
@@ -105,14 +107,13 @@ public class ObjectLoader {
     /**
      * Processes a mesh and appends its data to the provided lists.
      *
-     * @param mesh The mesh to process.
+     * @param mesh     The mesh to process.
      * @param vertices The list to append vertices to.
      * @param textures The list to append texture coordinates to.
-     * @param normals The list to append normals to.
-     * @param indices The list to append indices to.
-     * @param indexOffset The current index offset.
+     * @param normals  The list to append normals to.
+     * @param indices  The list to append indices to.
      */
-    private void processMesh(AIMesh mesh, List<Float> vertices, List<Float> textures, List<Float> normals, List<Integer> indices, int indexOffset) {
+    private void processMesh(@NotNull AIMesh mesh, List<Float> vertices, List<Float> textures, List<Float> normals, List<Integer> indices) {
         for (int i = 0; i < mesh.mNumVertices(); i++) { // Loop through the vertices
             AIVector3D vertex = mesh.mVertices().get(i); // Get the vertex
             vertices.add(vertex.x()); // Add the x-coordinate of the vertex
@@ -137,7 +138,7 @@ public class ObjectLoader {
         for (int i = 0; i < mesh.mNumFaces(); i++) { // Loop through the faces
             AIFace face = mesh.mFaces().get(i); // Get the face
             for (int j = 0; j < face.mNumIndices(); j++) { // Loop through the indices
-                indices.add(face.mIndices().get(j) + indexOffset); // Add the index with the current offset
+                indices.add(face.mIndices().get(j)); // Add the index with the current offset
             }
         }
     }
@@ -148,7 +149,7 @@ public class ObjectLoader {
      * @param list The list of materials.
      * @return The material processed.
      */
-    private float[] listToArray(List<Float> list) {
+    private float @NotNull [] listToArray(@NotNull List<Float> list) {
         float[] array = new float[list.size()]; // Create a new array
         for (int i = 0; i < list.size(); i++) { // Loop through the list
             array[i] = list.get(i); // Add the element to the array
@@ -162,7 +163,7 @@ public class ObjectLoader {
      * @param list The list of materials.
      * @return The material processed.
      */
-    private int[] listToIntArray(List<Integer> list) {
+    private int @NotNull [] listToIntArray(@NotNull List<Integer> list) {
         int[] array = new int[list.size()]; // Create a new array
         for (int i = 0; i < list.size(); i++) { // Loop through the list
             array[i] = list.get(i); // Add the element to the array

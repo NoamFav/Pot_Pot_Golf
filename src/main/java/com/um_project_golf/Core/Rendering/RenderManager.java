@@ -12,8 +12,7 @@ import com.um_project_golf.Core.ShaderManager;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.WindowManager;
 import com.um_project_golf.Game.Launcher;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
@@ -24,7 +23,6 @@ import java.util.List;
  */
 public class RenderManager {
 
-    private static final Logger log = LogManager.getLogger(RenderManager.class); // The logger of the render manager.
     private final WindowManager window;
     private EntityRenderer entityRenderer;
     private TerrainRenderer terrainRenderer;
@@ -60,7 +58,7 @@ public class RenderManager {
      * @param directionalLight The directional light of the game.
      * @param shader The shader of the game.
      */
-    public static void renderLight(PointLight[] pointLights, SpotLight[] spotLights, DirectionalLight directionalLight, ShaderManager shader) {
+    public static void renderLight(PointLight[] pointLights, SpotLight[] spotLights, DirectionalLight directionalLight, @NotNull ShaderManager shader) {
         shader.setUniform("ambientLight", Consts.AMBIENT_LIGHT); // Set the ambient light.
         shader.setUniform("specularPower", Consts.SPECULAR_POWER); // Set the specular power.
 
@@ -114,7 +112,7 @@ public class RenderManager {
      *
      * @param entity The entity to process.
      */
-    public void processEntity(Entity entity) {
+    public void processEntity(@NotNull Entity entity) {
         for (Model subModel : entity.getModels()) { // Loop through each sub-model of the entity
             List<Entity> batch = entityRenderer.getEntities().get(subModel); // Get the batch for the sub-model
             if (batch != null) { // If the batch is not null

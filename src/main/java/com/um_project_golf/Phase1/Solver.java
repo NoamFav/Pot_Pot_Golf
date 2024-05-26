@@ -1,6 +1,7 @@
 package com.um_project_golf.Phase1;
 
 import net.objecthunter.exp4j.Expression;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -54,7 +55,7 @@ public class Solver {
         return List.of(solutionsEulerHard, solutionsImprovedEulerHard, solutionsRK4Hard);
     }
 
-    private void print(double tFinal, HashMap<String, Double> solutionsEulerHard, HashMap<String, Double> solutionsImprovedEulerHard, HashMap<String, Double> solutionsRK4Hard, DecimalFormat df, boolean hard) {
+    private void print(double tFinal, @NotNull HashMap<String, Double> solutionsEulerHard, HashMap<String, Double> solutionsImprovedEulerHard, HashMap<String, Double> solutionsRK4Hard, DecimalFormat df, boolean hard) {
         for (String solution : solutionsEulerHard.keySet()) {
             Double valueE = solutionsEulerHard.get(solution);
             Double valueIE = solutionsImprovedEulerHard.get(solution);

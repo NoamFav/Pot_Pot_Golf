@@ -1,6 +1,7 @@
 package com.um_project_golf.Core;
 
 import com.um_project_golf.Game.Launcher;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
@@ -11,7 +12,7 @@ import org.lwjgl.glfw.GLFW;
  */
 public class MouseInput {
     private final Vector2d previousPos, currentPos; // The previous and current position of the mouse.
-    private final Vector2f displVec; // The displacement vector of the mouse.
+    private final Vector2f displayVec; // The displacement vector of the mouse.
 
     private boolean inWindow = true; // Flag to check if the cursor is in the window.
     private boolean leftButtonPressed = false; // Flag to check if the left button is pressed.
@@ -24,18 +25,18 @@ public class MouseInput {
     public MouseInput() {
         previousPos = new Vector2d(-1, -1);
         currentPos = new Vector2d(0, 0);
-        displVec = new Vector2f();
+        displayVec = new Vector2f();
     }
 
     /**
      * Initializes the mouse input.
-     * It sets the cursor position, window focus, cursor enter and mouse button callbacks.
+     * It sets the cursor position, window focus, cursor enter, and mouse button callbacks.
      */
     public void init() {
         // Set the cursor position callback to update the current position of the mouse.
-        GLFW.glfwSetCursorPosCallback(Launcher.getWindow().getWindow(), (window, xpos, ypos) -> {
-            currentPos.x = xpos;
-            currentPos.y = ypos;
+        GLFW.glfwSetCursorPosCallback(Launcher.getWindow().getWindow(), (window, xPos, yPos) -> {
+            currentPos.x = xPos;
+            currentPos.y = yPos;
         });
 
         // Set the window focus callback to update the inWindow flag.
@@ -67,7 +68,7 @@ public class MouseInput {
     }
 
     public void input() {
-        displVec.set(0,0); // Reset the displacement vector.
+        displayVec.set(0,0); // Reset the displacement vector.
         // If the previous position is valid, and the cursor is in the window.
         if (previousPos.x > 0 && previousPos.y > 0 && inWindow) {
             double deltaX = currentPos.x - previousPos.x; // The change in x position.
@@ -75,10 +76,10 @@ public class MouseInput {
             boolean rotateX = deltaX != 0; // Check if the x position has changed.
             boolean rotateY = deltaY != 0; // Check if the y position has changed.
             if (rotateX) { // If the x position has changed, set the x displacement.
-                displVec.y = (float) deltaX; // Set the x displacement.
+                displayVec.y = (float) deltaX; // Set the x displacement.
             }
             if (rotateY) { // If the y position has changed, set the y displacement.
-                displVec.x = (float) deltaY; // Set the y displacement.
+                displayVec.x = (float) deltaY; // Set the y displacement.
             }
         }
         previousPos.x = currentPos.x; // Set the previous x position.
@@ -91,7 +92,7 @@ public class MouseInput {
      * @return The displacement vector of the mouse.
      */
     public Vector2f getDisplayVec() {
-        return displVec;
+        return displayVec;
     }
 
     /**

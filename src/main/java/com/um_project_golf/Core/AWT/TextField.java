@@ -10,6 +10,9 @@ import org.lwjgl.system.MemoryStack;
 
 import static org.lwjgl.nanovg.NanoVG.*;
 
+/**
+ * The TextField class is used to render a text field on the screen
+ */
 public class TextField {
     private final float x, y;  // TextField position
     private final float width, height;  // TextField dimensions
@@ -23,6 +26,18 @@ public class TextField {
     private double scaledMouseX, scaledMouseY;  // Scaled mouse position
     private final WindowManager window = Launcher.getWindow(); // Window manager
 
+    /**
+     * Create a new TextField object
+     *
+     * @param x         The x position of the TextField
+     * @param y         The y position of the TextField
+     * @param width     The width of the TextField
+     * @param height    The height of the TextField
+     * @param prompt    The prompt to display when the TextField is empty
+     * @param fontSize  The font size of the text
+     * @param vg        The NanoVG context
+     * @param imagePath The path to the image to use for the TextField background
+     */
     public TextField(float x, float y, float width, float height, String prompt, float fontSize, long vg, String imagePath) {
         this.x = x;
         this.y = y;
@@ -41,8 +56,11 @@ public class TextField {
         }
     }
 
+    /**
+     * Render the TextField
+     */
     public void render() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
+        try (MemoryStack ignored = MemoryStack.stackPush()) {
             // Start new frame for NanoVG
             nvgBeginFrame(vg, window.getWidth(), window.getHeight(), 1);
 
@@ -85,11 +103,17 @@ public class TextField {
         }
     }
 
+    /**
+     * Update the TextField
+     */
     public void update() {
         updateMouseScaling();
         processTextFieldInteraction();
     }
 
+    /**
+     * Update the mouse scaling
+     */
     private void updateMouseScaling() {
         double[] mouseX = new double[1];
         double[] mouseY = new double[1];
@@ -109,6 +133,10 @@ public class TextField {
         scaledMouseY = mouseY[0] * scaleY;
     }
 
+    /**
+     * Process TextField interaction
+     * If the mouse is over the TextField and the left mouse button is pressed, focus the TextField
+     */
     private void processTextFieldInteraction() {
         boolean mouseOver = isMouseOver(scaledMouseX, scaledMouseY);
         boolean mouseButtonDown = GLFW.glfwGetMouseButton(GLFW.glfwGetCurrentContext(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
@@ -120,17 +148,31 @@ public class TextField {
         }
     }
 
+    /**
+     * Check if the mouse is over the TextField
+     *
+     * @param scaledMouseX The scaled x position of the mouse
+     * @param scaledMouseY The scaled y position of the mouse
+     * @return True if the mouse is over the TextField, false otherwise
+     */
     private boolean isMouseOver(double scaledMouseX, double scaledMouseY) {
         return scaledMouseX >= x && scaledMouseX <= x + width && scaledMouseY >= y && scaledMouseY <= y + height;
     }
 
+    /**
+     * Handle key input for the TextField
+     *
+     * @param key   The key code
+     * @param action The key action
+     * @param mods  The key mods
+     */
     public void handleKeyInput(int key, int action, int mods) {
         if (focused) {
             if (action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT) {
                 if (key == GLFW.GLFW_KEY_BACKSPACE && !text.isEmpty()) {
                     text = text.substring(0, text.length() - 1);
                 } else if (key == GLFW.GLFW_KEY_ENTER) {
-                    focused = false;  // Unfocus on Enter
+                    focused = false;  // Unfocused on Enter
                 } else {
                     int codePoint = glfwKeyToChar(key, mods);
                     if (codePoint != -1) {
@@ -141,6 +183,15 @@ public class TextField {
         }
     }
 
+    /**
+     * Convert GLFW key code to character
+     * Handles printable characters
+     * To be improved for more key codes and support for different keyboard layouts
+     *
+     * @param key  The key code
+     * @param mods The key mods
+     * @return The character corresponding to the key code
+     */
     private int glfwKeyToChar(int key, int mods) {
         // Handle printable characters
         if (key >= GLFW.GLFW_KEY_A && key <= GLFW.GLFW_KEY_Z) {
@@ -164,12 +215,11 @@ public class TextField {
         return -1; // Non-printable character
     }
 
+    /**
+     * Clean up the TextField
+     */
     public void cleanup() {
         nvgDeleteImage(vg, bgImage);
-    }
-
-    public void setText(String text) {
-        this.text = text;
     }
 
     public String getText() {
