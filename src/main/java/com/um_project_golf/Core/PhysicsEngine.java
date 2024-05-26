@@ -20,7 +20,7 @@ import org.joml.Vector3f;
 @SuppressWarnings("FieldCanBeLocal")
 public class PhysicsEngine {
 
-    private static final double GRAVITY = Consts.GRAVITY; // gravitational constant
+    private static final double g = Consts.GRAVITY; // gravitational constant
 
     private final double muK_grass = Consts.KINETIC_FRICTION_GRASS; // kinetic friction grass
     private final double muS_grass = Consts.STATIC_FRICTION_GRASS; // static friction grass
@@ -31,15 +31,6 @@ public class PhysicsEngine {
     @SuppressWarnings("FieldCanBeLocal") private static final double sandLevel = 0.5; // get this value from the constant file
     private final double VELOCITY_THRESHOLD = 0.05; // get this value from the constant file
     private final double ACCELERATION_THRESHOLD = 0.1; // get this value from the constant file
-    private final double DAMPING_COEFFICIENT = 0.1; // get this value from the constant file
-
-    File file = new File("output.txt");
-    File file2 = new File("output2.txt");
-
-
-
-    StringBuilder sb = new StringBuilder();
-    StringBuilder sb2 = new StringBuilder();
 
     /**
      * Create a new physics engine.
@@ -116,19 +107,11 @@ public class PhysicsEngine {
             magnitudeAcceleration = Math.sqrt(acceleration[2] * acceleration[2] + acceleration[3] * acceleration[3]);
             currentState = nextStep;
             currentTime += stepSize;
+
             assert heightMap != null;
             float height = heightMap.getHeight(new Vector3f((float) currentState[0], 0, (float) currentState[1]));
-            Vector3f position = new Vector3f((float) currentState[0], height, (float) currentState[1]);
-
-            sb2.append("Position: ").append(position).append("\n");
+            positions.add(new Vector3f((float) currentState[0], height, (float) currentState[1]));
         } while (magnitudeVelocity >= VELOCITY_THRESHOLD || magnitudeAcceleration >= ACCELERATION_THRESHOLD); // While the ball is not at rest
-
-        try (java.io.FileWriter fw = new java.io.FileWriter(file2, true)) {
-            fw.write(sb2.toString());
-            sb2.setLength(0);
-        } catch (java.io.IOException e) {
-            e.printStackTrace(System.err);
-        }
 
         return positions;
     }
@@ -166,43 +149,36 @@ public class PhysicsEngine {
         dh_dxValue = Math.abs(dh_dxValue) < 0.00001 ? 0 : dh_dxValue;
         dh_dzValue = Math.abs(dh_dzValue) < 0.00001 ? 0 : dh_dzValue;
 
-        if (magnitudeVelocity >= VELOCITY_THRESHOLD || dh_dxValue == 0 && dh_dzValue == 0) {
+        if (magnitudeVelocity >= VELOCITY_THRESHOLD) {
             // Moving or no slope present
             dxdt[0] = vx;
             dxdt[1] = vz;
 
+            // Calculate acceleration in x-direction
+            dxdt[2] = -g * dh_dxValue - kineticFriction * g * vx / magnitudeVelocity;
+            // Calculate acceleration in z-direction
+            dxdt[3] = -g * dh_dzValue - kineticFriction * g * vz / magnitudeVelocity;
 
-            dxdt[2] = -GRAVITY * dh_dxValue - kineticFriction * GRAVITY * vx / magnitudeVelocity;
-            dxdt[3] = - GRAVITY * dh_dzValue - kineticFriction * GRAVITY * vz / magnitudeVelocity;
-        } else {
-            // Considered at rest or very slow movement on a slope
-            double dh2 = Math.sqrt(dh_dxValue * dh_dxValue + dh_dzValue * dh_dzValue);
-            double slopeForce = dh2 * GRAVITY;
-            double staticFrictionForce = staticFriction * GRAVITY;
+        } else { // if the ball is at rest
+            vx = 0;
+            vz = 0;
+            dxdt[0] = vx;
+            dxdt[1] = vz;
 
-            if (staticFrictionForce < slopeForce) {
-                // Slope force overcomes static friction, begins to slide
-                dxdt[2] = -GRAVITY * dh_dxValue;
-                dxdt[3] = -GRAVITY * dh_dzValue;
+            if (dh_dxValue != 0 || dh_dzValue != 0) { // if the ball is on a slope
+                double dh2 = Math.sqrt(dh_dxValue * dh_dxValue + dh_dzValue * dh_dzValue);
+
+                if (staticFriction <= dh2) { // if the friction force is not does not overcome the downhill force, the ball will continue to slide
+                    dxdt[2] = -g * dh_dxValue - kineticFriction * g * dh_dxValue / dh2;
+                    dxdt[3] = -g * dh_dzValue - kineticFriction * g * dh_dzValue / dh2;
+                }
             } else {
-                // Static friction holds the object stationary
                 dxdt[2] = 0;
                 dxdt[3] = 0;
             }
-            dxdt[0] = 0;
-            dxdt[1] = 0;
         }
 
-        sb.append("dxdt: ").append(Arrays.toString(dxdt)).append("\n");
-
-        try (java.io.FileWriter fw = new java.io.FileWriter(file, true)) {
-            fw.write(sb.toString());
-            sb.setLength(0);
-        } catch (java.io.IOException e) {
-            e.printStackTrace(System.err);
-        }
-
-        return dxdt; // dxdt = [x_dot, z_dot, vx_dot, vz_dot]
+        return dxdt; // dxdt = [vx, vz, ax, az]
     }
 
 
