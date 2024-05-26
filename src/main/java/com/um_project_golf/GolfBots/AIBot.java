@@ -16,7 +16,7 @@ public class AIBot {
     private double maxVelocityX = 100;
     private double minVelocityZ = 0;
     private double maxVelocityZ = 0;
-    private float velocityStepX = 0.1F;
+    private double velocityStepX = 0.1;
     private double velocityStepZ = 0.1;
     private HeightMap testMap;
     private Entity ball;
@@ -46,8 +46,8 @@ public class AIBot {
         Random random = new Random();
 
         // Initialize with a random shot
-        double velocityX = minVelocityX + (maxVelocityX - minVelocityX) * random.nextDouble();
-        double velocityZ = minVelocityZ + (maxVelocityZ - minVelocityZ) * random.nextDouble();
+        float velocityX = (float) (minVelocityX + (maxVelocityX - minVelocityX) * random.nextDouble());
+        float velocityZ = (float) (minVelocityZ + (maxVelocityZ - minVelocityZ) * random.nextDouble());
         Vector3f velocity = new Vector3f(velocityX, 0,velocityZ);
         Shot currentShot = new Shot(velocity);
 
@@ -63,7 +63,9 @@ public class AIBot {
                 for (double dZ = -velocityStepZ; dZ <= velocityStepZ; dZ += velocityStepZ) {
                     if (dX == 0 && dZ == 0) continue; // Skip the current shot
 
-                    Shot neighborShot = new Shot(new Vector3f(currentShot.getVelocity().x + dX,0,currentShot.getVelocity().z + dZ) );
+                    float newVelocityX = (float) (currentShot.getVelocity().x + dX);
+                    float newVelocityZ = (float) (currentShot.getVelocity().z + dZ);
+                    Shot neighborShot = new Shot(new Vector3f(newVelocityX,0,newVelocityZ) );
                     double neighborDistance = evaluateShot(neighborShot, green);
 
                     if (neighborDistance < bestNeighborDistance) {
