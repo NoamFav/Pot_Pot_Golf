@@ -146,7 +146,7 @@ public class GolfGame implements ILogic {
         window.setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
 
         heightMap.createHeightMap();
-        path = pathfinder.getPath(20, 30, 5); // upper and lower bounds for the radius of the path
+        path = pathfinder.getPath(Consts.RADIUS_DOWN, Consts.RADIUS_UP, Consts.SIZE_GREEN); // upper and lower bounds for the radius of the path
 
         modelAndEntityCreation();
         terrainCreation();
@@ -356,7 +356,7 @@ public class GolfGame implements ILogic {
                         }
                     }
 
-                    ballCollisionDetector.checkCollisionBall(nextPosition);
+                    //ballCollisionDetector.checkCollisionBall(nextPosition);
                     if (nextPosition.y <= -0.3) { // Ball in water
                         golfBall.setPosition(shotStartPosition.x, shotStartPosition.y, shotStartPosition.z);
                         isAnimating = false;
@@ -825,7 +825,7 @@ public class GolfGame implements ILogic {
                 trees.clear();
                 System.out.println("Changing terrain");
                 heightMap.createHeightMap();
-                path = pathfinder.getPath(410, 550, 15);
+                path = pathfinder.getPath(Consts.RADIUS_DOWN, Consts.RADIUS_UP, Consts.SIZE_GREEN);
                 startPoint = new Vector3f(path.get(0).x, 0, path.get(0).y);
                 startPoint.x = (int) (startPoint.x / 4 - Consts.SIZE_X / 2);
                 startPoint.z = (int) (startPoint.z / 4 - Consts.SIZE_Z / 2);

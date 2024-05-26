@@ -6,9 +6,6 @@ import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
-import java.io.File;
-import java.io.PrintWriter;
-
 /**
  * The class responsible for detecting collisions with the camera.
  */
