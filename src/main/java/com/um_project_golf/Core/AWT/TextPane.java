@@ -8,6 +8,9 @@ import org.lwjgl.opengl.GL11;
 
 import static org.lwjgl.nanovg.NanoVG.*;
 
+/**
+ * The TextPane class is used to render a text pane on the screen
+ */
 public class TextPane {
 
     private final float x, y;  // TextPane position
@@ -19,6 +22,18 @@ public class TextPane {
 
     private final WindowManager window = Launcher.getWindow();
 
+    /**
+     * Create a new TextPane object
+     *
+     * @param x         The x position of the TextPane
+     * @param y         The y position of the TextPane
+     * @param width     The width of the TextPane
+     * @param height    The height of the TextPane
+     * @param text      The text to display on the TextPane
+     * @param fontSize  The font size of the text
+     * @param vg        The NanoVG context
+     * @param imagePath The path to the image to use for the TextPane background
+     */
     public TextPane(float x, float y, float width, float height, String text, float fontSize, long vg, String imagePath) {
         this.x = x;
         this.y = y;
@@ -35,6 +50,9 @@ public class TextPane {
         }
     }
 
+    /**
+     * Render the TextPane
+     */
     public void render() {
         nvgBeginFrame(vg, window.getWidth(), window.getHeight(), 1);
 
@@ -63,8 +81,6 @@ public class TextPane {
         nvgFillColor(vg, textColor);
         nvgText(vg, x + width / 2, y + height / 2, text);
 
-        String displayText = text;
-
         // End the frame for NanoVG
         nvgEndFrame(vg);
 
@@ -79,6 +95,9 @@ public class TextPane {
         GL11.glCullFace(GL11.GL_BACK); // Restore face culling
     }
 
+    /**
+     * Cleanup the TextPane
+      */
     public void cleanup() {
         if (bgImage != 0) {
             nvgDeleteImage(vg, bgImage);
@@ -86,6 +105,7 @@ public class TextPane {
         }
     }
 
+    @SuppressWarnings("unused")
     public String getText() {
         return text;
     }

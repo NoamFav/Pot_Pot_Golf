@@ -15,6 +15,8 @@ import com.um_project_golf.Core.Utils.BallCollisionDetector;
 import com.um_project_golf.Core.Utils.CollisionsDetector;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.Entity.Terrain.HeightMapPathfinder;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
@@ -37,9 +39,7 @@ import static org.lwjgl.nanovg.NanoVGGL3.*;
  */
 public class GolfGame implements ILogic {
 
-    private enum AnimationState {
-        IDLE, GOING_UP, GOING_DOWN
-    }
+    private enum AnimationState {IDLE, GOING_UP, GOING_DOWN}
 
     private final RenderManager renderer;
     private final ObjectLoader loader;
@@ -47,7 +47,7 @@ public class GolfGame implements ILogic {
     private final SceneManager scene;
     private MouseInput mouseInputs;
     private AudioManager audioManager;
-    private HeightMapPathfinder pathfinder;
+    private final HeightMapPathfinder pathfinder;
     private final CollisionsDetector collisionsDetector;
     private long vg;
 
@@ -81,11 +81,8 @@ public class GolfGame implements ILogic {
     private boolean hasStartPoint = false;
     public static boolean debugMode = false;
 
-    private float lastY;
-
     private AnimationState treeAnimationState = AnimationState.IDLE;
     private float treeAnimationTime = 0f;
-    private Entity animatedTree; // The tree to be animated
 
     private List<Model> tree;
     private final List<Entity> trees;
@@ -149,7 +146,7 @@ public class GolfGame implements ILogic {
         window.setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
 
         heightMap.createHeightMap();
-        path = pathfinder.getPath(410, 550, 15); // upper and lower bounds for the radius of the path
+        path = pathfinder.getPath(20, 30, 5); // upper and lower bounds for the radius of the path
 
         modelAndEntityCreation();
         terrainCreation();
@@ -178,7 +175,6 @@ public class GolfGame implements ILogic {
         //float lightPos2 = scene.getSpotLights()[1].getPointLight().getPosition().z;
 
         float moveSpeed = Consts.CAMERA_MOVEMENT_SPEED  / EngineManager.getFps();
-        float gravity = -9.81f;
 
         if (window.is_keyPressed(GLFW.GLFW_KEY_ESCAPE)) {
             isGuiVisible = true;  // Toggle GUI visibility
@@ -347,14 +343,24 @@ public class GolfGame implements ILogic {
 
                 if (currentPositionIndex < ballPositions.size()) {
                     Vector3f nextPosition = ballPositions.get(currentPositionIndex);
-                    Vector3f currentPosition = golfBall.getPosition();
+                    if (nextPosition == ballPositions.get(ballPositions.size() - 1)) {
+                        float isInHoleThreshold = 1.5f;
+                        if (nextPosition.x <= endPoint.x + isInHoleThreshold && nextPosition.x >= endPoint.x - isInHoleThreshold) {
+                            if (nextPosition.z <= endPoint.z + isInHoleThreshold && nextPosition.z >= endPoint.z - isInHoleThreshold) {
+                                System.out.println("Ball reached the end point!");
+                                System.out.println(endPoint);
+                                warningTextPane.setText("Ball reached the end point!");
+                                treeAnimationState = AnimationState.GOING_UP;
+                                treeAnimationTime = 0f;
+                            }
+                        }
+                    }
 
-                    ballCollisionDetector.checkCollisionBall(currentPosition, nextPosition);
-
-                    if (nextPosition.y <= -0.3) {
+                    ballCollisionDetector.checkCollisionBall(nextPosition);
+                    if (nextPosition.y <= -0.3) { // Ball in water
                         golfBall.setPosition(shotStartPosition.x, shotStartPosition.y, shotStartPosition.z);
                         isAnimating = false;
-                        warningTextPane.setText("Ball out of bounds! Resetting to last shot position.");
+                        warningTextPane.setText("Ball in water! Resetting to last shot position.");
                     } else {
                         golfBall.setPosition(nextPosition.x, nextPosition.y, nextPosition.z);
                         currentPositionIndex++;
@@ -468,7 +474,7 @@ public class GolfGame implements ILogic {
 
         List<TerrainTexture> textures = new ArrayList<>(List.of(sand, grass, fairway, dryGrass, mold, rock, snow));
         List<TerrainTexture> waterTextures = new ArrayList<>();
-        for (TerrainTexture texture : textures) {
+        for (TerrainTexture ignored : textures) {
             waterTextures.add(water);
         }
 
@@ -476,7 +482,7 @@ public class GolfGame implements ILogic {
         blueTerrain = new BlendMapTerrain(waterTextures);
 
         terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap, false);
-        ocean = new Terrain(new Vector3f(-Consts.SIZE_X / 2, -1, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blueTerrain, blendMap, true);
+        ocean = new Terrain(new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blueTerrain, blendMap, true);
         scene.addTerrain(terrain);
         scene.addTerrain(ocean);
         ocean.getModel().getMaterial().setDisableCulling(true);
@@ -492,6 +498,7 @@ public class GolfGame implements ILogic {
         List<Model> flag = loader.loadAssimpModel("src/main/resources/Models/flag/flag.obj");
         List<Model> tree2 = loader.loadAssimpModel("src/main/resources/Models/tree2/tree3-N.obj");
         List<Model> tree3 = loader.loadAssimpModel("src/main/resources/Models/sakura/sakura-A.obj");
+        List<Model> cloud = loader.loadAssimpModel("src/main/resources/Models/cloud/cloud lowpoly(big) -A.obj");
 
         for (Model model : tree) model.getMaterial().setDisableCulling(true);
         for (Model model : tree2) model.getMaterial().setDisableCulling(true);
@@ -501,12 +508,14 @@ public class GolfGame implements ILogic {
         for (Model model : arrow) model.getMaterial().setDisableCulling(true);
         for (Model model : flag) model.getMaterial().setDisableCulling(true);
         for (Model model : ball) model.getMaterial().setDisableCulling(true);
+        for (Model model : cloud) model.getMaterial().setDisableCulling(true);
 
         scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
+        scene.addEntity(new Entity(cloud, new Vector3f(0, 30, 0), new Vector3f(0, 0 , 0), 1 ));
         scene.addEntity(new Entity(wolf, new Vector3f(0, 20, 0), new Vector3f(45, 0 , 0), 20 ));
 
-        scene.addEntity(new Entity(tree2, new Vector3f(0, 10, 0), new Vector3f(0, 0, 0), 5));
-        scene.addEntity(new Entity(tree3, new Vector3f(10, 10, 0), new Vector3f(0, 0, 0), 5));
+        //scene.addEntity(new Entity(tree2, new Vector3f(0, 10, 0), new Vector3f(0, 0, 0), 5));
+        //scene.addEntity(new Entity(tree3, new Vector3f(10, 10, 0), new Vector3f(0, 0, 0), 5));
 
         arrowEntity = new Entity(arrow, new Vector3f(0, 0, 0), new Vector3f(0,-90 ,0), 2);
         scene.addEntity(arrowEntity);
@@ -527,10 +536,10 @@ public class GolfGame implements ILogic {
         System.out.println("End point: " + endPoint);
 
         //scene.addEntity(new Entity(flag, new Vector3f(startPoint.x, heightMap.getHeight(new Vector3f(startPoint.x, 0 , startPoint.y)), startPoint.y), new Vector3f(0, 0, 0), 3));
-        endFlag = new Entity(flag, endPoint, new Vector3f(0, 0, 0), 5);
+        endFlag = new Entity(flag, new Vector3f(endPoint), new Vector3f(0, 0, 0), 5);
         scene.addEntity(endFlag);
 
-        golfBall = new Entity(ball,startPoint, new Vector3f(50, 0, 0), 5);
+        golfBall = new Entity(ball, new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
         scene.addEntity(golfBall);
 
         createTrees(tree);
@@ -733,8 +742,8 @@ public class GolfGame implements ILogic {
         //infoButton = new Button(x, y, width, height, "Info", 70, () -> {}, vg, imageButton);
         numberOfShots = 0;
         infoTextPane = new TextPane(x, y, width, height / 2, "Position: (" + (int) golfBall.getPosition().x + ", " + (int) golfBall.getPosition().z + "). Number of shots: " + numberOfShots, 40, vg, imageButton);
-        warningTextPane = new TextPane(x, y + height / 2, width, height / 2, "", textFieldFont * .2f, vg, imageButton);
-        ballCollisionDetector = new BallCollisionDetector(heightMap, scene, warningTextPane);
+        warningTextPane = new TextPane(x, y + height / 2, width, height / 2, "", textFieldFont * .8f, vg, imageButton);
+        ballCollisionDetector = new BallCollisionDetector(heightMap, scene);
         //infoButton = new Button(x, y, width, height, "Info", font, () -> {}, vg, imageButton);
 
         // Creating text-fields and text panes for entering the velocities
@@ -759,9 +768,17 @@ public class GolfGame implements ILogic {
             }
         });
 
-        PhysicsEngine engine = new PhysicsEngine(heightMap, Consts.KINETIC_FRICTION_GRASS, Consts.STATIC_FRICTION_GRASS, Consts.KINETIC_FRICTION_SAND, Consts.STATIC_FRICTION_SAND);
+        Runnable applyVelocity = getPhysicsRunnable();
 
-        Runnable applyVelocity = () -> {
+        applyButton = new Button(x, y * 30 + height, 3 * width / 5, 2 * height / 3, "Apply Velocity", font, applyVelocity, vg, imageButton);
+    }
+
+    @NotNull
+    @Contract(pure = true)
+    private Runnable getPhysicsRunnable() {
+        PhysicsEngine engine = new PhysicsEngine(heightMap);
+
+        return () -> {
             if (isAnimating) {
                 return; // Exit if already animating
             }
@@ -777,6 +794,7 @@ public class GolfGame implements ILogic {
                     double[] initialState = {golfBall.getPosition().x, golfBall.getPosition().z, vx, vz}; // initialState = [x, z, vx, vz]
                     double h = 0.1; // Time step
                     ballPositions = engine.runImprovedEuler(initialState, h);
+
                     currentPositionIndex = 0;
                     isAnimating = true;
                     animationTimeAccumulator = 0f;
@@ -788,8 +806,6 @@ public class GolfGame implements ILogic {
                 throw new RuntimeException(e);
             }
         };
-
-        applyButton = new Button(x, y * 30 + height, 3 * width / 5, 2 * height / 3, "Apply Velocity", font, applyVelocity, vg, imageButton);
     }
 
     /**
@@ -803,7 +819,6 @@ public class GolfGame implements ILogic {
         camera.setRotation(20, 0, 0);
 
         float width = window.getWidth();
-        float height = window.getHeight();
 
         Runnable terrainChanger = () -> {
             try {
@@ -835,13 +850,15 @@ public class GolfGame implements ILogic {
 
         Runnable startGame = () -> {
             System.out.println("Allowing movement");
-            golfBall.setPosition(startPoint.x, startPoint.y, startPoint.z);
             camera.setPosition(startPoint);
             camera.setRotation(0, 0, 0);
             canMove = true;
             isGuiVisible = false;
             isOnMenu = false;
             gameStarted = true;
+
+            golfBall.setPosition(startPoint.x, startPoint.y, startPoint.z);
+            endFlag.setPosition(endPoint.x, endPoint.y, endPoint.z);
         };
 
         Runnable sound = () -> {
@@ -1016,15 +1033,6 @@ public class GolfGame implements ILogic {
             throw new RuntimeException(e);
         }
         renderer.processTerrain(terrain);
-    }
-
-    private float secondToVelocity(long ms) {
-        float second = (float) ms / 1000;
-        return cappedExponentialFunc(second, 3, 1, 74);
-    }
-
-    private float cappedExponentialFunc(float s, float C, float k, float max) {
-        return (float) Math.min(C*(Math.exp(k*s)-1), max);
     }
 
     public boolean canMove() {

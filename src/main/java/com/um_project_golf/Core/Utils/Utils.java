@@ -1,19 +1,12 @@
 package com.um_project_golf.Core.Utils;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.MemoryUtil;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.Scanner;
 
 /**
@@ -22,15 +15,13 @@ import java.util.Scanner;
  */
 public class Utils {
 
-    private static final Logger log = LogManager.getLogger(Utils.class); // The logger
-
     /**
      * Stores data in a float buffer.
      *
      * @param data The data to store.
      * @return The float buffer.
      */
-    public static FloatBuffer storeDataInFloatBuffer(float[] data) {
+    public static @NotNull FloatBuffer storeDataInFloatBuffer(float @NotNull [] data) {
         FloatBuffer buffer = MemoryUtil.memAllocFloat(data.length); // Allocate memory for the float buffer
         buffer.put(data).flip(); // Put the data into the buffer and flip it
         return buffer; // Return the buffer
@@ -42,7 +33,7 @@ public class Utils {
      * @param data The data to store.
      * @return The int buffer.
      */
-    public static IntBuffer storeDataInIntBuffer(int[] data) {
+    public static @NotNull IntBuffer storeDataInIntBuffer(int @NotNull [] data) {
         IntBuffer buffer = MemoryUtil.memAllocInt(data.length); // Allocate memory for the int buffer
         buffer.put(data).flip(); // Put the data into the buffer and flip it
         return buffer; // Return the buffer
@@ -64,24 +55,5 @@ public class Utils {
             result = scanner.useDelimiter("\\A").next(); // Get the result
         }
         return result; // Return the result
-    }
-
-    /**
-     * Reads all lines from a file.
-     *
-     * @param fileName The name of the file to read.
-     * @return The lines read.
-     */
-    public static List<String> readAllLines(String fileName) {
-        List<String> list = new ArrayList<>(); // Initialize a new list
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(Class.forName(Utils.class.getName()).getResourceAsStream(fileName))))) { // Try with resources
-            String line; // The line
-            while ((line = reader.readLine()) != null) { // While the line is not null
-                list.add(line); // Add the line to the list
-            }
-        } catch (IOException | ClassNotFoundException e) { // Catch any exceptions
-            log.error("An error occurred", e); // Log the error
-        }
-        return list; // Return the list
     }
 }

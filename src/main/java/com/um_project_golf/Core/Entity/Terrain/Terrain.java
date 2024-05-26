@@ -7,6 +7,7 @@ import com.um_project_golf.Core.Entity.Texture;
 import com.um_project_golf.Core.ObjectLoader;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Game.GolfGame;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 /**
@@ -66,7 +67,6 @@ public class Terrain {
         int[] indices = new int[6 * (Consts.VERTEX_COUNT - 1) * (Consts.VERTEX_COUNT - 1)]; // The indices
         int vertexPointer = 0; // The vertex pointer
         float[][] heightmap = SceneManager.getHeightMap(); // The heightmap
-        float scale = Consts.TEXTURE_SCALE; // The scale of the texture
 
         for(int i = 0; i < Consts.VERTEX_COUNT; i++){ // Loop through the heightmap array
             for(int j = 0; j < Consts.VERTEX_COUNT; j++){ // Loop through the heightmap array
@@ -123,7 +123,7 @@ public class Terrain {
      * @param normals The normals of the terrain.
      * @param vertexPointer The vertex pointer.
      */
-    private static void calcNormals(int j, float[][] heightmap, int i, float height, float[] normals, int vertexPointer) {
+    private static void calcNormals(int j, float[][] heightmap, int i, float height, float @NotNull [] normals, int vertexPointer) {
         float heightLeft = j > 0 ? heightmap[j - 1][i] : height; // Get the height of the left vertex
         float heightRight = j < Consts.VERTEX_COUNT - 1 ? heightmap[j + 1][i] : height; // Get the height of the right vertex
         float heightDown = i > 0 ? heightmap[j][i - 1] : height; // Get the height of the down vertex

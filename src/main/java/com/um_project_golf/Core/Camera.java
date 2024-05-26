@@ -26,6 +26,7 @@ public class Camera {
      * @param position The position of the camera.
      * @param rotation The rotation of the camera.
      */
+    @SuppressWarnings("unused")
     public Camera(Vector3f position, Vector3f rotation) {
         this.position = position;
         this.rotation = rotation;

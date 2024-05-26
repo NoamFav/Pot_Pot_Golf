@@ -1,6 +1,7 @@
 package com.um_project_golf.Core;
 
 import com.um_project_golf.Core.Utils.Consts;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -134,7 +135,7 @@ public class WindowManager {
      */
     public void cleanup() {
         GLFW.glfwDestroyWindow(window); // Destroy the window.
-        GLFW.glfwTerminate(); // Terminate GLFW. (Free the resources)
+        GLFW.glfwTerminate(); // Terminate GLFW. (Free resources)
     }
 
     /**
@@ -173,6 +174,7 @@ public class WindowManager {
      *
      * @return The title of the window.
      */
+    @SuppressWarnings("unused")
     public String getTitle() {
         return title;
     }
@@ -222,6 +224,7 @@ public class WindowManager {
      *
      * @param vSync The vSync of the window.
      */
+    @SuppressWarnings("unused")
     public void set_vSync(boolean vSync) {
         this.vSync = vSync;
     }
@@ -258,10 +261,12 @@ public class WindowManager {
      *
      * @return The projection matrix of the window manager.
      */
+    @SuppressWarnings("unused")
     public Matrix4f getProjectionMatrix() {
         return projectionMatrix;
     }
 
+    @SuppressWarnings("unused")
     public boolean isAntiAliasing() {
         return antiAliasing;
     }
@@ -286,16 +291,33 @@ public class WindowManager {
      * @param matrix The matrix to update.
      * @return The updated projection matrix.
      */
-    public Matrix4f updateProjectionMatrix(Matrix4f matrix, int width, int height) {
+    @SuppressWarnings("unused")
+    public Matrix4f updateProjectionMatrix(@NotNull Matrix4f matrix, int width, int height) {
         float aspectRatio = (float) width / (float) height; // Calculate the aspect ratio.
         return matrix.setPerspective(Consts.FOV, aspectRatio, Consts.Z_NEAR, Consts.Z_FAR); // Set the perspective.
     }
 
+    /**
+     * Converts a value from the reference width to the current width.
+     * Makes sure the value is scaled correctly.
+     * To keep the aspect ratio of the game.
+     *
+     * @param value The value to convert.
+     * @return The converted value.
+     */
     public float getWidthConverted(float value) {
         float scaleFactor = width / Consts.REFERENCE_WIDTH;
         return value * scaleFactor;
     }
 
+    /**
+     * Converts a value from the reference height to the current height.
+     * Makes sure the value is scaled correctly.
+     * To keep the aspect ratio of the game.
+     *
+     * @param value The value to convert.
+     * @return The converted value.
+     */
     public float getHeightConverted(float value) {
         float scaleFactor = height / Consts.REFERENCE_HEIGHT;
         return value * scaleFactor;

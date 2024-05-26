@@ -1,6 +1,7 @@
 package com.um_project_golf.Phase1;
 
 import net.objecthunter.exp4j.Expression;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -10,7 +11,8 @@ import java.util.Map;
 public class EulerSolver {
 
     // Euler's method for solving systems of first-order differential equations
-    public static HashMap<String, Double> eulerMethod(List<List<InputManagement.Token>> derivatives, HashMap<String, Double> initialValues, double stepSize, double tInitial, double tFinal, List<String> equations)
+    @Deprecated
+    public static @NotNull HashMap<String, Double> eulerMethod(List<List<InputManagement.Token>> derivatives, HashMap<String, Double> initialValues, double stepSize, double tInitial, double tFinal, List<String> equations)
     {
         int numSteps = (int) Math.ceil((tFinal-tInitial) / stepSize);// Number of steps necessary to get to the final time (Math.ceil just rounds up the number to an integer)
 
@@ -51,7 +53,7 @@ public class EulerSolver {
         return values;
     }
 
-    public static LinkedHashMap<Double, LinkedHashMap<String, Double>> eulerMethodHard(
+    public static @NotNull LinkedHashMap<Double, LinkedHashMap<String, Double>> eulerMethodHard(
             HashMap<String, Expression> derivatives,
             HashMap<String, Double> initialValues,
             double stepSize,

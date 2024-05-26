@@ -5,6 +5,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class GraphSolver extends Application {
-    public LineChart<Number,Number> createGraph(LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4, double tInitial, boolean euler, boolean improvedEuler, boolean rk4, double stepSize) {
+    public LineChart<Number,Number> createGraph(@NotNull LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler, LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsRK4, double tInitial, boolean euler, boolean improvedEuler, boolean rk4, double stepSize) {
         NumberAxis xAxis = new NumberAxis();
         xAxis.setLabel("Time");
         xAxis.setTickUnit(stepSize);
@@ -73,7 +74,7 @@ public class GraphSolver extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(@NotNull Stage primaryStage) {
         Solver solver = new Solver();
         LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsEuler = new LinkedHashMap<>();
         LinkedHashMap<Double, LinkedHashMap<String, Double>> solutionsImprovedEuler = new LinkedHashMap<>();
