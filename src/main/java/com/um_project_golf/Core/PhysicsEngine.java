@@ -1,6 +1,7 @@
 package com.um_project_golf.Core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.io.File;
@@ -19,7 +20,7 @@ import org.joml.Vector3f;
 @SuppressWarnings("FieldCanBeLocal")
 public class PhysicsEngine {
 
-    private static final double g = Consts.GRAVITY; // gravitational constant
+    private static final double GRAVITY = Consts.GRAVITY; // gravitational constant
 
     private final double muK_grass = Consts.KINETIC_FRICTION_GRASS; // kinetic friction grass
     private final double muS_grass = Consts.STATIC_FRICTION_GRASS; // static friction grass
@@ -28,14 +29,17 @@ public class PhysicsEngine {
     private final BiFunction<Double, Double, Double> heightFunction;
     private final HeightMap heightMap;
     @SuppressWarnings("FieldCanBeLocal") private static final double sandLevel = 0.5; // get this value from the constant file
-    private final double magnitudeVelocityThreshold = 0.05; // get this value from the constant file
-    private final double magnitudeAccelerationThreshold = 0.1; // get this value from the constant file
+    private final double VELOCITY_THRESHOLD = 0.05; // get this value from the constant file
+    private final double ACCELERATION_THRESHOLD = 0.1; // get this value from the constant file
+    private final double DAMPING_COEFFICIENT = 0.1; // get this value from the constant file
 
     File file = new File("output.txt");
+    File file2 = new File("output2.txt");
 
 
 
     StringBuilder sb = new StringBuilder();
+    StringBuilder sb2 = new StringBuilder();
 
     /**
      * Create a new physics engine.
@@ -110,14 +114,21 @@ public class PhysicsEngine {
             acceleration = equationsOfMotion(currentTime, currentState);
             magnitudeVelocity = Math.sqrt(nextStep[2] * nextStep[2] + nextStep[3] * nextStep[3]);
             magnitudeAcceleration = Math.sqrt(acceleration[2] * acceleration[2] + acceleration[3] * acceleration[3]);
-            sb.append("Magnitude 2: ").append(magnitudeVelocity).append("\n");
-            sb.append("Magnitude acceleration: ").append(magnitudeAcceleration).append("\n");
             currentState = nextStep;
             currentTime += stepSize;
             assert heightMap != null;
             float height = heightMap.getHeight(new Vector3f((float) currentState[0], 0, (float) currentState[1]));
-            positions.add(new Vector3f((float) currentState[0], height, (float) currentState[1]));
-        } while (magnitudeVelocity >= magnitudeVelocityThreshold || magnitudeAcceleration >= magnitudeAccelerationThreshold); // While the ball is not at rest
+            Vector3f postion = new Vector3f((float) currentState[0], height, (float) currentState[1]);
+            positions.add(postion);
+            sb2.append("Position: ").append(postion).append("\n");
+        } while (magnitudeVelocity >= VELOCITY_THRESHOLD || magnitudeAcceleration >= ACCELERATION_THRESHOLD); // While the ball is not at rest
+
+        try (java.io.FileWriter fw = new java.io.FileWriter(file2, true)) {
+            fw.write(sb2.toString());
+            sb2.setLength(0);
+        } catch (java.io.IOException e) {
+            e.printStackTrace(System.err);
+        }
 
         return positions;
     }
@@ -135,10 +146,9 @@ public class PhysicsEngine {
         double vx = x[2];
         double vz = x[3];
         double magnitudeVelocity = Math.sqrt(vx * vx + vz * vz);
-        double dampingCoefficient = 0.1; // damping coefficient
 
-        double dh_dxValue;
-        double dh_dzValue;
+        double dh_dxValue = dh_dxCentredDifferenceMap(x[0], x[1]);
+        double dh_dzValue = dh_dyCentredDifferenceMap(x[0], x[1]);
 
         double kineticFriction;
         double staticFriction;
@@ -152,9 +162,6 @@ public class PhysicsEngine {
             staticFriction = muS_grass;
         }
 
-        dh_dxValue = dh_dxCentredDifferenceMap(x[0], x[1]);
-        dh_dzValue = dh_dyCentredDifferenceMap(x[0], x[1]);
-
         // Threshold for numerical approximation
         if (Math.abs(dh_dxValue) < 0.00001) {
             dh_dxValue = 0;
@@ -163,47 +170,62 @@ public class PhysicsEngine {
             dh_dzValue = 0;
         }
 
-        if (magnitudeVelocity >= magnitudeVelocityThreshold) {// Lowered threshold for velocity
+//        sb.append("Time: ").append(t).append("\n");
+//        sb.append("State: ").append(Arrays.toString(x)).append("\n");
+//        sb.append("Magnitude velocity: ").append(magnitudeVelocity).append("\n");
+//        sb.append("dh_dxValue: ").append(dh_dxValue).append("\n");
+//        sb.append("dh_dzValue: ").append(dh_dzValue).append("\n");
+//        sb.append("Kinetic Friction: ").append(kineticFriction).append("\n");
+//        sb.append("Static Friction: ").append(staticFriction).append("\n");
+
+        if (magnitudeVelocity >= VELOCITY_THRESHOLD) {  // Ball is moving
+            sb.append("Moving\n");
             dxdt[0] = vx;
             dxdt[1] = vz;
-            sb.append("Magnitude velocity: ").append(magnitudeVelocity).append("\n");
+            dxdt[2] = -GRAVITY * dh_dxValue - kineticFriction * GRAVITY * vx / magnitudeVelocity;
+            dxdt[3] = -GRAVITY * dh_dzValue - kineticFriction * GRAVITY * vz / magnitudeVelocity;
 
-            // Calculate acceleration in x-direction
-            dxdt[2] = -g * dh_dxValue - kineticFriction * g * vx / magnitudeVelocity - dampingCoefficient * vx;
-            // Calculate acceleration in z-direction
-            dxdt[3] = -g * dh_dzValue - kineticFriction * g * vz / magnitudeVelocity - dampingCoefficient * vz;
-            //sb.append("Moving: ").append(Arrays.toString(dxdt)).append("\n");
-
-        } else { // if the ball is at rest
+//            sb.append("vx: ").append(vx).append("\n");
+//            sb.append("vz: ").append(vz).append("\n");
+//            sb.append("ax: ").append(dxdt[2]).append("\n");
+//            sb.append("az: ").append(dxdt[3]).append("\n");
+//            sb.append("Moving: ").append(Arrays.toString(dxdt)).append("\n");
+        } else { // Ball is at rest
+            sb.append("At rest\n");
             dxdt[0] = 0;
             dxdt[1] = 0;
 
-            if (dh_dxValue != 0 || dh_dzValue != 0) { // if the ball is on a slope
+            if (dh_dxValue != 0 || dh_dzValue != 0) { // Ball is on a slope
+                sb.append("On slope\n");
                 double dh2 = Math.sqrt(dh_dxValue * dh_dxValue + dh_dzValue * dh_dzValue);
-                double staticFrictionForce = staticFriction * g;
-                double slopeForce = dh2 * g;
-                sb.append("dh2: ").append(dh2).append("\n");
-                sb.append("Static friction force: ").append(staticFrictionForce).append("\n");
-                sb.append("Slope force: ").append(slopeForce).append("\n");
+                double staticFrictionForce = staticFriction * GRAVITY;
+                double slopeForce = dh2 * GRAVITY;
 
-                if (staticFrictionForce < slopeForce) { // if the slope force overcomes static friction
-                    // the ball will start sliding
-                    dxdt[2] = -g * dh_dxValue - dampingCoefficient * vx;
-                    dxdt[3] = -g * dh_dzValue - dampingCoefficient * vz;
-                    //sb.append("Sliding: ").append(Arrays.toString(dxdt)).append("\n");
+//                sb.append("dh2: ").append(dh2).append("\n");
+//                sb.append("Static friction force: ").append(staticFrictionForce).append("\n");
+//                sb.append("Slope force: ").append(slopeForce).append("\n");
+
+                if (staticFrictionForce < slopeForce) { // Slope force overcomes static friction
+                    sb.append("Sliding\n");
+                    dxdt[2] = -GRAVITY * dh_dxValue;
+                    dxdt[3] = -GRAVITY * dh_dzValue;
+
+//                    sb.append("Sliding: ").append(Arrays.toString(dxdt)).append("\n");
                 } else {
+                    sb.append("Stationary\n");
                     dxdt[2] = 0;
                     dxdt[3] = 0;
-                    sb.append("Stationary: Static friction holding").append("\n");
+//                    sb.append("Stationary: Static friction holding\n");
                 }
             } else {
+                sb.append("No slope\n");
                 dxdt[2] = 0;
                 dxdt[3] = 0;
-                sb.append("Stationary: No slope").append("\n");
+//                sb.append("Stationary: No slope\n");
             }
         }
 
-        //sb.append("dxdt: ").append(Arrays.toString(dxdt)).append("\n");
+        sb.append("dxdt: ").append(Arrays.toString(dxdt)).append("\n");
 
         try (java.io.FileWriter fw = new java.io.FileWriter(file, true)) {
             fw.write(sb.toString());
@@ -214,6 +236,9 @@ public class PhysicsEngine {
 
         return dxdt; // dxdt = [vx, vz, ax, az]
     }
+
+
+
 
     /**
      * Calculate the centred difference of the height function in the x-direction.
