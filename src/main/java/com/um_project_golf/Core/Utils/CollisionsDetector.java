@@ -18,8 +18,7 @@ public class CollisionsDetector {
     private Vector3f cameraInc;
     private HeightMap heightMap;
     private SceneManager scene;
-    private final File file = new File("output.txt");
-    private final StringBuilder sb = new StringBuilder();
+
 
     /**
      * Checks for collision with the camera.
@@ -90,8 +89,6 @@ public class CollisionsDetector {
         float[][] treePositions = scene.getTreePositions();
         float treeRadius = Consts.TREE_SIZE / 2; // Define the tree radius
 
-        sb.append("Checking collisions at position: ").append(position).append("\n");
-
         boolean collisionDetected = false;
 
         for (float[] treePosition : treePositions) {
@@ -108,7 +105,6 @@ public class CollisionsDetector {
             boolean isColliding = (distanceX * distanceX + distanceZ * distanceZ) < (treeRadius * treeRadius) && Math.abs(distanceY) < 8.0f;
 
             if (isColliding) {
-                sb.append("Collision detected with tree at: (").append(treeX).append(", ").append(treeY).append(", ").append(treeZ).append(")").append("\n");
 
                 // Normalize the direction vector from the tree to the camera
                 Vector3f direction = new Vector3f(distanceX, 0, distanceZ).normalize();
@@ -119,20 +115,12 @@ public class CollisionsDetector {
                 position.z = treeZ + direction.z * treeRadius;
 
                 collisionDetected = true;
-                sb.append("Adjusted position to: ").append(position).append("\n");
                 break; // Exit loop after handling the collision
             }
         }
 
         if (collisionDetected) {
             cameraInc.set(0, 0, 0); // Optionally, stop camera movement
-            sb.append("Final position after handling collision: ").append(position).append("\n");
-
-            try (PrintWriter out = new PrintWriter(file)) {
-                out.println(sb);
-            } catch (Exception e) {
-                System.err.println("Error writing to file: " + e.getMessage());
-            }
         }
     }
 
