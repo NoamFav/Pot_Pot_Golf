@@ -2,7 +2,7 @@ package com.um_project_golf.GolfBots;
 
 import org.joml.Vector3f;
 
-class Shot {
+public class Shot {
     private Vector3f velocity;
 
     // Constructor

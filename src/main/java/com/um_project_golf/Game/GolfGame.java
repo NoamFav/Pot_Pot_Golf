@@ -16,6 +16,7 @@ import com.um_project_golf.Core.Utils.CollisionsDetector;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.Entity.Terrain.HeightMapPathfinder;
 import com.um_project_golf.GolfBots.RuleBasedBot;
+import com.um_project_golf.GolfBots.Shot;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
@@ -79,6 +80,7 @@ public class GolfGame implements ILogic {
     private boolean isSoundPlaying = false;
     //private boolean wasPressed = false;
     private boolean isAnimating;
+    private boolean isBot;
     private boolean hasStartPoint = false;
     public static boolean debugMode = false;
 
@@ -106,6 +108,7 @@ public class GolfGame implements ILogic {
     private List<Model> botBallModel;
 
     private List<Vector3f> ballPositions;
+    private List<List<Vector3f>> botPath;
     private int currentPositionIndex;
     private float animationTimeAccumulator;
     private Vector3f shotStartPosition;
@@ -299,7 +302,6 @@ public class GolfGame implements ILogic {
             vxTextField.update();
             vzTextField.update();
             applyButton.update();
-            botButton.update();
         }
 
         if (isGuiVisible) {
@@ -780,7 +782,6 @@ public class GolfGame implements ILogic {
         Runnable runBot = createBotBall();
 
         applyButton = new Button(x, y * 30 + height, 3 * width / 5, 2 * height / 3, "Apply Velocity", font, applyVelocity, vg, imageButton);
-        botButton = new Button (x * 30, y * 30 + height, 3 * width / 5, 2 * height / 3, "Apply Velocity", font, runBot, vg, imageButton);
     }
 
     @NotNull
@@ -822,23 +823,15 @@ public class GolfGame implements ILogic {
     @Contract(pure = true)
     public Runnable createBotBall(){
 
-        botBall = new Entity(botBallModel, new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
-        scene.addEntity(botBall);
-
-        RuleBasedBot ruleBasedBot = new RuleBasedBot(botBall, endFlag, heightMap, 1.5, scene);
-        ruleBasedBot.findBestShot();
-
         return () -> {
-            if (isAnimating) {
-                return; // Exit if already animating
-            }
-            try {
+            botBall = new Entity(botBallModel, new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
+            scene.addEntity(botBall);
 
+            RuleBasedBot ruleBasedBot = new RuleBasedBot(botBall, endFlag, heightMap, 1.5, scene);
+            botPath = ruleBasedBot.findBestShot();
 
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
         };
+
     }
 
     /**
@@ -890,6 +883,10 @@ public class GolfGame implements ILogic {
             isOnMenu = false;
             gameStarted = true;
 
+            if(isBot){
+                createBotBall().run();
+            }
+
             golfBall.setPosition(startPoint.x, startPoint.y, startPoint.z);
             endFlag.setPosition(endPoint.x, endPoint.y, endPoint.z);
         };
@@ -938,6 +935,7 @@ public class GolfGame implements ILogic {
             audioManager.playSound();
         };
 
+
         float titleWidth = window.getWidthConverted(1200);
         float titleHeight = window.getHeightConverted(1200);
         float titleX = (window.getWidth() - titleWidth) / 2;
@@ -965,6 +963,9 @@ public class GolfGame implements ILogic {
 
         Button debugButton = new Button( window.getWidthConverted(30), window.getHeight() - heightButton, widthButton/4, heightButton, "Debug Mode", font * 0.7f, enableDebugMode, vg, imageButton);
         menuButtons.add(debugButton);
+
+        Button botButton = new Button(centerButtonX, centerButtonY + heightButton * 3, widthButton, heightButton, "Play with bot", font, () -> {isBot = !isBot;}, vg, imageButton);
+        menuButtons.add(botButton);
 
         float paneWidth = window.getWidthConverted(500);
         float paneHeight = window.getHeightConverted(500);
