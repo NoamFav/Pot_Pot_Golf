@@ -41,8 +41,24 @@ import static org.lwjgl.nanovg.NanoVGGL3.*;
  */
 public class GolfGame implements ILogic {
 
+    // Enum for the animation state of the trees
     private enum AnimationState {IDLE, GOING_UP, GOING_DOWN}
 
+    // Records for storing the models and terrains
+    private record ModelLoader(List<Model> skyBox, List<Model> ball, List<Model> arrow, List<Model> flag, List<Model> mill) {}
+    private record Terrains(TerrainTexture blendMap, List<TerrainTexture> textures, List<TerrainTexture> waterTextures) {}
+
+    // Records for storing the Runnables for the buttons
+    private record InGameMenuRunnable(Runnable resume, Runnable backToMenu, Runnable sound, Runnable quit) {}
+    private record MenuRunnable(Runnable terrainChanger, Runnable startGame, Runnable sound, Runnable quit, Runnable enableDebugMode) {}
+
+    // Debug mode for Examination purposes
+    public static boolean debugMode = false;
+
+    // NanoVG context
+    private long vg;
+
+    // Main game Classes and Managers
     private final RenderManager renderer;
     private final ObjectLoader loader;
     private final WindowManager window;
@@ -51,63 +67,22 @@ public class GolfGame implements ILogic {
     private AudioManager audioManager;
     private final HeightMapPathfinder pathfinder;
     private final CollisionsDetector collisionsDetector;
-    private long vg;
-
-    private final String imageButton = "Texture/buttons.png";
-
-    private Title title;
-    private TextPane pane;
-    private final List<Button> menuButtons;
-    private final List<Button> inGameMenuButtons;
-
-    private Vector3f startPoint;
-    private Vector3f endPoint;
-    private List<Vector2i> path;
-
-    private final Camera camera;
-    private Terrain terrain;
-    private Terrain ocean;
-    private final HeightMap heightMap;
-    private BlendMapTerrain blendMapTerrain;
-    private BlendMapTerrain blueTerrain;
-
-    Vector3f cameraInc;
-
-    private boolean canMove = false;
-    private boolean isGuiVisible = true;
-    private boolean isOnMenu = true;
-    private boolean gameStarted = false;
-    private boolean isSoundPlaying = false;
-    //private boolean wasPressed = false;
-    private boolean isAnimating;
-    private boolean isBot;
-    private boolean isAiBot;
-    private boolean is2player;
-    private boolean isPlayer1Turn;
-    private boolean hasStartPoint = false;
-    public static boolean debugMode = false;
-
-    private AnimationState treeAnimationState = AnimationState.IDLE;
-    private float treeAnimationTime = 0f;
-
-    private List<Model> tree;
-    private final List<Entity> trees;
-    private final List<Float> treeHeights;
-    private Entity golfBall;
-    private Entity golfBall2;
-    private Entity currentBall;
-
-    private Entity botBall;
-    private Entity aiBotBall;
-    private Entity endFlag;
-    private Entity arrowEntity;
     private BallCollisionDetector ballCollisionDetector;
 
+    // GUI elements
+    private Title title;
+    private final List<Button> menuButtons;
+    private final List<Button> inGameMenuButtons;
+    private final String imageButton = "Texture/buttons.png";
+
+    // Menu GUI elements
     private Button startButton;
+    private Button debugButton;
     private Button twoPlayerButton;
     private Button aiBotButton;
     private Button botButton;
-    private Button debugButton;
+
+    // In-game GUI elements
     private Button applyButton;
     private TextField vxTextField;
     private TextField vzTextField;
@@ -116,18 +91,66 @@ public class GolfGame implements ILogic {
     private TextPane infoTextPane;
     private TextPane warningTextPane;
     private TextPane currentPlayer;
-    private int numberOfShots;
-    private int numberOfShots2;
+
+    // A* pathfinding variables
+    private Vector3f startPoint;
+    private Vector3f endPoint;
+    private List<Vector2i> path;
+
+    // Models
     private List<Model> botBallModel;
     private List<Model> aiBotBallModel;
     private List<Model> ball2;
+    private List<Model> tree;
 
-    private List<Vector3f> ballPositions;
-    private List<List<Vector3f>> botPath;
-    private List<List<Vector3f>> aiBotPath;
+    // Entities
+    private final List<Entity> trees;
+    private final List<Float> treeHeights;
+    private Entity golfBall;
+    private Entity golfBall2;
+    private Entity currentBall;
+    private Entity botBall;
+    private Entity aiBotBall;
+    private Entity endFlag;
+    private Entity arrowEntity;
+
+    // Terrains
+    private Terrain terrain;
+    private Terrain ocean;
+    private final HeightMap heightMap;
+    private BlendMapTerrain blendMapTerrain;
+    private BlendMapTerrain blueTerrain;
+
+    // Camera (Player)
+    private final Camera camera;
+    Vector3f cameraInc;
+
+    // Game state variables
+    private boolean canMove = false;
+    private boolean isGuiVisible = true;
+    private boolean isOnMenu = true;
+    private boolean gameStarted = false;
+    private boolean isSoundPlaying = false;
+    private boolean isAnimating;
+    private boolean isBot;
+    private boolean isAiBot;
+    private boolean is2player;
+    private boolean isPlayer1Turn;
+    private boolean hasStartPoint = false;
+
+    // Game logic variables
+    private AnimationState treeAnimationState = AnimationState.IDLE;
+    private float treeAnimationTime = 0f;
+    private int numberOfShots;
+    private int numberOfShots2;
     private int currentPositionIndex;
     private float animationTimeAccumulator;
     private Vector3f shotStartPosition;
+
+    // Positions of the balls for Animation purposes
+    private List<Vector3f> ballPositions;
+    private List<List<Vector3f>> botPath;
+    private List<List<Vector3f>> aiBotPath;
 
     /**
      * The constructor of the game.
@@ -349,76 +372,13 @@ public class GolfGame implements ILogic {
 
         collisionsDetector.checkCollision(camera, cameraInc, heightMap, scene);
 
-        scene.increaseSpotAngle(0.01f);
-        if(scene.getSpotAngle() > 4) {
-            scene.setSpotInc(-1);
-        } else if(scene.getSpotAngle() < -4) {
-            scene.setSpotInc(1);
-        }
-
         daytimeCycle();
 
         updateTreeAnimations();
 
-        if (isAnimating) {
-            float timeStep = 0.1f;
-            animationTimeAccumulator += timeStep;
+        animateBall();
 
-            if (animationTimeAccumulator >= timeStep) {
-                animationTimeAccumulator -= timeStep;
-
-                if (currentPositionIndex < ballPositions.size()) {
-                    Vector3f nextPosition = ballPositions.get(currentPositionIndex);
-
-                    if (nextPosition == ballPositions.get(ballPositions.size() - 1)) {
-                        float isInHoleThreshold = 1.5f;
-                        if (nextPosition.x <= endPoint.x + isInHoleThreshold && nextPosition.x >= endPoint.x - isInHoleThreshold) {
-                            if (nextPosition.z <= endPoint.z + isInHoleThreshold && nextPosition.z >= endPoint.z - isInHoleThreshold) {
-                                int shot = isPlayer1Turn ? numberOfShots : numberOfShots2;
-                                System.out.println("Ball reached the end point!");
-                                System.out.println("You took " + shot + " shots to reach the end point!");
-                                System.out.println(endPoint);
-                                warningTextPane.setText("You Win! In " + shot + " shots!");
-                                treeAnimationState = AnimationState.GOING_UP;
-                                treeAnimationTime = 0f;
-                            }
-                        }
-                    }
-
-                    ballCollisionDetector.checkCollisionBall(nextPosition);
-                    if (nextPosition.y <= - 0.3) { // Ball in water
-                        currentBall.setPosition(shotStartPosition.x, shotStartPosition.y, shotStartPosition.z);
-                        isAnimating = false;
-                        updateBallMultiplayer();
-                        warningTextPane.setText("Ploof! Ball in water! Resetting to last shot position.");
-                    } else {
-                        currentBall.setPosition(nextPosition.x, nextPosition.y, nextPosition.z);
-                        currentPositionIndex++;
-                    }
-
-                } else {
-                    isAnimating = false; // Animation completed
-                    updateBallMultiplayer();
-                }
-            }
-        } else {
-            updateArrow();
-        }
-
-        if (isBot && isAiBot) {
-            startButton.setText("Start with Ai Bot and Bot (really long)");
-        } else if (isBot) {
-            startButton.setText("Start with Bot (long)");
-        } else if (isAiBot) {
-            startButton.setText("Start with Ai Bot (kinda long)");
-        } else {
-            startButton.setText("Start");
-        }
-
-        twoPlayerButton.setText(is2player ? "2 Player: On" : "2 Player: Off");
-        botButton.setText(isBot ? "Bot: On" : "Bot: Off");
-        aiBotButton.setText(isAiBot ? "AI Bot: On" : "AI Bot: Off");
-        debugButton.setText(debugMode ? "Debug: On" : "Debug: Off");
+        updateTextFields();
 
         for (Entity entity : scene.getEntities()) {
             renderer.processEntity(entity);
@@ -426,16 +386,6 @@ public class GolfGame implements ILogic {
 
         for (Terrain terrain : scene.getTerrains()) {
             renderer.processTerrain(terrain);
-        }
-    }
-
-    private void updateBallMultiplayer() {
-        if (is2player) {
-            isPlayer1Turn = !isPlayer1Turn;
-            currentBall = isPlayer1Turn ? golfBall : golfBall2;
-            System.out.println("Player " + (isPlayer1Turn ? "1" : "2") + " turn");
-            currentPlayer.setText("Player " + (isPlayer1Turn ? "1" : "2") + " turn");
-            infoTextPane.setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2));
         }
     }
 
@@ -514,99 +464,29 @@ public class GolfGame implements ILogic {
         vzTextPane.cleanup();
         currentPlayer.cleanup();
 
-        //infoButton.cleanup();
-        pane.cleanup();
         nvgDelete(vg);
-    }
-
-    private void terrainCreation() throws Exception {
-
-        TerrainTexture sand = new TerrainTexture(loader.loadTexture("Texture/cartoonSand.jpg"));
-        TerrainTexture grass = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
-        TerrainTexture fairway = new TerrainTexture(loader.loadTexture("Texture/cartoonGrass.jpg"));
-        TerrainTexture water = new TerrainTexture(loader.loadTexture("Texture/cartoonWater.jpg"));
-
-        //Not used for now (doesn't look good) (don't delete)
-        TerrainTexture rock = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
-        TerrainTexture dryGrass = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
-        TerrainTexture snow = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
-        TerrainTexture mold = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
-
-        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
-
-        List<TerrainTexture> textures = new ArrayList<>(List.of(sand, grass, fairway, dryGrass, mold, rock, snow));
-        List<TerrainTexture> waterTextures = new ArrayList<>();
-        for (TerrainTexture ignored : textures) {
-            waterTextures.add(water);
-        }
-
-        blendMapTerrain = new BlendMapTerrain(textures);
-        blueTerrain = new BlendMapTerrain(waterTextures);
-
-        terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap, false);
-        ocean = new Terrain(new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blueTerrain, blendMap, true);
-        scene.addTerrain(terrain);
-        scene.addTerrain(ocean);
-        ocean.getModel().getMaterial().setDisableCulling(true);
     }
 
     private void modelAndEntityCreation() throws Exception {
         //Model cube = loader.loadAssimpModel("src/main/resources/Models/Minecraft_Grass_Block_OBJ/SkyBox.obj");
-        tree = loader.loadAssimpModel("src/main/resources/Models/tree/tree.obj");
-        List<Model> skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
-        List<Model> ball = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
-        ball2 = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
-        botBallModel = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
-        aiBotBallModel = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
-        List<Model> arrow = loader.loadAssimpModel("src/main/resources/Models/Arrow/Arrow5.obj");
-        List<Model> flag = loader.loadAssimpModel("src/main/resources/Models/flag/flag.obj");
-        List<Model> tree3 = loader.loadAssimpModel("src/main/resources/Models/sakura/sakura-A.obj");
-        List<Model> cloud = loader.loadAssimpModel("src/main/resources/Models/cloud/cloud lowpoly(big) -A.obj");
-        List<Model> mill = loader.loadAssimpModel("src/main/resources/Models/mill/LowPolyMill.obj");
+        ModelLoader models = getModels();
 
-        ball.get(0).setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")));
-        ball2.get(0).setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball2.png")));
-        botBallModel.get(0).setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")));
-        aiBotBallModel.get(0).setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")));
+        scene.addEntity(new Entity(models.skyBox(), new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
+        scene.addEntity(new Entity(models.mill(), new Vector3f(0, 15, 0), new Vector3f(0, 0, 0), 20));
 
-        for (Model model : tree) model.getMaterial().setDisableCulling(true);
-        for (Model model : tree3) model.getMaterial().setDisableCulling(true);
-        for (Model model : skyBox) model.getMaterial().setDisableCulling(true);
-        for (Model model : arrow) model.getMaterial().setDisableCulling(true);
-        for (Model model : flag) model.getMaterial().setDisableCulling(true);
-        for (Model model : ball) model.getMaterial().setDisableCulling(true);
-        for (Model model : ball2) model.getMaterial().setDisableCulling(true);
-        for (Model model : botBallModel) model.getMaterial().setDisableCulling(true);
-        for (Model model : aiBotBallModel) model.getMaterial().setDisableCulling(true);
-        for (Model model : cloud) model.getMaterial().setDisableCulling(true);
-        for (Model model : mill) model.getMaterial().setDisableCulling(true);
-
-        scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
-        scene.addEntity(new Entity(mill, new Vector3f(0, 15, 0), new Vector3f(0, 0, 0), 20));
-
-        arrowEntity = new Entity(arrow, new Vector3f(0, 0, 0), new Vector3f(0,-90 ,0), 2);
+        arrowEntity = new Entity(models.arrow(), new Vector3f(0, 0, 0), new Vector3f(0,-90 ,0), 2);
         scene.addEntity(arrowEntity);
 
-        startPoint = new Vector3f(path.get(0).x, 0, path.get(0).y);
-        System.out.println("Start point: " + startPoint);
-        startPoint.x = (int) (startPoint.x / 4 - Consts.SIZE_X / 2);
-        startPoint.z = (int) (startPoint.z / 4 - Consts.SIZE_Z / 2);
-        startPoint.y = heightMap.getHeight(new Vector3f(startPoint.x, 0 , startPoint.z));
-
-        endPoint = new Vector3f(path.get(path.size() - 1).x ,  0, path.get(path.size() - 1).y);
-        System.out.println("End point: " + endPoint);
-        endPoint.x = (int) (endPoint.x / 4) - Consts.SIZE_X / 2;
-        endPoint.z = (int) (endPoint.z / 4) - Consts.SIZE_Z / 2;
-        endPoint.y = heightMap.getHeight(new Vector3f(endPoint.x, 0 , endPoint.z));
+        startEndPointConversion();
 
         System.out.println("Start point: " + startPoint);
         System.out.println("End point: " + endPoint);
 
         //scene.addEntity(new Entity(flag, new Vector3f(startPoint.x, heightMap.getHeight(new Vector3f(startPoint.x, 0 , startPoint.y)), startPoint.y), new Vector3f(0, 0, 0), 3));
-        endFlag = new Entity(flag, new Vector3f(endPoint), new Vector3f(0, 0, 0), 150);
+        endFlag = new Entity(models.flag(), new Vector3f(endPoint), new Vector3f(0, 0, 0), 150);
         scene.addEntity(endFlag);
 
-        golfBall = new Entity(ball, new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
+        golfBall = new Entity(models.ball(), new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
         scene.addEntity(golfBall);
 
         isPlayer1Turn = true;
@@ -618,7 +498,158 @@ public class GolfGame implements ILogic {
         createTrees(tree);
     }
 
+    private void terrainCreation() throws Exception {
+        Terrains terrains = getTerrains();
+
+        blendMapTerrain = new BlendMapTerrain(terrains.textures());
+        blueTerrain = new BlendMapTerrain(terrains.waterTextures());
+
+        terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, terrains.blendMap(), false);
+        ocean = new Terrain(new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blueTerrain, terrains.blendMap(), true);
+        scene.addTerrain(terrain);
+        scene.addTerrain(ocean);
+        ocean.getModel().getMaterial().setDisableCulling(true);
+    }
+
+    private void createDefaultGui(){
+        float width = window.getWidthConverted(1000);
+        float height = window.getHeightConverted(300);
+        float x = window.getWidthConverted(10);
+        float y = window.getHeightConverted(10);
+        float font = window.getHeightConverted(70);
+        float textFieldFont = window.getHeightConverted(50);
+
+        currentPlayer = new TextPane(x, y, width, height / 2, "Player 1's turn", font, vg, imageButton);
+        infoTextPane = new TextPane(x, y + height / 2, width, height / 2, "Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2), 40, vg, imageButton);
+        warningTextPane = new TextPane(x, y + height, width, height / 2, "", textFieldFont * .8f, vg, imageButton);
+        ballCollisionDetector = new BallCollisionDetector(heightMap, scene);
+
+        // Creating text-fields and text panes for entering the velocities
+        vxTextPane = new TextPane(x * 4, y * 30 + height / 2, width / 5, height / 2, "vx: ", font, vg, imageButton);
+        vxTextField = new TextField(x * 25, y * 30 + height / 2, width / 3, height / 2, "Enter vx", textFieldFont, vg, imageButton);
+
+        vzTextPane = new TextPane(x * 4, y * 30 + height, width / 5, height / 2, "vz: ", font, vg, imageButton);
+        vzTextField = new TextField(x * 25, y * 30 + height, width / 3, height / 2, "Enter vz", textFieldFont, vg, imageButton);
+
+        setUpCallbacks();
+
+        applyButton = new Button(x, y * 30 + height + height / 2, 3 * width / 5, 2 * height / 3, "Apply Velocity", font, runPhysics(), vg, imageButton);
+    }
+
+    private void setUpCallbacks() {
+        GLFW.glfwSetKeyCallback(window.getWindow(), (window, key, scancode, action, mods) -> {
+            vxTextField.handleKeyInput(key, action, mods);
+            vzTextField.handleKeyInput(key, action, mods);
+        });
+
+        GLFW.glfwSetMouseButtonCallback(window.getWindow(), (window, button, action, mods) -> {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_1 && action == GLFW.GLFW_PRESS) {
+                double[] xPos = new double[1];
+                double[] yPos = new double[1];
+                GLFW.glfwGetCursorPos(window, xPos, yPos);
+                vxTextField.handleMouseClick((float) xPos[0], (float) yPos[0]);
+                vzTextField.handleMouseClick((float) xPos[0], (float) yPos[0]);
+            }
+        });
+    }
+
+    /**
+     * Creates the menu.
+     *
+     * @param blendMapTerrain The terrain to create the menu for.
+     */
+    private void createMenu(BlendMapTerrain blendMapTerrain) {
+
+        camera.setPosition(new Vector3f(Consts.SIZE_X/4, 50, Consts.SIZE_Z/4));
+        camera.setRotation(20, 0, 0);
+
+        float width = window.getWidth();
+
+        MenuRunnable runnable = getRunnable(blendMapTerrain);
+
+        float titleWidth = window.getWidthConverted(1200);
+        float titleHeight = window.getHeightConverted(1200);
+        float titleX = (window.getWidth() - titleWidth) / 2;
+        float titleY = window.getHeightConverted(10);
+
+        title = new Title("Texture/title.png", titleX, titleY, titleWidth, titleHeight, vg);
+
+        float heightButton = window.getHeightConverted(300);
+        float widthButton = window.getWidthConverted(2000);
+        float centerButtonX = (width - widthButton) / 2;
+        float centerButtonY = titleHeight + titleY;
+        float font = window.getHeightConverted(100);
+
+        startButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", font, runnable.startGame(), vg, imageButton);
+        menuButtons.add(startButton);
+
+        Button changeTerrain = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Change Terrain", font, runnable.terrainChanger(), vg, imageButton);
+        menuButtons.add(changeTerrain);
+
+        Button soundButton = new Button(window.getWidth() - window.getWidthConverted(300), window.getHeightConverted(20), window.getWidthConverted(300), heightButton, "Sound", font, runnable.sound(), vg, imageButton);
+        menuButtons.add(soundButton);
+
+        Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2 , widthButton, heightButton, "Exit", font, runnable.quit(), vg, imageButton);
+        menuButtons.add(exit);
+
+        botButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 2, widthButton/4, heightButton, "Play with bot", font, () -> isBot = !isBot, vg, imageButton);
+        menuButtons.add(botButton);
+
+        aiBotButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 3, widthButton/4, heightButton, "Play with AI", font, () -> isAiBot = !isAiBot, vg, imageButton);
+        menuButtons.add(aiBotButton);
+
+        twoPlayerButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 4, widthButton/4, heightButton, "2 Player", font, () -> is2player = !is2player, vg, imageButton);
+        menuButtons.add(twoPlayerButton);
+
+        debugButton = new Button( window.getWidthConverted(30), window.getHeight() - heightButton, widthButton/4, heightButton, "Debug Mode", font * 0.7f, runnable.enableDebugMode(), vg, imageButton);
+        menuButtons.add(debugButton);
+    }
+
+    /**
+     * Creates the in-game menu.
+     */
+    private void createInGameMenu() {
+
+        InGameMenuRunnable runnable = getInGameMenuRunnable();
+
+        float heightButton = window.getHeightConverted(300);
+        float widthButton = window.getWidthConverted(2000);
+        float centerButtonX = (window.getWidth() - widthButton) / 2;
+        float centerButtonY = (window.getHeight() - heightButton * 3) / 2;
+        float font = window.getHeightConverted(100);
+
+        Button resumeButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Resume", font, runnable.resume(), vg, "Texture/inGameMenu.png");
+        inGameMenuButtons.add(resumeButton);
+
+        Button backToMenuButton = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Back to Menu", font, runnable.backToMenu(), vg, "Texture/inGameMenu.png");
+        inGameMenuButtons.add(backToMenuButton);
+
+        Button soundButton = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Sound", font, runnable.sound(), vg, "Texture/inGameMenu.png");
+        inGameMenuButtons.add(soundButton);
+
+        Button exitButton = new Button(centerButtonX, centerButtonY + heightButton * 3, widthButton, heightButton, "Exit", font, runnable.quit(), vg, "Texture/inGameMenu.png");
+        inGameMenuButtons.add(exitButton);
+    }
+
+    /**
+     * Recreates the GUIs.
+     */
+    private void recreateGUIs() {
+        menuButtons.clear();
+        inGameMenuButtons.clear();
+
+        createMenu(blendMapTerrain);
+        createInGameMenu();
+        createDefaultGui();
+    }
+
     private void daytimeCycle() {
+        scene.increaseSpotAngle(0.01f);
+        if(scene.getSpotAngle() > 4) {
+            scene.setSpotInc(-1);
+        } else if(scene.getSpotAngle() < -4) {
+            scene.setSpotInc(1);
+        }
 
         scene.increaseLightAngle(1.1f);
         scene.setLightAngle(65);
@@ -669,19 +700,40 @@ public class GolfGame implements ILogic {
         //scene.setSpotLights(new SpotLight[]{spotLight, spotLight2});
     }
 
-    private void updateArrow() {
+    private void updateTextFields() {
+        if (isBot && isAiBot) {
+            startButton.setText("Start with Ai Bot and Bot (really long)");
+        } else if (isBot) {
+            startButton.setText("Start with Bot (long)");
+        } else if (isAiBot) {
+            startButton.setText("Start with Ai Bot (kinda long)");
+        } else {
+            startButton.setText("Start");
+        }
+
+        twoPlayerButton.setText(is2player ? "2 Player: On" : "2 Player: Off");
+        botButton.setText(isBot ? "Bot: On" : "Bot: Off");
+        aiBotButton.setText(isAiBot ? "AI Bot: On" : "AI Bot: Off");
+        debugButton.setText(debugMode ? "Debug: On" : "Debug: Off");
+    }
+
+    private void updateBallMultiplayer() {
+        if (is2player) {
+            isPlayer1Turn = !isPlayer1Turn;
+            currentBall = isPlayer1Turn ? golfBall : golfBall2;
+            System.out.println("Player " + (isPlayer1Turn ? "1" : "2") + " turn");
+            currentPlayer.setText("Player " + (isPlayer1Turn ? "1" : "2") + " turn");
+            infoTextPane.setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2));
+        }
+    }
+
+    private void updateDirectionalArrow() {
         String vx = vxTextField.getText();
         String vz = vzTextField.getText();
 
-        if (vx.isEmpty() || vz.isEmpty()) {
-            return;
-        }
-        if (vx.equals("Enter vx") || vz.equals("Enter vz")) {
-            return;
-        }
-        if (isNotValidFloat(vx) || isNotValidFloat(vz)) {
-            return;
-        }
+        if (vx.isEmpty() || vz.isEmpty()) return;
+        if (vx.equals("Enter vx") || vz.equals("Enter vz")) return;
+        if (isNotValidFloat(vx) || isNotValidFloat(vz)) return;
 
         float vxValue = Float.parseFloat(vx);
         float vzValue = Float.parseFloat(vz);
@@ -744,12 +796,50 @@ public class GolfGame implements ILogic {
         }
     }
 
-    private boolean isNotValidFloat(String str) {
-        try {
-            Float.parseFloat(str);
-            return false;
-        } catch (NumberFormatException e) {
-            return true;
+    private void animateBall() {
+        if (isAnimating) {
+            float timeStep = 0.1f;
+            animationTimeAccumulator += timeStep;
+
+            if (animationTimeAccumulator >= timeStep) {
+                animationTimeAccumulator -= timeStep;
+
+                if (currentPositionIndex < ballPositions.size()) {
+                    Vector3f nextPosition = ballPositions.get(currentPositionIndex);
+
+                    if (nextPosition == ballPositions.get(ballPositions.size() - 1)) {
+                        float isInHoleThreshold = 1.5f;
+                        if (nextPosition.x <= endPoint.x + isInHoleThreshold && nextPosition.x >= endPoint.x - isInHoleThreshold) {
+                            if (nextPosition.z <= endPoint.z + isInHoleThreshold && nextPosition.z >= endPoint.z - isInHoleThreshold) {
+                                int shot = isPlayer1Turn ? numberOfShots : numberOfShots2;
+                                System.out.println("Ball reached the end point!");
+                                System.out.println("You took " + shot + " shots to reach the end point!");
+                                System.out.println(endPoint);
+                                warningTextPane.setText("You Win! In " + shot + " shots!");
+                                treeAnimationState = AnimationState.GOING_UP;
+                                treeAnimationTime = 0f;
+                            }
+                        }
+                    }
+
+                    ballCollisionDetector.checkCollisionBall(nextPosition);
+                    if (nextPosition.y <= - 0.3) { // Ball in water
+                        currentBall.setPosition(shotStartPosition.x, shotStartPosition.y, shotStartPosition.z);
+                        isAnimating = false;
+                        updateBallMultiplayer();
+                        warningTextPane.setText("Ploof! Ball in water! Resetting to last shot position.");
+                    } else {
+                        currentBall.setPosition(nextPosition.x, nextPosition.y, nextPosition.z);
+                        currentPositionIndex++;
+                    }
+
+                } else {
+                    isAnimating = false; // Animation completed
+                    updateBallMultiplayer();
+                }
+            }
+        } else {
+            updateDirectionalArrow();
         }
     }
 
@@ -802,73 +892,116 @@ public class GolfGame implements ILogic {
         scene.setTreePositions(treePositions);
     }
 
-    private void createDefaultGui(){
-        float width = window.getWidthConverted(1000);
-        float height = window.getHeightConverted(300);
-        float x = window.getWidthConverted(10);
-        float y = window.getHeightConverted(10);
-        float font = window.getHeightConverted(70);
-        float textFieldFont = window.getHeightConverted(50);
+    private void startEndPointConversion() {
+        startPoint = new Vector3f(path.get(0).x, 0, path.get(0).y);
+        System.out.println("Start point: " + startPoint);
+        startPoint.x = (int) (startPoint.x / 4 - Consts.SIZE_X / 2);
+        startPoint.z = (int) (startPoint.z / 4 - Consts.SIZE_Z / 2);
+        startPoint.y = heightMap.getHeight(new Vector3f(startPoint.x, 0 , startPoint.z));
 
-        currentPlayer = new TextPane(x, y, width, height / 2, "Player 1's turn", font, vg, imageButton);
-        infoTextPane = new TextPane(x, y + height / 2, width, height / 2, "Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2), 40, vg, imageButton);
-        warningTextPane = new TextPane(x, y + height, width, height / 2, "", textFieldFont * .8f, vg, imageButton);
-        ballCollisionDetector = new BallCollisionDetector(heightMap, scene);
+        endPoint = new Vector3f(path.get(path.size() - 1).x ,  0, path.get(path.size() - 1).y);
+        System.out.println("End point: " + endPoint);
+        endPoint.x = (int) (endPoint.x / 4) - Consts.SIZE_X / 2;
+        endPoint.z = (int) (endPoint.z / 4) - Consts.SIZE_Z / 2;
+        endPoint.y = heightMap.getHeight(new Vector3f(endPoint.x, 0 , endPoint.z));
+    }
 
-        // Creating text-fields and text panes for entering the velocities
-        vxTextPane = new TextPane(x * 4, y * 30 + height / 2, width / 5, height / 2, "vx: ", font, vg, imageButton);
-        vxTextField = new TextField(x * 25, y * 30 + height / 2, width / 3, height / 2, "Enter vx", textFieldFont, vg, imageButton);
-
-        vzTextPane = new TextPane(x * 4, y * 30 + height, width / 5, height / 2, "vz: ", font, vg, imageButton);
-        vzTextField = new TextField(x * 25, y * 30 + height, width / 3, height / 2, "Enter vz", textFieldFont, vg, imageButton);
-
-        GLFW.glfwSetKeyCallback(window.getWindow(), (window, key, scancode, action, mods) -> {
-            vxTextField.handleKeyInput(key, action, mods);
-            vzTextField.handleKeyInput(key, action, mods);
-        });
-
-        GLFW.glfwSetMouseButtonCallback(window.getWindow(), (window, button, action, mods) -> {
-            if (button == GLFW.GLFW_MOUSE_BUTTON_1 && action == GLFW.GLFW_PRESS) {
-                double[] xPos = new double[1];
-                double[] yPos = new double[1];
-                GLFW.glfwGetCursorPos(window, xPos, yPos);
-                vxTextField.handleMouseClick((float) xPos[0], (float) yPos[0]);
-                vzTextField.handleMouseClick((float) xPos[0], (float) yPos[0]);
-            }
-        });
-
-        Runnable applyVelocity = getPhysicsRunnable();
-
-        applyButton = new Button(x, y * 30 + height + height / 2, 3 * width / 5, 2 * height / 3, "Apply Velocity", font, applyVelocity, vg, imageButton);
+    private boolean isNotValidFloat(String str) {
+        try {
+            Float.parseFloat(str);
+            return false;
+        } catch (NumberFormatException e) {
+            return true;
+        }
     }
 
     /**
-     * Creates the menu.
+     * Switches the terrain of the game.
      *
-     * @param blendMapTerrain The terrain to create the menu for.
+     * @param blendMapTerrain The new terrain to switch to.
+     * @param tree The tree model to add to the new terrain.
+     * @param blendMap2 The new blend map to use.
      */
-    private void createMenu(BlendMapTerrain blendMapTerrain) {
+    private void terrainSwitch(BlendMapTerrain blendMapTerrain, List<Model> tree, TerrainTexture blendMap2) {
+        scene.getTerrains().remove(terrain);
+        scene.getTerrains().remove(ocean);
+        terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap2, false);
+        ocean = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blueTerrain, blendMap2, true);
+        scene.addTerrain(terrain);
+        scene.addTerrain(ocean);
+        scene.getEntities().removeIf(entity -> entity.getModels().equals(tree));
+        try {
+            if (!debugMode) {
+                createTrees(tree);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        renderer.processTerrain(terrain);
+    }
 
-        camera.setPosition(new Vector3f(Consts.SIZE_X/4, 50, Consts.SIZE_Z/4));
-        camera.setRotation(20, 0, 0);
+    private @NotNull ModelLoader getModels() throws Exception {
+        tree = loader.loadAssimpModel("src/main/resources/Models/tree/tree.obj");
+        List<Model> skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
+        List<Model> ball = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
+        ball2 = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
+        botBallModel = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
+        aiBotBallModel = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
+        List<Model> arrow = loader.loadAssimpModel("src/main/resources/Models/Arrow/Arrow5.obj");
+        List<Model> flag = loader.loadAssimpModel("src/main/resources/Models/flag/flag.obj");
+        List<Model> tree3 = loader.loadAssimpModel("src/main/resources/Models/sakura/sakura-A.obj");
+        List<Model> cloud = loader.loadAssimpModel("src/main/resources/Models/cloud/cloud lowpoly(big) -A.obj");
+        List<Model> mill = loader.loadAssimpModel("src/main/resources/Models/mill/LowPolyMill.obj");
 
-        float width = window.getWidth();
+        ball.get(0).setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")));
+        ball2.get(0).setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball2.png")));
+        botBallModel.get(0).setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")));
+        aiBotBallModel.get(0).setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")));
 
+        for (Model model : tree) model.getMaterial().setDisableCulling(true);
+        for (Model model : tree3) model.getMaterial().setDisableCulling(true);
+        for (Model model : skyBox) model.getMaterial().setDisableCulling(true);
+        for (Model model : arrow) model.getMaterial().setDisableCulling(true);
+        for (Model model : flag) model.getMaterial().setDisableCulling(true);
+        for (Model model : ball) model.getMaterial().setDisableCulling(true);
+        for (Model model : ball2) model.getMaterial().setDisableCulling(true);
+        for (Model model : botBallModel) model.getMaterial().setDisableCulling(true);
+        for (Model model : aiBotBallModel) model.getMaterial().setDisableCulling(true);
+        for (Model model : cloud) model.getMaterial().setDisableCulling(true);
+        for (Model model : mill) model.getMaterial().setDisableCulling(true);
+        return new ModelLoader(skyBox, ball, arrow, flag, mill);
+    }
+
+    private @NotNull Terrains getTerrains() throws Exception {
+        TerrainTexture sand = new TerrainTexture(loader.loadTexture("Texture/cartoonSand.jpg"));
+        TerrainTexture grass = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
+        TerrainTexture fairway = new TerrainTexture(loader.loadTexture("Texture/cartoonGrass.jpg"));
+        TerrainTexture water = new TerrainTexture(loader.loadTexture("Texture/cartoonWater.jpg"));
+
+        //Not used for now (doesn't look good) (don't delete)
+        TerrainTexture rock = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
+        TerrainTexture dryGrass = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
+        TerrainTexture snow = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
+        TerrainTexture mold = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
+
+        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
+
+        List<TerrainTexture> textures = new ArrayList<>(List.of(sand, grass, fairway, dryGrass, mold, rock, snow));
+        List<TerrainTexture> waterTextures = new ArrayList<>();
+        for (TerrainTexture ignored : textures) {
+            waterTextures.add(water);
+        }
+        return new Terrains(blendMap, textures, waterTextures);
+    }
+
+    private @NotNull MenuRunnable getRunnable(BlendMapTerrain blendMapTerrain) {
         Runnable terrainChanger = () -> {
             try {
                 trees.clear();
                 System.out.println("Changing terrain");
                 heightMap.createHeightMap();
                 path = pathfinder.getPath(Consts.RADIUS_DOWN, Consts.RADIUS_UP, Consts.SIZE_GREEN);
-                startPoint = new Vector3f(path.get(0).x, 0, path.get(0).y);
-                startPoint.x = (int) (startPoint.x / 4 - Consts.SIZE_X / 2);
-                startPoint.z = (int) (startPoint.z / 4 - Consts.SIZE_Z / 2);
-                startPoint.y = heightMap.getHeight(new Vector3f(startPoint.x, 0 , startPoint.z));
-
-                endPoint = new Vector3f(path.get(path.size() - 1).x, 0, path.get(path.size() - 1).y);
-                endPoint.x = (int) (endPoint.x / 4 - Consts.SIZE_X / 2);
-                endPoint.z = (int) (endPoint.z / 4 - Consts.SIZE_Z / 2);
-                endPoint.y = heightMap.getHeight(new Vector3f(endPoint.x, 0 , endPoint.z));
+                startEndPointConversion();
 
                 TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
                 SimplexNoise.shufflePermutation();
@@ -962,57 +1095,10 @@ public class GolfGame implements ILogic {
             }
             audioManager.playSound();
         };
-
-        float titleWidth = window.getWidthConverted(1200);
-        float titleHeight = window.getHeightConverted(1200);
-        float titleX = (window.getWidth() - titleWidth) / 2;
-        float titleY = window.getHeightConverted(10);
-
-        title = new Title("Texture/title.png", titleX, titleY, titleWidth, titleHeight, vg);
-
-        float heightButton = window.getHeightConverted(300);
-        float widthButton = window.getWidthConverted(2000);
-        float centerButtonX = (width - widthButton) / 2;
-        float centerButtonY = titleHeight + titleY;
-        float font = window.getHeightConverted(100);
-
-        startButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", font, startGame, vg, imageButton);
-        menuButtons.add(startButton);
-
-        Button changeTerrain = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Change Terrain", font, terrainChanger, vg, imageButton);
-        menuButtons.add(changeTerrain);
-
-        Button soundButton = new Button(window.getWidth() - window.getWidthConverted(300), window.getHeightConverted(20), window.getWidthConverted(300), heightButton, "Sound", font, sound, vg, imageButton);
-        menuButtons.add(soundButton);
-
-        Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2 , widthButton, heightButton, "Exit", font, quit, vg, imageButton);
-        menuButtons.add(exit);
-
-        botButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 2, widthButton/4, heightButton, "Play with bot", font, () -> isBot = !isBot, vg, imageButton);
-        menuButtons.add(botButton);
-
-        aiBotButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 3, widthButton/4, heightButton, "Play with AI", font, () -> isAiBot = !isAiBot, vg, imageButton);
-        menuButtons.add(aiBotButton);
-
-        twoPlayerButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 4, widthButton/4, heightButton, "2 Player", font, () -> is2player = !is2player, vg, imageButton);
-        menuButtons.add(twoPlayerButton);
-
-        debugButton = new Button( window.getWidthConverted(30), window.getHeight() - heightButton, widthButton/4, heightButton, "Debug Mode", font * 0.7f, enableDebugMode, vg, imageButton);
-        menuButtons.add(debugButton);
-
-        float paneWidth = window.getWidthConverted(500);
-        float paneHeight = window.getHeightConverted(500);
-        float paneX = (window.getWidth() - paneWidth);
-        float paneY = window.getHeight() - paneHeight - window.getHeightConverted(10);
-
-        pane = new TextPane(paneX, paneY, paneWidth, paneHeight, "Pane test", font * 0.7f,  vg, imageButton);
+        return new MenuRunnable(terrainChanger, startGame, sound, quit, enableDebugMode);
     }
 
-    /**
-     * Creates the in-game menu.
-     */
-    private void createInGameMenu() {
-
+    private @NotNull InGameMenuRunnable getInGameMenuRunnable() {
         Runnable resume = () -> {
             System.out.println("Resuming game");
             canMove = true;
@@ -1046,66 +1132,12 @@ public class GolfGame implements ILogic {
             System.out.println("Quitting game");
             GLFW.glfwSetWindowShouldClose(Launcher.getWindow().getWindow(), true);
         };
-
-        float heightButton = window.getHeightConverted(300);
-        float widthButton = window.getWidthConverted(2000);
-        float centerButtonX = (window.getWidth() - widthButton) / 2;
-        float centerButtonY = (window.getHeight() - heightButton * 3) / 2;
-        float font = window.getHeightConverted(100);
-
-        Button resumeButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Resume", font, resume, vg, "Texture/inGameMenu.png");
-        inGameMenuButtons.add(resumeButton);
-
-        Button backToMenuButton = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Back to Menu", font, backToMenu, vg, "Texture/inGameMenu.png");
-        inGameMenuButtons.add(backToMenuButton);
-
-        Button soundButton = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Sound", font, sound, vg, "Texture/inGameMenu.png");
-        inGameMenuButtons.add(soundButton);
-
-        Button exitButton = new Button(centerButtonX, centerButtonY + heightButton * 3, widthButton, heightButton, "Exit", font, quit, vg, "Texture/inGameMenu.png");
-        inGameMenuButtons.add(exitButton);
-    }
-
-    /**
-     * Recreates the GUIs.
-     */
-    private void recreateGUIs() {
-        menuButtons.clear();
-        inGameMenuButtons.clear();
-
-        createMenu(blendMapTerrain);
-        createInGameMenu();
-        createDefaultGui();
-    }
-
-    /**
-     * Switches the terrain of the game.
-     *
-     * @param blendMapTerrain The new terrain to switch to.
-     * @param tree The tree model to add to the new terrain.
-     * @param blendMap2 The new blend map to use.
-     */
-    private void terrainSwitch(BlendMapTerrain blendMapTerrain, List<Model> tree, TerrainTexture blendMap2) {
-        scene.getTerrains().remove(terrain);
-        scene.getTerrains().remove(ocean);
-        terrain = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blendMapTerrain, blendMap2, false);
-        ocean = new Terrain(new Vector3f(-Consts.SIZE_X/2 , 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0,0,0,0), 0.1f), blueTerrain, blendMap2, true);
-        scene.addTerrain(terrain);
-        scene.addTerrain(ocean);
-        scene.getEntities().removeIf(entity -> entity.getModels().equals(tree));
-        try {
-            if (!debugMode) {
-                createTrees(tree);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        renderer.processTerrain(terrain);
+        return new InGameMenuRunnable(resume, backToMenu, sound, quit);
     }
 
     @NotNull
     @Contract(pure = true)
-    private Runnable getPhysicsRunnable() {
+    private Runnable runPhysics() {
         PhysicsEngine engine = new PhysicsEngine(heightMap, scene);
 
         return () -> {
