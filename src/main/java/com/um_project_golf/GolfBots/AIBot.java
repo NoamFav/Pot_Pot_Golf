@@ -4,6 +4,7 @@ import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 import com.um_project_golf.Core.PhysicsEngine;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.Random;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class AIBot {
-    private final Vector3f startingPosition;
+    private Vector3f startingPosition;
     private final double flagRadius;
     private Vector3f velocityBall;
     private final double minVelocityX = -5;
@@ -28,8 +29,8 @@ public class AIBot {
     private HashMap<Vector3f,List<Vector3f>> fullPath;
     private final SceneManager scene;
 
-    public AIBot(Entity ball, Entity flag, HeightMap testMap, double flagRadius, SceneManager scene) {
-        startingPosition = ball.getPosition();
+    public AIBot(@NotNull Entity ball, Entity flag, HeightMap testMap, double flagRadius, SceneManager scene) {
+        startingPosition = new Vector3f(ball.getPosition());
         this.ball = ball;
         this.flag = flag;
         this.testMap = testMap;
@@ -81,6 +82,7 @@ public class AIBot {
                             velocity = newVelocity;
                             improvement = true;
                             path.add(fullPath.get(ball.getPosition()));
+                            startingPosition = new Vector3f(ball.getPosition());
                             if (isInHole()){
                                 return path;
                             }

@@ -15,6 +15,7 @@ import com.um_project_golf.Core.Utils.BallCollisionDetector;
 import com.um_project_golf.Core.Utils.CollisionsDetector;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.Entity.Terrain.HeightMapPathfinder;
+import com.um_project_golf.GolfBots.AIBot;
 import com.um_project_golf.GolfBots.RuleBasedBot;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -80,6 +81,7 @@ public class GolfGame implements ILogic {
     //private boolean wasPressed = false;
     private boolean isAnimating;
     private boolean isBot;
+    private boolean isAiBot;
     private boolean hasStartPoint = false;
     public static boolean debugMode = false;
 
@@ -91,6 +93,7 @@ public class GolfGame implements ILogic {
     private final List<Float> treeHeights;
     private Entity golfBall;
     private Entity botBall;
+    private Entity aiBotBall;
     private Entity endFlag;
     private Entity arrowEntity;
     private BallCollisionDetector ballCollisionDetector;
@@ -104,9 +107,11 @@ public class GolfGame implements ILogic {
     private TextPane warningTextPane;
     private int numberOfShots;
     private List<Model> botBallModel;
+    private List<Model> aiBotBallModel;
 
     private List<Vector3f> ballPositions;
     private List<List<Vector3f>> botPath;
+    private List<List<Vector3f>> aiBotPath;
     private int currentPositionIndex;
     private float animationTimeAccumulator;
     private Vector3f shotStartPosition;
@@ -509,6 +514,7 @@ public class GolfGame implements ILogic {
         List<Model> ball = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
         botBallModel = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
         List<Model> arrow = loader.loadAssimpModel("src/main/resources/Models/Arrow/Arrow5.obj");
+        aiBotBallModel = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
         List<Model> flag = loader.loadAssimpModel("src/main/resources/Models/flag/flag.obj");
         List<Model> tree2 = loader.loadAssimpModel("src/main/resources/Models/tree2/tree3-N.obj");
         List<Model> tree3 = loader.loadAssimpModel("src/main/resources/Models/sakura/sakura-A.obj");
@@ -525,6 +531,7 @@ public class GolfGame implements ILogic {
         for (Model model : flag) model.getMaterial().setDisableCulling(true);
         for (Model model : ball) model.getMaterial().setDisableCulling(true);
         for (Model model : botBallModel) model.getMaterial().setDisableCulling(true);
+        for (Model model : aiBotBallModel) model.getMaterial().setDisableCulling(true);
         for (Model model : cloud) model.getMaterial().setDisableCulling(true);
 
         scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
@@ -837,6 +844,19 @@ public class GolfGame implements ILogic {
         };
 
     }
+    @NotNull
+    @Contract(pure = true)
+    public Runnable createAiBotBall(){
+
+        return () -> {
+            aiBotBall = new Entity(aiBotBallModel, new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
+            scene.addEntity(aiBotBall);
+
+            AIBot aiBot = new AIBot(new Entity(aiBotBall), new Entity(endFlag), heightMap, 1.5, scene);
+            aiBotPath = aiBot.findBestShotUsingHillClimbing();
+        };
+
+    }
 
     /**
      * Creates the menu.
@@ -889,6 +909,10 @@ public class GolfGame implements ILogic {
 
             if(isBot){
                 createBotBall().run();
+            }
+
+            if(isAiBot){
+                createAiBotBall().run();
             }
 
             golfBall.setPosition(startPoint.x, startPoint.y, startPoint.z);
@@ -966,6 +990,9 @@ public class GolfGame implements ILogic {
 
         Button botButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 2, widthButton/4, heightButton, "Play with bot", font, () -> isBot = !isBot, vg, imageButton);
         menuButtons.add(botButton);
+
+        Button aiBotButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 3, widthButton/4, heightButton, "Play with AI", font, () -> isAiBot = !isAiBot, vg, imageButton);
+        menuButtons.add(aiBotButton);
 
         Button debugButton = new Button( window.getWidthConverted(30), window.getHeight() - heightButton, widthButton/4, heightButton, "Debug Mode", font * 0.7f, enableDebugMode, vg, imageButton);
         menuButtons.add(debugButton);
