@@ -97,7 +97,6 @@ public class GolfGame implements ILogic {
     private BallCollisionDetector ballCollisionDetector;
 
     private Button applyButton;
-    private Button botButton;
     private TextField vxTextField;
     private TextField vzTextField;
     private TextPane vxTextPane;
@@ -428,7 +427,6 @@ public class GolfGame implements ILogic {
             warningTextPane.render();
             infoTextPane.render();
             applyButton.render();
-            botButton.render();
             vxTextField.render();
             vzTextField.render();
             vxTextPane.render();
@@ -469,14 +467,17 @@ public class GolfGame implements ILogic {
     }
 
     private void terrainCreation() throws Exception {
-        TerrainTexture rock = new TerrainTexture(loader.loadTexture("Texture/rock.png"));
-        TerrainTexture sand = new TerrainTexture(loader.loadTexture("Texture/sand.png"));
-        TerrainTexture grass = new TerrainTexture(loader.loadTexture("Texture/grass.png"));
-        TerrainTexture dryGrass = new TerrainTexture(loader.loadTexture("Texture/dryGrass.png"));
-        TerrainTexture fairway = new TerrainTexture(loader.loadTexture("Texture/fairway.png"));
-        TerrainTexture snow = new TerrainTexture(loader.loadTexture("Texture/snow.png"));
-        TerrainTexture mold = new TerrainTexture(loader.loadTexture("Texture/mold.png"));
-        TerrainTexture water = new TerrainTexture(loader.loadTexture("Texture/water.png"));
+
+        TerrainTexture sand = new TerrainTexture(loader.loadTexture("Texture/cartoonSand.jpg"));
+        TerrainTexture grass = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
+        TerrainTexture fairway = new TerrainTexture(loader.loadTexture("Texture/cartoonGrass.jpg"));
+        TerrainTexture water = new TerrainTexture(loader.loadTexture("Texture/cartoonWater.jpg"));
+
+        //Not used for now (doesn't look good) (don't delete)
+        TerrainTexture rock = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
+        TerrainTexture dryGrass = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
+        TerrainTexture snow = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
+        TerrainTexture mold = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
 
         TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
 
@@ -498,8 +499,7 @@ public class GolfGame implements ILogic {
 
     private void modelAndEntityCreation() throws Exception {
         //Model cube = loader.loadAssimpModel("src/main/resources/Models/Minecraft_Grass_Block_OBJ/SkyBox.obj");
-        tree = loader.loadAssimpModel("src/main/resources/Models/tree/Tree.obj");
-        List<Model> wolf = loader.loadAssimpModel("src/main/resources/Models/Wolf_dae/wolf.dae");
+        tree = loader.loadAssimpModel("src/main/resources/Models/tree2/tree3-N.obj");
         List<Model> skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
         List<Model> ball = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
         botBallModel = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
@@ -509,10 +509,11 @@ public class GolfGame implements ILogic {
         List<Model> tree3 = loader.loadAssimpModel("src/main/resources/Models/sakura/sakura-A.obj");
         List<Model> cloud = loader.loadAssimpModel("src/main/resources/Models/cloud/cloud lowpoly(big) -A.obj");
 
+        ball.get(0).setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")));
+
         for (Model model : tree) model.getMaterial().setDisableCulling(true);
         for (Model model : tree2) model.getMaterial().setDisableCulling(true);
         for (Model model : tree3) model.getMaterial().setDisableCulling(true);
-        for (Model model : wolf) model.getMaterial().setDisableCulling(true);
         for (Model model : skyBox) model.getMaterial().setDisableCulling(true);
         for (Model model : arrow) model.getMaterial().setDisableCulling(true);
         for (Model model : flag) model.getMaterial().setDisableCulling(true);
@@ -522,7 +523,6 @@ public class GolfGame implements ILogic {
 
         scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
         scene.addEntity(new Entity(cloud, new Vector3f(0, 30, 0), new Vector3f(0, 0 , 0), 1 ));
-        scene.addEntity(new Entity(wolf, new Vector3f(0, 20, 0), new Vector3f(45, 0 , 0), 20 ));
 
         //scene.addEntity(new Entity(tree2, new Vector3f(0, 10, 0), new Vector3f(0, 0, 0), 5));
         //scene.addEntity(new Entity(tree3, new Vector3f(10, 10, 0), new Vector3f(0, 0, 0), 5));
@@ -546,7 +546,7 @@ public class GolfGame implements ILogic {
         System.out.println("End point: " + endPoint);
 
         //scene.addEntity(new Entity(flag, new Vector3f(startPoint.x, heightMap.getHeight(new Vector3f(startPoint.x, 0 , startPoint.y)), startPoint.y), new Vector3f(0, 0, 0), 3));
-        endFlag = new Entity(flag, new Vector3f(endPoint), new Vector3f(0, 0, 0), 5);
+        endFlag = new Entity(flag, new Vector3f(endPoint), new Vector3f(0, 0, 0), 150);
         scene.addEntity(endFlag);
 
         golfBall = new Entity(ball, new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
@@ -727,7 +727,7 @@ public class GolfGame implements ILogic {
         for (int i = 0; i < Consts.NUMBER_OF_TREES; i++) {
             Vector3f position = positions.get(rnd.nextInt(positions.size()));
             if (position != zero) {
-                Entity aTree = new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f);
+                Entity aTree = new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(0, 0, 0), 2); // - 90 and 0.03f
                 scene.addEntity(aTree);
                 trees.add(aTree);
                 treeHeights.add(position.y);
@@ -779,7 +779,6 @@ public class GolfGame implements ILogic {
         });
 
         Runnable applyVelocity = getPhysicsRunnable();
-        Runnable runBot = createBotBall();
 
         applyButton = new Button(x, y * 30 + height, 3 * width / 5, 2 * height / 3, "Apply Velocity", font, applyVelocity, vg, imageButton);
     }
@@ -935,7 +934,6 @@ public class GolfGame implements ILogic {
             audioManager.playSound();
         };
 
-
         float titleWidth = window.getWidthConverted(1200);
         float titleHeight = window.getHeightConverted(1200);
         float titleX = (window.getWidth() - titleWidth) / 2;
@@ -964,7 +962,7 @@ public class GolfGame implements ILogic {
         Button debugButton = new Button( window.getWidthConverted(30), window.getHeight() - heightButton, widthButton/4, heightButton, "Debug Mode", font * 0.7f, enableDebugMode, vg, imageButton);
         menuButtons.add(debugButton);
 
-        Button botButton = new Button(centerButtonX, centerButtonY + heightButton * 3, widthButton, heightButton, "Play with bot", font, () -> {isBot = !isBot;}, vg, imageButton);
+        Button botButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 2, widthButton/4, heightButton, "Play with bot", font, () -> isBot = !isBot, vg, imageButton);
         menuButtons.add(botButton);
 
         float paneWidth = window.getWidthConverted(500);
