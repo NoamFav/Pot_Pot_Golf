@@ -63,6 +63,9 @@ The system contains a basic API for string recognition into executable function,
 It wasn't kept in the final version of the project because it was not working for more complex functions.
 Instead, the system uses exp4j, a library that can evaluate strings into functions.
 
+## Texture Credits
+Cartoon Texture terrain image created by upklyak — www.freepik.com
+
 ## Authors
 Noam Favier
 Ole Rotteveel

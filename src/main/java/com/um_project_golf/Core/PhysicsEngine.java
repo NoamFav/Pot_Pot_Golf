@@ -1,11 +1,8 @@
 package com.um_project_golf.Core;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.io.File;
-
 
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 import com.um_project_golf.Core.Utils.Consts;
