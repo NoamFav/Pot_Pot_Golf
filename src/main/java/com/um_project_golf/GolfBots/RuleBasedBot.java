@@ -88,7 +88,7 @@ public class RuleBasedBot {
         double[] initialState = {ball.getPosition().x, ball.getPosition().z, velocityBall.x, velocityBall.z};
         double h = 0.1; // Time step
         PhysicsEngine engine = new PhysicsEngine(heightMap, scene);
-        List<Vector3f> positions = engine.runImprovedEuler(initialState, h);
+        List<Vector3f> positions = engine.runRK4(initialState, h);
 
         Vector3f finalPosition = positions.get(positions.size()-1);
 
