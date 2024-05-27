@@ -1,5 +1,6 @@
 package com.um_project_golf.GolfBots;
 
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 class Ball {
@@ -38,14 +39,13 @@ class Ball {
     }
 
     // Placeholder for calculating the distance to the flag
-    public double distanceToFlag(Green green) {
-        double dx = green.getFlagPosition().x - position.x;
-        double dy = green.getFlagPosition().y - position.y;
-        double dz = green.getFlagPosition().z - position.z;
+    public double distanceToFlag(@NotNull Green green) {
+        double dx = green.flagPosition().x - position.x;
+        double dy = green.flagPosition().y - position.y;
+        double dz = green.flagPosition().z - position.z;
 
         // Calculate the distance using the 3D distance formula
-        double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-        return distance;
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 }

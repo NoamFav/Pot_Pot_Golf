@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 
+import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
+import com.um_project_golf.Core.Utils.BallCollisionDetector;
 import com.um_project_golf.Core.Utils.Consts;
 
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +29,8 @@ public class PhysicsEngine {
     private final HeightMap heightMap;
     @SuppressWarnings("FieldCanBeLocal") private static final double sandLevel = 0.5; // get this value from the constant file
     private final double VELOCITY_THRESHOLD = 0.05; // get this value from the constant file
-    private final double ACCELERATION_THRESHOLD = 0.1; // get this value from the constant file
+    private final double ACCELERATION_THRESHOLD = 0.5; // get this value from the constant file
+    private final BallCollisionDetector ballCollisionDetector;
 
     /**
      * Create a new physics engine.
@@ -40,9 +43,10 @@ public class PhysicsEngine {
      */
     @Deprecated
     @SuppressWarnings("unused")
-    public PhysicsEngine(BiFunction<Double, Double, Double> height) {
+    public PhysicsEngine(BiFunction<Double, Double, Double> height, SceneManager scene) {
         this.heightFunction = height;
         this.heightMap = null;
+        this.ballCollisionDetector = new BallCollisionDetector(null, scene);
     }
 
 
@@ -51,11 +55,10 @@ public class PhysicsEngine {
      *
      * @param heightMap The height map
      */
-    public PhysicsEngine(HeightMap heightMap) {
+    public PhysicsEngine(HeightMap heightMap, SceneManager scene) {
         this.heightFunction = null;
         this.heightMap = heightMap;
-
-
+        this.ballCollisionDetector = new BallCollisionDetector(heightMap, scene);
     }
 
     /**
@@ -82,12 +85,13 @@ public class PhysicsEngine {
 
     /**
      * Run the improved Euler method.
+     * initialState = [x, z, vx, vz]
      *
      * @param initialState The initial state
      * @param stepSize The step size
      * @return The final position
      */
-    public List<Vector3f> runImprovedEuler(double[] initialState, double stepSize) { // initialState = [x, z, vx, vz]
+    public List<Vector3f> runImprovedEuler(double[] initialState, double stepSize) {
         List<Vector3f> positions = new ArrayList<>();
         double[] currentState = initialState;
         double magnitudeVelocity;
@@ -97,18 +101,19 @@ public class PhysicsEngine {
         double[] nextStep;
         double[] acceleration;
 
-        do { // Repeat until the ball is completely at rest
+        do {
             nextStep = SimpleRK2.simpleImprovedEuler(currentTime, currentState, currentTime + stepSize, stepSize, this::equationsOfMotion);
             acceleration = equationsOfMotion(currentTime, currentState);
             magnitudeVelocity = Math.sqrt(nextStep[2] * nextStep[2] + nextStep[3] * nextStep[3]);
             magnitudeAcceleration = Math.sqrt(acceleration[2] * acceleration[2] + acceleration[3] * acceleration[3]);
             currentState = nextStep;
             currentTime += stepSize;
-
             assert heightMap != null;
             float height = heightMap.getHeight(new Vector3f((float) currentState[0], 0, (float) currentState[1]));
-            positions.add(new Vector3f((float) currentState[0], height, (float) currentState[1]));
-        } while (magnitudeVelocity >= VELOCITY_THRESHOLD || magnitudeAcceleration >= ACCELERATION_THRESHOLD); // While the ball is not at rest
+            Vector3f position = new Vector3f((float) currentState[0], height, (float) currentState[1]);
+            ballCollisionDetector.checkCollisionBall(position);
+            positions.add(position);
+        } while (magnitudeVelocity >= VELOCITY_THRESHOLD || magnitudeAcceleration >= ACCELERATION_THRESHOLD);
 
         return positions;
     }
