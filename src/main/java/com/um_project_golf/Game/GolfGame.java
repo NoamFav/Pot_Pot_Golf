@@ -82,6 +82,7 @@ public class GolfGame implements ILogic {
     private boolean isAnimating;
     private boolean isBot;
     private boolean isAiBot;
+
     private boolean hasStartPoint = false;
     public static boolean debugMode = false;
 
@@ -98,6 +99,10 @@ public class GolfGame implements ILogic {
     private Entity arrowEntity;
     private BallCollisionDetector ballCollisionDetector;
 
+    private Button startButton;
+    private Button aiBotButton;
+    private Button botButton;
+    private Button debugButton;
     private Button applyButton;
     private TextField vxTextField;
     private TextField vzTextField;
@@ -359,8 +364,9 @@ public class GolfGame implements ILogic {
                         if (nextPosition.x <= endPoint.x + isInHoleThreshold && nextPosition.x >= endPoint.x - isInHoleThreshold) {
                             if (nextPosition.z <= endPoint.z + isInHoleThreshold && nextPosition.z >= endPoint.z - isInHoleThreshold) {
                                 System.out.println("Ball reached the end point!");
+                                System.out.println("You took " + numberOfShots + " shots to reach the end point!");
                                 System.out.println(endPoint);
-                                warningTextPane.setText("Ball reached the end point!");
+                                warningTextPane.setText("You Win! In " + numberOfShots + " shots!");
                                 treeAnimationState = AnimationState.GOING_UP;
                                 treeAnimationTime = 0f;
                             }
@@ -371,14 +377,10 @@ public class GolfGame implements ILogic {
                     if (nextPosition.y <= - 0.3) { // Ball in water
                         golfBall.setPosition(shotStartPosition.x, shotStartPosition.y, shotStartPosition.z);
                         isAnimating = false;
-                        warningTextPane.setText("Ball in water! Resetting to last shot position.");
+                        warningTextPane.setText("Ploof! Ball in water! Resetting to last shot position.");
                     } else {
                         golfBall.setPosition(nextPosition.x, nextPosition.y, nextPosition.z);
                         currentPositionIndex++;
-                    }
-
-                    if (isBot) {
-                        System.out.println("Bot path size: " + botPath.get(numberOfShots-1));
                     }
 
                 } else {
@@ -388,6 +390,20 @@ public class GolfGame implements ILogic {
         } else {
             updateArrow();
         }
+
+        if (isBot && isAiBot) {
+            startButton.setText("Start with Ai Bot and Bot (really long)");
+        } else if (isBot) {
+            startButton.setText("Start with Bot (long)");
+        } else if (isAiBot) {
+            startButton.setText("Start with Ai Bot (kinda long)");
+        } else {
+            startButton.setText("Start");
+        }
+
+        botButton.setText(isBot ? "Bot: On" : "Bot: Off");
+        aiBotButton.setText(isAiBot ? "AI Bot: On" : "AI Bot: Off");
+        debugButton.setText(debugMode ? "Debug: On" : "Debug: Off");
 
         for (Entity entity : scene.getEntities()) {
             renderer.processEntity(entity);
@@ -509,22 +525,22 @@ public class GolfGame implements ILogic {
 
     private void modelAndEntityCreation() throws Exception {
         //Model cube = loader.loadAssimpModel("src/main/resources/Models/Minecraft_Grass_Block_OBJ/SkyBox.obj");
-        tree = loader.loadAssimpModel("src/main/resources/Models/tree2/tree3-N.obj");
+        tree = loader.loadAssimpModel("src/main/resources/Models/tree/tree.obj");
         List<Model> skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
         List<Model> ball = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
         botBallModel = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
         List<Model> arrow = loader.loadAssimpModel("src/main/resources/Models/Arrow/Arrow5.obj");
         aiBotBallModel = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
         List<Model> flag = loader.loadAssimpModel("src/main/resources/Models/flag/flag.obj");
-        List<Model> tree2 = loader.loadAssimpModel("src/main/resources/Models/tree2/tree3-N.obj");
         List<Model> tree3 = loader.loadAssimpModel("src/main/resources/Models/sakura/sakura-A.obj");
         List<Model> cloud = loader.loadAssimpModel("src/main/resources/Models/cloud/cloud lowpoly(big) -A.obj");
+        List<Model> mill = loader.loadAssimpModel("src/main/resources/Models/mill/LowPolyMill.obj");
 
         ball.get(0).setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")));
         botBallModel.get(0).setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")));
+        aiBotBallModel.get(0).setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")));
 
         for (Model model : tree) model.getMaterial().setDisableCulling(true);
-        for (Model model : tree2) model.getMaterial().setDisableCulling(true);
         for (Model model : tree3) model.getMaterial().setDisableCulling(true);
         for (Model model : skyBox) model.getMaterial().setDisableCulling(true);
         for (Model model : arrow) model.getMaterial().setDisableCulling(true);
@@ -533,12 +549,14 @@ public class GolfGame implements ILogic {
         for (Model model : botBallModel) model.getMaterial().setDisableCulling(true);
         for (Model model : aiBotBallModel) model.getMaterial().setDisableCulling(true);
         for (Model model : cloud) model.getMaterial().setDisableCulling(true);
+        for (Model model : mill) model.getMaterial().setDisableCulling(true);
 
         scene.addEntity(new Entity(skyBox, new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
-        scene.addEntity(new Entity(cloud, new Vector3f(0, 30, 0), new Vector3f(0, 0 , 0), 1 ));
-
-        //scene.addEntity(new Entity(tree2, new Vector3f(0, 10, 0), new Vector3f(0, 0, 0), 5));
+        //scene.addEntity(new Entity(cloud, new Vector3f(0, 30, 0), new Vector3f(0, 0 , 0), 1 ));
         //scene.addEntity(new Entity(tree3, new Vector3f(10, 10, 0), new Vector3f(0, 0, 0), 5));
+
+
+        scene.addEntity(new Entity(mill, new Vector3f(0, 15, 0), new Vector3f(0, 0, 0), 20));
 
         arrowEntity = new Entity(arrow, new Vector3f(0, 0, 0), new Vector3f(0,-90 ,0), 2);
         scene.addEntity(arrowEntity);
@@ -669,10 +687,9 @@ public class GolfGame implements ILogic {
 
             switch (treeAnimationState) {
                 case GOING_UP:
-                    System.out.println("Going up");
                     if (treeAnimationTime <= treeAnimationDuration / 2) {
                         float newY = baseHeight + treeHeightOffset * t;
-                        float newRotation = 180 * t;
+                        float newRotation = -90 + 180 * t;
                         tree.setPosition(tree.getPosition().x, newY, tree.getPosition().z);
                         tree.setRotation(newRotation, tree.getRotation().y, tree.getRotation().z);
                     } else {
@@ -682,10 +699,9 @@ public class GolfGame implements ILogic {
                     break;
 
                 case GOING_DOWN:
-                    System.out.println("Going down");
                     if (treeAnimationTime <= treeAnimationDuration / 2) {
                         float newY = baseHeight + treeHeightOffset * (1 - t);
-                        float newRotation = 180 + 180f * t;
+                        float newRotation = 90 + 180f * t;
                         tree.setPosition(tree.getPosition().x, newY, tree.getPosition().z);
                         tree.setRotation(newRotation, tree.getRotation().y, tree.getRotation().z);
                     } else {
@@ -740,7 +756,7 @@ public class GolfGame implements ILogic {
         for (int i = 0; i < Consts.NUMBER_OF_TREES; i++) {
             Vector3f position = positions.get(rnd.nextInt(positions.size()));
             if (position != zero) {
-                Entity aTree = new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(0, 0, 0), 2); // - 90 and 0.03f
+                Entity aTree = new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f); // - 90 and 0.03f
                 scene.addEntity(aTree);
                 trees.add(aTree);
                 treeHeights.add(position.y);
@@ -844,6 +860,7 @@ public class GolfGame implements ILogic {
         };
 
     }
+
     @NotNull
     @Contract(pure = true)
     public Runnable createAiBotBall(){
@@ -976,8 +993,8 @@ public class GolfGame implements ILogic {
         float centerButtonY = titleHeight + titleY;
         float font = window.getHeightConverted(100);
 
-        Button start = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", font, startGame, vg, imageButton);
-        menuButtons.add(start);
+        startButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", font, startGame, vg, imageButton);
+        menuButtons.add(startButton);
 
         Button changeTerrain = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Change Terrain", font, terrainChanger, vg, imageButton);
         menuButtons.add(changeTerrain);
@@ -988,13 +1005,13 @@ public class GolfGame implements ILogic {
         Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2 , widthButton, heightButton, "Exit", font, quit, vg, imageButton);
         menuButtons.add(exit);
 
-        Button botButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 2, widthButton/4, heightButton, "Play with bot", font, () -> isBot = !isBot, vg, imageButton);
+        botButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 2, widthButton/4, heightButton, "Play with bot", font, () -> isBot = !isBot, vg, imageButton);
         menuButtons.add(botButton);
 
-        Button aiBotButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 3, widthButton/4, heightButton, "Play with AI", font, () -> isAiBot = !isAiBot, vg, imageButton);
+        aiBotButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 3, widthButton/4, heightButton, "Play with AI", font, () -> isAiBot = !isAiBot, vg, imageButton);
         menuButtons.add(aiBotButton);
 
-        Button debugButton = new Button( window.getWidthConverted(30), window.getHeight() - heightButton, widthButton/4, heightButton, "Debug Mode", font * 0.7f, enableDebugMode, vg, imageButton);
+        debugButton = new Button( window.getWidthConverted(30), window.getHeight() - heightButton, widthButton/4, heightButton, "Debug Mode", font * 0.7f, enableDebugMode, vg, imageButton);
         menuButtons.add(debugButton);
 
         float paneWidth = window.getWidthConverted(500);

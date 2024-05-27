@@ -34,7 +34,7 @@ public class CollisionsDetector {
 
         terrainCollision(position);
         borderCollision(position);
-        entityCollision(position);
+        //entityCollision(position); // Commented out to avoid collision with trees as only useful for the ball
 
         camera.setPosition(position);
     }
