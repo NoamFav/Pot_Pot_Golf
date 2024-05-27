@@ -118,6 +118,33 @@ public class PhysicsEngine {
         return positions;
     }
 
+    public List<Vector3f> runRK4(double[] initialState, double stepSize) { // initialState = [x, z, vx, vz]
+        List<Vector3f> positions = new ArrayList<>();
+        double[] currentState = initialState;
+        double magnitudeVelocity;
+        double magnitudeAcceleration;
+        double currentTime = 0;
+
+        double[] nextStep;
+        double[] acceleration;
+
+        do { // Repeat until the ball is completely at rest
+            nextStep = SimpleRK4.simpleRK4(currentTime, currentState, currentTime + stepSize, stepSize, this::equationsOfMotion);
+            acceleration = equationsOfMotion(currentTime, currentState);
+            magnitudeVelocity = Math.sqrt(nextStep[2] * nextStep[2] + nextStep[3] * nextStep[3]);
+            magnitudeAcceleration = Math.sqrt(acceleration[2] * acceleration[2] + acceleration[3] * acceleration[3]);
+            currentState = nextStep;
+            currentTime += stepSize;
+
+            assert heightMap != null;
+            float height = heightMap.getHeight(new Vector3f((float) currentState[0], 0, (float) currentState[1]));
+            positions.add(new Vector3f((float) currentState[0], height, (float) currentState[1]));
+        } while (magnitudeVelocity >= 1 || magnitudeAcceleration >= 1); // While the ball is not at rest
+
+        return positions;
+    }
+
+
     /**
      * Provide the equations of motion.
      * Uses the height map to calculate the equations of motion.
