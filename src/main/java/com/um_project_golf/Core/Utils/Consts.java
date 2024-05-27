@@ -30,7 +30,7 @@ public class Consts {
     public static final float SIZE_X = (float) Math.pow(2, POWER); // Size of the terrain in the x direction
     public static final float SIZE_Z = (float) Math.pow(2, POWER); // Size of the terrain in the z direction
     public static final int VERTEX_COUNT = (int) Math.pow(2, POWER + 2); // Number of vertices in the terrain (Higher = more detail but also more performance heavy)
-    public static final int NUMBER_OF_TREES = (int) (SIZE_X); // Density of the trees (higher = more trees) reduces for performance
+    public static final int NUMBER_OF_TREES = (int) (SIZE_X / 2); // Density of the trees (higher = more trees) reduces for performance
     public static final float TREE_SIZE = 1.5f; // Size of the trees at the trunk
     public static final float MAX_HEIGHT = 10000; // Maximum height of the terrain,
     // doesn't have to influence the actual height of the terrain just the maximum height reachable by the player
@@ -135,7 +135,6 @@ public class Consts {
     // 5 Iron = 58.1 m/s to 62.4 m/s (210 km/h to 225 km/h)
     // Pitching Wedge = 38 m/s to 45 m/s (137 km/h to 162 km/h)
     public static final float MAX_SPEED = 5; // Maximum speed of the ball (m/s)
-
 
     // The requirement of friction is tiny,
     // so on the simplex noise terrain, the ball will have trouble climbing the hills.
