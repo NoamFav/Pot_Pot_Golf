@@ -74,6 +74,32 @@ public class PhysicsEngine {
 
         return positions;
     }
+
+    public List<Vector3f> runRK4(double[] initialState, double stepSize) { // initialState = [x, z, vx, vz]
+        List<Vector3f> positions = new ArrayList<>();
+        double[] currentState = initialState;
+        double magnitudeVelocity;
+        double magnitudeAcceleration;
+        double currentTime = 0;
+
+        double[] nextStep;
+        double[] acceleration;
+
+        do { // Repeat until the ball is completely at rest
+            nextStep = SimpleRK4.simpleRK4(currentTime, currentState, currentTime + stepSize, stepSize, this::equationsOfMotion);
+            acceleration = equationsOfMotion(currentTime, currentState);
+            magnitudeVelocity = Math.sqrt(nextStep[2] * nextStep[2] + nextStep[3] * nextStep[3]);
+            magnitudeAcceleration = Math.sqrt(acceleration[2] * acceleration[2] + acceleration[3] * acceleration[3]);
+            currentState = nextStep;
+            currentTime += stepSize;
+
+            assert heightMap != null;
+            float height = heightMap.getHeight(new Vector3f((float) currentState[0], 0, (float) currentState[1]));
+            positions.add(new Vector3f((float) currentState[0], height, (float) currentState[1]));
+        } while (magnitudeVelocity >= 1 || magnitudeAcceleration >= 1); // While the ball is not at rest
+
+        return positions;
+    }
     
 
     private double[] equationsOfMotion(double t, double[] x) { // x = [x, z, vx, vz]
@@ -194,12 +220,19 @@ public class PhysicsEngine {
 //        double h = 0.1; // Time step
 //        //double totalTime = 5; // Total time
 //        PhysicsEngine engine = new PhysicsEngine(testMap, 0.08, 0.2, 0.1, 0.3);
+//        List<Vector3f> positions;
 //        Vector3f finalPosition;
-//        for (int i = 0; i < 50; i++) {
-//            finalPosition = engine.runImprovedEuler(initialState, h);
-//            initialState[0] = finalPosition.x;
-//            initialState[1] = finalPosition.z;
-//            System.out.println(finalPosition.x + ", " + finalPosition.y + ", " + finalPosition.z);
-//        }
+
+//         positions = engine.runImprovedEuler(initialState, h);
+//         finalPosition = positions.get(positions.size() - 1);
+//         initialState[0] = finalPosition.x;
+//         initialState[1] = finalPosition.z;
+//         System.out.println(finalPosition.x + ", " + finalPosition.y + ", " + finalPosition.z);
+
+//         positions = engine.runRK4(initialState, h);
+//         finalPosition = positions.get(positions.size() - 1);
+//         initialState[0] = finalPosition.x;
+//         initialState[1] = finalPosition.z;
+//         System.out.println(finalPosition.x + ", " + finalPosition.y + ", " + finalPosition.z);
 //    }
 }
