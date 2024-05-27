@@ -1,6 +1,7 @@
 package com.um_project_golf.GolfBots;
 
 import com.um_project_golf.Core.Entity.Entity;
+import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 import com.um_project_golf.Core.PhysicsEngine;
 import org.joml.Vector3f;
@@ -9,29 +10,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Function;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class AIBot {
-    private Vector3f startingPosition;
-    private double flagRadius;
+    private final Vector3f startingPosition;
+    private final double flagRadius;
     private Vector3f velocityBall;
-    private double minVelocityX = -5;
-    private double maxVelocityX = 5;
-    private double minVelocityZ = -5;
-    private double maxVelocityZ = 5;
-    private double velocityStepX = 0.1;
-    private double velocityStepZ = 0.1;
-    private HeightMap testMap;
-    private Entity ball;
-    private Entity flag;
+    private final double minVelocityX = -5;
+    private final double maxVelocityX = 5;
+    private final double minVelocityZ = -5;
+    private final double maxVelocityZ = 5;
+    private final double velocityStepX = 0.1;
+    private final double velocityStepZ = 0.1;
+    private final HeightMap testMap;
+    private final Entity ball;
+    private final Entity flag;
     private HashMap<Vector3f,List<Vector3f>> fullPath;
+    private final SceneManager scene;
 
-    public AIBot(Entity ball, Entity flag, HeightMap testMap, double flagRadius){
+    public AIBot(Entity ball, Entity flag, HeightMap testMap, double flagRadius, SceneManager scene) {
         startingPosition = ball.getPosition();
         this.ball = ball;
         this.flag = flag;
         this.testMap = testMap;
         this.flagRadius = flagRadius;
+        this.scene = scene;
     }
 
     public List<List<Vector3f>> findBestShotUsingHillClimbing() {
@@ -98,7 +101,7 @@ public class AIBot {
     }
 
     public double evaluateShot(Shot shot) {
-        applyVelocities(shot.getVelocity());
+        applyVelocities(shot.velocity());
         simulateBallMovement();
         return distanceToFlag();
     }
@@ -111,7 +114,7 @@ public class AIBot {
         fullPath = new HashMap<>();
         double[] initialState = {ball.getPosition().x, ball.getPosition().z, velocityBall.x, velocityBall.z};
         double h = 0.1; // Time step
-        PhysicsEngine engine = new PhysicsEngine(testMap);
+        PhysicsEngine engine = new PhysicsEngine(testMap, scene);
         List<Vector3f> positions = engine.runImprovedEuler(initialState, h);
 
         Vector3f finalPosition = positions.get(positions.size()-1);
@@ -133,8 +136,7 @@ public class AIBot {
         double dz = flag.getPosition().z - ball.getPosition().z;
 
         // Calculate the distance using the 3D distance formula
-        double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-        return distance;
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 }

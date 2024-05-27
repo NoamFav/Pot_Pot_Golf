@@ -35,19 +35,6 @@ public class Consts {
     public static final float MAX_HEIGHT = 10000; // Maximum height of the terrain,
     // doesn't have to influence the actual height of the terrain just the maximum height reachable by the player
 
-    // Change the radius to make the game easier or harder.
-    // Beware of not making the radius bigger than half of the size of the terrain.
-    // Otherwise, the A* algorithm will not find a path to the hole.
-    // Nor a valid end point most of the time.
-    // Recommended values are the standard Par values.
-    // Par 3: 115-230 meters (need size terrain of 512)
-    // Par 4: 230-410 meters (need size terrain of 1024)
-    // Par 5: 410-550 meters (need size terrain of 1024)
-    // Par 6: 550-700 meters (need size terrain of 2048)
-    public static final int RADIUS_DOWN = 250; // Minimum distance from the hole
-    public static final int RADIUS_UP = 320; // Maximum distance from the hole
-    public static final int SIZE_GREEN = 15; // Size of the green (meters)
-
     public static final int MAX_TEXTURES = 7; // Maximum number of textures (don't change)
 
     // Configuration for the terrain generation
@@ -126,6 +113,19 @@ public class Consts {
     public static final Vector3f TEE_POSITION = new Vector3f(0f, 0f, 0f); // Position of the hole
     public static final Vector3f HOLE_POSITION = new Vector3f(0f, 0f, 0f); // Position of the hole
     public static final float TARGET_RADIUS = 0.15f; // Radius of the ball (meters)
+
+    // Change the radius to make the game easier or harder.
+    // Beware of not making the radius bigger than half of the size of the terrain.
+    // Otherwise, the A* algorithm will not find a path to the hole.
+    // Nor a valid end point most of the time.
+    // Recommended values are the standard Par values.
+    // Par 3: 115-230 meters (need size terrain of 512)
+    // Par 4: 230-410 meters (need size terrain of 1024)
+    // Par 5: 410-550 meters (need size terrain of 1024)
+    // Par 6: 550-700 meters (need size terrain of 2048)
+    public static final int RADIUS_DOWN = 20; // Minimum distance from the hole
+    public static final int RADIUS_UP = 30; // Maximum distance from the hole
+    public static final int SIZE_GREEN = 15; // Size of the green (meters)
 
     // (Recommend higher when using long distances)
     // For the connoisseurs

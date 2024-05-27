@@ -9,7 +9,6 @@ import java.util.List;
  * This class is responsible for the entities of the game.
  */
 public class Entity {
-    public Object getRotation; // get the rotation of the entity
     private final List<Model> model; // model of the entity
     private final Vector3f position, rotation; // position and rotation of the entity
     private float scale; // scale of the entity
@@ -28,6 +27,13 @@ public class Entity {
         this.position = position;
         this.rotation = rotation;
         this.scale = scale;
+    }
+
+    public Entity(Entity entity) {
+        this.model = entity.model;
+        this.position = entity.position;
+        this.rotation = entity.rotation;
+        this.scale = entity.scale;
     }
 
     /**
@@ -92,5 +98,9 @@ public class Entity {
 
     public void setScale(float scale) {
         this.scale = scale;
+    }
+
+    public void setPosition(Vector3f startPoint) {
+        this.position.set(startPoint);
     }
 }
