@@ -809,7 +809,7 @@ public class GolfGame implements ILogic {
                 } else {
                     double[] initialState = {golfBall.getPosition().x, golfBall.getPosition().z, vx, vz}; // initialState = [x, z, vx, vz]
                     double h = 0.1; // Time step
-                    ballPositions = engine.runImprovedEuler(initialState, h);
+                    ballPositions = engine.runRK4(initialState, h);
 
                     currentPositionIndex = 0;
                     isAnimating = true;

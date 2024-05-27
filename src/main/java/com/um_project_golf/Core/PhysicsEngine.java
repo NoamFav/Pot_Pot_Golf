@@ -91,6 +91,7 @@ public class PhysicsEngine {
      * @param stepSize The step size
      * @return The final position
      */
+    @SuppressWarnings("unused") // This method is a alternative to the rk4 method
     public List<Vector3f> runImprovedEuler(double[] initialState, double stepSize) {
         List<Vector3f> positions = new ArrayList<>();
         double[] currentState = initialState;
@@ -118,6 +119,16 @@ public class PhysicsEngine {
         return positions;
     }
 
+    /**
+     * Run the Runge-Kutta 4 method.
+     * Improvement on the Euler method.
+     * Offers numerical stability and accuracy.
+     * initialState = [x, z, vx, vz]
+     *
+     * @param initialState The initial state
+     * @param stepSize The step size
+     * @return The final position
+     */
     public List<Vector3f> runRK4(double[] initialState, double stepSize) { // initialState = [x, z, vx, vz]
         List<Vector3f> positions = new ArrayList<>();
         double[] currentState = initialState;
@@ -138,8 +149,10 @@ public class PhysicsEngine {
 
             assert heightMap != null;
             float height = heightMap.getHeight(new Vector3f((float) currentState[0], 0, (float) currentState[1]));
-            positions.add(new Vector3f((float) currentState[0], height, (float) currentState[1]));
-        } while (magnitudeVelocity >= 1 || magnitudeAcceleration >= 1); // While the ball is not at rest
+            Vector3f position = new Vector3f((float) currentState[0], height, (float) currentState[1]);
+            ballCollisionDetector.checkCollisionBall(position);
+            positions.add(position);
+        } while (magnitudeVelocity >= VELOCITY_THRESHOLD || magnitudeAcceleration >= ACCELERATION_THRESHOLD); // While the ball is not at rest
 
         return positions;
     }
