@@ -6,6 +6,8 @@ import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
+import java.util.List;
+
 /**
  * The class responsible for detecting collisions with the camera.
  */
@@ -34,7 +36,7 @@ public class CollisionsDetector {
 
         terrainCollision(position);
         borderCollision(position);
-        //entityCollision(position); // Commented out to avoid collision with trees as only useful for the ball
+        entityCollision(position); // Comment it out to avoid collision with trees as only useful for the ball
 
         camera.setPosition(position);
     }
@@ -83,7 +85,7 @@ public class CollisionsDetector {
      * @param position The position of the camera.
      */
     private void entityCollision(Vector3f position) {
-        float[][] treePositions = scene.getTreePositions();
+        List<float[]> treePositions = scene.getTreePositions();
         float treeRadius = Consts.TREE_SIZE / 2; // Define the tree radius
 
         boolean collisionDetected = false;
@@ -103,13 +105,15 @@ public class CollisionsDetector {
 
             if (isColliding) {
 
-                // Normalize the direction vector from the tree to the camera
-                Vector3f direction = new Vector3f(distanceX, 0, distanceZ).normalize();
-
-                // Move the camera to the edge of the tree radius
-                position.x = treeX + direction.x * treeRadius;
-                 // Ensure the camera is above the tree
-                position.z = treeZ + direction.z * treeRadius;
+                if (distanceX != 0 || distanceZ != 0) {
+                    Vector3f direction = new Vector3f(distanceX, 0, distanceZ).normalize();
+                    position.x = treeX + direction.x * treeRadius;
+                    position.z = treeZ + direction.z * treeRadius;
+                } else {
+                    // Handle the case where the camera is directly above the tree
+                    position.x = treeX; // Or some other logic to handle this case
+                    position.z = treeZ;
+                }
 
                 collisionDetected = true;
                 break; // Exit loop after handling the collision

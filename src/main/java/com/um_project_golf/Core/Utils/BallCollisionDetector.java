@@ -6,6 +6,8 @@ import org.joml.Vector3f;
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 
+import java.util.List;
+
 /**
  * The class responsible for detecting collisions with the ball.
  */
@@ -81,7 +83,7 @@ public class BallCollisionDetector {
     }
 
     private void treeCollisionBall(Vector3f newPosition) {
-        float[][] treePositions = scene.getTreePositions();
+        List<float[]> treePositions = scene.getTreePositions();
         float treeRadius = Consts.TREE_SIZE / 2; // Define the tree radius
 
         for (float[] treePosition : treePositions) {

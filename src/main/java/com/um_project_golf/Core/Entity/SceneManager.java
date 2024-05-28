@@ -30,7 +30,7 @@ public class SceneManager {
     private float spotInc = 1; // The spot increment.
 
     private static float[][] heightMap; // The height map.
-    private static float[][] treePositions; // The tree positions.
+    private static List<float[]> treePositions; // The tree positions.
 
     /**
      * The constructor of the scene manager.
@@ -72,6 +72,7 @@ public class SceneManager {
     public void setSpotInc(float spotInc) {this.spotInc = spotInc;}
     public void setDefaultTexture(Texture defaultTexture) {SceneManager.defaultTexture = defaultTexture;}
     public static Texture getDefaultTexture() { return defaultTexture;}
-    public float[][] getTreePositions() { return treePositions;}
-    public void setTreePositions(float[][] treePositions) {SceneManager.treePositions = treePositions;}
+    public List<float[]> getTreePositions() { return treePositions;}
+    public void setTreePositions(List<float[]> treePosition) {treePositions = treePosition;}
+    public void addTreePosition(float[] treePosition) {treePositions.add(treePosition);}
 }
