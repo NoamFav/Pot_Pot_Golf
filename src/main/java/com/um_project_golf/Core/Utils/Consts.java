@@ -1,7 +1,5 @@
 package com.um_project_golf.Core.Utils;
 
-import javafx.util.Pair;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
@@ -122,7 +120,7 @@ public class Consts {
     // You don't have to worry about y, it is calculated by the terrain at render time.
     public static final Vector3f TEE_POSITION = new Vector3f(0f, 0f, 0f); // Position of the hole
     public static final Vector3f HOLE_POSITION = new Vector3f(0f, 0f, 0f); // Position of the hole
-    public static final boolean WANT_TREE = false; // Want trees on the terrain
+    public static final boolean WANT_TREE = true; // Want trees on the terrain
     public static final boolean USE_PREDEFINED_POSITIONS = false; // Use predefined positions for the tee and the hole
     public static final float TARGET_RADIUS = 1f; // Radius of the ball (meters)
     // Harder to hit the ball with a smaller radius
@@ -138,7 +136,7 @@ public class Consts {
     // Par 6: 550-700 meters (need size terrain of 2048)
     public static final int RADIUS_DOWN = 10; // Minimum distance from the hole
     public static final int RADIUS_UP = 15; // Maximum distance from the hole
-    public static final int SIZE_GREEN = 15; // Size of the green (meters)
+    public static final int SIZE_GREEN = 10; // Size of the green (meters)
 
     // (Recommend higher when using long distances)
     // For the connoisseurs

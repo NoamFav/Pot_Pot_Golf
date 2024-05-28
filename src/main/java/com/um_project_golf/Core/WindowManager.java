@@ -323,4 +323,18 @@ public class WindowManager {
         return value * scaleFactor;
     }
 
+    /**
+     * Converts a value to an uniform scale factor.
+     * Makes sure the value is scaled correctly.
+     * Used for scaling the font.
+     *
+     * @param value The value to convert.
+     * @return The converted value.
+     */
+    public float getUniformScaleFactorFont(float value) {
+        float widthScaleFactor = width / Consts.REFERENCE_WIDTH;
+        float heightScaleFactor = height / Consts.REFERENCE_HEIGHT;
+        float scaleFactor = Math.min(widthScaleFactor, heightScaleFactor);
+        return value * scaleFactor;
+    }
 }
