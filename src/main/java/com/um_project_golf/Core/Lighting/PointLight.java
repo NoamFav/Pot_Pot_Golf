@@ -2,6 +2,10 @@ package com.um_project_golf.Core.Lighting;
 
 import org.joml.Vector3f;
 
+/**
+ * The class responsible for the point light.
+ */
+@SuppressWarnings("unused")
 public class PointLight {
 
     private Vector3f color, position; // color of the light, position of the light

@@ -2,6 +2,9 @@ package com.um_project_golf.Core.Lighting;
 
 import org.joml.Vector3f;
 
+/**
+ * The class responsible for the directional light.
+ */
 public class DirectionalLight {
 
     private Vector3f color, direction; // color of the light, direction of the light

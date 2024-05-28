@@ -22,7 +22,5 @@ public class Texture {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    @SuppressWarnings("unused") public void setId(int id) {this.id = id;}
 }

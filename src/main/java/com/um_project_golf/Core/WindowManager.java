@@ -324,7 +324,7 @@ public class WindowManager {
     }
 
     /**
-     * Converts a value to an uniform scale factor.
+     * Converts a value to a uniform scale factor.
      * Makes sure the value is scaled correctly.
      * Used for scaling the font.
      *

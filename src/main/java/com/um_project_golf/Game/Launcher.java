@@ -7,8 +7,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.Version;
 
-import java.io.PrintStream;
-
 /**
  * The main class of the game.
  * It is responsible for starting the game.
@@ -34,8 +32,7 @@ public class Launcher {
         try { // Try to start the engine
             engine.start();
         } catch (Exception e) { // If an exception is thrown, print the stack trace
-            // TODO:modify this to use the logger (not useful for debugging)
-            e.printStackTrace(new PrintStream(System.err)); // Print the stack trace
+            log.error("An error occurred while starting the engine: {}", e.getMessage());
         }
     }
 

@@ -3,6 +3,10 @@ package com.um_project_golf.Core.Lighting;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
+/**
+ * The class responsible for the spotlight.
+ */
+@SuppressWarnings("unused")
 public class SpotLight {
 
     private PointLight pointLight; // point light

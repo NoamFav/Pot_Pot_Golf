@@ -36,7 +36,7 @@ public class Consts {
     public static final int MAX_TEXTURES = 7; // Maximum number of textures (don't change)
 
     // Configuration for the terrain generation
-    // Change at your own risk (may be unstable)
+    // Change at your own risk (maybe unstable)
     // The recommended values are the default values.
     // Scale = 0.005, Octaves = 11, Persistence = 0.4, Amplitude = 1
     public static final double SCALE = 0.005; // Used for scaling the terrain with simplex noise
@@ -151,8 +151,8 @@ public class Consts {
     // so on the simplex noise terrain, the ball will have trouble climbing the hills.
     // Use the recommended values for the best experience.
     // And the motions should be more realistic with the recommended values.
-    // Furthermore, you can also modify the maximum height of the terrain to make the terrain more flat.
-    // Inherently, making the friction values below have more impact.
+    // Furthermore, you can also modify the maximum height of the terrain to make the terrain flatter.
+    // Inherently, giving the friction values below more impact.
     public static final float KINETIC_FRICTION_GRASS = 0.1f; // Friction of the grass (recommended: 0.2)
     public static final float STATIC_FRICTION_GRASS = 0.2f; // Friction of the grass (recommended: 0.4)
 

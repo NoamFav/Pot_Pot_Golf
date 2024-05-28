@@ -91,6 +91,7 @@ public class Model {
      * @param texture The texture to set.
      * @param reflectance The reflectance to set.
      */
+    @SuppressWarnings("unused")
     public void setTexture(Texture texture, float reflectance) {
         this.material.setTexture(texture); // Set the texture.
         this.material.setReflectance(reflectance); // Set the reflectance.

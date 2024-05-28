@@ -1,6 +1,5 @@
 package com.um_project_golf.Core;
 
-import java.util.Arrays;
 import java.util.function.BiFunction;
 
 public class SimpleRK4 {

@@ -4,6 +4,7 @@ package com.um_project_golf.Core.Utils;
  * A class that represents a timer for a button.
  * It is used to measure the time a button is pressed.
  */
+@Deprecated
 public class ButtonTimer {
 
     private long startTime;
@@ -30,6 +31,7 @@ public class ButtonTimer {
      *
      * @return The elapsed time of the timer in milliseconds.
      */
+    @Deprecated
     public long getTime() {
         return (System.nanoTime() - startTime) / 1_000_000; // Convert nanoseconds to milliseconds
     }

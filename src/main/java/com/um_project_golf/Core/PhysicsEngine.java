@@ -33,7 +33,7 @@ public class PhysicsEngine {
     private final BallCollisionDetector ballCollisionDetector;
 
     /**
-     * Create a new physics engine.
+     * Create a new physics' engine.
      * This constructor is deprecated and should not be used.
      * This constructor is kept for backward compatibility.
      * It uses the height function to calculate the height of the ball.
@@ -51,7 +51,7 @@ public class PhysicsEngine {
 
 
     /**
-     * Create a new physics engine.
+     * Create a new physics' engine.
      *
      * @param heightMap The height map
      */
@@ -91,7 +91,7 @@ public class PhysicsEngine {
      * @param stepSize The step size
      * @return The final position
      */
-    @SuppressWarnings("unused") // This method is a alternative to the rk4 method
+    @SuppressWarnings("unused") // This method is an alternative to the rk4 method
     public List<Vector3f> runImprovedEuler(double[] initialState, double stepSize) {
         List<Vector3f> positions = new ArrayList<>();
         double[] currentState = initialState;
@@ -210,7 +210,8 @@ public class PhysicsEngine {
             if (dh_dxValue != 0 || dh_dzValue != 0) { // if the ball is on a slope
                 double dh2 = Math.sqrt(dh_dxValue * dh_dxValue + dh_dzValue * dh_dzValue);
 
-                if (staticFriction <= dh2) { // if the friction force is not does not overcome the downhill force, the ball will continue to slide
+                if (staticFriction <= dh2) { // if the friction force does not overcome the downhill force,
+                    // the ball will continue to slide
                     dxdt[2] = -g * dh_dxValue - kineticFriction * g * dh_dxValue / dh2;
                     dxdt[3] = -g * dh_dzValue - kineticFriction * g * dh_dzValue / dh2;
                 }
