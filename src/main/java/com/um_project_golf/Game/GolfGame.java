@@ -137,6 +137,7 @@ public class GolfGame implements ILogic {
     private boolean is2player;
     private boolean isPlayer1Turn;
     private boolean hasStartPoint = false;
+    private boolean tKeyWasPressed = false;
 
     // Game logic variables
     private AnimationState treeAnimationState = AnimationState.IDLE;
@@ -149,8 +150,9 @@ public class GolfGame implements ILogic {
 
     // Positions of the balls for Animation purposes
     private List<Vector3f> ballPositions;
-    private List<List<Vector3f>> botPath;
-    private List<List<Vector3f>> aiBotPath;
+
+    @SuppressWarnings("unused") private List<List<Vector3f>> botPath; // Path followed by the bot
+    @SuppressWarnings("unused") private List<List<Vector3f>> aiBotPath; // Path followed by AI bot
 
     /**
      * The constructor of the game.
@@ -207,7 +209,9 @@ public class GolfGame implements ILogic {
 
         createDefaultGui();
 
-        audioManager = new AudioManager("src/main/resources/SoundTrack/kavinsky.wav");
+        audioManager = new AudioManager("src/main/resources/SoundTrack/PotPot.wav");
+        audioManager.playSound();
+        isSoundPlaying = true;
     }
 
     /**
@@ -227,6 +231,7 @@ public class GolfGame implements ILogic {
             canMove = false;  // Disable movement
         }
 
+        // Movement controls
         if (canMove) {
             if(window.is_keyPressed(GLFW.GLFW_KEY_W)) {
                 cameraInc.z = -moveSpeed;
@@ -257,11 +262,31 @@ public class GolfGame implements ILogic {
                 treeAnimationState = AnimationState.GOING_UP;
                 treeAnimationTime = 0f;
             }
+
+            if (window.is_keyPressed(GLFW.GLFW_KEY_Q)) {
+                camera.setPosition(new Vector3f(currentBall.getPosition().x, currentBall.getPosition().y + Consts.PLAYER_HEIGHT, currentBall.getPosition().z));
+            }
+
+            // Create a tree at the camera position
+            boolean isTPressed = window.is_keyPressed(GLFW.GLFW_KEY_T);
+
+            if (isTPressed && !tKeyWasPressed) {
+                Vector3f cameraPos = new Vector3f(camera.getPosition());
+                Entity newTree = new Entity(tree, new Vector3f(cameraPos.x, cameraPos.y - Consts.PLAYER_HEIGHT, cameraPos.z), new Vector3f(-90, 0, 0), 0.03f);
+                scene.addEntity(newTree);
+                trees.add(newTree);
+                treeHeights.add(cameraPos.y - Consts.PLAYER_HEIGHT);
+                scene.addTreePosition(new float[]{cameraPos.x, cameraPos.y - Consts.PLAYER_HEIGHT, cameraPos.z});
+                tKeyWasPressed = true;  // Mark the key as pressed
+                System.out.println("Tree added at: " + cameraPos);
+            } else if (!isTPressed) {
+                tKeyWasPressed = false;  // Reset the flag when the key is released
+            }
         }
 
         if (debugMode && canMove) {
             if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
-                if (!hasStartPoint) { // Ensure start point is only set once
+                if (!hasStartPoint) { // Ensure the start point is only set once
                     scene.getEntities().removeAll(trees);
                     heightMap.createHeightMap();
                     startPoint = new Vector3f(camera.getPosition()); // Create a new instance to avoid reference issues
@@ -291,7 +316,7 @@ public class GolfGame implements ILogic {
                 try {
                     TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
                     terrainSwitch(blendMapTerrain, tree, blendMap2);
-                    createTrees(tree);
+                    createTrees();
                 } catch (Exception ignore) {
                 }
                 endFlag.setPosition(endPoint.x, endPoint.y - Consts.PLAYER_HEIGHT, endPoint.z);
@@ -308,6 +333,8 @@ public class GolfGame implements ILogic {
             camera.moveRotation(0, 0.1f, 0);
         }
 
+        // Not used for now (unused)
+        // Controls for moving the lights
 //        if (window.is_keyPressed(GLFW.GLFW_KEY_I)) {
 //            scene.getSpotLights()[0].getPointLight().getPosition().z = lightPos + 0.1f;
 //        }
@@ -359,9 +386,11 @@ public class GolfGame implements ILogic {
         }
 
         if (window.isResized()) {
+            Vector3f oldPosition = new Vector3f(camera.getPosition());
             window.setResized(false);
             recreateGUIs();
             mouseInputs.init();
+            camera.setPosition(oldPosition);
         }
 
         camera.movePosition(
@@ -468,11 +497,10 @@ public class GolfGame implements ILogic {
     }
 
     private void modelAndEntityCreation() throws Exception {
-        //Model cube = loader.loadAssimpModel("src/main/resources/Models/Minecraft_Grass_Block_OBJ/SkyBox.obj");
+
         ModelLoader models = getModels();
 
         scene.addEntity(new Entity(models.skyBox(), new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
-        scene.addEntity(new Entity(models.mill(), new Vector3f(0, 15, 0), new Vector3f(0, 0, 0), 20));
 
         arrowEntity = new Entity(models.arrow(), new Vector3f(0, 0, 0), new Vector3f(0,-90 ,0), 2);
         scene.addEntity(arrowEntity);
@@ -482,7 +510,6 @@ public class GolfGame implements ILogic {
         System.out.println("Start point: " + startPoint);
         System.out.println("End point: " + endPoint);
 
-        //scene.addEntity(new Entity(flag, new Vector3f(startPoint.x, heightMap.getHeight(new Vector3f(startPoint.x, 0 , startPoint.y)), startPoint.y), new Vector3f(0, 0, 0), 3));
         endFlag = new Entity(models.flag(), new Vector3f(endPoint), new Vector3f(0, 0, 0), 150);
         scene.addEntity(endFlag);
 
@@ -495,7 +522,7 @@ public class GolfGame implements ILogic {
         numberOfShots2 = 0;
         numberOfShots = 0;
 
-        createTrees(tree);
+        createTrees();
     }
 
     private void terrainCreation() throws Exception {
@@ -676,6 +703,7 @@ public class GolfGame implements ILogic {
 //        scene.getDirectionalLight().getDirection().y = (float) Math.cos(angle);
     }
 
+    @SuppressWarnings("unused")
     private void setUpLight() {
         float lightIntensity =10f;
 
@@ -728,8 +756,8 @@ public class GolfGame implements ILogic {
     }
 
     private void updateDirectionalArrow() {
-        String vx = vxTextField.getText();
-        String vz = vzTextField.getText();
+        String vx = vxTextField.getText().replaceAll("[a-zA-Z]", "");
+        String vz = vzTextField.getText().replaceAll("[a-zA-Z]", "");
 
         if (vx.isEmpty() || vz.isEmpty()) return;
         if (vx.equals("Enter vx") || vz.equals("Enter vz")) return;
@@ -843,7 +871,7 @@ public class GolfGame implements ILogic {
         }
     }
 
-    private void createTrees(List<Model> tree) throws IOException {
+    private void createTrees() throws IOException {
         BufferedImage heightmapImage = ImageIO.read(new File("Texture/heightmap.png"));
 
         List<Vector3f> positions = new ArrayList<>();
@@ -870,7 +898,7 @@ public class GolfGame implements ILogic {
             return;
         }
 
-        float[][] treePositions = new float[Consts.NUMBER_OF_TREES][3];
+        List<float[]> treePositions = new ArrayList<>();
         Random rnd = new Random();
         Vector3f zero = new Vector3f(0, 0, 0);
 
@@ -882,12 +910,12 @@ public class GolfGame implements ILogic {
                 scene.addEntity(aTree);
                 trees.add(aTree);
                 treeHeights.add(position.y);
-                treePositions[i] = new float[]{position.x, position.y, position.z};
+                treePositions.add(new float[]{position.x, position.y, position.z});
             } else {
                 System.out.println("Position is null at index: " + i);
             }
         }
-        System.out.println("Tree length: " + treePositions.length);
+        System.out.println("Tree length: " + treePositions.size());
 
         scene.setTreePositions(treePositions);
     }
@@ -932,7 +960,7 @@ public class GolfGame implements ILogic {
         scene.getEntities().removeIf(entity -> entity.getModels().equals(tree));
         try {
             if (!debugMode) {
-                createTrees(tree);
+                createTrees();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -1087,13 +1115,6 @@ public class GolfGame implements ILogic {
 
             recreateGUIs();
             mouseInputs.init();
-
-            if (debugMode) {
-                audioManager = new AudioManager("src/main/resources/SoundTrack/nothing2.wav");
-            } else {
-                audioManager = new AudioManager("src/main/resources/SoundTrack/nothing.wav");
-            }
-            audioManager.playSound();
         };
         return new MenuRunnable(terrainChanger, startGame, sound, quit, enableDebugMode);
     }
@@ -1146,8 +1167,10 @@ public class GolfGame implements ILogic {
             }
             try {
                 warningTextPane.setText("");
-                double vx = Double.parseDouble(vxTextField.getText());
-                double vz = Double.parseDouble(vzTextField.getText());
+                // Remove any non-numeric characters from the text fields if present
+                // (backup in case of threading issues)
+                double vx = Double.parseDouble(vxTextField.getText().replaceAll("[a-zA-Z]", ""));
+                double vz = Double.parseDouble(vzTextField.getText().replaceAll("[a-zA-Z]", ""));
                 System.out.println("vx: " + vx + ", vz: " + vz);
 
                 if (Math.abs(vx) > Consts.MAX_SPEED || Math.abs(vz) > Consts.MAX_SPEED) {
