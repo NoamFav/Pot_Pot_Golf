@@ -24,21 +24,21 @@ Specification for Apple users:
 
 ## GamePlay
 
-The goal of the game is to get the ball in the hole with the least amount of shots.
-The ball will move according to the laws of physics.
+The goal of the game is to get the ball in the hole with the least number of shots.
+The ball will move, according to the laws of physics.
 If you find the ball to slide too much, you can increase the friction in the Consts class.
 When the ball is in the hole, the game will display a message with the number of shots.
 As well as a small animation.
 
 ## Ball Movement
 
-For moving the ball the approach is a TextField one.
+For moving the ball, the approach is a TextField one.
 You will have to input the initial velocity of the ball as a vector
 v = (vx, vz), x and z being the horizontal components.
 The vertical component is calculated by the HeightFunction.
-So as vector works you can input negative values to make the ball go backward.
+So as vector works, you can input negative values to make the ball go backward.
 Floating point values are accepted.
-Then when pressing the Apply button, the ball will move according to the input.
+Then when pressing the Apply button, the ball will move, according to the input.
 
 Also considering the critical difficulty of inputting the right angle with the +/-
 a directional Arrow is placed in the game.
@@ -58,7 +58,7 @@ Also, The start Button will have a little message to indicate the time it will t
 
 ## Debug Mode
 
-In debug mode everything is modifiable.
+In debug mode, everything is modifiable.
 For ease of Examination.
 A small issue we have is that if you haven't selected the start and hole position before starting the game.
 The path will not be calculated.
@@ -165,6 +165,14 @@ Those are marked with a warning in the comments.
 The comments are there to help you understand what each value does.
 So if you are finding the game too hard or too easy, or even too slow, it will guide you to the right value to change.
 
+## Known Issues
+
+- The game is not optimized for low-end computers.
+- The ball movement is not perfect, and sometimes gets stuck mid-shot. But starts moving again after a while.
+- The ball slides too much on the grass. Especially in simple terrain. (Recommended to increase the friction in the Consts class)
+- Due to small friction, the bots may not be able to reach the hole due to hills. (This will be fixed in the future by improving the AIs by taking the height into account for decision-making.)
+- The bot mode is not animated, so the ball will move instantly.
+
 ## Credits & License
 Cartoon Texture terrain image created by upklyak (Free license) —
 <a href="https://www.freepik.com/free-vector/game-textures-water-green-lawn-sand-grass-meadow-with-flowers-seamless-patterns-top-view-cartoon-textured-backgrounds-blue-liquid-field-desert-surface-graphic-ui-gui-vector-layers_21267469.htm#query=texture&position=8&from_view=author&uuid=fb39b549-3ad8-46e1-ba38-41fd1a95803a">Cartoon Vectors by Freepik</a>
@@ -186,7 +194,6 @@ Font mighty souly created by graphicsauceco (Freeware, Non-commercial license) �
 
 Background music created by Fernweh Goldfish (Royalty-free license) —
 <a href="https://uppbeat.io/t/fernweh-goldfish/skippy-mr-sunshine">Music from UppBeat</a>
-
 
 ## Authors
 - Noam Favier

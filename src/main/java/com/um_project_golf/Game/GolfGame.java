@@ -30,7 +30,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.security.cert.CertPath;
 import java.util.*;
 import java.util.List;
 
@@ -518,6 +517,10 @@ public class GolfGame implements ILogic {
         nvgDelete(vg);
     }
 
+    /**
+     * Creates the models and entities for the game.
+     * Uses a record to store the models.
+     */
     private void modelAndEntityCreation() throws Exception {
 
         ModelLoader models = getModels();
@@ -547,6 +550,10 @@ public class GolfGame implements ILogic {
         createTrees();
     }
 
+    /**
+     * Create the terrain for the game.
+     * Uses a record to store the terrains.
+     */
     private void terrainCreation() throws Exception {
         Terrains terrains = getTerrains();
 
@@ -560,6 +567,9 @@ public class GolfGame implements ILogic {
         ocean.getModel().getMaterial().setDisableCulling(true);
     }
 
+    /**
+     * Create the gui when in game.
+     */
     private void createDefaultGui(){
         float width = window.getWidthConverted(1000);
         float height = window.getHeightConverted(300);
@@ -583,23 +593,6 @@ public class GolfGame implements ILogic {
         setUpCallbacks();
 
         applyButton = new Button(x, y * 30 + height + height / 2, 3 * width / 5, 2 * height / 3, "Apply Velocity", font, runPhysics(), vg, imageButton);
-    }
-
-    private void setUpCallbacks() {
-        GLFW.glfwSetKeyCallback(window.getWindow(), (window, key, scancode, action, mods) -> {
-            vxTextField.handleKeyInput(key, action, mods);
-            vzTextField.handleKeyInput(key, action, mods);
-        });
-
-        GLFW.glfwSetMouseButtonCallback(window.getWindow(), (window, button, action, mods) -> {
-            if (button == GLFW.GLFW_MOUSE_BUTTON_1 && action == GLFW.GLFW_PRESS) {
-                double[] xPos = new double[1];
-                double[] yPos = new double[1];
-                GLFW.glfwGetCursorPos(window, xPos, yPos);
-                vxTextField.handleMouseClick((float) xPos[0], (float) yPos[0]);
-                vzTextField.handleMouseClick((float) xPos[0], (float) yPos[0]);
-            }
-        });
     }
 
     /**
@@ -692,6 +685,30 @@ public class GolfGame implements ILogic {
         createDefaultGui();
     }
 
+    /**
+     * Sets up the callbacks for the text fields.
+     */
+    private void setUpCallbacks() {
+        GLFW.glfwSetKeyCallback(window.getWindow(), (window, key, scancode, action, mods) -> {
+            vxTextField.handleKeyInput(key, action, mods);
+            vzTextField.handleKeyInput(key, action, mods);
+        });
+
+        GLFW.glfwSetMouseButtonCallback(window.getWindow(), (window, button, action, mods) -> {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_1 && action == GLFW.GLFW_PRESS) {
+                double[] xPos = new double[1];
+                double[] yPos = new double[1];
+                GLFW.glfwGetCursorPos(window, xPos, yPos);
+                vxTextField.handleMouseClick((float) xPos[0], (float) yPos[0]);
+                vzTextField.handleMouseClick((float) xPos[0], (float) yPos[0]);
+            }
+        });
+    }
+
+    /**
+     * Make the day and night cycle.
+     * Not used for now.
+     */
     private void daytimeCycle() {
         scene.increaseSpotAngle(0.01f);
         if(scene.getSpotAngle() > 4) {
@@ -725,6 +742,10 @@ public class GolfGame implements ILogic {
 //        scene.getDirectionalLight().getDirection().y = (float) Math.cos(angle);
     }
 
+    /**
+     * Set up the light for the game.
+     * Not used for now.
+     */
     @SuppressWarnings("unused")
     private void setUpLight() {
         float lightIntensity =10f;
@@ -750,6 +771,10 @@ public class GolfGame implements ILogic {
         //scene.setSpotLights(new SpotLight[]{spotLight, spotLight2});
     }
 
+    /**
+     * Update the text fields.
+     * Used for On/Off buttons.
+     */
     private void updateTextFields() {
         if (isBot && isAiBot) {
             startButton.setText("Start with Ai Bot and Bot (really long)");
@@ -767,6 +792,11 @@ public class GolfGame implements ILogic {
         debugButton.setText(debugMode ? "Debug: On" : "Debug: Off");
     }
 
+    /**
+     * Update the ball for multiplayer.
+     * Switches the player's turn.
+     * Used for multiplayer.
+     */
     private void updateBallMultiplayer() {
         if (is2player) {
             isPlayer1Turn = !isPlayer1Turn;
@@ -777,6 +807,10 @@ public class GolfGame implements ILogic {
         }
     }
 
+    /**
+     * Update the Directional Arrow.
+     * Used for the ball's direction.
+     */
     private void updateDirectionalArrow() {
         String vx = vxTextField.getText().replaceAll("[a-zA-Z]", "");
         String vz = vzTextField.getText().replaceAll("[a-zA-Z]", "");
@@ -802,6 +836,10 @@ public class GolfGame implements ILogic {
         arrowEntity.setRotation(rotation.x, yRotation - 90, rotation.z);
     }
 
+    /**
+     * Update the tree animations.
+     * Used for end game animation.
+     */
     private void updateTreeAnimations() {
         if (trees.isEmpty() || treeAnimationState == AnimationState.IDLE) {
             return;
@@ -846,6 +884,11 @@ public class GolfGame implements ILogic {
         }
     }
 
+    /**
+     * Animate the ball.
+     * Used for the ball's movement.
+     * Makes the ball move to the end point.
+     */
     private void animateBall() {
         if (isAnimating) {
             float timeStep = 0.1f;
@@ -896,6 +939,11 @@ public class GolfGame implements ILogic {
         }
     }
 
+    /**
+     * Place the trees on the terrain.
+     * Randomly picks a position on the terrain.
+     * As long as the position is green
+     */
     private void createTrees() throws IOException {
         BufferedImage heightmapImage = ImageIO.read(new File("Texture/heightmap.png"));
 
@@ -945,6 +993,9 @@ public class GolfGame implements ILogic {
         scene.setTreePositions(treePositions);
     }
 
+    /**
+     * Convert distance from meters to vertices.
+     */
     private void startEndPointConversion() {
         startPoint = new Vector3f(path.get(0).x, 0, path.get(0).y);
         System.out.println("Start point: " + startPoint);
@@ -959,6 +1010,12 @@ public class GolfGame implements ILogic {
         endPoint.y = heightMap.getHeight(new Vector3f(endPoint.x, 0 , endPoint.z));
     }
 
+    /**
+     * Checks if the string is a valid float.
+     *
+     * @param str The string to check.
+     * @return True if the string is not a valid float, false otherwise.
+     */
     private boolean isNotValidFloat(String str) {
         try {
             Float.parseFloat(str);
@@ -993,6 +1050,12 @@ public class GolfGame implements ILogic {
         renderer.processTerrain(terrain);
     }
 
+    /**
+     * Gets the model for the game.
+     * Uses a record to store the models.
+     *
+     * @return The models for the game.
+     */
     private @NotNull ModelLoader getModels() throws Exception {
         tree = loader.loadAssimpModel("src/main/resources/Models/tree/tree.obj");
         List<Model> skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
@@ -1025,6 +1088,12 @@ public class GolfGame implements ILogic {
         return new ModelLoader(skyBox, ball, arrow, flag, mill);
     }
 
+    /**
+     * Gets the terrains for the game.
+     * Uses a record to store the terrains.
+     *
+     * @return The terrains for the game.
+     */
     private @NotNull Terrains getTerrains() throws Exception {
         TerrainTexture sand = new TerrainTexture(loader.loadTexture("Texture/cartoonSand.jpg"));
         TerrainTexture grass = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
@@ -1047,6 +1116,12 @@ public class GolfGame implements ILogic {
         return new Terrains(blendMap, textures, waterTextures);
     }
 
+    /**
+     * Gets the runnable for the menu.
+     *
+     * @param blendMapTerrain The terrain to create the menu for.
+     * @return The runnable for the menu.
+     */
     private @NotNull MenuRunnable getRunnable(BlendMapTerrain blendMapTerrain) {
         Runnable terrainChanger = () -> {
             try {
@@ -1175,6 +1250,11 @@ public class GolfGame implements ILogic {
         return new MenuRunnable(terrainChanger, startGame, sound, quit, enableDebugMode);
     }
 
+    /**
+     * Gets the runnable for the in-game menu.
+     *
+     * @return The runnable for the in-game menu.
+     */
     private @NotNull InGameMenuRunnable getInGameMenuRunnable() {
         Runnable resume = () -> {
             System.out.println("Resuming game");
@@ -1212,6 +1292,11 @@ public class GolfGame implements ILogic {
         return new InGameMenuRunnable(resume, backToMenu, sound, quit);
     }
 
+    /**
+     * Creates the physics runnable.
+     *
+     * @return The physics runnable.
+     */
     @NotNull
     @Contract(pure = true)
     private Runnable runPhysics() {
@@ -1253,6 +1338,12 @@ public class GolfGame implements ILogic {
         };
     }
 
+    /**
+     * Creates the bot ball.
+     * And run the simulation.
+     *
+     * @return The bot ball.
+     */
     @NotNull
     @Contract(pure = true)
     public Runnable createBotBall(){
@@ -1267,6 +1358,12 @@ public class GolfGame implements ILogic {
 
     }
 
+    /**
+     * Creates the AI bot ball.
+     * And run the simulation.
+     *
+     * @return The AI bot ball.
+     */
     @NotNull
     @Contract(pure = true)
     public Runnable createAiBotBall(){
