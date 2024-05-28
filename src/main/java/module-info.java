@@ -1,4 +1,4 @@
-module com.example.um_project_golf {
+module com.um_project_golf {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
@@ -28,6 +28,8 @@ module com.example.um_project_golf {
     opens com.um_project_golf.Phase1 to javafx.graphics;
     exports com.um_project_golf.Core;
     exports com.um_project_golf.Game;
+    exports com.um_project_golf.GolfBots;
+    exports com.um_project_golf.Phase1;
     exports com.um_project_golf.Core.Entity;
     exports com.um_project_golf.Core.Utils;
     exports com.um_project_golf.Core.Lighting;
