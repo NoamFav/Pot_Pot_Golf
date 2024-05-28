@@ -36,7 +36,7 @@ public class Title {
     }
 
     /**
-     * Initialize the image for the title
+     * Initialize the image for the title,
      * This method is called once when the Title object is created
      */
     private void initImage() {

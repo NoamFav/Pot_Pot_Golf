@@ -38,8 +38,8 @@ public class RuleBasedBot {
     // Method returns the path the ball takes from its initial position until the last position found by the bot.
     // It does so by iterating over every possible velocity pair (x and z) within the constraints given (min -5m/s max 5m/s),
     // and comparing it to the other shots already taken, saving the information of the shot that gets closer to the flag.
-    // If it is not possible to get to the flag in one shot, the shot that gets closer will be taken and the process will
-    // continue until the flag is reached, or when it is not possible to move anymore (for more details on this issue please
+    // If it is not possible to get to the flag in one shot, the shot that gets closer will be taken. The process will
+    // continue until the flag is reached, or when it is not possible to move anymore (for more details on this issue, please
     // consult the README).
     public List<List<Vector3f>> findBestShot() {
         int shotCounter = 0;
@@ -63,9 +63,10 @@ public class RuleBasedBot {
 
                     // Check if the shot is better than the best one already saved
                     if (distanceToFlag() < minDistance) {
-                        // Check if the ball is in hole
+                        // Check if the ball is in the hole
                         if (isInHole()) {
                             bestPosition = new Vector3f(ball.getPosition());
+                            shotCounter++;
                             path.add(fullPath.get(bestPosition)); // adds the position to the path of points passed by
                             System.out.println("Shot "+ shotCounter +". Distance to flag: " + distanceToFlag());
                             System.out.println("Ball is in hole! With " + shotCounter + " shots taken");

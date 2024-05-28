@@ -54,7 +54,7 @@ public class RenderManager {
      * Renders the light.
      *
      * @param pointLights The point lights of the game.
-     * @param spotLights The spot lights of the game.
+     * @param spotLights The spotlights of the game.
      * @param directionalLight The directional light of the game.
      * @param shader The shader of the game.
      */
@@ -113,14 +113,14 @@ public class RenderManager {
      * @param entity The entity to process.
      */
     public void processEntity(@NotNull Entity entity) {
-        for (Model subModel : entity.getModels()) { // Loop through each sub-model of the entity
-            List<Entity> batch = entityRenderer.getEntities().get(subModel); // Get the batch for the sub-model
+        for (Model subModel : entity.getModels()) { // Loop through each submodel of the entity
+            List<Entity> batch = entityRenderer.getEntities().get(subModel); // Get the batch for the submodel
             if (batch != null) { // If the batch is not null
                 batch.add(entity); // Add the entity to the batch
             } else { // If the batch is null
                 List<Entity> newBatch = new ArrayList<>(); // Create a new batch
                 newBatch.add(entity); // Add the entity to the new batch
-                entityRenderer.getEntities().put(subModel, newBatch); // Put the new batch in the entities map
+                entityRenderer.getEntities().put(subModel, newBatch); // Put the new batch in the entity map
             }
         }
     }

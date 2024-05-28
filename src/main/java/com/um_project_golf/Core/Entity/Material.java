@@ -7,6 +7,7 @@ import org.joml.Vector4f;
  * The material class.
  * This class is responsible for the materials of the game.
  */
+@SuppressWarnings("unused")
 public class Material {
 
 

@@ -63,6 +63,7 @@ public class Camera {
      * @param y The y-axis position.
      * @param z The z-axis position.
      */
+    @SuppressWarnings("unused")
     public void setPosition(float x, float y, float z) {
         position.set(x, y, z);
     }

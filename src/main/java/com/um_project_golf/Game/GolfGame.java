@@ -1189,10 +1189,14 @@ public class GolfGame implements ILogic {
 
             if(isBot){
                 createBotBall().run();
+            } else {
+                if (botBall != null) scene.getEntities().removeIf(entity -> entity.equals(botBall));
             }
 
             if(isAiBot){
                 createAiBotBall().run();
+            } else {
+                if (aiBotBall != null) scene.getEntities().removeIf(entity -> entity.equals(aiBotBall));
             }
 
             if (is2player) {

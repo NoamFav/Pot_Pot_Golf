@@ -97,7 +97,6 @@ public class AIBot {
                 // Generate neighboring shots by adjusting velocity slightly
                 for (double dX = -5; dX <= 5; dX += 1) {
                     for (double dZ = -5; dZ <= 5; dZ += 1) {
-                        improvement = false;
                         if (dX == velocity.x && dZ == velocity.z) continue; // Skip the current shot
 
                         float newVelocityX = (float) dX;
