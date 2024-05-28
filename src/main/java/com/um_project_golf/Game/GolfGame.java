@@ -151,6 +151,7 @@ public class GolfGame implements ILogic {
     // Positions of the balls for Animation purposes
     private List<Vector3f> ballPositions;
 
+    // Path for the bots, not used currently as a problem with movement issue and threading issues.
     @SuppressWarnings("unused") private List<List<Vector3f>> botPath; // Path followed by the bot
     @SuppressWarnings("unused") private List<List<Vector3f>> aiBotPath; // Path followed by AI bot
 
@@ -209,7 +210,7 @@ public class GolfGame implements ILogic {
 
         createDefaultGui();
 
-        audioManager = new AudioManager("src/main/resources/SoundTrack/PotPot.wav");
+        audioManager = new AudioManager("src/main/resources/SoundTrack/skippy-mr-sunshine-fernweh-goldfish-main-version-02-32-7172.wav");
         audioManager.playSound();
         isSoundPlaying = true;
     }
@@ -316,7 +317,8 @@ public class GolfGame implements ILogic {
                 try {
                     TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
                     terrainSwitch(blendMapTerrain, tree, blendMap2);
-                    createTrees();
+                    //createTrees();  // Commented for removing automatic tree creation, can be uncommented if needed
+                    // Otherwise, trees can be added manually using the 'T' key
                 } catch (Exception ignore) {
                 }
                 endFlag.setPosition(endPoint.x, endPoint.y - Consts.PLAYER_HEIGHT, endPoint.z);

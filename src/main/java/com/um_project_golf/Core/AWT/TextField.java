@@ -78,6 +78,11 @@ public class TextField {
             textColor.b(1.0f);
             textColor.a(1.0f);
 
+            int fontId = nvgCreateFont(vg, "golf", "src/main/resources/fonts/MightySouly-lxggD.ttf");
+            if (fontId == -1) {
+                throw new RuntimeException("Could not add font");
+            }
+
             nvgFontSize(vg, fontSize);
             nvgFontFace(vg, "golf");  // Make sure you have a font loaded
             nvgFillColor(vg, textColor);
