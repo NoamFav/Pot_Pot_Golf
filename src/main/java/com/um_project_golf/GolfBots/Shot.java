@@ -4,8 +4,11 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
+/**
+ * Class responsible for access of the velocities of the shots in the AIBot class.
+ */
+
 public record Shot(Vector3f velocity) {
-    // Constructor
 
     @Contract(pure = true)
     @Override

@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Class responsible for the logic behind the Rule-based bot.
+ */
 
 public class RuleBasedBot {
     private Vector3f startingPosition;
@@ -32,14 +35,21 @@ public class RuleBasedBot {
         this.scene = scene;
     }
 
+    // Method returns the path the ball takes from its initial position until the last position found by the bot.
+    // It does so by iterating over every possible velocity pair (x and z) within the constraints given (min -5m/s max 5m/s),
+    // and comparing it to the other shots already taken, saving the information of the shot that gets closer to the flag.
+    // If it is not possible to get to the flag in one shot, the shot that gets closer will be taken and the process will
+    // continue until the flag is reached, or when it is not possible to move anymore (for more details on this issue please
+    // consult the README).
     public List<List<Vector3f>> findBestShot() {
+        int shotCounter = 0;
         double minDistance = Double.MAX_VALUE;
         List<List<Vector3f>> path = new ArrayList<>();
         Vector3f bestPosition = null;
         Vector3f velocity;
-        System.out.println("start");
-        int count = 1;
+        System.out.println("Start");
 
+        //Checks whether the ball is already in the hole
         while (!isInHole()) {
             // Placeholder for iterating over possible velocities
             for (float velocityX = -5; velocityX <= 5; velocityX += 0.1f) {
@@ -51,16 +61,18 @@ public class RuleBasedBot {
                     // Simulate the ball's movement using the physics engine
                     simulateBallMovement();
 
-                    // Check if it's in hole
+                    // Check if the shot is better than the best one already saved
                     if (distanceToFlag() < minDistance) {
+                        // Check if the ball is in hole
                         if (isInHole()) {
                             bestPosition = new Vector3f(ball.getPosition());
-                            path.add(fullPath.get(bestPosition));
-                            System.out.println("Found a path");
+                            path.add(fullPath.get(bestPosition)); // adds the position to the path of points passed by
+                            System.out.println("Shot "+ shotCounter +". Distance to flag: " + distanceToFlag());
+                            System.out.println("Ball is in hole! With " + shotCounter + " shots taken");
                             return path;
                         }
-                        minDistance = distanceToFlag();
-                        bestPosition = new Vector3f(ball.getPosition());
+                        minDistance = distanceToFlag(); // replaces the old best shot with the new one
+                        bestPosition = new Vector3f(ball.getPosition()); // saves the end position of the new shot
                     }
 
                     // Reset ball position for the next shot
@@ -68,21 +80,22 @@ public class RuleBasedBot {
                 }
             }
             assert bestPosition != null;
-            ball.setPosition(bestPosition.x,bestPosition.y,bestPosition.z);
-            startingPosition = new Vector3f(bestPosition);
-            path.add(fullPath.get(bestPosition));
-            count++;
-            System.out.println("count: " + count);
-            System.out.println("Found a path");
+            ball.setPosition(bestPosition.x,bestPosition.y,bestPosition.z); // sets ball to start in the new position
+            startingPosition = new Vector3f(bestPosition); // sets initial position to be now the new position
+            path.add(fullPath.get(bestPosition)); // adds the position to the path of points passed by
+            shotCounter++;
+            System.out.println("Shot "+ shotCounter +". Distance to flag: " + distanceToFlag());
         }
 
         return path;
     }
 
+    // Updates velocity of the ball
     public void applyVelocities(Vector3f velocity) {
         velocityBall = (velocity);
     }
 
+    // Simulates ball movement with the use of the Physics Engine
     public void simulateBallMovement() {
         fullPath = new HashMap<>();
         double[] initialState = {ball.getPosition().x, ball.getPosition().z, velocityBall.x, velocityBall.z};
@@ -98,11 +111,13 @@ public class RuleBasedBot {
         ball.setPosition(finalPosition.x,finalPosition.y,finalPosition.z);
     }
 
+    // Method to check whether the ball is in hole
     public boolean isInHole() {
         double distanceToFlag = distanceToFlag();
         return distanceToFlag <= flagRadius;
     }
 
+    // Method to calculate the distance to the flag
     public double distanceToFlag() {
         double dx = flag.getPosition().x - ball.getPosition().x;
         double dy = flag.getPosition().y - ball.getPosition().y;
