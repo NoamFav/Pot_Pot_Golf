@@ -100,7 +100,6 @@ public class HeightMapPathfinder {
             costMap = generateCostMap(heightMapImage);
 
             while (attempts < 1000 && !pathFound) {
-
                 path = findPathAStart(start, end);
                 pathFound = !path.isEmpty();
 
@@ -132,7 +131,7 @@ public class HeightMapPathfinder {
     private void drawPathOnImage(BufferedImage image, @NotNull List<Vector2i> path) {
         int rgbBlue = new java.awt.Color(0, 0, 255).getRGB(); // Color blue in RGB
         for (Vector2i point : path) {
-            drawCircleOnImage(image, point.x, point.y, PATH_CIRCLE_RADIUS, rgbBlue);
+            drawCircleOnImage(image, point.x, point.y, Consts.SIZE_GREEN, rgbBlue);
         }
     }
 

@@ -79,7 +79,16 @@ public class Consts {
     public static final Vector3f AMBIENT_LIGHT = new Vector3f(0.8f, 0.8f, 0.8f); // Ambient light color (higher = brighter)
 
     // For examination purposes:
+
+    // The color of the terrain is defined by the height of the terrain.
     public static final BiFunction<Float, Float, Float> HEIGHT_FUNCTION = (x, z) -> (float) (Math.sin((x - z) / 7) + 0.5); // Height function for the terrain
+
+    // When running the game with a function, make sure the height of it is mostly superior to the sand height.
+    // Otherwise, the sand will be too present on the terrain.
+    // And the A* algorithm will not be able to find a path to the hole.
+    // As it sees the sand as a wall.
+    // (You wouldn't want to play golf in the sand, would you?)
+    public static final float SAND_HEIGHT = 0.5f; // Height of the sand (meters)
 
     public static final float MAX_TERRAIN_HEIGHT = 10; // Height of the terrain (meters)
     /* The max height is only a scaling factor for the simplex noise.
@@ -110,9 +119,13 @@ public class Consts {
     // So be sure to have a valid path between the tee and the hole.
     // Otherwise, the ball may not be able to reach the hole.
     // (water bodies)
+    // You don't have to worry about y, it is calculated by the terrain at render time.
     public static final Vector3f TEE_POSITION = new Vector3f(0f, 0f, 0f); // Position of the hole
     public static final Vector3f HOLE_POSITION = new Vector3f(0f, 0f, 0f); // Position of the hole
-    public static final float TARGET_RADIUS = 0.15f; // Radius of the ball (meters)
+    public static final boolean WANT_TREE = false; // Want trees on the terrain
+    public static final boolean USE_PREDEFINED_POSITIONS = false; // Use predefined positions for the tee and the hole
+    public static final float TARGET_RADIUS = 1f; // Radius of the ball (meters)
+    // Harder to hit the ball with a smaller radius
 
     // Change the radius to make the game easier or harder.
     // Beware of not making the radius bigger than half of the size of the terrain.
@@ -123,8 +136,8 @@ public class Consts {
     // Par 4: 230-410 meters (need size terrain of 1024)
     // Par 5: 410-550 meters (need size terrain of 1024)
     // Par 6: 550-700 meters (need size terrain of 2048)
-    public static final int RADIUS_DOWN = 20; // Minimum distance from the hole
-    public static final int RADIUS_UP = 30; // Maximum distance from the hole
+    public static final int RADIUS_DOWN = 10; // Minimum distance from the hole
+    public static final int RADIUS_UP = 15; // Maximum distance from the hole
     public static final int SIZE_GREEN = 15; // Size of the green (meters)
 
     // (Recommend higher when using long distances)
