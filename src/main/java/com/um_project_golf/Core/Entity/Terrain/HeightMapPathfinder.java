@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.*;
@@ -18,7 +19,7 @@ import java.util.List;
 public class HeightMapPathfinder {
     private int width;
     private int height;
-    private final int SCALE = 4; // 4 units in the heightmap equal 1 meter in the real world
+    private final int SCALE = (int) (Consts.VERTEX_COUNT / Consts.SIZE_X); // Compute the scale based on the size of the terrain
     private int CIRCLE_RADIUS; // Radius of the circle around the start point
     @SuppressWarnings("FieldCanBeLocal") private final int SEARCH_RADIUS = 20 * SCALE; // Radius of the search area around a point
     private final int BORDER_OFFSET = (int) (Consts.SIZE_X/3 * SCALE); // Offset from the border of the heightmap
@@ -131,7 +132,7 @@ public class HeightMapPathfinder {
     private void drawPathOnImage(BufferedImage image, @NotNull List<Vector2i> path) {
         int rgbBlue = new java.awt.Color(0, 0, 255).getRGB(); // Color blue in RGB
         for (Vector2i point : path) {
-            drawCircleOnImage(image, point.x, point.y, Consts.SIZE_GREEN, rgbBlue);
+            drawCircleOnImage(image, point.x, point.y, PATH_CIRCLE_RADIUS, rgbBlue);
         }
     }
 
@@ -152,6 +153,9 @@ public class HeightMapPathfinder {
 
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
+                if (image.getRGB(x, y) == Color.RED.getRGB()) {
+                    continue; // Skip if the pixel is Red (sand)
+                }
                 int dx = x - centerX;
                 int dy = y - centerY;
                 if (dx * dx + dy * dy <= radius * radius) {

@@ -19,8 +19,16 @@ The project runs on java 21.
 ## Functioning
 
 For running the game, you will have to run the launcher class in the game directory.
-Specification for Apple users:
+Specification for Mac users:
 - When running the class, you will have to pass as java arguments: -XstartOnFirstThread
+
+### DISCLAIMER: 
+
+- The keyboard bindings map out a standard QWERTY keyboard.
+  So the keys might be different on a different keyboard layout.
+  Numbers should be at the same place, but the special characters might be different.
+  So if you are having trouble with the controls, you can change them in the Input class in the GolfGame class.
+- The game is not optimized for low-end computers.
 
 ## GamePlay
 
@@ -166,8 +174,7 @@ The comments are there to help you understand what each value does.
 So if you are finding the game too hard or too easy, or even too slow, it will guide you to the right value to change.
 
 ## Known Issues
-
-- The game is not optimized for low-end computers.
+- 
 - The ball movement is not perfect, and sometimes gets stuck mid-shot. But starts moving again after a while.
 - The ball slides too much on the grass. Especially in simple terrain. (Recommended to increase the friction in the Consts class)
 - Due to small friction, the bots may not be able to reach the hole due to hills. (This will be fixed in the future by improving the AIs by taking the height into account for decision-making.)
