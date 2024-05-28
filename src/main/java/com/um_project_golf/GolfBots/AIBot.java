@@ -14,7 +14,7 @@ import java.util.Random;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class AIBot {
-    private Vector3f startingPosition;
+    private final Vector3f startingPosition;
     private final double flagRadius;
     private Vector3f velocityBall;
     private final double minVelocityX = -5;
