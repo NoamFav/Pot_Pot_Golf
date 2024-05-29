@@ -27,7 +27,7 @@ public class PhysicsEngine {
     private final double muS_sand = Consts.STATIC_FRICTION_SAND; // static friction sand
     private final BiFunction<Double, Double, Double> heightFunction;
     private final HeightMap heightMap;
-    @SuppressWarnings("FieldCanBeLocal") private static final double sandLevel = 0.5; // get this value from the constant file
+    @SuppressWarnings("FieldCanBeLocal") private static final double sandLevel = Consts.SAND_HEIGHT; // get this value from the constant file
     private final double VELOCITY_THRESHOLD = 0.05; // get this value from the constant file
     private final double ACCELERATION_THRESHOLD = 0.5; // get this value from the constant file
     private final BallCollisionDetector ballCollisionDetector;

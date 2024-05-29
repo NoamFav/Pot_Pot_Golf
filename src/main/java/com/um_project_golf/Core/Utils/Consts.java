@@ -79,14 +79,14 @@ public class Consts {
     // For examination purposes:
 
     // The color of the terrain is defined by the height of the terrain.
-    public static final BiFunction<Float, Float, Float> HEIGHT_FUNCTION = (x, z) -> (float) (Math.sin((x - z) / 7) + 0.5); // Height function for the terrain
+    public static final BiFunction<Float, Float, Float> HEIGHT_FUNCTION = (x, z) -> (float) (0.4 * (0.9 - Math.exp((x*x + z*z)/-8))); // Height function for the terrain
 
     // When running the game with a function, make sure the height of it is mostly superior to the sand height.
     // Otherwise, the sand will be too present on the terrain.
     // And the A* algorithm will not be able to find a path to the hole.
     // As it sees the sand as a wall.
     // (You wouldn't want to play golf in the sand, would you?)
-    public static final float SAND_HEIGHT = 0.5f; // Height of the sand (meters)
+    public static final float SAND_HEIGHT = 0.2f; // Height of the sand (meters)
 
     public static final float MAX_TERRAIN_HEIGHT = 10; // Height of the terrain (meters)
     /* The max height is only a scaling factor for the simplex noise.
