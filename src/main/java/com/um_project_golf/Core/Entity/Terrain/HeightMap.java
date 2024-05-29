@@ -85,7 +85,7 @@ public class HeightMap {
 
                 // Get the height value of the vertex
                 Color color; // Create a new color
-                float sand = .5f;// (float) (Math.random() * 1.5f); // Generate a random red value
+                float sand = Consts.SAND_HEIGHT ;// (float) (Math.random() * 1.5f); // Generate a random red value
                 float grass = 10; //(float) (Math.random() * 1.5f); // Generate a random green value
                 float fairway = 11; //+ (float) (Math.random() * 2.5f); // Generate a random blue value
                 float dryGrass = 17 + (float) (Math.random() * 2.5f); // Generate a random blue value

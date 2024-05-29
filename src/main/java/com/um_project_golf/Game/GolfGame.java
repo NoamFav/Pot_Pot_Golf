@@ -375,11 +375,7 @@ public class GolfGame implements ILogic {
             camera.setPosition(oldPosition);
         }
 
-        camera.movePosition(
-                cameraInc.x * Consts.CAMERA_MOVEMENT_SPEED,
-                (cameraInc.y * Consts.CAMERA_MOVEMENT_SPEED),
-                cameraInc.z * Consts.CAMERA_MOVEMENT_SPEED
-        );
+        camera.movePosition(cameraInc.x * Consts.CAMERA_MOVEMENT_SPEED, (cameraInc.y * Consts.CAMERA_MOVEMENT_SPEED), cameraInc.z * Consts.CAMERA_MOVEMENT_SPEED);
 
         collisionsDetector.checkCollision(camera, cameraInc, heightMap, scene);
 
