@@ -173,7 +173,7 @@ public class PhysicsEngine {
         double magnitudeVelocity = Math.sqrt(vx * vx + vz * vz);
 
         double dh_dxValue = dh_dxCentredDifferenceMap(x[0], x[1]);
-        double dh_dzValue = dh_dyCentredDifferenceMap(x[0], x[1]);
+        double dh_dzValue = dh_dzCentredDifferenceMap(x[0], x[1]);
 
         double kineticFriction;
         double staticFriction;
@@ -290,7 +290,7 @@ public class PhysicsEngine {
      * @param z The z coordinate
      * @return The derivative
      */
-    private double dh_dyCentredDifferenceMap(double x, double z) {
+    private double dh_dzCentredDifferenceMap(double x, double z) {
         float stepSize = Consts.SIZE_Z / (Consts.VERTEX_COUNT - 1);
         assert heightMap != null;
         double h1 = this.heightMap.getHeight(new Vector3f((float) x, 0, (float) (z - 2 * stepSize)));
