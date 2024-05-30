@@ -32,7 +32,8 @@ public class Launcher {
         try { // Try to start the engine
             engine.start();
         } catch (Exception e) { // If an exception is thrown, print the stack trace
-            log.error("An error occurred while starting the engine: {}", e.getMessage());
+            System.err.println("An error occurred while starting the engine: " + e.getMessage());
+            //log.error("An error occurred while starting the engine: {}", e.getMessage());
         }
     }
 
