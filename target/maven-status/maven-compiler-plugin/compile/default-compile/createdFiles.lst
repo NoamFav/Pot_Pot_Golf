@@ -1,5 +1,5 @@
 com/um_project_golf/Core/Rendering/IRenderer.class
-com/um_project_golf/Core/Entity/Terrain/TerrainGenerator.class
+com/um_project_golf/GolfBots/RuleBasedBot.class
 com/um_project_golf/Phase1/Tokenizer.class
 com/um_project_golf/Core/AWT/TextPane.class
 com/um_project_golf/Phase1/InputManagement.class
@@ -12,6 +12,8 @@ com/um_project_golf/Core/Lighting/DirectionalLight.class
 com/um_project_golf/Core/EngineManager.class
 com/um_project_golf/Core/Entity/SceneManager.class
 com/um_project_golf/Core/Entity/Terrain/HeightMap.class
+com/um_project_golf/Game/GolfGame$ModelLoader.class
+com/um_project_golf/Game/GolfGame$MenuRunnable.class
 com/um_project_golf/Phase1/InputManagement$Token.class
 com/um_project_golf/Core/Entity/Terrain/SimplexNoise.class
 module-info.class
@@ -21,7 +23,9 @@ com/um_project_golf/Core/Entity/Texture.class
 com/um_project_golf/Core/Utils/ButtonTimer.class
 com/um_project_golf/Core/Lighting/SpotLight.class
 com/um_project_golf/Core/Lighting/PointLight.class
+com/um_project_golf/GolfBots/AIBot.class
 com/um_project_golf/Core/ShaderManager.class
+com/um_project_golf/GolfBots/Shot.class
 com/um_project_golf/Core/Rendering/RenderManager.class
 com/um_project_golf/Phase1/GraphSolver.class
 com/um_project_golf/Core/PhysicsEngine.class
@@ -31,6 +35,7 @@ com/um_project_golf/Phase1/RK4.class
 com/um_project_golf/Core/Entity/Terrain/BlendMapTerrain.class
 com/um_project_golf/Phase1/EulerSolver.class
 com/um_project_golf/Core/Entity/Terrain/TerrainTexture.class
+com/um_project_golf/Core/SimpleRK4.class
 com/um_project_golf/Core/Entity/Model.class
 com/um_project_golf/Phase1/Main.class
 com/um_project_golf/Core/Utils/Utils.class
@@ -48,7 +53,9 @@ com/um_project_golf/Phase1/InputManagement$Type.class
 com/um_project_golf/Core/AWT/TextField.class
 com/um_project_golf/Core/Entity/Material.class
 com/um_project_golf/Phase1/Solver.class
+com/um_project_golf/Game/GolfGame$Terrains.class
 com/um_project_golf/Core/MouseInput.class
 com/um_project_golf/Game/GolfGame.class
 com/um_project_golf/Core/Utils/CollisionsDetector.class
+com/um_project_golf/Game/GolfGame$InGameMenuRunnable.class
 com/um_project_golf/Core/AudioManager.class

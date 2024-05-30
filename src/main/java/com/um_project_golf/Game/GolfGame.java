@@ -83,7 +83,7 @@ public class GolfGame implements ILogic {
     private Title title;
     private final List<Button> menuButtons;
     private final List<Button> inGameMenuButtons;
-    private final String imageButton = "Texture/buttons.png";
+    private final String imageButton = "src/main/resources/Texture/buttons.png";
 
     // Menu GUI elements
     private Button startButton;
@@ -202,7 +202,7 @@ public class GolfGame implements ILogic {
 
         mouseInputs = mouseInput;
 
-        scene.setDefaultTexture(new Texture(loader.loadTexture("Texture/Default.png")));
+        scene.setDefaultTexture(new Texture(loader.loadTexture("src/main/resources/Texture/Default.png")));
         window.setAntiAliasing(true);
         window.setResized(false);
 
@@ -571,7 +571,7 @@ public class GolfGame implements ILogic {
         float titleX = (window.getWidth() - titleWidth) / 2;
         float titleY = window.getHeightConverted(10);
 
-        title = new Title("Texture/title.png", titleX, titleY, titleWidth, titleHeight, vg);
+        title = new Title("src/main/resources/Texture/title.png", titleX, titleY, titleWidth, titleHeight, vg);
 
         float heightButton = window.getHeightConverted(300);
         float widthButton = window.getWidthConverted(2000);
@@ -617,16 +617,16 @@ public class GolfGame implements ILogic {
         float centerButtonY = (window.getHeight() - heightButton * 3) / 2;
         float font = window.getHeightConverted(100);
 
-        Button resumeButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Resume", font, runnable.resume(), vg, "Texture/inGameMenu.png");
+        Button resumeButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Resume", font, runnable.resume(), vg, "src/main/resources/Texture/inGameMenu.png");
         inGameMenuButtons.add(resumeButton);
 
-        Button backToMenuButton = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Back to Menu", font, runnable.backToMenu(), vg, "Texture/inGameMenu.png");
+        Button backToMenuButton = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Back to Menu", font, runnable.backToMenu(), vg, "src/main/resources/Texture/inGameMenu.png");
         inGameMenuButtons.add(backToMenuButton);
 
-        soundButtonInGame = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Sound", font, runnable.sound(), vg, "Texture/inGameMenu.png");
+        soundButtonInGame = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Sound", font, runnable.sound(), vg, "src/main/resources/Texture/inGameMenu.png");
         inGameMenuButtons.add(soundButtonInGame);
 
-        Button exitButton = new Button(centerButtonX, centerButtonY + heightButton * 3, widthButton, heightButton, "Exit", font, runnable.quit(), vg, "Texture/inGameMenu.png");
+        Button exitButton = new Button(centerButtonX, centerButtonY + heightButton * 3, widthButton, heightButton, "Exit", font, runnable.quit(), vg, "src/main/resources/Texture/inGameMenu.png");
         inGameMenuButtons.add(exitButton);
     }
 
@@ -799,7 +799,7 @@ public class GolfGame implements ILogic {
 
         path = pathfinder.getPathDebug(start, end, Consts.SIZE_GREEN);
         try {
-            TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
+            TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
             terrainSwitch(blendMapTerrain, tree, blendMap2);
             if (Consts.WANT_TREE) { // If the trees are enabled in the Consts
                 createTrees();
@@ -984,7 +984,7 @@ public class GolfGame implements ILogic {
      * As long as the position is green
      */
     private void createTrees() throws IOException {
-        BufferedImage heightmapImage = ImageIO.read(new File("Texture/heightmap.png"));
+        BufferedImage heightmapImage = ImageIO.read(new File("src/main/resources/Texture/heightmap.png"));
 
         List<Vector3f> positions = new ArrayList<>();
 
@@ -1134,18 +1134,18 @@ public class GolfGame implements ILogic {
      * @return The terrains for the game.
      */
     private @NotNull Terrains getTerrains() throws Exception {
-        TerrainTexture sand = new TerrainTexture(loader.loadTexture("Texture/cartoonSand.jpg"));
-        TerrainTexture grass = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
-        TerrainTexture fairway = new TerrainTexture(loader.loadTexture("Texture/cartoonGrass.jpg"));
-        TerrainTexture water = new TerrainTexture(loader.loadTexture("Texture/cartoonWater.jpg"));
+        TerrainTexture sand = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonSand.jpg"));
+        TerrainTexture grass = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonFlowers.jpg"));
+        TerrainTexture fairway = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonGrass.jpg"));
+        TerrainTexture water = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonWater.jpg"));
 
         //Not used for now (doesn't look good) (don't delete)
-        TerrainTexture rock = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
-        TerrainTexture dryGrass = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
-        TerrainTexture snow = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
-        TerrainTexture mold = new TerrainTexture(loader.loadTexture("Texture/cartoonFlowers.jpg"));
+        TerrainTexture rock = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonFlowers.jpg"));
+        TerrainTexture dryGrass = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonFlowers.jpg"));
+        TerrainTexture snow = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonFlowers.jpg"));
+        TerrainTexture mold = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonFlowers.jpg"));
 
-        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
+        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
 
         List<TerrainTexture> textures = new ArrayList<>(List.of(sand, grass, fairway, dryGrass, mold, rock, snow));
         List<TerrainTexture> waterTextures = new ArrayList<>();
@@ -1170,7 +1170,7 @@ public class GolfGame implements ILogic {
                 path = pathfinder.getPath(Consts.RADIUS_DOWN, Consts.RADIUS_UP, Consts.SIZE_GREEN);
                 startEndPointConversion();
 
-                TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
+                TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
                 SimplexNoise.shufflePermutation();
                 terrainSwitch(blendMapTerrain, tree, blendMap2);
                 golfBall.setPosition(startPoint.x, startPoint.y, startPoint.z);
@@ -1259,13 +1259,13 @@ public class GolfGame implements ILogic {
                 }
                 try {
                     heightMap.createHeightMap();
-                    TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
+                    TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
                     terrainSwitch(blendMapTerrain, tree, blendMap2);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
 
-                if (Consts.USE_PREDEFINED_POSITIONS && !debugMode) {
+                if (Consts.USE_PREDEFINED_POSITIONS && debugMode) {
                     endPoint = new Vector3f(Consts.HOLE_POSITION.x, heightMap.getHeight(new Vector3f(Consts.HOLE_POSITION.x, 0, Consts.HOLE_POSITION.z)), Consts.HOLE_POSITION.z);
                     startPoint = new Vector3f(Consts.TEE_POSITION.x, heightMap.getHeight(new Vector3f(Consts.TEE_POSITION.x, 0, Consts.TEE_POSITION.z)), Consts.TEE_POSITION.z);
 
@@ -1282,7 +1282,7 @@ public class GolfGame implements ILogic {
 
                     path = pathfinder.getPathDebug(start, end, Consts.SIZE_GREEN);
                     try {
-                        TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("Texture/heightmap.png"));
+                        TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
                         terrainSwitch(blendMapTerrain, tree, blendMap2);
                         if (Consts.WANT_TREE) { // If the trees are enabled in the Consts
                             createTrees();

@@ -79,7 +79,7 @@ public class Consts {
     // For examination purposes:
 
     // The color of the terrain is defined by the height of the terrain.
-    public static final BiFunction<Float, Float, Float> HEIGHT_FUNCTION = (x, z) -> (float) (0.4 * (0.9 - Math.exp((x*x + z*z)/-8))); // Height function for the terrain
+    public static final BiFunction<Float, Float, Float> HEIGHT_FUNCTION = (x, z) -> (float) (0.5*Math.sin((x+z)/10) + 1)  ; // Height function for the terrain
 
     // When running the game with a function, make sure the height of it is mostly superior to the sand height.
     // Otherwise, the sand will be too present on the terrain.
@@ -118,11 +118,11 @@ public class Consts {
     // Otherwise, the ball may not be able to reach the hole.
     // (water bodies)
     // You don't have to worry about y, it is calculated by the terrain at render time.
-    public static final Vector3f TEE_POSITION = new Vector3f(0f, 0f, 0f); // Position of the hole
-    public static final Vector3f HOLE_POSITION = new Vector3f(0f, 0f, 0f); // Position of the hole
+    public static final Vector3f TEE_POSITION = new Vector3f(-3, 0f, 0f); // Position of the hole
+    public static final Vector3f HOLE_POSITION = new Vector3f(4f, 0f, 1f); // Position of the hole
     public static final boolean WANT_TREE = true; // Want trees on the terrain
-    public static final boolean USE_PREDEFINED_POSITIONS = false; // Use predefined positions for the tee and the hole
-    public static final float TARGET_RADIUS = 1f; // Radius of the ball (meters)
+    public static final boolean USE_PREDEFINED_POSITIONS = true; // Use predefined positions for the tee and the hole
+    public static final float TARGET_RADIUS = 0.05f; // Radius of the ball (meters)
     // Harder to hit the ball with a smaller radius
 
     // Change the radius to make the game easier or harder.
@@ -153,7 +153,7 @@ public class Consts {
     // And the motions should be more realistic with the recommended values.
     // Furthermore, you can also modify the maximum height of the terrain to make the terrain flatter.
     // Inherently, giving the friction values below more impact.
-    public static final float KINETIC_FRICTION_GRASS = 0.1f; // Friction of the grass (recommended: 0.2)
+    public static final float KINETIC_FRICTION_GRASS = 0.08f; // Friction of the grass (recommended: 0.2)
     public static final float STATIC_FRICTION_GRASS = 0.2f; // Friction of the grass (recommended: 0.4)
 
     public static final float KINETIC_FRICTION_SAND = 0.2f; // Friction of the sand (recommended: 0.4)
