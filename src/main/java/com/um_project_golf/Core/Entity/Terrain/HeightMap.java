@@ -113,7 +113,7 @@ public class HeightMap {
         }
 
         try { // Try to write the image to a file
-            ImageIO.write(image, "PNG", new File("Texture/heightmap.png"));
+            ImageIO.write(image, "PNG", new File("src/main/resources/Texture/heightmap.png"));
         } catch (Exception e) { // Catch any exceptions
             log.error("Error creating heightmap image: {}", e.getMessage()); // Log the error
         }
