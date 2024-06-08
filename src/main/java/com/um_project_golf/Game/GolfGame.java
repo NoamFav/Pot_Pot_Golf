@@ -15,6 +15,7 @@ import com.um_project_golf.Core.Utils.BallCollisionDetector;
 import com.um_project_golf.Core.Utils.CollisionsDetector;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.Entity.Terrain.HeightMapPathfinder;
+import com.um_project_golf.Core.GameStateManager;
 import com.um_project_golf.GolfBots.AIBot;
 import com.um_project_golf.GolfBots.RuleBasedBot;
 import org.jetbrains.annotations.Contract;
@@ -54,12 +55,9 @@ public class GolfGame implements ILogic {
     }
 
     // Records for storing the Runnables for the buttons
-    private record InGameMenuRunnable(Runnable resume, Runnable backToMenu, Runnable sound, Runnable quit) {
-    }
+    private record InGameMenuRunnable(Runnable resume, Runnable backToMenu, Runnable sound, Runnable quit) {}
 
-    private record MenuRunnable(Runnable terrainChanger, Runnable startGame, Runnable sound, Runnable quit,
-                                Runnable enableDebugMode) {
-    }
+    private record MenuRunnable(Runnable terrainChanger, Runnable startGame, Runnable sound, Runnable quit, Runnable enableDebugMode) {}
 
     // Debug mode for Examination purposes
     public static boolean debugMode = false; //Do not change this value to true,
@@ -78,6 +76,7 @@ public class GolfGame implements ILogic {
     private final HeightMapPathfinder pathfinder;
     private final CollisionsDetector collisionsDetector;
     private BallCollisionDetector ballCollisionDetector;
+    private final GameStateManager gameState;
 
     // GUI elements
     private Title title;
@@ -137,21 +136,6 @@ public class GolfGame implements ILogic {
     private final Camera camera;
     Vector3f cameraInc;
 
-    // Game state variables
-    private boolean canMove = false;
-    private boolean isGuiVisible = true;
-    private boolean isOnMenu = true;
-    private boolean gameStarted = false;
-    private boolean isSoundPlaying = false;
-    private boolean isAnimating;
-    private boolean isBot;
-    private boolean isAiBot;
-    private boolean is2player;
-    private boolean isPlayer1Turn;
-    private boolean player1Won;
-    private boolean hasStartPoint = false;
-    private boolean tKeyWasPressed = false;
-
     // Game logic variables
     private AnimationState treeAnimationState = AnimationState.IDLE;
     private float treeAnimationTime = 0f;
@@ -188,6 +172,7 @@ public class GolfGame implements ILogic {
         inGameMenuButtons = new ArrayList<>();
         trees = new ArrayList<>();
         treeHeights = new ArrayList<>();
+        gameState = new GameStateManager();
     }
 
     /**
@@ -219,15 +204,15 @@ public class GolfGame implements ILogic {
         vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
         createMenu(blendMapTerrain);
         createInGameMenu();
-        isGuiVisible = true;
-        canMove = false;
-        isOnMenu = true;
+        gameState.setGuiVisible(true);
+        gameState.setCanMove(false);
+        gameState.setOnMenu(true);
 
         createDefaultGui();
 
         audioManager = new AudioManager("src/main/resources/SoundTrack/skippy-mr-sunshine-fernweh-goldfish-main-version-02-32-7172.wav");
         audioManager.playSound();
-        isSoundPlaying = true;
+        gameState.setSoundPlaying(true);
     }
 
     /**
@@ -243,12 +228,12 @@ public class GolfGame implements ILogic {
         float moveSpeed = Consts.CAMERA_MOVEMENT_SPEED / EngineManager.getFps();
 
         if (window.is_keyPressed(GLFW.GLFW_KEY_ESCAPE)) {
-            isGuiVisible = true;  // Toggle GUI visibility
-            canMove = false;  // Disable movement
+            gameState.setGuiVisible(true);  // Toggle GUI visibility
+            gameState.setCanMove(false); // Disable movement
         }
 
         // Movement controls
-        if (canMove) {
+        if (gameState.isCanMove()) {
             if (window.is_keyPressed(GLFW.GLFW_KEY_W)) {
                 cameraInc.z = -moveSpeed;
             }
@@ -283,35 +268,35 @@ public class GolfGame implements ILogic {
                 camera.setPosition(new Vector3f(currentBall.getPosition().x, currentBall.getPosition().y + Consts.PLAYER_HEIGHT, currentBall.getPosition().z));
             }
 
-            if (window.is_keyPressed(GLFW.GLFW_KEY_R) && !isAnimating) {
+            if (window.is_keyPressed(GLFW.GLFW_KEY_R) && !gameState.isAnimating()) {
                 restartBalls();
             }
 
             // Create a tree at the camera position
             boolean isTPressed = window.is_keyPressed(GLFW.GLFW_KEY_T);
 
-            if (isTPressed && !tKeyWasPressed) {
+            if (isTPressed && !gameState.istKeyWasPressed()) {
                 plantTree();
             } else if (!isTPressed) {
-                tKeyWasPressed = false;  // Reset the flag when the key is released
+                gameState.settKeyWasPressed(false); // Reset the flag when the key is released
             }
         }
 
-        if (debugMode && canMove) {
+        if (debugMode && gameState.isCanMove()) {
             if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
                 setUpStartPoint();
             }
-            if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT) && hasStartPoint) {
+            if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT) && gameState.isHasStartPoint()) {
                 setUpEndPoint();
             }
         }
 
-        if (canMove) {
+        if (gameState.isCanMove()) {
             if (mouseInputs.isRightButtonPressed()) {
                 Vector2f rotVec = mouseInputs.getDisplayVec();
                 camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
             }
-        } else if (isOnMenu && isGuiVisible) {
+        } else if (gameState.isOnMenu() && gameState.isGuiVisible()) {
             camera.moveRotation(0, 0.1f, 0);
         }
 
@@ -349,14 +334,14 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void update() {
-        if (gameStarted) {
+        if (gameState.isGameStarted()) {
             vxTextField.update();
             vzTextField.update();
             applyButton.update();
         }
 
-        if (isGuiVisible) {
-            if (isOnMenu) {
+        if (gameState.isGuiVisible()) {
+            if (gameState.isOnMenu()) {
                 for (Button button : menuButtons) {
                     button.update();
                 }
@@ -406,8 +391,8 @@ public class GolfGame implements ILogic {
         renderer.render(camera, scene);
 
         // Render your UI elements like menuButtons
-        if (isGuiVisible) {
-            if (isOnMenu) {
+        if (gameState.isGuiVisible()) {
+            if (gameState.isOnMenu()) {
                 for (Button button : menuButtons) {
                     if (!Objects.equals(button.getText(), "Change Terrain")) {
                         button.render();
@@ -425,13 +410,13 @@ public class GolfGame implements ILogic {
             }
         }
 
-        if (isAnimating) {
+        if (gameState.isAnimating()) {
             scene.getEntities().remove(arrowEntity);
         } else {
             scene.addEntity(arrowEntity);
         }
 
-        if (gameStarted) {
+        if (gameState.isGameStarted()) {
             warningTextPane.render();
             infoTextPane.render();
             applyButton.render();
@@ -498,7 +483,7 @@ public class GolfGame implements ILogic {
         golfBall = new Entity(models.ball(), new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
         scene.addEntity(golfBall);
 
-        isPlayer1Turn = true;
+        gameState.setPlayer1Turn(true);
         currentBall = golfBall;
 
         numberOfShots2 = 0;
@@ -534,6 +519,7 @@ public class GolfGame implements ILogic {
         float y = window.getHeightConverted(10);
         float font = window.getUniformScaleFactorFont(70);
         float textFieldFont = window.getUniformScaleFactorFont(50);
+        boolean isPlayer1Turn = gameState.isPlayer1Turn();
 
         currentPlayer = new TextPane(x, y, width, height / 2, "Player 1's turn", font, vg, imageButton);
         infoTextPane = new TextPane(x, y + height / 2, width, height / 2, "Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2), textFieldFont, vg, imageButton);
@@ -591,13 +577,13 @@ public class GolfGame implements ILogic {
         Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Exit", font, runnable.quit(), vg, imageButton);
         menuButtons.add(exit);
 
-        botButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 2, widthButton / 4, heightButton, "Play with bot", font, () -> isBot = !isBot, vg, imageButton);
+        botButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 2, widthButton / 4, heightButton, "Play with bot", font, gameState::switchBot, vg, imageButton);
         menuButtons.add(botButton);
 
-        aiBotButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 3, widthButton / 4, heightButton, "Play with AI", font, () -> isAiBot = !isAiBot, vg, imageButton);
+        aiBotButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 3, widthButton / 4, heightButton, "Play with AI", font, gameState::switchAiBot, vg, imageButton);
         menuButtons.add(aiBotButton);
 
-        twoPlayerButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 4, widthButton / 4, heightButton, "2 Player", font, () -> is2player = !is2player, vg, imageButton);
+        twoPlayerButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 4, widthButton / 4, heightButton, "2 Player", font, gameState::switch2player, vg, imageButton);
         menuButtons.add(twoPlayerButton);
 
         debugButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton, widthButton / 4, heightButton, "Debug Mode", font * 0.7f, runnable.enableDebugMode(), vg, imageButton);
@@ -733,19 +719,19 @@ public class GolfGame implements ILogic {
      */
     private void restartBalls() {
         Vector3f start = new Vector3f(startPoint);
-        if (is2player) {
+        if (gameState.isIs2player()) {
             golfBall.setPosition(start);
             golfBall2.setPosition(start);
             numberOfShots = 0;
             numberOfShots2 = 0;
-            isPlayer1Turn = true;
+            gameState.setPlayer1Turn(true);
             currentBall = golfBall;
             currentPlayer.setText("Player 1's turn");
         } else {
             golfBall.setPosition(start);
             numberOfShots = 0;
         }
-        infoTextPane.setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2));
+        infoTextPane.setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
     }
 
     /**
@@ -759,7 +745,7 @@ public class GolfGame implements ILogic {
         trees.add(newTree);
         treeHeights.add(cameraPos.y);
         scene.addTreePosition(new float[]{cameraPos.x, cameraPos.y, cameraPos.z});
-        tKeyWasPressed = true;  // Mark the key as pressed
+        gameState.settKeyWasPressed(true); // Mark the key as pressed
         System.out.println("Tree added at: " + cameraPos);
     }
 
@@ -767,15 +753,15 @@ public class GolfGame implements ILogic {
      * Set up the start Point in debug mode.
      */
     private void setUpStartPoint() {
-        if (!hasStartPoint) { // Ensure the start point is only set once
+        if (!gameState.isHasStartPoint()) { // Ensure the start point is only set once
             scene.getEntities().removeAll(trees);
             heightMap.createHeightMap();
             startPoint = new Vector3f(camera.getPosition().x, camera.getPosition().y - Consts.PLAYER_HEIGHT, camera.getPosition().z); // Create a new instance to avoid reference issues
             golfBall.setPosition(startPoint);
-            if (is2player) {
+            if (gameState.isIs2player()) {
                 golfBall2.setPosition(startPoint);
             }
-            hasStartPoint = true;
+            gameState.setHasStartPoint(true);
             System.out.println("Start point set: " + startPoint); // Print with more decimal places for clarity
         }
     }
@@ -807,7 +793,7 @@ public class GolfGame implements ILogic {
         } catch (Exception ignore) {
         }
         endFlag.setPosition(endPoint);
-        hasStartPoint = false;
+        gameState.setHasStartPoint(false);
     }
 
     /**
@@ -815,6 +801,10 @@ public class GolfGame implements ILogic {
      * Used for On/Off buttons.
      */
     private void updateTextFields() {
+        boolean isBot = gameState.isBot();
+        boolean isAiBot = gameState.isAiBot();
+        boolean is2player = gameState.isIs2player();
+
         if (isBot && isAiBot) {
             startButton.setText("Start with Ai Bot and Bot (really long)");
         } else if (isBot) {
@@ -837,8 +827,11 @@ public class GolfGame implements ILogic {
      * Used for multiplayer.
      */
     private void updateBallMultiplayer() {
+        boolean is2player = gameState.isIs2player();
+        boolean isPlayer1Turn = gameState.isPlayer1Turn();
+
         if (is2player) {
-            isPlayer1Turn = !isPlayer1Turn;
+            gameState.switchPlayer1Turn();
             currentBall = isPlayer1Turn ? golfBall : golfBall2;
             System.out.println("Player " + (isPlayer1Turn ? "1's" : "2's") + " turn");
             currentPlayer.setText("Player " + (isPlayer1Turn ? "1's" : "2's") + " turn");
@@ -929,7 +922,7 @@ public class GolfGame implements ILogic {
      * Makes the ball move to the end point.
      */
     private void animateBall() {
-        if (isAnimating) {
+        if (gameState.isAnimating()) {
             float timeStep = 0.1f;
             animationTimeAccumulator += timeStep;
 
@@ -943,13 +936,13 @@ public class GolfGame implements ILogic {
                         float isInHoleThreshold = Consts.TARGET_RADIUS;
                         if (nextPosition.x <= endPoint.x + isInHoleThreshold && nextPosition.x >= endPoint.x - isInHoleThreshold) {
                             if (nextPosition.z <= endPoint.z + isInHoleThreshold && nextPosition.z >= endPoint.z - isInHoleThreshold) {
-                                int shot = isPlayer1Turn ? numberOfShots : numberOfShots2;
+                                int shot = gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2;
                                 System.out.println("Ball reached the end point!");
                                 System.out.println("You took " + shot + " shots to reach the end point!");
                                 System.out.println(endPoint);
-                                if (is2player) player1Won = isPlayer1Turn;
-                                currentPlayer.setText("Player " + (player1Won ? "1" : "2") + " wins!");
-                                System.out.println("Player " + (player1Won ? "1" : "2") + " wins!");
+                                if (gameState.isIs2player()) gameState.setPlayer1Won(gameState.isPlayer1Turn());
+                                currentPlayer.setText("Player " + (gameState.isPlayer1Won() ? "1" : "2") + " wins!");
+                                System.out.println("Player " + (gameState.isPlayer1Won() ? "1" : "2") + " wins!");
                                 warningTextPane.setText("You Win! In " + shot + " shots!");
                                 treeAnimationState = AnimationState.GOING_UP;
                                 treeAnimationTime = 0f;
@@ -960,7 +953,7 @@ public class GolfGame implements ILogic {
                     ballCollisionDetector.checkCollisionBall(nextPosition);
                     if (nextPosition.y <= -0.1) { // Ball in water
                         currentBall.setPosition(shotStartPosition.x, shotStartPosition.y, shotStartPosition.z);
-                        isAnimating = false;
+                        gameState.setAnimating(false);
                         updateBallMultiplayer();
                         warningTextPane.setText("Ploof! Ball in water! Resetting to last shot position.");
                     } else {
@@ -969,7 +962,7 @@ public class GolfGame implements ILogic {
                     }
 
                 } else {
-                    isAnimating = false; // Animation completed
+                    gameState.setAnimating(false); // Animation completed
                     updateBallMultiplayer();
                 }
             }
@@ -1174,13 +1167,13 @@ public class GolfGame implements ILogic {
                 SimplexNoise.shufflePermutation();
                 terrainSwitch(blendMapTerrain, tree, blendMap2);
                 golfBall.setPosition(startPoint.x, startPoint.y, startPoint.z);
-                if (is2player) {
+                if (gameState.isIs2player()) {
                     golfBall2.setPosition(startPoint.x, startPoint.y, startPoint.z);
                 }
                 endFlag.setPosition(endPoint.x, endPoint.y, endPoint.z);
                 numberOfShots = 0;
                 numberOfShots2 = 0;
-                infoTextPane.setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2));
+                infoTextPane.setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -1190,18 +1183,18 @@ public class GolfGame implements ILogic {
             System.out.println("Starting game");
             camera.setPosition(startPoint);
             camera.setRotation(0, 0, 0);
-            canMove = true;
-            isGuiVisible = false;
-            isOnMenu = false;
-            gameStarted = true;
+            gameState.setCanMove(true);
+            gameState.setGuiVisible(false);
+            gameState.setOnMenu(false);
+            gameState.setAnimating(true);
 
-            if (isBot) {
+            if (gameState.isBot()) {
                 createBotBall().run();
             } else {
                 if (botBall != null) scene.getEntities().removeIf(entity -> entity.equals(botBall));
             }
 
-            if (isAiBot) {
+            if (gameState.isAiBot()) {
                 createAiBotBall().run();
             } else {
                 if (aiBotBall != null) scene.getEntities().removeIf(entity -> entity.equals(aiBotBall));
@@ -1213,7 +1206,7 @@ public class GolfGame implements ILogic {
             Vector3f end = new Vector3f(endPoint);
             end.y = heightMap.getHeight(new Vector3f(endPoint.x, 0, endPoint.z));
 
-            if (is2player) {
+            if (gameState.isIs2player()) {
                 if (golfBall2 == null) {
                     golfBall2 = new Entity(ball2, new Vector3f(start), new Vector3f(50, 0, 0), 5);
                     scene.addEntity(golfBall2);
@@ -1229,7 +1222,7 @@ public class GolfGame implements ILogic {
         };
 
         Runnable sound = () -> {
-            if (isSoundPlaying) {
+            if (gameState.isSoundPlaying()) {
                 System.out.println("Stopping sound");
                 audioManager.stopSound();
                 soundButton.setText("Sound: OFF");
@@ -1240,7 +1233,7 @@ public class GolfGame implements ILogic {
                 soundButton.setText("Sound: ON");
                 soundButtonInGame.setText("Sound: ON");
             }
-            isSoundPlaying = !isSoundPlaying;
+            gameState.switchAudio();
         };
 
         Runnable quit = () -> {
@@ -1253,7 +1246,7 @@ public class GolfGame implements ILogic {
             debugMode = !debugMode;
             if (debugMode) {
                 System.out.println("Enabling debug mode");
-                if (golfBall2 == null && is2player) {
+                if (golfBall2 == null && gameState.isIs2player()) {
                     golfBall2 = new Entity(ball2, new Vector3f(0, 0, 0), new Vector3f(50, 0, 0), 5);
                     scene.addEntity(golfBall2);
                 }
@@ -1296,7 +1289,7 @@ public class GolfGame implements ILogic {
                 }
 
                 golfBall.setPosition(startPoint.x, heightMap.getHeight(new Vector3f(startPoint.x, 0, startPoint.z)), startPoint.z);
-                if (is2player) {
+                if (gameState.isIs2player()) {
                     golfBall2.setPosition(startPoint.x, heightMap.getHeight(new Vector3f(startPoint.x, 0, startPoint.z)), startPoint.z);
                 }
                 endFlag.setPosition(endPoint.x, heightMap.getHeight(new Vector3f(endPoint.x, 0, endPoint.z)), endPoint.z);
@@ -1319,25 +1312,25 @@ public class GolfGame implements ILogic {
     private @NotNull InGameMenuRunnable getInGameMenuRunnable() {
         Runnable resume = () -> {
             System.out.println("Resuming game");
-            canMove = true;
-            isGuiVisible = false;
+            gameState.setCanMove(true);
+            gameState.setGuiVisible(false);
         };
 
         Runnable backToMenu = () -> {
             System.out.println("Returning to menu");
             camera.setPosition(new Vector3f(Consts.SIZE_X / 4, 50, Consts.SIZE_Z / 4));
             camera.setRotation(20, 0, 0);
-            canMove = false;
-            isGuiVisible = true;
-            isOnMenu = true;
-            gameStarted = false;
+            gameState.setCanMove(false);
+            gameState.setGuiVisible(true);
+            gameState.setOnMenu(true);
+            gameState.setGameStarted(false);
             numberOfShots = 0;
             numberOfShots2 = 0;
-            infoTextPane.setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2));
+            infoTextPane.setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
         };
 
         Runnable sound = () -> {
-            if (isSoundPlaying) {
+            if (gameState.isSoundPlaying()) {
                 System.out.println("Stopping sound");
                 audioManager.stopSound();
                 soundButtonInGame.setText("Sound: OFF");
@@ -1348,7 +1341,7 @@ public class GolfGame implements ILogic {
                 soundButtonInGame.setText("Sound: ON");
                 soundButton.setText("Sound: ON");
             }
-            isSoundPlaying = !isSoundPlaying;
+            gameState.switchAudio();
         };
 
         Runnable quit = () -> {
@@ -1369,7 +1362,7 @@ public class GolfGame implements ILogic {
         PhysicsEngine engine = new PhysicsEngine(heightMap, scene);
 
         return () -> {
-            if (isAnimating) {
+            if (gameState.isAnimating()) {
                 return; // Exit if already animating
             }
             try {
@@ -1388,15 +1381,15 @@ public class GolfGame implements ILogic {
                     ballPositions = engine.runRK4(initialState, h);
 
                     currentPositionIndex = 0;
-                    isAnimating = true;
+                    gameState.setAnimating(true);
                     animationTimeAccumulator = 0f;
-                    if (isPlayer1Turn) {
+                    if (gameState.isPlayer1Turn()) {
                         numberOfShots++;
                     } else {
                         numberOfShots2++;
                     }
                     shotStartPosition = new Vector3f(currentBall.getPosition()); // Store the start position of the shot
-                    infoTextPane.setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2));
+                    infoTextPane.setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
