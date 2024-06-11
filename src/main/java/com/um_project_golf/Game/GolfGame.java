@@ -232,55 +232,7 @@ public class GolfGame implements ILogic {
             gameState.setCanMove(false); // Disable movement
         }
 
-        // Movement controls
-        if (gameState.isCanMove()) {
-            if (window.is_keyPressed(GLFW.GLFW_KEY_W)) {
-                cameraInc.z = -moveSpeed;
-            }
-            if (window.is_keyPressed(GLFW.GLFW_KEY_S)) {
-                cameraInc.z = moveSpeed;
-            }
-            if (window.is_keyPressed(GLFW.GLFW_KEY_A)) {
-                cameraInc.x = -moveSpeed;
-            }
-            if (window.is_keyPressed(GLFW.GLFW_KEY_D)) {
-                cameraInc.x = moveSpeed;
-            }
-            if (window.is_keyPressed(GLFW.GLFW_KEY_SPACE)) {
-                cameraInc.y = moveSpeed;
-            }
-            if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
-                cameraInc.y = -moveSpeed;
-            }
-            if (window.is_keyPressed(GLFW.GLFW_KEY_UP)) {
-                camera.setPosition(startPoint);
-            }
-            if (window.is_keyPressed(GLFW.GLFW_KEY_DOWN)) {
-                camera.setPosition(endPoint);
-            }
-
-            if (window.is_keyPressed(GLFW.GLFW_KEY_F) && treeAnimationState == AnimationState.IDLE) {
-                treeAnimationState = AnimationState.GOING_UP;
-                treeAnimationTime = 0f;
-            }
-
-            if (window.is_keyPressed(GLFW.GLFW_KEY_Q)) {
-                camera.setPosition(new Vector3f(currentBall.getPosition().x, currentBall.getPosition().y + Consts.PLAYER_HEIGHT, currentBall.getPosition().z));
-            }
-
-            if (window.is_keyPressed(GLFW.GLFW_KEY_R) && !gameState.isAnimating()) {
-                restartBalls();
-            }
-
-            // Create a tree at the camera position
-            boolean isTPressed = window.is_keyPressed(GLFW.GLFW_KEY_T);
-
-            if (isTPressed && !gameState.istKeyWasPressed()) {
-                plantTree();
-            } else if (!isTPressed) {
-                gameState.settKeyWasPressed(false); // Reset the flag when the key is released
-            }
-        }
+        movementControl(moveSpeed);
 
         if (debugMode && gameState.isCanMove()) {
             if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
@@ -457,6 +409,58 @@ public class GolfGame implements ILogic {
         currentPlayer.cleanup();
 
         nvgDelete(vg);
+    }
+
+    private void movementControl(float moveSpeed) {
+        // Movement controls
+        if (gameState.isCanMove()) {
+            if (window.is_keyPressed(GLFW.GLFW_KEY_W)) {
+                cameraInc.z = -moveSpeed;
+            }
+            if (window.is_keyPressed(GLFW.GLFW_KEY_S)) {
+                cameraInc.z = moveSpeed;
+            }
+            if (window.is_keyPressed(GLFW.GLFW_KEY_A)) {
+                cameraInc.x = -moveSpeed;
+            }
+            if (window.is_keyPressed(GLFW.GLFW_KEY_D)) {
+                cameraInc.x = moveSpeed;
+            }
+            if (window.is_keyPressed(GLFW.GLFW_KEY_SPACE)) {
+                cameraInc.y = moveSpeed;
+            }
+            if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
+                cameraInc.y = -moveSpeed;
+            }
+            if (window.is_keyPressed(GLFW.GLFW_KEY_UP)) {
+                camera.setPosition(startPoint);
+            }
+            if (window.is_keyPressed(GLFW.GLFW_KEY_DOWN)) {
+                camera.setPosition(endPoint);
+            }
+
+            if (window.is_keyPressed(GLFW.GLFW_KEY_F) && treeAnimationState == AnimationState.IDLE) {
+                treeAnimationState = AnimationState.GOING_UP;
+                treeAnimationTime = 0f;
+            }
+
+            if (window.is_keyPressed(GLFW.GLFW_KEY_Q)) {
+                camera.setPosition(new Vector3f(currentBall.getPosition().x, currentBall.getPosition().y + Consts.PLAYER_HEIGHT, currentBall.getPosition().z));
+            }
+
+            if (window.is_keyPressed(GLFW.GLFW_KEY_R) && !gameState.isAnimating()) {
+                restartBalls();
+            }
+
+            // Create a tree at the camera position
+            boolean isTPressed = window.is_keyPressed(GLFW.GLFW_KEY_T);
+
+            if (isTPressed && !gameState.istKeyWasPressed()) {
+                plantTree();
+            } else if (!isTPressed) {
+                gameState.settKeyWasPressed(false); // Reset the flag when the key is released
+            }
+        }
     }
 
     /**
