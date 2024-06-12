@@ -10,6 +10,7 @@ import com.um_project_golf.Core.Entity.Terrain.*;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
+import com.um_project_golf.Core.Physics.*;
 import com.um_project_golf.Core.Rendering.RenderManager;
 import com.um_project_golf.Core.Utils.BallCollisionDetector;
 import com.um_project_golf.Core.Utils.CollisionsDetector;
@@ -1366,7 +1367,7 @@ public class GolfGame implements ILogic {
     @NotNull
     @Contract(pure = true)
     private Runnable runPhysics() {
-        PhysicsEngine engine = new PhysicsEngine(heightMap, scene);
+        PhysicsEngine engine = new SimplePhysicsEngine(heightMap, scene);
 
         return () -> {
             if (isAnimating) {
