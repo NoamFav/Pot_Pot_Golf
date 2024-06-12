@@ -3,7 +3,7 @@ package com.um_project_golf.GolfBots;
 import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
-import com.um_project_golf.Core.PhysicsEngine;
+import com.um_project_golf.Core.Physics.*;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
@@ -157,7 +157,7 @@ public class AIBot {
         fullPath = new HashMap<>();
         double[] initialState = {ball.getPosition().x, ball.getPosition().z, velocityBall.x, velocityBall.z};
         double h = 0.1; // Time step
-        PhysicsEngine engine = new PhysicsEngine(testMap, scene);
+        PhysicsEngine engine = new SimplePhysicsEngine(testMap, scene);
         List<Vector3f> positions = engine.runRK4(initialState, h);
 
         Vector3f finalPosition = positions.get(positions.size()-1);
