@@ -6,10 +6,7 @@ import com.um_project_golf.Core.Camera;
 import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.WindowManager;
-import com.um_project_golf.Game.FieldManager.EntitiesManager;
-import com.um_project_golf.Game.FieldManager.GameStateManager;
-import com.um_project_golf.Game.FieldManager.GameVarManager;
-import com.um_project_golf.Game.FieldManager.GuiElementManager;
+import com.um_project_golf.Game.FieldManager.*;
 import com.um_project_golf.Game.Launcher;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
@@ -30,16 +27,15 @@ public class InGameGUI {
     private final GameVarManager gameVarManager;
     private final EntitiesManager entitiesManager;
 
-    public InGameGUI(long vg, Camera camera, AudioManager audioManager, GuiElementManager guiElementManager,
-                     GameStateManager gameState, GameVarManager gameVarManager, EntitiesManager entitiesManager) {
+    public InGameGUI(long vg, MainFieldManager context) {
         this.vg = vg;
         this.window = Launcher.getWindow();
-        this.camera = camera;
-        this.audioManager = audioManager;
-        this.guiElementManager = guiElementManager;
-        this.gameState = gameState;
-        this.gameVarManager = gameVarManager;
-        this.entitiesManager = entitiesManager;
+        this.camera = context.getCamera();
+        this.audioManager = context.getAudioManager();
+        this.guiElementManager = context.getGuiElementManager();
+        this.gameState = context.getGameStateManager();
+        this.gameVarManager = context.getGameVarManager();
+        this.entitiesManager = context.getEntitiesManager();
 
         createInGameMenu();
     }

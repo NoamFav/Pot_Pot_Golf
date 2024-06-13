@@ -10,10 +10,7 @@ import com.um_project_golf.Core.PhysicsEngine;
 import com.um_project_golf.Core.Utils.BallCollisionDetector;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.WindowManager;
-import com.um_project_golf.Game.FieldManager.EntitiesManager;
-import com.um_project_golf.Game.FieldManager.GameStateManager;
-import com.um_project_golf.Game.FieldManager.GameVarManager;
-import com.um_project_golf.Game.FieldManager.GuiElementManager;
+import com.um_project_golf.Game.FieldManager.*;
 import com.um_project_golf.Game.Launcher;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -32,16 +29,15 @@ public class DefaultGUI {
     private final GameVarManager gameVarManager;
     private final GuiElementManager guiElementManager;
 
-    public DefaultGUI(long vg, HeightMap heightMap, SceneManager scene, GameStateManager gameStateManager,
-                      EntitiesManager entitiesManager, GameVarManager gameVarManager, GuiElementManager guiElementManager) {
+    public DefaultGUI(long vg, MainFieldManager context) {
         this.window = Launcher.getWindow();
         this.vg = vg;
-        this.heightMap = heightMap;
-        this.scene = scene;
-        this.gameStateManager = gameStateManager;
-        this.entitiesManager = entitiesManager;
-        this.gameVarManager = gameVarManager;
-        this.guiElementManager = guiElementManager;
+        this.heightMap = context.getHeightMap();
+        this.scene = context.getScene();
+        this.gameStateManager = context.getGameStateManager();
+        this.entitiesManager = context.getEntitiesManager();
+        this.gameVarManager = context.getGameVarManager();
+        this.guiElementManager = context.getGuiElementManager();
 
         createDefaultGui();
     }
