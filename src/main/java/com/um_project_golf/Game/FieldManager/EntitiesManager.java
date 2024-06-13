@@ -1,9 +1,11 @@
 package com.um_project_golf.Game.FieldManager;
 
 import com.um_project_golf.Core.Entity.Entity;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class EntitiesManager {
     // EntitiesManager
@@ -26,8 +28,24 @@ public class EntitiesManager {
         return trees;
     }
 
+    public void addTree(Entity tree) {
+        this.trees.add(tree);
+    }
+
+    public void clearTrees() {
+        this.trees.clear();
+    }
+
     public List<Float> getTreeHeights() {
         return treeHeights;
+    }
+
+    public void addTreeHeight(Float height) {
+        this.treeHeights.add(height);
+    }
+
+    public void clearTreeHeights() {
+        this.treeHeights.clear();
     }
 
     public Entity getGolfBall() {
@@ -38,6 +56,10 @@ public class EntitiesManager {
         this.golfBall = golfBall;
     }
 
+    public void setGolfBallPosition(Vector3f position) {
+        this.golfBall.setPosition(position);
+    }
+
     public Entity getGolfBall2() {
         return golfBall2;
     }
@@ -46,12 +68,24 @@ public class EntitiesManager {
         this.golfBall2 = golfBall2;
     }
 
+    public void setGolfBall2Position(Vector3f position) {
+        this.golfBall2.setPosition(position);
+    }
+
+    public void updateCurrentBall(boolean isPlayer1Turn) {
+        currentBall = isPlayer1Turn ? golfBall : golfBall2;
+    }
+
     public Entity getCurrentBall() {
         return currentBall;
     }
 
     public void setCurrentBall(Entity currentBall) {
         this.currentBall = currentBall;
+    }
+
+    public void setCurrentBallPosition(Vector3f position) {
+        this.currentBall.setPosition(position);
     }
 
     public Entity getBotBall() {
@@ -78,11 +112,23 @@ public class EntitiesManager {
         this.endFlag = endFlag;
     }
 
+    public void setEndFlagPosition(Vector3f position) {
+        this.endFlag.setPosition(position);
+    }
+
     public Entity getArrowEntity() {
         return arrowEntity;
     }
 
     public void setArrowEntity(Entity arrowEntity) {
         this.arrowEntity = arrowEntity;
+    }
+
+    public void setArrowEntityPosition(Vector3f position) {
+        this.arrowEntity.setPosition(position);
+    }
+
+    public void setArrowEntityRotation(Vector3f rotation) {
+        this.arrowEntity.setRotation(rotation);
     }
 }
