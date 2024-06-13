@@ -14,6 +14,7 @@ import com.um_project_golf.Game.FieldManager.EntitiesManager;
 import com.um_project_golf.Game.FieldManager.GameStateManager;
 import com.um_project_golf.Game.FieldManager.GameVarManager;
 import com.um_project_golf.Game.FieldManager.GuiElementManager;
+import com.um_project_golf.Game.Launcher;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
@@ -31,8 +32,9 @@ public class DefaultGUI {
     private final GameVarManager gameVarManager;
     private final GuiElementManager guiElementManager;
 
-    public DefaultGUI(WindowManager window, long vg, HeightMap heightMap, SceneManager scene, GameStateManager gameStateManager, EntitiesManager entitiesManager, GameVarManager gameVarManager, GuiElementManager guiElementManager) {
-        this.window = window;
+    public DefaultGUI(long vg, HeightMap heightMap, SceneManager scene, GameStateManager gameStateManager,
+                      EntitiesManager entitiesManager, GameVarManager gameVarManager, GuiElementManager guiElementManager) {
+        this.window = Launcher.getWindow();
         this.vg = vg;
         this.heightMap = heightMap;
         this.scene = scene;

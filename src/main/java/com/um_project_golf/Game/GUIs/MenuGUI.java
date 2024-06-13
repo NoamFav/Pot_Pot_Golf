@@ -48,14 +48,14 @@ public class MenuGUI {
     private final GameVarManager gameVarManager;
     private final TerrainManager terrainManager;
 
-    public MenuGUI(Camera camera, WindowManager window, long vg,
+    public MenuGUI(Camera camera, long vg,
                    GuiElementManager guiElementManager, GameStateManager gameStateManager, ModelManager modelManager,
                    PathManager pathManager, TerrainManager terrainManager,EntitiesManager entitiesManager, GameVarManager gameVarManager,
-                   HeightMap heightMap, HeightMapPathfinder pathfinder, AudioManager audioManager,
-                   SceneManager scene, BlendMapTerrain blendMapTerrain, ObjectLoader loader,
-                   MouseInput mouseInputs, TerrainSwitch terrainSwitch, StartEndPoint startEndPoint) {
+                   HeightMap heightMap, HeightMapPathfinder pathfinder, AudioManager audioManager, SceneManager scene,
+                   BlendMapTerrain blendMapTerrain, ObjectLoader loader, MouseInput mouseInputs,
+                   TerrainSwitch terrainSwitch, StartEndPoint startEndPoint) {
         this.camera = camera;
-        this.window = window;
+        this.window = Launcher.getWindow();
         this.vg = vg;
         this.guiElementManager = guiElementManager;
         this.gameStateManager = gameStateManager;
@@ -298,7 +298,7 @@ public class MenuGUI {
                 terrainChanger.run();
             }
 
-            new RecreateGUIs(guiElementManager, camera, window, vg,
+            new RecreateGUIs(guiElementManager, camera, vg,
                     gameStateManager, modelManager, pathManager, entitiesManager,
                     gameVarManager, heightMap, pathfinder, audioManager, scene,
                     terrainManager, loader, mouseInputs, terrainSwitch, startEndPoint);
