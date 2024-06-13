@@ -42,9 +42,6 @@ import static org.lwjgl.nanovg.NanoVGGL3.*;
  */
 public class GolfGame implements ILogic {
 
-    // Enum for the animation state of the trees
-    private enum AnimationState {IDLE, GOING_UP, GOING_DOWN}
-
     // Records for storing the models and terrains
     private record ModelLoader(List<Model> skyBox, List<Model> ball, List<Model> arrow, List<Model> flag, List<Model> mill) {}
 
@@ -57,7 +54,7 @@ public class GolfGame implements ILogic {
 
     // Debug mode for Examination purposes
     public static boolean debugMode = false; //Do not change this value to true,
-    // it will break the game (you can change it to true in the game only)
+    // it will break the game (you can change it to true in-game only)
 
     // NanoVG context
     private long vg;
@@ -78,6 +75,7 @@ public class GolfGame implements ILogic {
     private final EntitiesManager entitiesManager;
     private final ModelManager modelManager;
     private final TerrainManager terrainManager;
+    private final GameVarManager gameVarManager;
 
     // A* pathfinding variables
     private Vector3f startPoint;
@@ -87,15 +85,6 @@ public class GolfGame implements ILogic {
     // Camera (Player)
     private final Camera camera;
     Vector3f cameraInc;
-
-    // Game logic variables
-    private AnimationState treeAnimationState = AnimationState.IDLE;
-    private float treeAnimationTime = 0f;
-    private int numberOfShots;
-    private int numberOfShots2;
-    private int currentPositionIndex;
-    private float animationTimeAccumulator;
-    private Vector3f shotStartPosition;
 
     // Positions of the balls for Animation purposes
     private List<Vector3f> ballPositions;
@@ -126,6 +115,7 @@ public class GolfGame implements ILogic {
         entitiesManager = new EntitiesManager();
         modelManager = new ModelManager();
         terrainManager = new TerrainManager();
+        gameVarManager = new GameVarManager();
     }
 
     /**
@@ -331,9 +321,9 @@ public class GolfGame implements ILogic {
                 camera.setPosition(endPoint);
             }
 
-            if (window.is_keyPressed(GLFW.GLFW_KEY_F) && treeAnimationState == AnimationState.IDLE) {
-                treeAnimationState = AnimationState.GOING_UP;
-                treeAnimationTime = 0f;
+            if (window.is_keyPressed(GLFW.GLFW_KEY_F) && gameVarManager.isTreeAnimationIdle()) {
+                gameVarManager.setTreeAnimationGoingUp();
+                gameVarManager.resetTreeAnimationTime();
             }
 
             if (window.is_keyPressed(GLFW.GLFW_KEY_Q)) {
@@ -386,8 +376,7 @@ public class GolfGame implements ILogic {
         gameState.setPlayer1Turn(true);
         entitiesManager.setCurrentBall(golfBall);
 
-        numberOfShots2 = 0;
-        numberOfShots = 0;
+        gameVarManager.resetNumberOfShots();
 
         createTrees();
     }
@@ -426,6 +415,8 @@ public class GolfGame implements ILogic {
         boolean isPlayer1Turn = gameState.isPlayer1Turn();
         String imageButton = guiElementManager.getImageButton();
         Entity currentBall = entitiesManager.getCurrentBall();
+        int numberOfShots = gameVarManager.getNumberOfShots();
+        int numberOfShots2 = gameVarManager.getNumberOfShots2();
 
         TextPane currentPlayer = new TextPane(x, y, width, height / 2, "Player 1's turn", font, vg, imageButton);
         TextPane infoTextPane = new TextPane(x, y + height / 2, width, height / 2, "Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2), textFieldFont, vg, imageButton);
@@ -645,16 +636,17 @@ public class GolfGame implements ILogic {
         if (gameState.isIs2player()) {
             entitiesManager.setGolfBallPosition(start);
             entitiesManager.setGolfBall2Position(start);
-            numberOfShots = 0;
-            numberOfShots2 = 0;
+            gameVarManager.resetNumberOfShots();
             gameState.setPlayer1Turn(true);
             entitiesManager.setCurrentBall(entitiesManager.getGolfBall());
             guiElementManager.getCurrentPlayer().setText("Player 1's turn");
         } else {
             entitiesManager.setGolfBallPosition(start);
-            numberOfShots = 0;
+            gameVarManager.resetNumberOfShots();
         }
         Entity currentBall = entitiesManager.getCurrentBall();
+        int numberOfShots = gameVarManager.getNumberOfShots();
+        int numberOfShots2 = gameVarManager.getNumberOfShots2();
         guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
     }
 
@@ -735,7 +727,9 @@ public class GolfGame implements ILogic {
             System.out.println("Player " + (isPlayer1Turn ? "1's" : "2's") + " turn");
             guiElementManager.getCurrentPlayer().setText("Player " + (isPlayer1Turn ? "1's" : "2's") + " turn");
             Entity currentBall = entitiesManager.getCurrentBall();
-            guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2));
+            int numberOfShots = gameVarManager.getNumberOfShots();
+            int numberOfShots2 = gameVarManager.getNumberOfShots2();
+            guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (!isPlayer1Turn ? numberOfShots : numberOfShots2));
         }
     }
 
@@ -773,15 +767,15 @@ public class GolfGame implements ILogic {
      * Used for end game animation.
      */
     private void updateTreeAnimations() {
-        if (entitiesManager.getTrees().isEmpty() || treeAnimationState == AnimationState.IDLE) {
+        if (entitiesManager.getTrees().isEmpty() || gameVarManager.isTreeAnimationIdle()) {
             return;
         }
 
-        treeAnimationTime += 0.1f; // Adjust the time increment as needed
+        gameVarManager.incrementTreeAnimationTime(0.1f); // Adjust the time increment as needed
 
         // Total duration of the animation (5 seconds up and 5 seconds down)
         float treeAnimationDuration = 10f;
-        float t = treeAnimationTime / (treeAnimationDuration / 2);
+        float t = gameVarManager.getTreeAnimationTime() / (treeAnimationDuration / 2);
         if (t > 1f) t = 1f;
 
         for (int i = 0; i < entitiesManager.getTrees().size(); i++) {
@@ -789,29 +783,24 @@ public class GolfGame implements ILogic {
             float baseHeight = entitiesManager.getTreeHeights().get(i);
             float treeHeightOffset = 10f;
 
-            switch (treeAnimationState) {
-                case GOING_UP:
-                    if (treeAnimationTime <= treeAnimationDuration / 2) {
-                        float newY = baseHeight + treeHeightOffset * t;
-                        float newRotation = -90 + 180 * t;
-                        tree.setPosition(tree.getPosition().x, newY, tree.getPosition().z);
-                        tree.setRotation(newRotation, tree.getRotation().y, tree.getRotation().z);
-                    } else {
-                        treeAnimationState = AnimationState.GOING_DOWN;
-                        treeAnimationTime = 0f;
-                    }
-                    break;
-
-                case GOING_DOWN:
-                    if (treeAnimationTime <= treeAnimationDuration / 2) {
-                        float newY = baseHeight + treeHeightOffset * (1 - t);
-                        float newRotation = 90 + 180f * t;
-                        tree.setPosition(tree.getPosition().x, newY, tree.getPosition().z);
-                        tree.setRotation(newRotation, tree.getRotation().y, tree.getRotation().z);
-                    } else {
-                        treeAnimationState = AnimationState.IDLE;
-                    }
-                    break;
+            if (gameVarManager.isTreeAnimationGoingUp()) {
+                if (gameVarManager.getTreeAnimationTime() <= treeAnimationDuration / 2) {
+                    float newY = baseHeight + treeHeightOffset * t;
+                    float newRotation = -90 + 180 * t;
+                    tree.setPosition(tree.getPosition().x, newY, tree.getPosition().z);
+                    tree.setRotation(newRotation, tree.getRotation().y, tree.getRotation().z);
+                } else {
+                    gameVarManager.setTreeAnimationGoingDown();
+                    gameVarManager.resetTreeAnimationTime();
+                }
+            } else if(gameVarManager.isTreeAnimationGoingDown()) {
+                if (gameVarManager.getTreeAnimationTime() <= treeAnimationDuration / 2) {
+                    float newY = baseHeight + treeHeightOffset * (1 - t);
+                    float newRotation = 90 + 180f * t;
+                    tree.setPosition(tree.getPosition().x, newY, tree.getPosition().z);
+                    tree.setRotation(newRotation, tree.getRotation().y, tree.getRotation().z);
+                } else {
+                    gameVarManager.setTreeAnimationIdle();}
             }
         }
     }
@@ -824,18 +813,20 @@ public class GolfGame implements ILogic {
     private void animateBall() {
         if (gameState.isAnimating()) {
             float timeStep = 0.1f;
-            animationTimeAccumulator += timeStep;
+            gameVarManager.incrementAnimationTimeAccumulator(timeStep);
 
-            if (animationTimeAccumulator >= timeStep) {
-                animationTimeAccumulator -= timeStep;
+            if (gameVarManager.getAnimationTimeAccumulator() >= timeStep) {
+                gameVarManager.decrementAnimationTimeAccumulator(timeStep);
 
-                if (currentPositionIndex < ballPositions.size()) {
-                    Vector3f nextPosition = ballPositions.get(currentPositionIndex);
+                if (gameVarManager.getCurrentPositionIndex() < ballPositions.size()) {
+                    Vector3f nextPosition = ballPositions.get(gameVarManager.getCurrentPositionIndex());
 
                     if (nextPosition == ballPositions.get(ballPositions.size() - 1)) {
                         float isInHoleThreshold = Consts.TARGET_RADIUS;
                         if (nextPosition.x <= endPoint.x + isInHoleThreshold && nextPosition.x >= endPoint.x - isInHoleThreshold) {
                             if (nextPosition.z <= endPoint.z + isInHoleThreshold && nextPosition.z >= endPoint.z - isInHoleThreshold) {
+                                int numberOfShots = gameVarManager.getNumberOfShots();
+                                int numberOfShots2 = gameVarManager.getNumberOfShots2();
                                 int shot = gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2;
                                 System.out.println("Ball reached the end point!");
                                 System.out.println("You took " + shot + " shots to reach the end point!");
@@ -844,23 +835,21 @@ public class GolfGame implements ILogic {
                                 guiElementManager.getCurrentPlayer().setText("Player " + (gameState.isPlayer1Won() ? "1" : "2") + " wins!");
                                 System.out.println("Player " + (gameState.isPlayer1Won() ? "1" : "2") + " wins!");
                                 guiElementManager.getWarningTextPane().setText("You Win! In " + shot + " shots!");
-                                treeAnimationState = AnimationState.GOING_UP;
-                                treeAnimationTime = 0f;
+                                gameVarManager.setTreeAnimationGoingUp();
+                                gameVarManager.resetTreeAnimationTime();
                             }
                         }
                     }
 
                     ballCollisionDetector.checkCollisionBall(nextPosition);
                     if (nextPosition.y <= -0.1) { // Ball in water
-                        entitiesManager.setCurrentBallPosition(shotStartPosition);
+                        entitiesManager.setCurrentBallPosition(gameVarManager.getShotStartPosition());
                         gameState.setAnimating(false);
                         updateBallMultiplayer();
                         guiElementManager.getWarningTextPane().setText("Ploof! Ball in water! Resetting to last shot position.");
                     } else {
                         entitiesManager.setCurrentBallPosition(nextPosition);
-                        currentPositionIndex++;
-                    }
-
+                        gameVarManager.incrementCurrentPositionIndex();}
                 } else {
                     gameState.setAnimating(false); // Animation completed
                     updateBallMultiplayer();
@@ -1073,9 +1062,10 @@ public class GolfGame implements ILogic {
                     entitiesManager.setGolfBall2Position(startPoint);
                 }
                 entitiesManager.setEndFlagPosition(endPoint);
-                numberOfShots = 0;
-                numberOfShots2 = 0;
+                gameVarManager.resetNumberOfShots();
                 Entity currentBall = entitiesManager.getCurrentBall();
+                int numberOfShots = gameVarManager.getNumberOfShots();
+                int numberOfShots2 = gameVarManager.getNumberOfShots2();
                 guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -1091,6 +1081,7 @@ public class GolfGame implements ILogic {
             gameState.setOnMenu(false);
             gameState.setAnimating(true);
             gameState.setGameStarted(true);
+            gameState.setPlayer1Turn(true);
 
             if (gameState.isBot()) {
                 createBotBall().run();
@@ -1115,10 +1106,13 @@ public class GolfGame implements ILogic {
                     Entity golfBall2 = new Entity(modelManager.getBall2(), new Vector3f(start), new Vector3f(50, 0, 0), 5);
                     entitiesManager.setGolfBall2(golfBall2);
                     scene.addEntity(golfBall2);
+                } else {
+                    entitiesManager.setGolfBall2Position(start);
                 }
             } else {
                 if (entitiesManager.getGolfBall2() != null) {
                     scene.getEntities().removeIf(entity -> entity.equals(entitiesManager.getGolfBall2()));
+                    entitiesManager.setGolfBall2(null);
                 }
             }
 
@@ -1230,8 +1224,9 @@ public class GolfGame implements ILogic {
             gameState.setGuiVisible(true);
             gameState.setOnMenu(true);
             gameState.setGameStarted(false);
-            numberOfShots = 0;
-            numberOfShots2 = 0;
+            gameVarManager.resetNumberOfShots();
+            int numberOfShots = gameVarManager.getNumberOfShots();
+            int numberOfShots2 = gameVarManager.getNumberOfShots2();
             Entity currentBall = entitiesManager.getCurrentBall();
             guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
         };
@@ -1288,15 +1283,17 @@ public class GolfGame implements ILogic {
                     double h = 0.1; // Time step
                     ballPositions = engine.runRK4(initialState, h);
 
-                    currentPositionIndex = 0;
+                    gameVarManager.resetCurrentPositionIndex();
                     gameState.setAnimating(true);
-                    animationTimeAccumulator = 0f;
+                    gameVarManager.resetAnimationTimeAccumulator();
                     if (gameState.isPlayer1Turn()) {
-                        numberOfShots++;
+                        gameVarManager.incrementNumberOfShots();
                     } else {
-                        numberOfShots2++;
+                        gameVarManager.incrementNumberOfShots2();
                     }
-                    shotStartPosition = new Vector3f(currentBall.getPosition()); // Store the start position of the shot
+                    gameVarManager.setShotStartPosition(new Vector3f(currentBall.getPosition())); // Store the start position of the shot
+                    int numberOfShots = gameVarManager.getNumberOfShots();
+                    int numberOfShots2 = gameVarManager.getNumberOfShots2();
                     guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
                 }
             } catch (Exception e) {
