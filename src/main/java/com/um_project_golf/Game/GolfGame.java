@@ -718,11 +718,10 @@ public class GolfGame implements ILogic {
      * Used for multiplayer.
      */
     private void updateBallMultiplayer() {
-        boolean is2player = gameState.isIs2player();
-        boolean isPlayer1Turn = gameState.isPlayer1Turn();
-
-        if (is2player) {
+        if (gameState.isIs2player()) {
+            System.out.println(Arrays.toString(Thread.currentThread().getStackTrace()));
             gameState.switchPlayer1Turn();
+            boolean isPlayer1Turn = gameState.isPlayer1Turn();
             entitiesManager.updateCurrentBall(isPlayer1Turn);
             System.out.println("Player " + (isPlayer1Turn ? "1's" : "2's") + " turn");
             guiElementManager.getCurrentPlayer().setText("Player " + (isPlayer1Turn ? "1's" : "2's") + " turn");
@@ -1079,7 +1078,6 @@ public class GolfGame implements ILogic {
             gameState.setCanMove(true);
             gameState.setGuiVisible(false);
             gameState.setOnMenu(false);
-            gameState.setAnimating(true);
             gameState.setGameStarted(true);
             gameState.setPlayer1Turn(true);
 

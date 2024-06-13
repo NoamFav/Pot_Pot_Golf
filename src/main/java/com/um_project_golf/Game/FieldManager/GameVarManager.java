@@ -3,6 +3,7 @@ package com.um_project_golf.Game.FieldManager;
 import com.um_project_golf.Core.Utils.AnimationState;
 import org.joml.Vector3f;
 
+@SuppressWarnings("unused")
 public class GameVarManager {
 
     // Game logic variables
