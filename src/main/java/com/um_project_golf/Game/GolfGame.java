@@ -18,6 +18,7 @@ import com.um_project_golf.Core.Utils.CollisionsDetector;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.Entity.Terrain.HeightMapPathfinder;
 import com.um_project_golf.Game.FieldManager.GameStateManager;
+import com.um_project_golf.Game.FieldManager.ModelManager;
 import com.um_project_golf.GolfBots.AIBot;
 import com.um_project_golf.GolfBots.RuleBasedBot;
 import org.jetbrains.annotations.Contract;
@@ -48,13 +49,9 @@ public class GolfGame implements ILogic {
     private enum AnimationState {IDLE, GOING_UP, GOING_DOWN}
 
     // Records for storing the models and terrains
-    private record ModelLoader(List<Model> skyBox, List<Model> ball, List<Model> arrow, List<Model> flag,
-                               List<Model> mill) {
-    }
+    private record ModelLoader(List<Model> skyBox, List<Model> ball, List<Model> arrow, List<Model> flag, List<Model> mill) {}
 
-    private record Terrains(TerrainTexture blendMap, List<TerrainTexture> textures,
-                            List<TerrainTexture> waterTextures) {
-    }
+    private record Terrains(TerrainTexture blendMap, List<TerrainTexture> textures, List<TerrainTexture> waterTextures) {}
 
     // Records for storing the Runnables for the buttons
     private record InGameMenuRunnable(Runnable resume, Runnable backToMenu, Runnable sound, Runnable quit) {}
@@ -81,17 +78,12 @@ public class GolfGame implements ILogic {
     private final GameStateManager gameState;
     private final GuiElementManager guiElementManager;
     private final EntitiesManager entitiesManager;
+    private final ModelManager modelManager;
 
     // A* pathfinding variables
     private Vector3f startPoint;
     private Vector3f endPoint;
     private List<Vector2i> path;
-
-    // Models
-    private List<Model> botBallModel;
-    private List<Model> aiBotBallModel;
-    private List<Model> ball2;
-    private List<Model> tree;
 
     // Terrains
     private Terrain terrain;
@@ -140,6 +132,7 @@ public class GolfGame implements ILogic {
         gameState = new GameStateManager();
         guiElementManager = new GuiElementManager();
         entitiesManager = new EntitiesManager();
+        modelManager = new ModelManager();
     }
 
     /**
@@ -674,7 +667,7 @@ public class GolfGame implements ILogic {
      */
     private void plantTree() {
         Vector3f cameraPos = new Vector3f(camera.getPosition().x, camera.getPosition().y - Consts.PLAYER_HEIGHT, camera.getPosition().z);
-        Entity newTree = new Entity(tree, new Vector3f(cameraPos.x, cameraPos.y, cameraPos.z), new Vector3f(-90, 0, 0), 0.03f);
+        Entity newTree = new Entity(modelManager.getTree(), new Vector3f(cameraPos.x, cameraPos.y, cameraPos.z), new Vector3f(-90, 0, 0), 0.03f);
         scene.addEntity(newTree);
         entitiesManager.addTree(newTree);
         entitiesManager.addTreeHeight(cameraPos.y);
@@ -720,7 +713,7 @@ public class GolfGame implements ILogic {
         path = pathfinder.getPathDebug(start, end, Consts.SIZE_GREEN);
         try {
             TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
-            terrainSwitch(blendMapTerrain, tree, blendMap2);
+            terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
             if (Consts.WANT_TREE) { // If the trees are enabled in the Consts
                 createTrees();
             }
@@ -921,7 +914,7 @@ public class GolfGame implements ILogic {
         for (int i = 0; i < Consts.NUMBER_OF_TREES; i++) {
             Vector3f position = positions.get(rnd.nextInt(positions.size()));
             if (position != zero) {
-                Entity aTree = new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f); // - 90 and 0.03f
+                Entity aTree = new Entity(modelManager.getTree(), new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f); // - 90 and 0.03f
                 scene.addEntity(aTree);
                 entitiesManager.addTree(aTree);
                 entitiesManager.addTreeHeight(position.y);
@@ -999,12 +992,12 @@ public class GolfGame implements ILogic {
      * @return The models for the game.
      */
     private @NotNull ModelLoader getModels() throws Exception {
-        tree = loader.loadAssimpModel("src/main/resources/Models/tree/tree.obj");
+        List<Model> tree = loader.loadAssimpModel("src/main/resources/Models/tree/tree.obj"); modelManager.setTree(tree);
         List<Model> skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
         List<Model> ball = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
-        ball2 = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
-        botBallModel = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
-        aiBotBallModel = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
+        List<Model> ball2 = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj"); modelManager.setBall2(ball2);
+        List<Model> botBallModel = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj"); modelManager.setBotBallModel(botBallModel);
+        List<Model> aiBotBallModel = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj"); modelManager.setAiBotBallModel(aiBotBallModel);
         List<Model> arrow = loader.loadAssimpModel("src/main/resources/Models/Arrow/Arrow5.obj");
         List<Model> flag = loader.loadAssimpModel("src/main/resources/Models/flag/flag.obj");
         List<Model> tree3 = loader.loadAssimpModel("src/main/resources/Models/sakura/sakura-A.obj");
@@ -1075,7 +1068,7 @@ public class GolfGame implements ILogic {
 
                 TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
                 SimplexNoise.shufflePermutation();
-                terrainSwitch(blendMapTerrain, tree, blendMap2);
+                terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
                 entitiesManager.setGolfBallPosition(startPoint);
                 if (gameState.isIs2player()) {
                     entitiesManager.setGolfBall2Position(startPoint);
@@ -1120,7 +1113,7 @@ public class GolfGame implements ILogic {
 
             if (gameState.isIs2player()) {
                 if (entitiesManager.getGolfBall2() == null) {
-                    Entity golfBall2 = new Entity(ball2, new Vector3f(start), new Vector3f(50, 0, 0), 5);
+                    Entity golfBall2 = new Entity(modelManager.getBall2(), new Vector3f(start), new Vector3f(50, 0, 0), 5);
                     entitiesManager.setGolfBall2(golfBall2);
                     scene.addEntity(golfBall2);
                 }
@@ -1160,14 +1153,14 @@ public class GolfGame implements ILogic {
             if (debugMode) {
                 System.out.println("Enabling debug mode");
                 if (entitiesManager.getGolfBall2() == null && gameState.isIs2player()) {
-                    Entity golfBall2 = new Entity(ball2, new Vector3f(0, 0, 0), new Vector3f(50, 0, 0), 5);
+                    Entity golfBall2 = new Entity(modelManager.getBall2(), new Vector3f(0, 0, 0), new Vector3f(50, 0, 0), 5);
                     entitiesManager.setGolfBall2(golfBall2);
                     scene.addEntity(golfBall2);
                 }
                 try {
                     heightMap.createHeightMap();
                     TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
-                    terrainSwitch(blendMapTerrain, tree, blendMap2);
+                    terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -1190,7 +1183,7 @@ public class GolfGame implements ILogic {
                     path = pathfinder.getPathDebug(start, end, Consts.SIZE_GREEN);
                     try {
                         TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
-                        terrainSwitch(blendMapTerrain, tree, blendMap2);
+                        terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
                         if (Consts.WANT_TREE) { // If the trees are enabled in the Consts
                             createTrees();
                         }
@@ -1325,7 +1318,7 @@ public class GolfGame implements ILogic {
 
         return () -> {
             System.out.println("Creating bot ball");
-            Entity botBall = new Entity(botBallModel, new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
+            Entity botBall = new Entity(modelManager.getBotBallModel(), new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
             entitiesManager.setBotBall(botBall);
             scene.addEntity(botBall);
 
@@ -1347,7 +1340,7 @@ public class GolfGame implements ILogic {
 
         return () -> {
             System.out.println("Creating AI bot ball");
-            Entity aiBotBall = new Entity(aiBotBallModel, new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
+            Entity aiBotBall = new Entity(modelManager.getAiBotBallModel(), new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
             entitiesManager.setAiBotBall(aiBotBall);
             scene.addEntity(aiBotBall);
 
