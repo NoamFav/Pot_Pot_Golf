@@ -1,4 +1,4 @@
-package com.um_project_golf.GolfBots;
+package com.um_project_golf.Core.GolfBots;
 
 import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.SceneManager;
