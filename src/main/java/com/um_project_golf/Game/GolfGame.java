@@ -7,8 +7,7 @@ import com.um_project_golf.Core.AWT.Title;
 import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.Entity.*;
 import com.um_project_golf.Core.Entity.Terrain.*;
-import com.um_project_golf.Game.FieldManager.EntitiesManager;
-import com.um_project_golf.Game.FieldManager.GuiElementManager;
+import com.um_project_golf.Game.FieldManager.*;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
@@ -17,8 +16,6 @@ import com.um_project_golf.Core.Utils.BallCollisionDetector;
 import com.um_project_golf.Core.Utils.CollisionsDetector;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.Entity.Terrain.HeightMapPathfinder;
-import com.um_project_golf.Game.FieldManager.GameStateManager;
-import com.um_project_golf.Game.FieldManager.ModelManager;
 import com.um_project_golf.GolfBots.AIBot;
 import com.um_project_golf.GolfBots.RuleBasedBot;
 import org.jetbrains.annotations.Contract;
@@ -72,6 +69,7 @@ public class GolfGame implements ILogic {
     private final SceneManager scene;
     private MouseInput mouseInputs;
     private AudioManager audioManager;
+    private final HeightMap heightMap;
     private final HeightMapPathfinder pathfinder;
     private final CollisionsDetector collisionsDetector;
     private BallCollisionDetector ballCollisionDetector;
@@ -79,18 +77,12 @@ public class GolfGame implements ILogic {
     private final GuiElementManager guiElementManager;
     private final EntitiesManager entitiesManager;
     private final ModelManager modelManager;
+    private final TerrainManager terrainManager;
 
     // A* pathfinding variables
     private Vector3f startPoint;
     private Vector3f endPoint;
     private List<Vector2i> path;
-
-    // Terrains
-    private Terrain terrain;
-    private Terrain ocean;
-    private final HeightMap heightMap;
-    private BlendMapTerrain blendMapTerrain;
-    private BlendMapTerrain blueTerrain;
 
     // Camera (Player)
     private final Camera camera;
@@ -133,6 +125,7 @@ public class GolfGame implements ILogic {
         guiElementManager = new GuiElementManager();
         entitiesManager = new EntitiesManager();
         modelManager = new ModelManager();
+        terrainManager = new TerrainManager();
     }
 
     /**
@@ -162,7 +155,7 @@ public class GolfGame implements ILogic {
         setUpLight();
 
         vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
-        createMenu(blendMapTerrain);
+        createMenu(terrainManager.getBlendMapTerrain());
         createInGameMenu();
         gameState.setGuiVisible(true);
         gameState.setCanMove(false);
@@ -406,11 +399,15 @@ public class GolfGame implements ILogic {
     private void terrainCreation() throws Exception {
         Terrains terrains = getTerrains();
 
-        blendMapTerrain = new BlendMapTerrain(terrains.textures());
-        blueTerrain = new BlendMapTerrain(terrains.waterTextures());
+        BlendMapTerrain blendMapTerrain = new BlendMapTerrain(terrains.textures());
+        BlendMapTerrain blueTerrain = new BlendMapTerrain(terrains.waterTextures());
+        terrainManager.setBlendMapTerrain(blendMapTerrain);
+        terrainManager.setBlueTerrain(blueTerrain);
 
-        terrain = new Terrain(new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blendMapTerrain, terrains.blendMap(), false);
-        ocean = new Terrain(new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blueTerrain, terrains.blendMap(), true);
+        Terrain terrain = new Terrain(new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blendMapTerrain, terrains.blendMap(), false);
+        Terrain ocean = new Terrain(new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blueTerrain, terrains.blendMap(), true);
+        terrainManager.setTerrain(terrain);
+        terrainManager.setOcean(ocean);
         scene.addTerrain(terrain);
         scene.addTerrain(ocean);
         ocean.getModel().getMaterial().setDisableCulling(true);
@@ -549,7 +546,7 @@ public class GolfGame implements ILogic {
         guiElementManager.clearMenuButtons();
         guiElementManager.clearInGameMenuButtons();
 
-        createMenu(blendMapTerrain);
+        createMenu(terrainManager.getBlendMapTerrain());
         createInGameMenu();
         createDefaultGui();
     }
@@ -713,7 +710,7 @@ public class GolfGame implements ILogic {
         path = pathfinder.getPathDebug(start, end, Consts.SIZE_GREEN);
         try {
             TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
-            terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
+            terrainSwitch(terrainManager.getBlendMapTerrain(), modelManager.getTree(), blendMap2);
             if (Consts.WANT_TREE) { // If the trees are enabled in the Consts
                 createTrees();
             }
@@ -968,10 +965,12 @@ public class GolfGame implements ILogic {
      * @param blendMap2       The new blend map to use.
      */
     private void terrainSwitch(BlendMapTerrain blendMapTerrain, List<Model> tree, TerrainTexture blendMap2) {
-        scene.getTerrains().remove(terrain);
-        scene.getTerrains().remove(ocean);
-        terrain = new Terrain(new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blendMapTerrain, blendMap2, false);
-        ocean = new Terrain(new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blueTerrain, blendMap2, true);
+        scene.getTerrains().remove(terrainManager.getTerrain());
+        scene.getTerrains().remove(terrainManager.getOcean());
+        Terrain terrain = new Terrain(new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blendMapTerrain, blendMap2, false);
+        Terrain ocean = new Terrain(new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), terrainManager.getBlueTerrain(), blendMap2, true);
+        terrainManager.setTerrain(terrain);
+        terrainManager.setOcean(ocean);
         scene.addTerrain(terrain);
         scene.addTerrain(ocean);
         scene.getEntities().removeIf(entity -> entity.getModels().equals(tree));
