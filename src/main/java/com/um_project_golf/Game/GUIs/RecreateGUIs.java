@@ -13,27 +13,28 @@ public class RecreateGUIs {
      * Recreates the GUIs.
      */
     public RecreateGUIs(GuiElementManager guiElementManager, Camera camera,
-                         WindowManager window, long vg, GameStateManager gameStateManager,
+                        long vg, GameStateManager gameStateManager,
                          ModelManager modelManager, PathManager pathManager,
                          EntitiesManager entitiesManager, GameVarManager gameVarManager,
                          HeightMap heightMap, HeightMapPathfinder pathfinder, AudioManager audioManager,
                          SceneManager scene, TerrainManager terrainManager, ObjectLoader loader,
                          MouseInput mouseInputs, TerrainSwitch terrainSwitch,
                          StartEndPoint startEndPoint) {
+
         guiElementManager.clearMenuButtons();
         guiElementManager.clearInGameMenuButtons();
 
-        new MenuGUI(camera, window, vg, guiElementManager,
+        new MenuGUI(camera, vg, guiElementManager,
                 gameStateManager, modelManager, pathManager, terrainManager, entitiesManager,
                 gameVarManager, heightMap, pathfinder, audioManager, scene,
                 terrainManager.getBlendMapTerrain(), loader, mouseInputs,
                 terrainSwitch, startEndPoint);
 
-        new InGameGUI(vg, window, camera, audioManager,
+        new InGameGUI(vg, camera, audioManager,
                 guiElementManager, gameStateManager, gameVarManager,
                 entitiesManager);
 
-        new DefaultGUI(window, vg, heightMap, scene,
+        new DefaultGUI(vg, heightMap, scene,
                 gameStateManager, entitiesManager, gameVarManager, guiElementManager);
 
     }
