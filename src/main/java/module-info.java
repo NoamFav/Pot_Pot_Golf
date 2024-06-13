@@ -39,4 +39,6 @@ module com.um_project_golf {
     opens com.um_project_golf.Core.Utils to javafx.fxml;
     exports com.um_project_golf.Core.GameLogic;
     opens com.um_project_golf.Core.GameLogic to javafx.fxml;
+    exports com.um_project_golf.Game.FieldManager;
+    opens com.um_project_golf.Game.FieldManager to javafx.fxml;
 }

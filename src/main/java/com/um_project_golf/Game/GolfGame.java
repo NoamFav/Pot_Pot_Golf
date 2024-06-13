@@ -7,6 +7,7 @@ import com.um_project_golf.Core.AWT.Title;
 import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.Entity.*;
 import com.um_project_golf.Core.Entity.Terrain.*;
+import com.um_project_golf.Game.FieldManager.GuiElementManager;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
@@ -15,7 +16,7 @@ import com.um_project_golf.Core.Utils.BallCollisionDetector;
 import com.um_project_golf.Core.Utils.CollisionsDetector;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.Entity.Terrain.HeightMapPathfinder;
-import com.um_project_golf.Core.GameStateManager;
+import com.um_project_golf.Game.FieldManager.GameStateManager;
 import com.um_project_golf.GolfBots.AIBot;
 import com.um_project_golf.GolfBots.RuleBasedBot;
 import org.jetbrains.annotations.Contract;
@@ -77,31 +78,7 @@ public class GolfGame implements ILogic {
     private final CollisionsDetector collisionsDetector;
     private BallCollisionDetector ballCollisionDetector;
     private final GameStateManager gameState;
-
-    // GUI elements
-    private Title title;
-    private final List<Button> menuButtons;
-    private final List<Button> inGameMenuButtons;
-    private final String imageButton = "src/main/resources/Texture/buttons.png";
-
-    // Menu GUI elements
-    private Button startButton;
-    private Button debugButton;
-    private Button twoPlayerButton;
-    private Button aiBotButton;
-    private Button botButton;
-    private Button soundButton;
-    private Button soundButtonInGame;
-
-    // In-game GUI elements
-    private Button applyButton;
-    private TextField vxTextField;
-    private TextField vzTextField;
-    private TextPane vxTextPane;
-    private TextPane vzTextPane;
-    private TextPane infoTextPane;
-    private TextPane warningTextPane;
-    private TextPane currentPlayer;
+    private final GuiElementManager guiElementManager;
 
     // A* pathfinding variables
     private Vector3f startPoint;
@@ -168,11 +145,11 @@ public class GolfGame implements ILogic {
         collisionsDetector = new CollisionsDetector();
         cameraInc = new Vector3f(0, 0, 0);
         heightMap = new HeightMap();
-        menuButtons = new ArrayList<>();
-        inGameMenuButtons = new ArrayList<>();
         trees = new ArrayList<>();
         treeHeights = new ArrayList<>();
+        ballPositions = new ArrayList<>();
         gameState = new GameStateManager();
+        guiElementManager = new GuiElementManager();
     }
 
     /**
@@ -286,23 +263,7 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void update() {
-        if (gameState.isGameStarted()) {
-            vxTextField.update();
-            vzTextField.update();
-            applyButton.update();
-        }
-
-        if (gameState.isGuiVisible()) {
-            if (gameState.isOnMenu()) {
-                for (Button button : menuButtons) {
-                    button.update();
-                }
-            } else {
-                for (Button button : inGameMenuButtons) {
-                    button.update();
-                }
-            }
-        }
+        guiElementManager.update(gameState);
 
         if (window.isResized()) {
             Vector3f oldPosition = new Vector3f(camera.getPosition());
@@ -322,7 +283,7 @@ public class GolfGame implements ILogic {
 
         animateBall();
 
-        updateTextFields();
+        guiElementManager.updateTextFields(gameState, debugMode);
 
         for (Entity entity : scene.getEntities()) {
             renderer.processEntity(entity);
@@ -342,41 +303,12 @@ public class GolfGame implements ILogic {
         renderer.clear();
         renderer.render(camera, scene);
 
-        // Render your UI elements like menuButtons
-        if (gameState.isGuiVisible()) {
-            if (gameState.isOnMenu()) {
-                for (Button button : menuButtons) {
-                    if (!Objects.equals(button.getText(), "Change Terrain")) {
-                        button.render();
-                    } else {
-                        if (!debugMode) {
-                            button.render();
-                        }
-                    }
-                }
-                title.render();
-            } else {
-                for (Button button : inGameMenuButtons) {
-                    button.render();
-                }
-            }
-        }
+        guiElementManager.render(gameState);
 
         if (gameState.isAnimating()) {
             scene.getEntities().remove(arrowEntity);
         } else {
             scene.addEntity(arrowEntity);
-        }
-
-        if (gameState.isGameStarted()) {
-            warningTextPane.render();
-            infoTextPane.render();
-            applyButton.render();
-            vxTextField.render();
-            vzTextField.render();
-            vxTextPane.render();
-            vzTextPane.render();
-            currentPlayer.render();
         }
     }
 
@@ -389,24 +321,7 @@ public class GolfGame implements ILogic {
         renderer.cleanup();
         loader.cleanUp();
         audioManager.cleanup();
-        if (title != null) {
-            title.cleanup();  // Clean up the title resources
-        }
-        for (Button button : menuButtons) {
-            button.cleanup();
-        }
-        for (Button button : inGameMenuButtons) {
-            button.cleanup();
-        }
-
-        warningTextPane.cleanup();
-        infoTextPane.cleanup();
-        applyButton.cleanup();
-        vxTextField.cleanup();
-        vzTextField.cleanup();
-        vxTextPane.cleanup();
-        vzTextPane.cleanup();
-        currentPlayer.cleanup();
+        guiElementManager.cleanup();
 
         nvgDelete(vg);
     }
@@ -524,22 +439,31 @@ public class GolfGame implements ILogic {
         float font = window.getUniformScaleFactorFont(70);
         float textFieldFont = window.getUniformScaleFactorFont(50);
         boolean isPlayer1Turn = gameState.isPlayer1Turn();
+        String imageButton = guiElementManager.getImageButton();
 
-        currentPlayer = new TextPane(x, y, width, height / 2, "Player 1's turn", font, vg, imageButton);
-        infoTextPane = new TextPane(x, y + height / 2, width, height / 2, "Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2), textFieldFont, vg, imageButton);
-        warningTextPane = new TextPane(x, y + height, width, height / 2, "", textFieldFont * .8f, vg, imageButton);
+        TextPane currentPlayer = new TextPane(x, y, width, height / 2, "Player 1's turn", font, vg, imageButton);
+        TextPane infoTextPane = new TextPane(x, y + height / 2, width, height / 2, "Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2), textFieldFont, vg, imageButton);
+        TextPane warningTextPane = new TextPane(x, y + height, width, height / 2, "", textFieldFont * .8f, vg, imageButton);
         ballCollisionDetector = new BallCollisionDetector(heightMap, scene);
+        guiElementManager.setCurrentPlayer(currentPlayer);
+        guiElementManager.setInfoTextPane(infoTextPane);
+        guiElementManager.setWarningTextPane(warningTextPane);
 
         // Creating text-fields and text panes for entering the velocities
-        vxTextPane = new TextPane(x * 4, y * 30 + height / 2, width / 5, height / 2, "vx: ", font, vg, imageButton);
-        vxTextField = new TextField(x * 25, y * 30 + height / 2, width / 3, height / 2, "Enter vx", textFieldFont, vg, imageButton);
+        TextPane vxTextPane = new TextPane(x * 4, y * 30 + height / 2, width / 5, height / 2, "vx: ", font, vg, imageButton);
+        TextField vxTextField = new TextField(x * 25, y * 30 + height / 2, width / 3, height / 2, "Enter vx", textFieldFont, vg, imageButton);
+        guiElementManager.setVxTextPane(vxTextPane);
+        guiElementManager.setVxTextField(vxTextField);
 
-        vzTextPane = new TextPane(x * 4, y * 30 + height, width / 5, height / 2, "vz: ", font, vg, imageButton);
-        vzTextField = new TextField(x * 25, y * 30 + height, width / 3, height / 2, "Enter vz", textFieldFont, vg, imageButton);
+        TextPane vzTextPane = new TextPane(x * 4, y * 30 + height, width / 5, height / 2, "vz: ", font, vg, imageButton);
+        TextField vzTextField = new TextField(x * 25, y * 30 + height, width / 3, height / 2, "Enter vz", textFieldFont, vg, imageButton);
+        guiElementManager.setVzTextPane(vzTextPane);
+        guiElementManager.setVzTextField(vzTextField);
 
         setUpCallbacks();
 
-        applyButton = new Button(x, y * 30 + height + height / 2, 3 * width / 5, 2 * height / 3, "Apply Velocity", font, runPhysics(), vg, imageButton);
+        Button applyButton = new Button(x, y * 30 + height + height / 2, 3 * width / 5, 2 * height / 3, "Apply Velocity", font, runPhysics(), vg, imageButton);
+        guiElementManager.setApplyButton(applyButton);
     }
 
     /**
@@ -561,37 +485,45 @@ public class GolfGame implements ILogic {
         float titleX = (window.getWidth() - titleWidth) / 2;
         float titleY = window.getHeightConverted(10);
 
-        title = new Title("src/main/resources/Texture/title.png", titleX, titleY, titleWidth, titleHeight, vg);
+        Title title = new Title("src/main/resources/Texture/title.png", titleX, titleY, titleWidth, titleHeight, vg);
+        guiElementManager.setTitle(title);
 
         float heightButton = window.getHeightConverted(300);
         float widthButton = window.getWidthConverted(2000);
         float centerButtonX = (width - widthButton) / 2;
         float centerButtonY = titleHeight + titleY;
         float font = window.getUniformScaleFactorFont(100);
+        String imageButton = guiElementManager.getImageButton();
 
-        startButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", font, runnable.startGame(), vg, imageButton);
-        menuButtons.add(startButton);
+        Button startButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", font, runnable.startGame(), vg, imageButton);
+        guiElementManager.setStartButton(startButton);
+        guiElementManager.addMenuButton(startButton);
 
         Button changeTerrain = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Change Terrain", font, runnable.terrainChanger(), vg, imageButton);
-        menuButtons.add(changeTerrain);
+        guiElementManager.addMenuButton(changeTerrain);
 
-        soundButton = new Button(window.getWidth() - window.getWidthConverted(450), window.getHeightConverted(20), window.getWidthConverted(400), heightButton, "Sound: ON", font, runnable.sound(), vg, imageButton);
-        menuButtons.add(soundButton);
+        Button soundButton = new Button(window.getWidth() - window.getWidthConverted(450), window.getHeightConverted(20), window.getWidthConverted(400), heightButton, "Sound: ON", font, runnable.sound(), vg, imageButton);
+        guiElementManager.setSoundButton(soundButton);
+        guiElementManager.addMenuButton(soundButton);
 
         Button exit = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Exit", font, runnable.quit(), vg, imageButton);
-        menuButtons.add(exit);
+        guiElementManager.addMenuButton(exit);
 
-        botButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 2, widthButton / 4, heightButton, "Play with bot", font, gameState::switchBot, vg, imageButton);
-        menuButtons.add(botButton);
+        Button botButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 2, widthButton / 4, heightButton, "Play with bot", font, gameState::switchBot, vg, imageButton);
+        guiElementManager.setBotButton(botButton);
+        guiElementManager.addMenuButton(botButton);
 
-        aiBotButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 3, widthButton / 4, heightButton, "Play with AI", font, gameState::switchAiBot, vg, imageButton);
-        menuButtons.add(aiBotButton);
+        Button aiBotButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 3, widthButton / 4, heightButton, "Play with AI", font, gameState::switchAiBot, vg, imageButton);
+        guiElementManager.setAiBotButton(aiBotButton);
+        guiElementManager.addMenuButton(aiBotButton);
 
-        twoPlayerButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 4, widthButton / 4, heightButton, "2 Player", font, gameState::switch2player, vg, imageButton);
-        menuButtons.add(twoPlayerButton);
+        Button twoPlayerButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton * 4, widthButton / 4, heightButton, "2 Player", font, gameState::switch2player, vg, imageButton);
+        guiElementManager.setTwoPlayerButton(twoPlayerButton);
+        guiElementManager.addMenuButton(twoPlayerButton);
 
-        debugButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton, widthButton / 4, heightButton, "Debug Mode", font * 0.7f, runnable.enableDebugMode(), vg, imageButton);
-        menuButtons.add(debugButton);
+        Button debugButton = new Button(window.getWidthConverted(30), window.getHeight() - heightButton, widthButton / 4, heightButton, "Debug Mode", font * 0.7f, runnable.enableDebugMode(), vg, imageButton);
+        guiElementManager.setDebugButton(debugButton);
+        guiElementManager.addMenuButton(debugButton);
     }
 
     /**
@@ -608,24 +540,25 @@ public class GolfGame implements ILogic {
         float font = window.getHeightConverted(100);
 
         Button resumeButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Resume", font, runnable.resume(), vg, "src/main/resources/Texture/inGameMenu.png");
-        inGameMenuButtons.add(resumeButton);
+        guiElementManager.addInGameMenuButton(resumeButton);
 
         Button backToMenuButton = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Back to Menu", font, runnable.backToMenu(), vg, "src/main/resources/Texture/inGameMenu.png");
-        inGameMenuButtons.add(backToMenuButton);
+        guiElementManager.addInGameMenuButton(backToMenuButton);
 
-        soundButtonInGame = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Sound", font, runnable.sound(), vg, "src/main/resources/Texture/inGameMenu.png");
-        inGameMenuButtons.add(soundButtonInGame);
+        Button soundButtonInGame = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Sound", font, runnable.sound(), vg, "src/main/resources/Texture/inGameMenu.png");
+        guiElementManager.setSoundButtonInGame(soundButtonInGame);
+        guiElementManager.addInGameMenuButton(soundButtonInGame);
 
         Button exitButton = new Button(centerButtonX, centerButtonY + heightButton * 3, widthButton, heightButton, "Exit", font, runnable.quit(), vg, "src/main/resources/Texture/inGameMenu.png");
-        inGameMenuButtons.add(exitButton);
+        guiElementManager.addInGameMenuButton(exitButton);
     }
 
     /**
      * Recreates the GUIs.
      */
     private void recreateGUIs() {
-        menuButtons.clear();
-        inGameMenuButtons.clear();
+        guiElementManager.clearMenuButtons();
+        guiElementManager.clearInGameMenuButtons();
 
         createMenu(blendMapTerrain);
         createInGameMenu();
@@ -637,8 +570,8 @@ public class GolfGame implements ILogic {
      */
     private void setUpCallbacks() {
         GLFW.glfwSetKeyCallback(window.getWindow(), (window, key, scancode, action, mods) -> {
-            vxTextField.handleKeyInput(key, action, mods);
-            vzTextField.handleKeyInput(key, action, mods);
+            guiElementManager.getVxTextField().handleKeyInput(key, action, mods);
+            guiElementManager.getVzTextField().handleKeyInput(key, action, mods);
         });
 
         GLFW.glfwSetMouseButtonCallback(window.getWindow(), (window, button, action, mods) -> {
@@ -646,8 +579,8 @@ public class GolfGame implements ILogic {
                 double[] xPos = new double[1];
                 double[] yPos = new double[1];
                 GLFW.glfwGetCursorPos(window, xPos, yPos);
-                vxTextField.handleMouseClick((float) xPos[0], (float) yPos[0]);
-                vzTextField.handleMouseClick((float) xPos[0], (float) yPos[0]);
+                guiElementManager.getVxTextField().handleMouseClick((float) xPos[0], (float) yPos[0]);
+                guiElementManager.getVzTextField().handleMouseClick((float) xPos[0], (float) yPos[0]);
             }
         });
     }
@@ -730,12 +663,12 @@ public class GolfGame implements ILogic {
             numberOfShots2 = 0;
             gameState.setPlayer1Turn(true);
             currentBall = golfBall;
-            currentPlayer.setText("Player 1's turn");
+            guiElementManager.getCurrentPlayer().setText("Player 1's turn");
         } else {
             golfBall.setPosition(start);
             numberOfShots = 0;
         }
-        infoTextPane.setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
+        guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
     }
 
     /**
@@ -801,31 +734,6 @@ public class GolfGame implements ILogic {
     }
 
     /**
-     * Update the text fields.
-     * Used for On/Off buttons.
-     */
-    private void updateTextFields() {
-        boolean isBot = gameState.isBot();
-        boolean isAiBot = gameState.isAiBot();
-        boolean is2player = gameState.isIs2player();
-
-        if (isBot && isAiBot) {
-            startButton.setText("Start with Ai Bot and Bot (really long)");
-        } else if (isBot) {
-            startButton.setText("Start with Bot (long)");
-        } else if (isAiBot) {
-            startButton.setText("Start with Ai Bot (kinda long)");
-        } else {
-            startButton.setText("Start");
-        }
-
-        twoPlayerButton.setText(is2player ? "2 Player: On" : "2 Player: Off");
-        botButton.setText(isBot ? "Bot: On" : "Bot: Off");
-        aiBotButton.setText(isAiBot ? "AI Bot: On" : "AI Bot: Off");
-        debugButton.setText(debugMode ? "Debug: On" : "Debug: Off");
-    }
-
-    /**
      * Update the ball for multiplayer.
      * Switches the player's turn.
      * Used for multiplayer.
@@ -838,8 +746,8 @@ public class GolfGame implements ILogic {
             gameState.switchPlayer1Turn();
             currentBall = isPlayer1Turn ? golfBall : golfBall2;
             System.out.println("Player " + (isPlayer1Turn ? "1's" : "2's") + " turn");
-            currentPlayer.setText("Player " + (isPlayer1Turn ? "1's" : "2's") + " turn");
-            infoTextPane.setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2));
+            guiElementManager.getCurrentPlayer().setText("Player " + (isPlayer1Turn ? "1's" : "2's") + " turn");
+            guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2));
         }
     }
 
@@ -848,8 +756,8 @@ public class GolfGame implements ILogic {
      * Used for the ball's direction.
      */
     private void updateDirectionalArrow() {
-        String vx = vxTextField.getText().replaceAll("[a-zA-Z]", "");
-        String vz = vzTextField.getText().replaceAll("[a-zA-Z]", "");
+        String vx = guiElementManager.getVxTextField().getText().replaceAll("[a-zA-Z]", "");
+        String vz = guiElementManager.getVzTextField().getText().replaceAll("[a-zA-Z]", "");
 
         if (vx.isEmpty() || vz.isEmpty()) return;
         if (vx.equals("Enter vx") || vz.equals("Enter vz")) return;
@@ -945,9 +853,9 @@ public class GolfGame implements ILogic {
                                 System.out.println("You took " + shot + " shots to reach the end point!");
                                 System.out.println(endPoint);
                                 if (gameState.isIs2player()) gameState.setPlayer1Won(gameState.isPlayer1Turn());
-                                currentPlayer.setText("Player " + (gameState.isPlayer1Won() ? "1" : "2") + " wins!");
+                                guiElementManager.getCurrentPlayer().setText("Player " + (gameState.isPlayer1Won() ? "1" : "2") + " wins!");
                                 System.out.println("Player " + (gameState.isPlayer1Won() ? "1" : "2") + " wins!");
-                                warningTextPane.setText("You Win! In " + shot + " shots!");
+                                guiElementManager.getWarningTextPane().setText("You Win! In " + shot + " shots!");
                                 treeAnimationState = AnimationState.GOING_UP;
                                 treeAnimationTime = 0f;
                             }
@@ -959,7 +867,7 @@ public class GolfGame implements ILogic {
                         currentBall.setPosition(shotStartPosition.x, shotStartPosition.y, shotStartPosition.z);
                         gameState.setAnimating(false);
                         updateBallMultiplayer();
-                        warningTextPane.setText("Ploof! Ball in water! Resetting to last shot position.");
+                        guiElementManager.getWarningTextPane().setText("Ploof! Ball in water! Resetting to last shot position.");
                     } else {
                         currentBall.setPosition(nextPosition.x, nextPosition.y, nextPosition.z);
                         currentPositionIndex++;
@@ -1177,7 +1085,7 @@ public class GolfGame implements ILogic {
                 endFlag.setPosition(endPoint.x, endPoint.y, endPoint.z);
                 numberOfShots = 0;
                 numberOfShots2 = 0;
-                infoTextPane.setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
+                guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -1191,6 +1099,7 @@ public class GolfGame implements ILogic {
             gameState.setGuiVisible(false);
             gameState.setOnMenu(false);
             gameState.setAnimating(true);
+            gameState.setGameStarted(true);
 
             if (gameState.isBot()) {
                 createBotBall().run();
@@ -1229,13 +1138,13 @@ public class GolfGame implements ILogic {
             if (gameState.isSoundPlaying()) {
                 System.out.println("Stopping sound");
                 audioManager.stopSound();
-                soundButton.setText("Sound: OFF");
-                soundButtonInGame.setText("Sound: OFF");
+                guiElementManager.getSoundButton().setText("Sound: OFF");
+                guiElementManager.getSoundButtonInGame().setText("Sound: OFF");
             } else {
                 System.out.println("Playing sound");
                 audioManager.playSound();
-                soundButton.setText("Sound: ON");
-                soundButtonInGame.setText("Sound: ON");
+                guiElementManager.getSoundButton().setText("Sound: ON");
+                guiElementManager.getSoundButtonInGame().setText("Sound: ON");
             }
             gameState.switchAudio();
         };
@@ -1330,20 +1239,20 @@ public class GolfGame implements ILogic {
             gameState.setGameStarted(false);
             numberOfShots = 0;
             numberOfShots2 = 0;
-            infoTextPane.setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
+            guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
         };
 
         Runnable sound = () -> {
             if (gameState.isSoundPlaying()) {
                 System.out.println("Stopping sound");
                 audioManager.stopSound();
-                soundButtonInGame.setText("Sound: OFF");
-                soundButton.setText("Sound: OFF");
+                guiElementManager.getSoundButtonInGame().setText("Sound: OFF");
+                guiElementManager.getSoundButton().setText("Sound: OFF");
             } else {
                 System.out.println("Playing sound");
                 audioManager.playSound();
-                soundButtonInGame.setText("Sound: ON");
-                soundButton.setText("Sound: ON");
+                guiElementManager.getSoundButtonInGame().setText("Sound: ON");
+                guiElementManager.getSoundButton().setText("Sound: ON");
             }
             gameState.switchAudio();
         };
@@ -1370,15 +1279,15 @@ public class GolfGame implements ILogic {
                 return; // Exit if already animating
             }
             try {
-                warningTextPane.setText("");
+                guiElementManager.getWarningTextPane().setText("");
                 // Remove any non-numeric characters from the text fields if present
                 // (backup in case of threading issues)
-                double vx = Double.parseDouble(vxTextField.getText().replaceAll("[a-zA-Z]", ""));
-                double vz = Double.parseDouble(vzTextField.getText().replaceAll("[a-zA-Z]", ""));
+                double vx = Double.parseDouble(guiElementManager.getVxTextField().getText().replaceAll("[a-zA-Z]", ""));
+                double vz = Double.parseDouble(guiElementManager.getVzTextField().getText().replaceAll("[a-zA-Z]", ""));
                 System.out.println("Applying physics with vx: " + vx + ", vz: " + vz);
 
                 if (Math.abs(vx) > Consts.MAX_SPEED || Math.abs(vz) > Consts.MAX_SPEED) {
-                    warningTextPane.setText("Speed too high: max " + Consts.MAX_SPEED + " m/s");
+                    guiElementManager.getWarningTextPane().setText("Speed too high: max " + Consts.MAX_SPEED + " m/s");
                 } else {
                     double[] initialState = {currentBall.getPosition().x, currentBall.getPosition().z, vx, vz}; // initialState = [x, z, vx, vz]
                     double h = 0.1; // Time step
@@ -1393,7 +1302,7 @@ public class GolfGame implements ILogic {
                         numberOfShots2++;
                     }
                     shotStartPosition = new Vector3f(currentBall.getPosition()); // Store the start position of the shot
-                    infoTextPane.setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
+                    guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
