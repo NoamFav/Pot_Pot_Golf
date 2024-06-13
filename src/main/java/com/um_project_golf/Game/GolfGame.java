@@ -86,15 +86,6 @@ public class GolfGame implements ILogic {
     private final Camera camera;
     Vector3f cameraInc;
 
-    // Positions of the balls for Animation purposes
-    private List<Vector3f> ballPositions;
-
-    // Path for the bots, not used currently as a problem with movement issue and threading issues.
-    @SuppressWarnings("unused")
-    private List<List<Vector3f>> botPath; // Path followed by the bot
-    @SuppressWarnings("unused")
-    private List<List<Vector3f>> aiBotPath; // Path followed by AI bot
-
     /**
      * The constructor of the game.
      * It initializes the renderer, window, loader and camera.
@@ -109,7 +100,6 @@ public class GolfGame implements ILogic {
         collisionsDetector = new CollisionsDetector();
         cameraInc = new Vector3f(0, 0, 0);
         heightMap = new HeightMap();
-        ballPositions = new ArrayList<>();
         gameState = new GameStateManager();
         guiElementManager = new GuiElementManager();
         entitiesManager = new EntitiesManager();
@@ -719,7 +709,6 @@ public class GolfGame implements ILogic {
      */
     private void updateBallMultiplayer() {
         if (gameState.isIs2player()) {
-            System.out.println(Arrays.toString(Thread.currentThread().getStackTrace()));
             gameState.switchPlayer1Turn();
             boolean isPlayer1Turn = gameState.isPlayer1Turn();
             entitiesManager.updateCurrentBall(isPlayer1Turn);
@@ -816,6 +805,7 @@ public class GolfGame implements ILogic {
 
             if (gameVarManager.getAnimationTimeAccumulator() >= timeStep) {
                 gameVarManager.decrementAnimationTimeAccumulator(timeStep);
+                List<Vector3f> ballPositions = gameVarManager.getBallPositions();
 
                 if (gameVarManager.getCurrentPositionIndex() < ballPositions.size()) {
                     Vector3f nextPosition = ballPositions.get(gameVarManager.getCurrentPositionIndex());
@@ -1279,7 +1269,7 @@ public class GolfGame implements ILogic {
                     Entity currentBall = entitiesManager.getCurrentBall();
                     double[] initialState = {currentBall.getPosition().x, currentBall.getPosition().z, vx, vz}; // initialState = [x, z, vx, vz]
                     double h = 0.1; // Time step
-                    ballPositions = engine.runRK4(initialState, h);
+                    gameVarManager.setBallPositions(engine.runRK4(initialState, h)); // Run the simulation
 
                     gameVarManager.resetCurrentPositionIndex();
                     gameState.setAnimating(true);
@@ -1317,7 +1307,7 @@ public class GolfGame implements ILogic {
             scene.addEntity(botBall);
 
             RuleBasedBot ruleBasedBot = new RuleBasedBot(new Entity(botBall), new Entity(entitiesManager.getEndFlag()), heightMap, Consts.TARGET_RADIUS, scene);
-            botPath = ruleBasedBot.findBestShot();
+            gameVarManager.setBotPath(ruleBasedBot.findBestShot());
         };
 
     }
@@ -1339,7 +1329,7 @@ public class GolfGame implements ILogic {
             scene.addEntity(aiBotBall);
 
             AIBot aiBot = new AIBot(new Entity(aiBotBall), new Entity(entitiesManager.getEndFlag()), heightMap, Consts.TARGET_RADIUS, scene);
-            aiBotPath = aiBot.findBestShotUsingHillClimbing();
+            gameVarManager.setAiBotPath(aiBot.findBestShotUsingHillClimbing());
         };
 
     }
