@@ -46,33 +46,30 @@ public class MenuGUI {
     private final PathManager pathManager;
     private final EntitiesManager entitiesManager;
     private final GameVarManager gameVarManager;
-    private final TerrainManager terrainManager;
 
-    public MenuGUI(Camera camera, long vg,
-                   GuiElementManager guiElementManager, GameStateManager gameStateManager, ModelManager modelManager,
-                   PathManager pathManager, TerrainManager terrainManager,EntitiesManager entitiesManager, GameVarManager gameVarManager,
-                   HeightMap heightMap, HeightMapPathfinder pathfinder, AudioManager audioManager, SceneManager scene,
-                   BlendMapTerrain blendMapTerrain, ObjectLoader loader, MouseInput mouseInputs,
-                   TerrainSwitch terrainSwitch, StartEndPoint startEndPoint) {
-        this.camera = camera;
-        this.window = Launcher.getWindow();
+    private final MainFieldManager context;
+
+    public MenuGUI(long vg, @NotNull MainFieldManager context) {
         this.vg = vg;
-        this.guiElementManager = guiElementManager;
-        this.gameStateManager = gameStateManager;
-        this.modelManager = modelManager;
-        this.pathManager = pathManager;
-        this.entitiesManager = entitiesManager;
-        this.terrainManager = terrainManager;
-        this.heightMap = heightMap;
-        this.pathfinder = pathfinder;
-        this.audioManager = audioManager;
-        this.gameVarManager = gameVarManager;
-        this.scene = scene;
-        this.blendMapTerrain = blendMapTerrain;
-        this.loader = loader;
-        this.mouseInputs = mouseInputs;
-        this.terrainSwitch = terrainSwitch;
-        this.startEndPoint = startEndPoint;
+        this.camera = context.getCamera();
+        this.window = context.getWindow();
+        this.heightMap = context.getHeightMap();
+        this.pathfinder = context.getPathfinder();
+        this.audioManager = context.getAudioManager();
+        this.scene = context.getScene();
+        this.blendMapTerrain = context.getTerrainManager().getBlendMapTerrain();
+        this.loader = context.getLoader();
+        this.mouseInputs = context.getMouseInputs();
+        this.terrainSwitch = context.getTerrainSwitch();
+        this.startEndPoint = context.getStartEndPoint();
+        this.guiElementManager = context.getGuiElementManager();
+        this.gameStateManager = context.getGameStateManager();
+        this.modelManager = context.getModelManager();
+        this.pathManager = context.getPathManager();
+        this.entitiesManager = context.getEntitiesManager();
+        this.gameVarManager = context.getGameVarManager();
+
+        this.context = context;
 
         createMenu();
     }
@@ -298,10 +295,9 @@ public class MenuGUI {
                 terrainChanger.run();
             }
 
-            new RecreateGUIs(guiElementManager, camera, vg,
-                    gameStateManager, modelManager, pathManager, entitiesManager,
-                    gameVarManager, heightMap, pathfinder, audioManager, scene,
-                    terrainManager, loader, mouseInputs, terrainSwitch, startEndPoint);
+            new RecreateGUIs(vg,
+                    context
+            );
             mouseInputs.init();
         };
         return new MenuRunnable(terrainChanger, startGame, sound, quit, enableDebugMode);
