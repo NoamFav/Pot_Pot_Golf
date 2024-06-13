@@ -87,7 +87,6 @@ public class RuleBasedBot {
             shotCounter++;
             System.out.println("Shot "+ shotCounter +". Distance to flag: " + distanceToFlag());
         }
-
         return path;
     }
 

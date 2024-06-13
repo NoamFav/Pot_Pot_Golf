@@ -11,7 +11,13 @@ import org.joml.Vector3f;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.*;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * The HeightMap class is used to generate a heightmap using simplex noise and store it in a 2D array.
@@ -145,5 +151,34 @@ public class HeightMap {
         }
 
         return height; // Return the height of the vertex
+    }
+
+    public float[][] getHeightMap() {
+        return SceneManager.getHeightMap();
+    }
+
+    public void saveHeightMap() {
+        for (int l = 0; l < 1000; l++) {
+            createHeightMap();
+            float[][] heightMap = getHeightMap();
+
+            File file = new File("/Users/noamfavier/Desktop/Heightmap/heightmap[" + l + "].bin");
+            try (DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) {
+                for (int i = 0; i < Consts.VERTEX_COUNT; i++) {
+                    for (int j = 0; j < Consts.VERTEX_COUNT; j++) {
+                        dos.writeFloat(heightMap[i][j]);
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to write to file: " + file.getPath());
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public static void main(String[] args) {
+        HeightMap heightMap = new HeightMap();
+        heightMap.saveHeightMap();
     }
 }
