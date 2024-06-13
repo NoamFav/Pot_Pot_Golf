@@ -7,6 +7,7 @@ import com.um_project_golf.Core.AWT.Title;
 import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.Entity.*;
 import com.um_project_golf.Core.Entity.Terrain.*;
+import com.um_project_golf.Game.FieldManager.EntitiesManager;
 import com.um_project_golf.Game.FieldManager.GuiElementManager;
 import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
@@ -79,6 +80,7 @@ public class GolfGame implements ILogic {
     private BallCollisionDetector ballCollisionDetector;
     private final GameStateManager gameState;
     private final GuiElementManager guiElementManager;
+    private final EntitiesManager entitiesManager;
 
     // A* pathfinding variables
     private Vector3f startPoint;
@@ -90,17 +92,6 @@ public class GolfGame implements ILogic {
     private List<Model> aiBotBallModel;
     private List<Model> ball2;
     private List<Model> tree;
-
-    // Entities
-    private final List<Entity> trees;
-    private final List<Float> treeHeights;
-    private Entity golfBall;
-    private Entity golfBall2;
-    private Entity currentBall;
-    private Entity botBall;
-    private Entity aiBotBall;
-    private Entity endFlag;
-    private Entity arrowEntity;
 
     // Terrains
     private Terrain terrain;
@@ -145,11 +136,10 @@ public class GolfGame implements ILogic {
         collisionsDetector = new CollisionsDetector();
         cameraInc = new Vector3f(0, 0, 0);
         heightMap = new HeightMap();
-        trees = new ArrayList<>();
-        treeHeights = new ArrayList<>();
         ballPositions = new ArrayList<>();
         gameState = new GameStateManager();
         guiElementManager = new GuiElementManager();
+        entitiesManager = new EntitiesManager();
     }
 
     /**
@@ -305,6 +295,7 @@ public class GolfGame implements ILogic {
 
         guiElementManager.render(gameState);
 
+        Entity arrowEntity = entitiesManager.getArrowEntity();
         if (gameState.isAnimating()) {
             scene.getEntities().remove(arrowEntity);
         } else {
@@ -360,6 +351,7 @@ public class GolfGame implements ILogic {
             }
 
             if (window.is_keyPressed(GLFW.GLFW_KEY_Q)) {
+                Entity currentBall = entitiesManager.getCurrentBall();
                 camera.setPosition(new Vector3f(currentBall.getPosition().x, currentBall.getPosition().y + Consts.PLAYER_HEIGHT, currentBall.getPosition().z));
             }
 
@@ -388,7 +380,8 @@ public class GolfGame implements ILogic {
 
         scene.addEntity(new Entity(models.skyBox(), new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
 
-        arrowEntity = new Entity(models.arrow(), new Vector3f(0, 0, 0), new Vector3f(0, -90, 0), 2);
+        Entity arrowEntity = new Entity(models.arrow(), new Vector3f(0, 0, 0), new Vector3f(0, -90, 0), 2);
+        entitiesManager.setArrowEntity(arrowEntity);
         scene.addEntity(arrowEntity);
 
         startEndPointConversion();
@@ -396,14 +389,16 @@ public class GolfGame implements ILogic {
         System.out.println("Start point: " + startPoint);
         System.out.println("End point: " + endPoint);
 
-        endFlag = new Entity(models.flag(), new Vector3f(endPoint), new Vector3f(0, 0, 0), 150);
+        Entity endFlag = new Entity(models.flag(), new Vector3f(endPoint), new Vector3f(0, 0, 0), 150);
+        entitiesManager.setEndFlag(endFlag);
         scene.addEntity(endFlag);
 
-        golfBall = new Entity(models.ball(), new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
+        Entity golfBall = new Entity(models.ball(), new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
+        entitiesManager.setGolfBall(golfBall);
         scene.addEntity(golfBall);
 
         gameState.setPlayer1Turn(true);
-        currentBall = golfBall;
+        entitiesManager.setCurrentBall(golfBall);
 
         numberOfShots2 = 0;
         numberOfShots = 0;
@@ -440,6 +435,7 @@ public class GolfGame implements ILogic {
         float textFieldFont = window.getUniformScaleFactorFont(50);
         boolean isPlayer1Turn = gameState.isPlayer1Turn();
         String imageButton = guiElementManager.getImageButton();
+        Entity currentBall = entitiesManager.getCurrentBall();
 
         TextPane currentPlayer = new TextPane(x, y, width, height / 2, "Player 1's turn", font, vg, imageButton);
         TextPane infoTextPane = new TextPane(x, y + height / 2, width, height / 2, "Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2), textFieldFont, vg, imageButton);
@@ -657,17 +653,18 @@ public class GolfGame implements ILogic {
     private void restartBalls() {
         Vector3f start = new Vector3f(startPoint);
         if (gameState.isIs2player()) {
-            golfBall.setPosition(start);
-            golfBall2.setPosition(start);
+            entitiesManager.setGolfBallPosition(start);
+            entitiesManager.setGolfBall2Position(start);
             numberOfShots = 0;
             numberOfShots2 = 0;
             gameState.setPlayer1Turn(true);
-            currentBall = golfBall;
+            entitiesManager.setCurrentBall(entitiesManager.getGolfBall());
             guiElementManager.getCurrentPlayer().setText("Player 1's turn");
         } else {
-            golfBall.setPosition(start);
+            entitiesManager.setGolfBallPosition(start);
             numberOfShots = 0;
         }
+        Entity currentBall = entitiesManager.getCurrentBall();
         guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
     }
 
@@ -679,8 +676,8 @@ public class GolfGame implements ILogic {
         Vector3f cameraPos = new Vector3f(camera.getPosition().x, camera.getPosition().y - Consts.PLAYER_HEIGHT, camera.getPosition().z);
         Entity newTree = new Entity(tree, new Vector3f(cameraPos.x, cameraPos.y, cameraPos.z), new Vector3f(-90, 0, 0), 0.03f);
         scene.addEntity(newTree);
-        trees.add(newTree);
-        treeHeights.add(cameraPos.y);
+        entitiesManager.addTree(newTree);
+        entitiesManager.addTreeHeight(cameraPos.y);
         scene.addTreePosition(new float[]{cameraPos.x, cameraPos.y, cameraPos.z});
         gameState.settKeyWasPressed(true); // Mark the key as pressed
         System.out.println("Tree added at: " + cameraPos);
@@ -691,12 +688,12 @@ public class GolfGame implements ILogic {
      */
     private void setUpStartPoint() {
         if (!gameState.isHasStartPoint()) { // Ensure the start point is only set once
-            scene.getEntities().removeAll(trees);
+            scene.getEntities().removeAll(entitiesManager.getTrees());
             heightMap.createHeightMap();
             startPoint = new Vector3f(camera.getPosition().x, camera.getPosition().y - Consts.PLAYER_HEIGHT, camera.getPosition().z); // Create a new instance to avoid reference issues
-            golfBall.setPosition(startPoint);
+            entitiesManager.setGolfBallPosition(startPoint);
             if (gameState.isIs2player()) {
-                golfBall2.setPosition(startPoint);
+                entitiesManager.setGolfBall2Position(startPoint);
             }
             gameState.setHasStartPoint(true);
             System.out.println("Start point set: " + startPoint); // Print with more decimal places for clarity
@@ -729,7 +726,7 @@ public class GolfGame implements ILogic {
             }
         } catch (Exception ignore) {
         }
-        endFlag.setPosition(endPoint);
+        entitiesManager.setEndFlagPosition(endPoint);
         gameState.setHasStartPoint(false);
     }
 
@@ -744,9 +741,10 @@ public class GolfGame implements ILogic {
 
         if (is2player) {
             gameState.switchPlayer1Turn();
-            currentBall = isPlayer1Turn ? golfBall : golfBall2;
+            entitiesManager.updateCurrentBall(isPlayer1Turn);
             System.out.println("Player " + (isPlayer1Turn ? "1's" : "2's") + " turn");
             guiElementManager.getCurrentPlayer().setText("Player " + (isPlayer1Turn ? "1's" : "2's") + " turn");
+            Entity currentBall = entitiesManager.getCurrentBall();
             guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2));
         }
     }
@@ -766,8 +764,8 @@ public class GolfGame implements ILogic {
         float vxValue = Float.parseFloat(vx);
         float vzValue = Float.parseFloat(vz);
 
-        Vector3f position = currentBall.getPosition();
-        Vector3f rotation = arrowEntity.getRotation();
+        Vector3f position = entitiesManager.getCurrentBall().getPosition();
+        Vector3f rotation = entitiesManager.getArrowEntity().getRotation();
 
         // Calculate the direction vector from vx and vz
         Vector3f direction = new Vector3f(vxValue, 0, vzValue).normalize();
@@ -776,8 +774,8 @@ public class GolfGame implements ILogic {
         float yRotation = (float) Math.toDegrees(Math.atan2(direction.x, direction.z));
 
         // Update the arrow entity's position and rotation
-        arrowEntity.setPosition(position.x, position.y + .5f, position.z);
-        arrowEntity.setRotation(rotation.x, yRotation - 90, rotation.z);
+        entitiesManager.setArrowEntityPosition(new Vector3f(position.x, position.y + .5f, position.z));
+        entitiesManager.setArrowEntityRotation(new Vector3f(rotation.x, yRotation - 90, rotation.z));
     }
 
     /**
@@ -785,7 +783,7 @@ public class GolfGame implements ILogic {
      * Used for end game animation.
      */
     private void updateTreeAnimations() {
-        if (trees.isEmpty() || treeAnimationState == AnimationState.IDLE) {
+        if (entitiesManager.getTrees().isEmpty() || treeAnimationState == AnimationState.IDLE) {
             return;
         }
 
@@ -796,9 +794,9 @@ public class GolfGame implements ILogic {
         float t = treeAnimationTime / (treeAnimationDuration / 2);
         if (t > 1f) t = 1f;
 
-        for (int i = 0; i < trees.size(); i++) {
-            Entity tree = trees.get(i);
-            float baseHeight = treeHeights.get(i);
+        for (int i = 0; i < entitiesManager.getTrees().size(); i++) {
+            Entity tree = entitiesManager.getTrees().get(i);
+            float baseHeight = entitiesManager.getTreeHeights().get(i);
             float treeHeightOffset = 10f;
 
             switch (treeAnimationState) {
@@ -864,12 +862,12 @@ public class GolfGame implements ILogic {
 
                     ballCollisionDetector.checkCollisionBall(nextPosition);
                     if (nextPosition.y <= -0.1) { // Ball in water
-                        currentBall.setPosition(shotStartPosition.x, shotStartPosition.y, shotStartPosition.z);
+                        entitiesManager.setCurrentBallPosition(shotStartPosition);
                         gameState.setAnimating(false);
                         updateBallMultiplayer();
                         guiElementManager.getWarningTextPane().setText("Ploof! Ball in water! Resetting to last shot position.");
                     } else {
-                        currentBall.setPosition(nextPosition.x, nextPosition.y, nextPosition.z);
+                        entitiesManager.setCurrentBallPosition(nextPosition);
                         currentPositionIndex++;
                     }
 
@@ -925,8 +923,8 @@ public class GolfGame implements ILogic {
             if (position != zero) {
                 Entity aTree = new Entity(tree, new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f); // - 90 and 0.03f
                 scene.addEntity(aTree);
-                trees.add(aTree);
-                treeHeights.add(position.y);
+                entitiesManager.addTree(aTree);
+                entitiesManager.addTreeHeight(position.y);
                 treePositions.add(new float[]{position.x, position.y, position.z});
             } else {
                 System.out.println("Position is null at index: " + i);
@@ -1069,7 +1067,7 @@ public class GolfGame implements ILogic {
     private @NotNull MenuRunnable getRunnable(BlendMapTerrain blendMapTerrain) {
         Runnable terrainChanger = () -> {
             try {
-                trees.clear();
+                entitiesManager.clearTrees();
                 System.out.println("Changing terrain");
                 heightMap.createHeightMap();
                 path = pathfinder.getPath(Consts.RADIUS_DOWN, Consts.RADIUS_UP, Consts.SIZE_GREEN);
@@ -1078,13 +1076,14 @@ public class GolfGame implements ILogic {
                 TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
                 SimplexNoise.shufflePermutation();
                 terrainSwitch(blendMapTerrain, tree, blendMap2);
-                golfBall.setPosition(startPoint.x, startPoint.y, startPoint.z);
+                entitiesManager.setGolfBallPosition(startPoint);
                 if (gameState.isIs2player()) {
-                    golfBall2.setPosition(startPoint.x, startPoint.y, startPoint.z);
+                    entitiesManager.setGolfBall2Position(startPoint);
                 }
-                endFlag.setPosition(endPoint.x, endPoint.y, endPoint.z);
+                entitiesManager.setEndFlagPosition(endPoint);
                 numberOfShots = 0;
                 numberOfShots2 = 0;
+                Entity currentBall = entitiesManager.getCurrentBall();
                 guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -1104,13 +1103,13 @@ public class GolfGame implements ILogic {
             if (gameState.isBot()) {
                 createBotBall().run();
             } else {
-                if (botBall != null) scene.getEntities().removeIf(entity -> entity.equals(botBall));
+                if (entitiesManager.getBotBall() != null) scene.getEntities().removeIf(entity -> entity.equals(entitiesManager.getBotBall()));
             }
 
             if (gameState.isAiBot()) {
                 createAiBotBall().run();
             } else {
-                if (aiBotBall != null) scene.getEntities().removeIf(entity -> entity.equals(aiBotBall));
+                if (entitiesManager.getAiBotBall() != null) scene.getEntities().removeIf(entity -> entity.equals(entitiesManager.getAiBotBall()));
             }
 
             Vector3f start = new Vector3f(startPoint);
@@ -1120,18 +1119,19 @@ public class GolfGame implements ILogic {
             end.y = heightMap.getHeight(new Vector3f(endPoint.x, 0, endPoint.z));
 
             if (gameState.isIs2player()) {
-                if (golfBall2 == null) {
-                    golfBall2 = new Entity(ball2, new Vector3f(start), new Vector3f(50, 0, 0), 5);
+                if (entitiesManager.getGolfBall2() == null) {
+                    Entity golfBall2 = new Entity(ball2, new Vector3f(start), new Vector3f(50, 0, 0), 5);
+                    entitiesManager.setGolfBall2(golfBall2);
                     scene.addEntity(golfBall2);
                 }
             } else {
-                if (golfBall2 != null) {
-                    scene.getEntities().removeIf(entity -> entity.equals(golfBall2));
+                if (entitiesManager.getGolfBall2() != null) {
+                    scene.getEntities().removeIf(entity -> entity.equals(entitiesManager.getGolfBall2()));
                 }
             }
 
-            golfBall.setPosition(start);
-            endFlag.setPosition(end);
+            entitiesManager.setGolfBallPosition(start);
+            entitiesManager.setEndFlagPosition(end);
         };
 
         Runnable sound = () -> {
@@ -1155,12 +1155,13 @@ public class GolfGame implements ILogic {
         };
 
         Runnable enableDebugMode = () -> {
-            trees.clear();
+            entitiesManager.clearTrees();
             debugMode = !debugMode;
             if (debugMode) {
                 System.out.println("Enabling debug mode");
-                if (golfBall2 == null && gameState.isIs2player()) {
-                    golfBall2 = new Entity(ball2, new Vector3f(0, 0, 0), new Vector3f(50, 0, 0), 5);
+                if (entitiesManager.getGolfBall2() == null && gameState.isIs2player()) {
+                    Entity golfBall2 = new Entity(ball2, new Vector3f(0, 0, 0), new Vector3f(50, 0, 0), 5);
+                    entitiesManager.setGolfBall2(golfBall2);
                     scene.addEntity(golfBall2);
                 }
                 try {
@@ -1201,11 +1202,11 @@ public class GolfGame implements ILogic {
                     startPoint = new Vector3f(0, 0, 0);
                 }
 
-                golfBall.setPosition(startPoint.x, heightMap.getHeight(new Vector3f(startPoint.x, 0, startPoint.z)), startPoint.z);
+                entitiesManager.setGolfBallPosition(new Vector3f(startPoint.x, heightMap.getHeight(new Vector3f(startPoint.x, 0, startPoint.z)), startPoint.z));
                 if (gameState.isIs2player()) {
-                    golfBall2.setPosition(startPoint.x, heightMap.getHeight(new Vector3f(startPoint.x, 0, startPoint.z)), startPoint.z);
+                    entitiesManager.setGolfBall2Position(new Vector3f(startPoint.x, heightMap.getHeight(new Vector3f(startPoint.x, 0, startPoint.z)), startPoint.z));
                 }
-                endFlag.setPosition(endPoint.x, heightMap.getHeight(new Vector3f(endPoint.x, 0, endPoint.z)), endPoint.z);
+                entitiesManager.setEndFlagPosition(new Vector3f(endPoint.x, heightMap.getHeight(new Vector3f(endPoint.x, 0, endPoint.z)), endPoint.z));
             } else {
                 System.out.println("Disabling debug mode");
                 terrainChanger.run();
@@ -1239,6 +1240,7 @@ public class GolfGame implements ILogic {
             gameState.setGameStarted(false);
             numberOfShots = 0;
             numberOfShots2 = 0;
+            Entity currentBall = entitiesManager.getCurrentBall();
             guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameState.isPlayer1Turn() ? numberOfShots : numberOfShots2));
         };
 
@@ -1289,6 +1291,7 @@ public class GolfGame implements ILogic {
                 if (Math.abs(vx) > Consts.MAX_SPEED || Math.abs(vz) > Consts.MAX_SPEED) {
                     guiElementManager.getWarningTextPane().setText("Speed too high: max " + Consts.MAX_SPEED + " m/s");
                 } else {
+                    Entity currentBall = entitiesManager.getCurrentBall();
                     double[] initialState = {currentBall.getPosition().x, currentBall.getPosition().z, vx, vz}; // initialState = [x, z, vx, vz]
                     double h = 0.1; // Time step
                     ballPositions = engine.runRK4(initialState, h);
@@ -1322,10 +1325,11 @@ public class GolfGame implements ILogic {
 
         return () -> {
             System.out.println("Creating bot ball");
-            botBall = new Entity(botBallModel, new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
+            Entity botBall = new Entity(botBallModel, new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
+            entitiesManager.setBotBall(botBall);
             scene.addEntity(botBall);
 
-            RuleBasedBot ruleBasedBot = new RuleBasedBot(new Entity(botBall), new Entity(endFlag), heightMap, Consts.TARGET_RADIUS, scene);
+            RuleBasedBot ruleBasedBot = new RuleBasedBot(new Entity(botBall), new Entity(entitiesManager.getEndFlag()), heightMap, Consts.TARGET_RADIUS, scene);
             botPath = ruleBasedBot.findBestShot();
         };
 
@@ -1343,10 +1347,11 @@ public class GolfGame implements ILogic {
 
         return () -> {
             System.out.println("Creating AI bot ball");
-            aiBotBall = new Entity(aiBotBallModel, new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
+            Entity aiBotBall = new Entity(aiBotBallModel, new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
+            entitiesManager.setAiBotBall(aiBotBall);
             scene.addEntity(aiBotBall);
 
-            AIBot aiBot = new AIBot(new Entity(aiBotBall), new Entity(endFlag), heightMap, Consts.TARGET_RADIUS, scene);
+            AIBot aiBot = new AIBot(new Entity(aiBotBall), new Entity(entitiesManager.getEndFlag()), heightMap, Consts.TARGET_RADIUS, scene);
             aiBotPath = aiBot.findBestShotUsingHillClimbing();
         };
 

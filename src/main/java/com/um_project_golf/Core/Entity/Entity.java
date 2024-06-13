@@ -106,4 +106,8 @@ public class Entity {
     public void setPosition(Vector3f startPoint) {
         this.position.set(startPoint);
     }
+
+    public void setRotation(Vector3f rotation) {
+        this.rotation.set(rotation);
+    }
 }
