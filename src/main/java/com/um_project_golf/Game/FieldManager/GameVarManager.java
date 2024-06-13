@@ -1,6 +1,7 @@
 package com.um_project_golf.Game.FieldManager;
 
 import com.um_project_golf.Core.Utils.AnimationState;
+import com.um_project_golf.Core.Utils.BallCollisionDetector;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class GameVarManager {
     // Positions of the balls for Animation purposes
     private List<Vector3f> ballPositions = new ArrayList<>();
 
+    private BallCollisionDetector ballCollisionDetector;
     // Path for the bots, not used currently as a problem with movement issue and threading issues.
     @SuppressWarnings("unused")
     private List<List<Vector3f>> botPath; // Path followed by the bot
@@ -61,4 +63,7 @@ public class GameVarManager {
     public void setAiBotPath(List<List<Vector3f>> aiBotPath) {this.aiBotPath = aiBotPath;}
     public List<List<Vector3f>> getBotPath() {return botPath;}
     public void setBotPath(List<List<Vector3f>> botPath) {this.botPath = botPath;}
+    public BallCollisionDetector getBallCollisionDetector() {return ballCollisionDetector;}
+    public void setBallCollisionDetector(BallCollisionDetector ballCollisionDetector) {this.ballCollisionDetector = ballCollisionDetector;}
+
 }
