@@ -74,33 +74,35 @@ public class GolfGame implements ILogic {
     private final Camera camera;
     private final Vector3f cameraInc;
 
+    MainFieldManager context;
+
     /**
      * The constructor of the game.
      * It initializes the renderer, window, loader and camera.
      */
     public GolfGame() {
-        renderer = new RenderManager();
+        context = new MainFieldManager();
+        renderer = context.getRenderer();
         window = Launcher.getWindow();
-        loader = new ObjectLoader();
-        scene = new SceneManager(-90);
-        camera = new Camera();
-        pathfinder = new HeightMapPathfinder();
-        collisionsDetector = new CollisionsDetector();
-        cameraInc = new Vector3f(0, 0, 0);
-        heightMap = new HeightMap();
-        gameStateManager = new GameStateManager();
-        guiElementManager = new GuiElementManager();
-        entitiesManager = new EntitiesManager();
-        modelManager = new ModelManager();
-        terrainManager = new TerrainManager();
-        gameVarManager = new GameVarManager();
-        pathManager = new PathManager();
-        terrainSwitch = new TerrainSwitch(scene, renderer, heightMap, loader, terrainManager, modelManager, entitiesManager);
-        startEndPoint = new StartEndPoint();
-
-        initManager = new InitManager();
-        inputManager = new InputManager();
-        updateManager = new UpdateManager();
+        loader = context.getLoader();
+        scene = context.getScene();
+        camera = context.getCamera();
+        pathfinder = context.getPathfinder();
+        collisionsDetector = context.getCollisionsDetector();
+        cameraInc = context.getCameraInc();
+        heightMap = context.getHeightMap();
+        gameStateManager = context.getGameStateManager();
+        guiElementManager = context.getGuiElementManager();
+        entitiesManager = context.getEntitiesManager();
+        modelManager = context.getModelManager();
+        terrainManager = context.getTerrainManager();
+        gameVarManager = context.getGameVarManager();
+        pathManager = context.getPathManager();
+        terrainSwitch = context.getTerrainSwitch();
+        startEndPoint = context.getStartEndPoint();
+        initManager = context.getInitManager();
+        inputManager = context.getInputManager();
+        updateManager = context.getUpdateManager();
     }
 
     /**
@@ -113,7 +115,7 @@ public class GolfGame implements ILogic {
     public void init(MouseInput mouseInput) throws Exception {
         System.out.println("Initializing game");
 
-        mouseInputs = mouseInput;
+        context.setMouseInputs(mouseInput);
 
         scene.setDefaultTexture(new Texture(loader.loadTexture("src/main/resources/Texture/Default.png")));
         window.setAntiAliasing(true);
@@ -140,17 +142,11 @@ public class GolfGame implements ILogic {
         audioManager.playSound();
         gameStateManager.setSoundPlaying(true);
 
-        new MenuGUI(camera, vg, guiElementManager,
-                gameStateManager, modelManager, pathManager, terrainManager, entitiesManager,
-                gameVarManager, heightMap, pathfinder, audioManager, scene,
-                terrainManager.getBlendMapTerrain(), loader, mouseInputs,
-                terrainSwitch, startEndPoint);
+        new MenuGUI(vg, context);
 
-        new InGameGUI(vg, camera, audioManager, guiElementManager,
-                gameStateManager, gameVarManager, entitiesManager);
+        new InGameGUI(vg, context);
 
-        new DefaultGUI(vg, heightMap, scene, gameStateManager,
-                entitiesManager, gameVarManager, guiElementManager);
+        new DefaultGUI(vg, context);
     }
 
     /**
@@ -192,10 +188,9 @@ public class GolfGame implements ILogic {
             Vector3f oldPosition = new Vector3f(camera.getPosition());
             window.setResized(false);
 
-            new RecreateGUIs(guiElementManager, camera, vg,
-                    gameStateManager, modelManager, pathManager, entitiesManager,
-                    gameVarManager, heightMap, pathfinder, audioManager, scene,
-                    terrainManager, loader, mouseInputs, terrainSwitch, startEndPoint);
+            new RecreateGUIs(vg,
+                    context
+            );
 
             mouseInputs.init();
             camera.setPosition(oldPosition);
