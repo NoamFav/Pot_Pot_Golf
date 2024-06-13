@@ -16,8 +16,8 @@ import com.um_project_golf.Core.Utils.BallCollisionDetector;
 import com.um_project_golf.Core.Utils.CollisionsDetector;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.Entity.Terrain.HeightMapPathfinder;
-import com.um_project_golf.GolfBots.AIBot;
-import com.um_project_golf.GolfBots.RuleBasedBot;
+import com.um_project_golf.Core.GolfBots.AIBot;
+import com.um_project_golf.Core.GolfBots.RuleBasedBot;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
@@ -31,6 +31,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 
@@ -76,11 +77,7 @@ public class GolfGame implements ILogic {
     private final ModelManager modelManager;
     private final TerrainManager terrainManager;
     private final GameVarManager gameVarManager;
-
-    // A* pathfinding variables
-    private Vector3f startPoint;
-    private Vector3f endPoint;
-    private List<Vector2i> path;
+    private final PathManager pathManager;
 
     // Camera (Player)
     private final Camera camera;
@@ -106,6 +103,7 @@ public class GolfGame implements ILogic {
         modelManager = new ModelManager();
         terrainManager = new TerrainManager();
         gameVarManager = new GameVarManager();
+        pathManager = new PathManager();
     }
 
     /**
@@ -128,7 +126,8 @@ public class GolfGame implements ILogic {
         window.setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
 
         heightMap.createHeightMap();
-        path = pathfinder.getPath(Consts.RADIUS_DOWN, Consts.RADIUS_UP, Consts.SIZE_GREEN); // upper and lower bounds for the radius of the path
+        List<Vector2i> path = pathfinder.getPath(Consts.RADIUS_DOWN, Consts.RADIUS_UP, Consts.SIZE_GREEN); // upper and lower bounds for the radius of the path
+        pathManager.setPath(path);
 
         modelAndEntityCreation();
         terrainCreation();
@@ -305,10 +304,10 @@ public class GolfGame implements ILogic {
                 cameraInc.y = -moveSpeed;
             }
             if (window.is_keyPressed(GLFW.GLFW_KEY_UP)) {
-                camera.setPosition(startPoint);
+                camera.setPosition(new Vector3f(pathManager.getStartPoint()));
             }
             if (window.is_keyPressed(GLFW.GLFW_KEY_DOWN)) {
-                camera.setPosition(endPoint);
+                camera.setPosition(new Vector3f(pathManager.getEndPoint()));
             }
 
             if (window.is_keyPressed(GLFW.GLFW_KEY_F) && gameVarManager.isTreeAnimationIdle()) {
@@ -351,6 +350,9 @@ public class GolfGame implements ILogic {
         scene.addEntity(arrowEntity);
 
         startEndPointConversion();
+
+        Vector3f startPoint = pathManager.getStartPoint();
+        Vector3f endPoint = pathManager.getEndPoint();
 
         System.out.println("Start point: " + startPoint);
         System.out.println("End point: " + endPoint);
@@ -622,7 +624,7 @@ public class GolfGame implements ILogic {
      * Restart the balls to the start point.
      */
     private void restartBalls() {
-        Vector3f start = new Vector3f(startPoint);
+        Vector3f start = new Vector3f(pathManager.getStartPoint());
         if (gameState.isIs2player()) {
             entitiesManager.setGolfBallPosition(start);
             entitiesManager.setGolfBall2Position(start);
@@ -662,7 +664,8 @@ public class GolfGame implements ILogic {
         if (!gameState.isHasStartPoint()) { // Ensure the start point is only set once
             scene.getEntities().removeAll(entitiesManager.getTrees());
             heightMap.createHeightMap();
-            startPoint = new Vector3f(camera.getPosition().x, camera.getPosition().y - Consts.PLAYER_HEIGHT, camera.getPosition().z); // Create a new instance to avoid reference issues
+            Vector3f startPoint = new Vector3f(camera.getPosition().x, camera.getPosition().y - Consts.PLAYER_HEIGHT, camera.getPosition().z); // Create a new instance to avoid reference issues
+            pathManager.setStartPoint(startPoint);
             entitiesManager.setGolfBallPosition(startPoint);
             if (gameState.isIs2player()) {
                 entitiesManager.setGolfBall2Position(startPoint);
@@ -676,9 +679,10 @@ public class GolfGame implements ILogic {
      * Set up the end Point in debug mode.
      */
     private void setUpEndPoint() {
-        endPoint = new Vector3f(camera.getPosition().x, camera.getPosition().y - Consts.PLAYER_HEIGHT, camera.getPosition().z); // Create a new instance to avoid reference issues
+        Vector3f endPoint = new Vector3f(camera.getPosition().x, camera.getPosition().y - Consts.PLAYER_HEIGHT, camera.getPosition().z); // Create a new instance to avoid reference issues
+        pathManager.setEndPoint(endPoint);
 
-        Vector2i start = new Vector2i((int) startPoint.x, (int) startPoint.z);
+        Vector2i start = new Vector2i((int) pathManager.getStartPoint().x, (int) pathManager.getStartPoint().z);
         start.x = (int) ((start.x + Consts.SIZE_X / 2) * (Consts.VERTEX_COUNT / Consts.SIZE_X));
         start.y = (int) ((start.y + Consts.SIZE_Z / 2) * (Consts.VERTEX_COUNT / Consts.SIZE_Z));
 
@@ -689,7 +693,7 @@ public class GolfGame implements ILogic {
         System.out.println("Start point: " + start);
         System.out.println("End point: " + end);
 
-        path = pathfinder.getPathDebug(start, end, Consts.SIZE_GREEN);
+        pathManager.setPath(pathfinder.getPathDebug(start, end, Consts.SIZE_GREEN));
         try {
             TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
             terrainSwitch(terrainManager.getBlendMapTerrain(), modelManager.getTree(), blendMap2);
@@ -812,6 +816,7 @@ public class GolfGame implements ILogic {
 
                     if (nextPosition == ballPositions.get(ballPositions.size() - 1)) {
                         float isInHoleThreshold = Consts.TARGET_RADIUS;
+                        Vector3f endPoint = new Vector3f(pathManager.getEndPoint());
                         if (nextPosition.x <= endPoint.x + isInHoleThreshold && nextPosition.x >= endPoint.x - isInHoleThreshold) {
                             if (nextPosition.z <= endPoint.z + isInHoleThreshold && nextPosition.z >= endPoint.z - isInHoleThreshold) {
                                 int numberOfShots = gameVarManager.getNumberOfShots();
@@ -907,17 +912,20 @@ public class GolfGame implements ILogic {
      * Convert distance from meters to vertices.
      */
     private void startEndPointConversion() {
-        startPoint = new Vector3f(path.get(0).x, 0, path.get(0).y);
+        List<Vector2i> path = pathManager.getPath();
+        Vector3f startPoint = new Vector3f(path.get(0).x, 0, path.get(0).y);
         System.out.println("Start point: " + startPoint);
         startPoint.x = (int) (startPoint.x / 4 - Consts.SIZE_X / 2);
         startPoint.z = (int) (startPoint.z / 4 - Consts.SIZE_Z / 2);
         startPoint.y = heightMap.getHeight(new Vector3f(startPoint.x, 0, startPoint.z));
+        pathManager.setStartPoint(startPoint);
 
-        endPoint = new Vector3f(path.get(path.size() - 1).x, 0, path.get(path.size() - 1).y);
+        Vector3f endPoint = new Vector3f(path.get(path.size() - 1).x, 0, path.get(path.size() - 1).y);
         System.out.println("End point: " + endPoint);
         endPoint.x = (int) (endPoint.x / 4) - Consts.SIZE_X / 2;
         endPoint.z = (int) (endPoint.z / 4) - Consts.SIZE_Z / 2;
         endPoint.y = heightMap.getHeight(new Vector3f(endPoint.x, 0, endPoint.z));
+        pathManager.setEndPoint(endPoint);
     }
 
     /**
@@ -1040,17 +1048,18 @@ public class GolfGame implements ILogic {
                 entitiesManager.clearTrees();
                 System.out.println("Changing terrain");
                 heightMap.createHeightMap();
-                path = pathfinder.getPath(Consts.RADIUS_DOWN, Consts.RADIUS_UP, Consts.SIZE_GREEN);
+                List<Vector2i> path = pathfinder.getPath(Consts.RADIUS_DOWN, Consts.RADIUS_UP, Consts.SIZE_GREEN);
+                pathManager.setPath(path);
                 startEndPointConversion();
 
                 TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
                 SimplexNoise.shufflePermutation();
                 terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
-                entitiesManager.setGolfBallPosition(startPoint);
+                entitiesManager.setGolfBallPosition(new Vector3f(pathManager.getStartPoint()));
                 if (gameState.isIs2player()) {
-                    entitiesManager.setGolfBall2Position(startPoint);
+                    entitiesManager.setGolfBall2Position(new Vector3f(pathManager.getStartPoint()));
                 }
-                entitiesManager.setEndFlagPosition(endPoint);
+                entitiesManager.setEndFlagPosition(new Vector3f(pathManager.getEndPoint()));
                 gameVarManager.resetNumberOfShots();
                 Entity currentBall = entitiesManager.getCurrentBall();
                 int numberOfShots = gameVarManager.getNumberOfShots();
@@ -1063,7 +1072,7 @@ public class GolfGame implements ILogic {
 
         Runnable startGame = () -> {
             System.out.println("Starting game");
-            camera.setPosition(startPoint);
+            camera.setPosition(new Vector3f(pathManager.getStartPoint()));
             camera.setRotation(0, 0, 0);
             gameState.setCanMove(true);
             gameState.setGuiVisible(false);
@@ -1083,11 +1092,11 @@ public class GolfGame implements ILogic {
                 if (entitiesManager.getAiBotBall() != null) scene.getEntities().removeIf(entity -> entity.equals(entitiesManager.getAiBotBall()));
             }
 
-            Vector3f start = new Vector3f(startPoint);
-            start.y = heightMap.getHeight(new Vector3f(startPoint.x, 0, startPoint.z));
+            Vector3f start = new Vector3f(pathManager.getStartPoint());
+            start.y = heightMap.getHeight(new Vector3f(pathManager.getStartPoint().x, 0, pathManager.getStartPoint().z));
 
-            Vector3f end = new Vector3f(endPoint);
-            end.y = heightMap.getHeight(new Vector3f(endPoint.x, 0, endPoint.z));
+            Vector3f end = new Vector3f(pathManager.getEndPoint());
+            end.y = heightMap.getHeight(new Vector3f(pathManager.getEndPoint().x, 0, pathManager.getEndPoint().z));
 
             if (gameState.isIs2player()) {
                 if (entitiesManager.getGolfBall2() == null) {
@@ -1147,8 +1156,10 @@ public class GolfGame implements ILogic {
                 }
 
                 if (Consts.USE_PREDEFINED_POSITIONS && debugMode) {
-                    endPoint = new Vector3f(Consts.HOLE_POSITION.x, heightMap.getHeight(new Vector3f(Consts.HOLE_POSITION.x, 0, Consts.HOLE_POSITION.z)), Consts.HOLE_POSITION.z);
-                    startPoint = new Vector3f(Consts.TEE_POSITION.x, heightMap.getHeight(new Vector3f(Consts.TEE_POSITION.x, 0, Consts.TEE_POSITION.z)), Consts.TEE_POSITION.z);
+                    Vector3f endPoint = new Vector3f(Consts.HOLE_POSITION.x, heightMap.getHeight(new Vector3f(Consts.HOLE_POSITION.x, 0, Consts.HOLE_POSITION.z)), Consts.HOLE_POSITION.z);
+                    Vector3f startPoint = new Vector3f(Consts.TEE_POSITION.x, heightMap.getHeight(new Vector3f(Consts.TEE_POSITION.x, 0, Consts.TEE_POSITION.z)), Consts.TEE_POSITION.z);
+                    pathManager.setStartPoint(startPoint);
+                    pathManager.setEndPoint(endPoint);
 
                     Vector2i start = new Vector2i((int) startPoint.x, (int) startPoint.z);
                     start.x = (int) ((start.x + Consts.SIZE_X / 2) * (Consts.VERTEX_COUNT / Consts.SIZE_X));
@@ -1161,7 +1172,8 @@ public class GolfGame implements ILogic {
                     System.out.println("Start point: " + start);
                     System.out.println("End point: " + end);
 
-                    path = pathfinder.getPathDebug(start, end, Consts.SIZE_GREEN);
+                    List<Vector2i> path = pathfinder.getPathDebug(start, end, Consts.SIZE_GREEN);
+                    pathManager.setPath(path);
                     try {
                         TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
                         terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
@@ -1172,9 +1184,13 @@ public class GolfGame implements ILogic {
                     }
                 } else {
                     // Can be changed with the left and right arrow keys
-                    endPoint = new Vector3f(0, 0, 0);
-                    startPoint = new Vector3f(0, 0, 0);
+                    Vector3f endPoint = new Vector3f(0, 0, 0);
+                    Vector3f startPoint = new Vector3f(0, 0, 0);
+                    pathManager.setStartPoint(startPoint);
+                    pathManager.setEndPoint(endPoint);
                 }
+                Vector3f startPoint = new Vector3f(pathManager.getStartPoint());
+                Vector3f endPoint = new Vector3f(pathManager.getEndPoint());
 
                 entitiesManager.setGolfBallPosition(new Vector3f(startPoint.x, heightMap.getHeight(new Vector3f(startPoint.x, 0, startPoint.z)), startPoint.z));
                 if (gameState.isIs2player()) {
@@ -1302,7 +1318,7 @@ public class GolfGame implements ILogic {
 
         return () -> {
             System.out.println("Creating bot ball");
-            Entity botBall = new Entity(modelManager.getBotBallModel(), new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
+            Entity botBall = new Entity(modelManager.getBotBallModel(), new Vector3f(pathManager.getStartPoint()), new Vector3f(50, 0, 0), 5);
             entitiesManager.setBotBall(botBall);
             scene.addEntity(botBall);
 
@@ -1324,7 +1340,7 @@ public class GolfGame implements ILogic {
 
         return () -> {
             System.out.println("Creating AI bot ball");
-            Entity aiBotBall = new Entity(modelManager.getAiBotBallModel(), new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
+            Entity aiBotBall = new Entity(modelManager.getAiBotBallModel(), new Vector3f(pathManager.getStartPoint()), new Vector3f(50, 0, 0), 5);
             entitiesManager.setAiBotBall(aiBotBall);
             scene.addEntity(aiBotBall);
 

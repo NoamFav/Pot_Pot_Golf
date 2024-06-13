@@ -1,4 +1,4 @@
-package com.um_project_golf.GolfBots;
+package com.um_project_golf.Core.GolfBots;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
