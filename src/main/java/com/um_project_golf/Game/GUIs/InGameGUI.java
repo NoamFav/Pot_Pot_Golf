@@ -30,9 +30,10 @@ public class InGameGUI {
     private final GameVarManager gameVarManager;
     private final EntitiesManager entitiesManager;
 
-    public InGameGUI(long vg, WindowManager window, Camera camera, AudioManager audioManager, GuiElementManager guiElementManager, GameStateManager gameState, GameVarManager gameVarManager, EntitiesManager entitiesManager) {
+    public InGameGUI(long vg, Camera camera, AudioManager audioManager, GuiElementManager guiElementManager,
+                     GameStateManager gameState, GameVarManager gameVarManager, EntitiesManager entitiesManager) {
         this.vg = vg;
-        this.window = window;
+        this.window = Launcher.getWindow();
         this.camera = camera;
         this.audioManager = audioManager;
         this.guiElementManager = guiElementManager;
