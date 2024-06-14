@@ -10,8 +10,6 @@ import com.um_project_golf.Core.Entity.Texture;
 import com.um_project_golf.Core.Rendering.RenderManager;
 import com.um_project_golf.Core.Utils.CollisionsDetector;
 import com.um_project_golf.Core.Utils.Consts;
-import com.um_project_golf.Core.Utils.StartEndPoint;
-import com.um_project_golf.Core.Utils.TerrainSwitch;
 import com.um_project_golf.Game.FieldManager.*;
 import com.um_project_golf.Game.GUIs.DefaultGUI;
 import com.um_project_golf.Game.GUIs.InGameGUI;
@@ -52,17 +50,10 @@ public class GolfGame implements ILogic {
     private final HeightMapPathfinder pathfinder;
     private final CollisionsDetector collisionsDetector;
 
-    // Utilities for the game
-    private final TerrainSwitch terrainSwitch;
-    private final StartEndPoint startEndPoint;
-
     // Field Managers for the game
     private final GameStateManager gameStateManager;
     private final GuiElementManager guiElementManager;
     private final EntitiesManager entitiesManager;
-    private final ModelManager modelManager;
-    private final TerrainManager terrainManager;
-    private final GameVarManager gameVarManager;
     private final PathManager pathManager;
 
     // Managers for the game logic
@@ -94,15 +85,11 @@ public class GolfGame implements ILogic {
         gameStateManager = context.getGameStateManager();
         guiElementManager = context.getGuiElementManager();
         entitiesManager = context.getEntitiesManager();
-        modelManager = context.getModelManager();
-        terrainManager = context.getTerrainManager();
-        gameVarManager = context.getGameVarManager();
         pathManager = context.getPathManager();
-        terrainSwitch = context.getTerrainSwitch();
-        startEndPoint = context.getStartEndPoint();
-        initManager = context.getInitManager();
-        inputManager = context.getInputManager();
-        updateManager = context.getUpdateManager();
+
+        initManager = new InitManager(context);
+        inputManager = new InputManager(context);
+        updateManager = new UpdateManager(context);
     }
 
     /**
@@ -129,9 +116,9 @@ public class GolfGame implements ILogic {
         List<Vector2i> path = pathfinder.getPath(Consts.RADIUS_DOWN, Consts.RADIUS_UP, Consts.SIZE_GREEN); // upper and lower bounds for the radius of the path
         pathManager.setPath(path);
 
-        initManager.modelAndEntityCreation(scene, entitiesManager, modelManager, startEndPoint, pathManager, gameStateManager, gameVarManager, terrainSwitch, heightMap, loader);
-        initManager.terrainCreation(terrainManager, scene, loader);
-        initManager.setUpLight(scene);
+        initManager.modelAndEntityCreation();
+        initManager.terrainCreation();
+        initManager.setUpLight();
 
         vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
 
@@ -142,6 +129,7 @@ public class GolfGame implements ILogic {
         audioManager = new AudioManager("src/main/resources/SoundTrack/skippy-mr-sunshine-fernweh-goldfish-main-version-02-32-7172.wav");
         audioManager.playSound();
         gameStateManager.setSoundPlaying(true);
+        context.setAudioManager(audioManager);
 
         new MenuGUI(vg, context);
 
@@ -165,16 +153,9 @@ public class GolfGame implements ILogic {
             gameStateManager.setCanMove(false); // Disable movement
         }
 
-        inputManager.movementControl(gameStateManager, window, cameraInc,
-                camera, pathManager, gameVarManager, entitiesManager,
-                guiElementManager, scene, modelManager);
-
-        inputManager.cameraMovement(gameStateManager, mouseInputs, camera);
-
-        inputManager.startEndPointDebugMode(gameStateManager, window, scene,
-                entitiesManager, heightMap, pathManager, camera,
-                pathfinder, terrainManager, terrainSwitch,
-                modelManager, loader);
+        inputManager.movementControl();
+        inputManager.cameraMovement();
+        inputManager.startEndPointDebugMode();
     }
 
     /**
@@ -201,9 +182,9 @@ public class GolfGame implements ILogic {
 
         collisionsDetector.checkCollision(camera, cameraInc, heightMap, scene);
 
-        updateManager.daytimeCycle(scene);
-        updateManager.updateTreeAnimations(entitiesManager, gameVarManager);
-        updateManager.animateBall(gameStateManager, gameVarManager, entitiesManager, pathManager, guiElementManager);
+        updateManager.daytimeCycle();
+        updateManager.updateTreeAnimations();
+        updateManager.animateBall();
 
         guiElementManager.updateTextFields(gameStateManager, debugMode);
 
