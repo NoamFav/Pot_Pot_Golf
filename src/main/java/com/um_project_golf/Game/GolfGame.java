@@ -115,7 +115,8 @@ public class GolfGame implements ILogic {
     public void init(MouseInput mouseInput) throws Exception {
         System.out.println("Initializing game");
 
-        context.setMouseInputs(mouseInput);
+        mouseInputs = mouseInput;
+        context.setMouseInputs(mouseInputs);
 
         scene.setDefaultTexture(new Texture(loader.loadTexture("src/main/resources/Texture/Default.png")));
         window.setAntiAliasing(true);
