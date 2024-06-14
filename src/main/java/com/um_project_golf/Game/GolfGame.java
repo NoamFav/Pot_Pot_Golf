@@ -2,13 +2,8 @@ package com.um_project_golf.Game;
 
 import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.Entity.Entity;
-import com.um_project_golf.Core.Entity.SceneManager;
-import com.um_project_golf.Core.Entity.Terrain.HeightMap;
-import com.um_project_golf.Core.Entity.Terrain.HeightMapPathfinder;
 import com.um_project_golf.Core.Entity.Terrain.Terrain;
 import com.um_project_golf.Core.Entity.Texture;
-import com.um_project_golf.Core.Rendering.RenderManager;
-import com.um_project_golf.Core.Utils.CollisionsDetector;
 import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Game.FieldManager.*;
 import com.um_project_golf.Game.GUIs.DefaultGUI;
@@ -18,11 +13,8 @@ import com.um_project_golf.Game.GUIs.RecreateGUIs;
 import com.um_project_golf.Game.GameLogic.InitManager;
 import com.um_project_golf.Game.GameLogic.InputManager;
 import com.um_project_golf.Game.GameLogic.UpdateManager;
-import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.List;
 
 import static org.lwjgl.nanovg.NanoVGGL3.*;
 
@@ -39,31 +31,10 @@ public class GolfGame implements ILogic {
     // NanoVG context
     private long vg;
 
-    // Main game Classes and Managers
-    private final RenderManager renderer;
-    private final ObjectLoader loader;
-    private final WindowManager window;
-    private final SceneManager scene;
-    private MouseInput mouseInputs;
-    private AudioManager audioManager;
-    private final HeightMap heightMap;
-    private final HeightMapPathfinder pathfinder;
-    private final CollisionsDetector collisionsDetector;
-
-    // Field Managers for the game
-    private final GameStateManager gameStateManager;
-    private final GuiElementManager guiElementManager;
-    private final EntitiesManager entitiesManager;
-    private final PathManager pathManager;
-
     // Managers for the game logic
     private final InitManager initManager;
     private final InputManager inputManager;
     private final UpdateManager updateManager;
-
-    // Camera (Player)
-    private final Camera camera;
-    private final Vector3f cameraInc;
 
     MainFieldManager context;
 
@@ -73,19 +44,6 @@ public class GolfGame implements ILogic {
      */
     public GolfGame() {
         context = new MainFieldManager();
-        renderer = context.getRenderer();
-        window = Launcher.getWindow();
-        loader = context.getLoader();
-        scene = context.getScene();
-        camera = context.getCamera();
-        pathfinder = context.getPathfinder();
-        collisionsDetector = context.getCollisionsDetector();
-        cameraInc = context.getCameraInc();
-        heightMap = context.getHeightMap();
-        gameStateManager = context.getGameStateManager();
-        guiElementManager = context.getGuiElementManager();
-        entitiesManager = context.getEntitiesManager();
-        pathManager = context.getPathManager();
 
         initManager = new InitManager(context);
         inputManager = new InputManager(context);
@@ -102,19 +60,17 @@ public class GolfGame implements ILogic {
     public void init(MouseInput mouseInput) throws Exception {
         System.out.println("Initializing game");
 
-        mouseInputs = mouseInput;
-        context.setMouseInputs(mouseInputs);
+        context.setMouseInputs(mouseInput);
 
-        scene.setDefaultTexture(new Texture(loader.loadTexture("src/main/resources/Texture/Default.png")));
-        window.setAntiAliasing(true);
-        window.setResized(false);
+        context.getScene().setDefaultTexture(new Texture(context.getLoader().loadTexture("src/main/resources/Texture/Default.png")));
+        context.getWindow().setAntiAliasing(true);
+        context.getWindow().setResized(false);
 
-        renderer.init();
-        window.setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
+        context.getRenderer().init();
+        context.getWindow().setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
 
-        heightMap.createHeightMap();
-        List<Vector2i> path = pathfinder.getPath(Consts.RADIUS_DOWN, Consts.RADIUS_UP, Consts.SIZE_GREEN); // upper and lower bounds for the radius of the path
-        pathManager.setPath(path);
+        context.getHeightMap().createHeightMap();
+        context.getPathManager().setPath(context.getPathfinder().getPath(Consts.RADIUS_DOWN, Consts.RADIUS_UP, Consts.SIZE_GREEN));
 
         initManager.modelAndEntityCreation();
         initManager.terrainCreation();
@@ -122,11 +78,12 @@ public class GolfGame implements ILogic {
 
         vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
 
+        GameStateManager gameStateManager = context.getGameStateManager();
         gameStateManager.setGuiVisible(true);
         gameStateManager.setCanMove(false);
         gameStateManager.setOnMenu(true);
 
-        audioManager = new AudioManager("src/main/resources/SoundTrack/skippy-mr-sunshine-fernweh-goldfish-main-version-02-32-7172.wav");
+        AudioManager audioManager = new AudioManager("src/main/resources/SoundTrack/skippy-mr-sunshine-fernweh-goldfish-main-version-02-32-7172.wav");
         audioManager.playSound();
         gameStateManager.setSoundPlaying(true);
         context.setAudioManager(audioManager);
@@ -144,11 +101,12 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void input() {
-        cameraInc.set(0, 0, 0);
+        context.setCameraInc(new Vector3f(0, 0, 0));
         //float lightPos = scene.getSpotLights()[0].getPointLight().getPosition().z;
         //float lightPos2 = scene.getSpotLights()[1].getPointLight().getPosition().z;
 
-        if (window.is_keyPressed(GLFW.GLFW_KEY_ESCAPE)) {
+        if (context.getWindow().is_keyPressed(GLFW.GLFW_KEY_ESCAPE)) {
+            GameStateManager gameStateManager = context.getGameStateManager();
             gameStateManager.setGuiVisible(true);  // Toggle GUI visibility
             gameStateManager.setCanMove(false); // Disable movement
         }
@@ -164,36 +122,38 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void update() {
-        guiElementManager.update(gameStateManager);
+        context.getGuiElementManager().update(context.getGameStateManager());
 
-        if (window.isResized()) {
-            Vector3f oldPosition = new Vector3f(camera.getPosition());
-            window.setResized(false);
+        if (context.getWindow().isResized()) {
+            Vector3f oldPosition = new Vector3f(context.getCamera().getPosition());
+            context.getWindow().setResized(false);
 
             new RecreateGUIs(vg,
                     context
             );
 
-            mouseInputs.init();
-            camera.setPosition(oldPosition);
+            context.getMouseInputs().init();
+            context.getCamera().setPosition(oldPosition);
         }
 
-        camera.movePosition(cameraInc.x * Consts.CAMERA_MOVEMENT_SPEED, (cameraInc.y * Consts.CAMERA_MOVEMENT_SPEED), cameraInc.z * Consts.CAMERA_MOVEMENT_SPEED);
+        Vector3f cameraInc = new Vector3f(context.getCameraInc());
+        context.getCamera().movePosition(cameraInc.x * Consts.CAMERA_MOVEMENT_SPEED, (cameraInc.y * Consts.CAMERA_MOVEMENT_SPEED), cameraInc.z * Consts.CAMERA_MOVEMENT_SPEED);
 
-        collisionsDetector.checkCollision(camera, cameraInc, heightMap, scene);
+        context.getCollisionsDetector().checkCollision(context.getCamera(), cameraInc, context.getHeightMap(), context.getScene());
 
         updateManager.daytimeCycle();
         updateManager.updateTreeAnimations();
         updateManager.animateBall();
 
-        guiElementManager.updateTextFields(gameStateManager, debugMode);
+        context.getGuiElementManager().updateTextFields(context.getGameStateManager(), debugMode);
 
-        for (Entity entity : scene.getEntities()) {
-            renderer.processEntity(entity);
+
+        for (Entity entity : context.getScene().getEntities()) {
+            context.getRenderer().processEntity(entity);
         }
 
-        for (Terrain terrain : scene.getTerrains()) {
-            renderer.processTerrain(terrain);
+        for (Terrain terrain : context.getScene().getTerrains()) {
+            context.getRenderer().processTerrain(terrain);
         }
     }
 
@@ -203,16 +163,16 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void render() {
-        renderer.clear();
-        renderer.render(camera, scene);
+        context.getRenderer().clear();
+        context.getRenderer().render(context.getCamera(), context.getScene());
 
-        guiElementManager.render(gameStateManager);
+        context.getGuiElementManager().render(context.getGameStateManager());
 
-        Entity arrowEntity = entitiesManager.getArrowEntity();
-        if (gameStateManager.isAnimating()) {
-            scene.getEntities().remove(arrowEntity);
+        Entity arrowEntity = context.getEntitiesManager().getArrowEntity();
+        if (context.getGameStateManager().isAnimating()) {
+            context.getScene().getEntities().remove(arrowEntity);
         } else {
-            scene.addEntity(arrowEntity);
+            context.getScene().addEntity(arrowEntity);
         }
     }
 
@@ -222,10 +182,10 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void cleanUp() {
-        renderer.cleanup();
-        loader.cleanUp();
-        audioManager.cleanup();
-        guiElementManager.cleanup();
+        context.getRenderer().cleanup();
+        context.getLoader().cleanUp();
+        context.getAudioManager().cleanup();
+        context.getGuiElementManager().cleanup();
 
         nvgDelete(vg);
     }

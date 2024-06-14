@@ -39,7 +39,7 @@ public class MainFieldManager {
 
     // Camera (Player)
     private final Camera camera;
-    private final Vector3f cameraInc;
+    private Vector3f cameraInc;
 
     public MainFieldManager() {
         renderer = new RenderManager();
@@ -84,4 +84,5 @@ public class MainFieldManager {
     public PathManager getPathManager() {return pathManager;}
     public Camera getCamera() {return camera;}
     public Vector3f getCameraInc() {return cameraInc;}
+    public void setCameraInc(Vector3f cameraInc) {this.cameraInc = cameraInc;}
 }
