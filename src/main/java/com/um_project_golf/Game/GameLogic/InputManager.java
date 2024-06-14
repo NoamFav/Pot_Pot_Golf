@@ -18,10 +18,47 @@ import org.lwjgl.glfw.GLFW;
 import static com.um_project_golf.Game.GolfGame.debugMode;
 
 public class InputManager {
-    public void movementControl(@NotNull GameStateManager gameStateManager, WindowManager window,
-                                Vector3f cameraInc, Camera camera, PathManager pathManager,
-                                GameVarManager gameVarManager, EntitiesManager entitiesManager,
-                                GuiElementManager guiElementManager, SceneManager scene, ModelManager modelManager) {
+
+    private final WindowManager window;
+    private final Camera camera;
+    private final SceneManager scene;
+    private final Vector3f cameraInc;
+    private final MouseInput mouseInputs;
+    private final HeightMap heightMap;
+    private final HeightMapPathfinder pathfinder;
+    private final TerrainSwitch terrainSwitch;
+    private final ObjectLoader loader;
+
+    private final ModelManager modelManager;
+    private final PathManager pathManager;
+    private final GameVarManager gameVarManager;
+    private final EntitiesManager entitiesManager;
+    private final GuiElementManager guiElementManager;
+    private final GameStateManager gameStateManager;
+    private final TerrainManager terrainManager;
+
+
+    public InputManager(@NotNull MainFieldManager context) {
+        this.window = context.getWindow();
+        this.camera = context.getCamera();
+        this.scene = context.getScene();
+        this.cameraInc = context.getCameraInc();
+        this.mouseInputs = context.getMouseInputs();
+        this.heightMap = context.getHeightMap();
+        this.pathfinder = context.getPathfinder();
+        this.terrainSwitch = context.getTerrainSwitch();
+        this.loader = context.getLoader();
+
+        this.modelManager = context.getModelManager();
+        this.pathManager = context.getPathManager();
+        this.gameVarManager = context.getGameVarManager();
+        this.entitiesManager = context.getEntitiesManager();
+        this.guiElementManager = context.getGuiElementManager();
+        this.gameStateManager = context.getGameStateManager();
+        this.terrainManager = context.getTerrainManager();
+    }
+
+    public void movementControl() {
 
         float moveSpeed = Consts.CAMERA_MOVEMENT_SPEED / EngineManager.getFps();
 
@@ -63,14 +100,14 @@ public class InputManager {
             }
 
             if (window.is_keyPressed(GLFW.GLFW_KEY_R) && !gameStateManager.isAnimating()) {
-                restartBalls(pathManager, gameStateManager, entitiesManager, gameVarManager, guiElementManager);
+                restartBalls();
             }
 
             // Create a tree at the camera position
             boolean isTPressed = window.is_keyPressed(GLFW.GLFW_KEY_T);
 
             if (isTPressed && !gameStateManager.istKeyWasPressed()) {
-                plantTree(camera, modelManager, scene, entitiesManager, gameStateManager);
+                plantTree();
             } else if (!isTPressed) {
                 gameStateManager.settKeyWasPressed(false); // Reset the flag when the key is released
             }
@@ -80,7 +117,7 @@ public class InputManager {
     /**
      * Restart the balls to the start point.
      */
-    private void restartBalls(@NotNull PathManager pathManager, @NotNull GameStateManager gameStateManager, EntitiesManager entitiesManager, GameVarManager gameVarManager, GuiElementManager guiElementManager) {
+    private void restartBalls() {
         Vector3f start = new Vector3f(pathManager.getStartPoint());
         if (gameStateManager.isIs2player()) {
             entitiesManager.setGolfBallPosition(start);
@@ -103,7 +140,7 @@ public class InputManager {
      * Save the forest
      * Plant a tree at the camera position.
      */
-    private void plantTree(@NotNull Camera camera, @NotNull ModelManager modelManager, @NotNull SceneManager scene, @NotNull EntitiesManager entitiesManager, @NotNull GameStateManager gameStateManager) {
+    private void plantTree() {
         Vector3f cameraPos = new Vector3f(camera.getPosition().x, camera.getPosition().y - Consts.PLAYER_HEIGHT, camera.getPosition().z);
         Entity newTree = new Entity(modelManager.getTree(), new Vector3f(cameraPos.x, cameraPos.y, cameraPos.z), new Vector3f(-90, 0, 0), 0.03f);
         scene.addEntity(newTree);
@@ -115,7 +152,7 @@ public class InputManager {
     }
 
 
-    public void cameraMovement(@NotNull GameStateManager gameStateManager, MouseInput mouseInputs, Camera camera) {
+    public void cameraMovement() {
         if (gameStateManager.isCanMove()) {
             if (mouseInputs.isRightButtonPressed()) {
                 Vector2f rotVec = mouseInputs.getDisplayVec();
@@ -126,16 +163,13 @@ public class InputManager {
         }
     }
 
-    public void startEndPointDebugMode(GameStateManager gameStateManager, WindowManager window, SceneManager scene,
-                                        EntitiesManager entitiesManager, HeightMap heightMap, PathManager pathManager, Camera camera,
-                                        HeightMapPathfinder pathfinder, TerrainManager terrainManager, TerrainSwitch terrainSwitch,
-                                        ModelManager modelManager, ObjectLoader loader) {
+    public void startEndPointDebugMode() {
         if (debugMode && gameStateManager.isCanMove()) {
             if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
-                setUpStartPoint(gameStateManager, scene, entitiesManager, heightMap, pathManager, camera);
+                setUpStartPoint();
             }
             if (window.is_keyPressed(GLFW.GLFW_KEY_RIGHT) && gameStateManager.isHasStartPoint()) {
-                setUpEndPoint(camera, pathManager, pathfinder, terrainManager, terrainSwitch, modelManager, loader, entitiesManager, gameStateManager);
+                setUpEndPoint();
             }
         }
     }
@@ -144,8 +178,7 @@ public class InputManager {
     /**
      * Set up the start Point in debug mode.
      */
-    private void setUpStartPoint(@NotNull GameStateManager gameStateManager, SceneManager scene, EntitiesManager entitiesManager,
-                                 HeightMap heightMap, PathManager pathManager, Camera camera) {
+    private void setUpStartPoint() {
         if (!gameStateManager.isHasStartPoint()) { // Ensure the start point is only set once
             scene.getEntities().removeAll(entitiesManager.getTrees());
             heightMap.createHeightMap();
@@ -163,10 +196,7 @@ public class InputManager {
     /**
      * Set up the end Point in debug mode.
      */
-    private void setUpEndPoint(Camera camera, PathManager pathManager, HeightMapPathfinder pathfinder,
-                               TerrainManager terrainManager, TerrainSwitch terrainSwitch,
-                               ModelManager modelManager, ObjectLoader loader,
-                               EntitiesManager entitiesManager, GameStateManager gameStateManager) {
+    private void setUpEndPoint() {
         Vector3f endPoint = new Vector3f(camera.getPosition().x, camera.getPosition().y - Consts.PLAYER_HEIGHT, camera.getPosition().z); // Create a new instance to avoid reference issues
         pathManager.setEndPoint(endPoint);
 

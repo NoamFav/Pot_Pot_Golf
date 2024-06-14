@@ -10,11 +10,29 @@ import org.joml.Vector3f;
 import java.util.List;
 
 public class UpdateManager {
+
+    private final SceneManager scene;
+
+    private final EntitiesManager entitiesManager;
+    private final GameVarManager gameVarManager;
+    private final PathManager pathManager;
+    private final GuiElementManager guiElementManager;
+    private final GameStateManager gameStateManager;
+
+    public UpdateManager(@NotNull MainFieldManager context) {
+        this.scene = context.getScene();
+        this.entitiesManager = context.getEntitiesManager();
+        this.gameVarManager = context.getGameVarManager();
+        this.pathManager = context.getPathManager();
+        this.guiElementManager = context.getGuiElementManager();
+        this.gameStateManager = context.getGameStateManager();
+    }
+
     /**
      * Make the day and night cycle.
      * Not used for now.
      */
-    public void daytimeCycle(@NotNull SceneManager scene) {
+    public void daytimeCycle() {
         scene.increaseSpotAngle(0.01f);
         if (scene.getSpotAngle() > 4) {
             scene.setSpotInc(-1);
@@ -51,7 +69,7 @@ public class UpdateManager {
      * Update the tree animations.
      * Used for end game animation.
      */
-    public void updateTreeAnimations(@NotNull EntitiesManager entitiesManager, GameVarManager gameVarManager) {
+    public void updateTreeAnimations() {
         if (entitiesManager.getTrees().isEmpty() || gameVarManager.isTreeAnimationIdle()) {
             return;
         }
@@ -95,9 +113,7 @@ public class UpdateManager {
      * Used for the ball's movement.
      * Makes the ball move to the end point.
      */
-    public void animateBall(@NotNull GameStateManager gameStateManager, GameVarManager gameVarManager,
-                             EntitiesManager entitiesManager, PathManager pathManager,
-                             GuiElementManager guiElementManager) {
+    public void animateBall() {
         if (gameStateManager.isAnimating()) {
             float timeStep = 0.1f;
             gameVarManager.incrementAnimationTimeAccumulator(timeStep);
@@ -134,18 +150,18 @@ public class UpdateManager {
                     if (nextPosition.y <= -0.1) { // Ball in water
                         entitiesManager.setCurrentBallPosition(gameVarManager.getShotStartPosition());
                         gameStateManager.setAnimating(false);
-                        updateBallMultiplayer(gameStateManager, entitiesManager, gameVarManager, guiElementManager);
+                        updateBallMultiplayer();
                         guiElementManager.getWarningTextPane().setText("Ploof! Ball in water! Resetting to last shot position.");
                     } else {
                         entitiesManager.setCurrentBallPosition(nextPosition);
                         gameVarManager.incrementCurrentPositionIndex();}
                 } else {
                     gameStateManager.setAnimating(false); // Animation completed
-                    updateBallMultiplayer(gameStateManager, entitiesManager, gameVarManager, guiElementManager);
+                    updateBallMultiplayer();
                 }
             }
         } else {
-            updateDirectionalArrow(guiElementManager, entitiesManager);
+            updateDirectionalArrow();
         }
     }
 
@@ -154,8 +170,7 @@ public class UpdateManager {
      * Switches the player's turn.
      * Used for multiplayer.
      */
-    private void updateBallMultiplayer(@NotNull GameStateManager gameStateManager, EntitiesManager entitiesManager,
-                                       GameVarManager gameVarManager, GuiElementManager guiElementManager) {
+    private void updateBallMultiplayer() {
         if (gameStateManager.isIs2player()) {
             gameStateManager.switchPlayer1Turn();
             boolean isPlayer1Turn = gameStateManager.isPlayer1Turn();
@@ -173,7 +188,7 @@ public class UpdateManager {
      * Update the Directional Arrow.
      * Used for the ball's direction.
      */
-    private void updateDirectionalArrow(@NotNull GuiElementManager guiElementManager, EntitiesManager entitiesManager) {
+    private void updateDirectionalArrow() {
         String vx = guiElementManager.getVxTextField().getText().replaceAll("[a-zA-Z]", "");
         String vz = guiElementManager.getVzTextField().getText().replaceAll("[a-zA-Z]", "");
 
