@@ -165,7 +165,7 @@ public class UpdateManager {
             Entity currentBall = entitiesManager.getCurrentBall();
             int numberOfShots = gameVarManager.getNumberOfShots();
             int numberOfShots2 = gameVarManager.getNumberOfShots2();
-            guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (!isPlayer1Turn ? numberOfShots : numberOfShots2));
+            guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (isPlayer1Turn ? numberOfShots : numberOfShots2));
         }
     }
 

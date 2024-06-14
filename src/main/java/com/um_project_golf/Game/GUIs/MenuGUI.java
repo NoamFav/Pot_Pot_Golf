@@ -236,13 +236,13 @@ public class MenuGUI {
         Runnable enableDebugMode = () -> {
             entitiesManager.clearTrees();
             debugMode = !debugMode;
+            if (entitiesManager.getGolfBall2() == null && gameStateManager.isIs2player()) {
+                Entity golfBall2 = new Entity(modelManager.getBall2(), new Vector3f(0, 0, 0), new Vector3f(50, 0, 0), 5);
+                entitiesManager.setGolfBall2(golfBall2);
+                scene.addEntity(golfBall2);
+            }
             if (debugMode) {
                 System.out.println("Enabling debug mode");
-                if (entitiesManager.getGolfBall2() == null && gameStateManager.isIs2player()) {
-                    Entity golfBall2 = new Entity(modelManager.getBall2(), new Vector3f(0, 0, 0), new Vector3f(50, 0, 0), 5);
-                    entitiesManager.setGolfBall2(golfBall2);
-                    scene.addEntity(golfBall2);
-                }
                 try {
                     heightMap.createHeightMap();
                     TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
