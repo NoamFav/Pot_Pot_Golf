@@ -13,7 +13,6 @@ import com.um_project_golf.Core.Utils.Consts;
 import com.um_project_golf.Core.Utils.StartEndPoint;
 import com.um_project_golf.Core.Utils.TerrainSwitch;
 import com.um_project_golf.Game.FieldManager.*;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -28,15 +27,39 @@ public class InitManager {
 
     private record Terrains(TerrainTexture blendMap, List<TerrainTexture> textures, List<TerrainTexture> waterTextures) {}
 
+    private final SceneManager scene;
+    private final EntitiesManager entitiesManager;
+    private final ModelManager modelManager;
+    private final StartEndPoint startEndPoint;
+    private final PathManager pathManager;
+    private final GameStateManager gameStateManager;
+    private final GameVarManager gameVarManager;
+    private final TerrainManager terrainManager;
+    private final TerrainSwitch terrainSwitch;
+    private final HeightMap heightMap;
+    private final ObjectLoader loader;
+
+    public InitManager(@NotNull MainFieldManager context) {
+        this.scene = context.getScene();
+        this.entitiesManager = context.getEntitiesManager();
+        this.modelManager = context.getModelManager();
+        this.startEndPoint = context.getStartEndPoint();
+        this.pathManager = context.getPathManager();
+        this.gameStateManager = context.getGameStateManager();
+        this.gameVarManager = context.getGameVarManager();
+        this.terrainManager = context.getTerrainManager();
+        this.terrainSwitch = context.getTerrainSwitch();
+        this.heightMap = context.getHeightMap();
+        this.loader = context.getLoader();
+    }
+
     /**
      * Creates the models and entities for the game.
      * Uses a record to store the models.
      */
-    public void modelAndEntityCreation(@NotNull SceneManager scene, @NotNull EntitiesManager entitiesManager, @NotNull ModelManager modelManager,
-                                        @NotNull StartEndPoint startEndPoint, PathManager pathManager, @NotNull GameStateManager gameStateManager,
-                                        @NotNull GameVarManager gameVarManager, @NotNull TerrainSwitch terrainSwitch, HeightMap heightMap, ObjectLoader loader) throws Exception {
+    public void modelAndEntityCreation() throws Exception {
 
-        ModelLoader models = getModels(loader ,modelManager);
+        ModelLoader models = getModels();
 
         scene.addEntity(new Entity(models.skyBox(), new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
 
@@ -72,9 +95,8 @@ public class InitManager {
      * Create the terrain for the game.
      * Uses a record to store the terrains.
      */
-    public void terrainCreation(@NotNull TerrainManager terrainManager, @NotNull SceneManager scene,
-                                 @NotNull ObjectLoader loader) throws Exception {
-        Terrains terrains = getTerrains(loader);
+    public void terrainCreation() throws Exception {
+        Terrains terrains = getTerrains();
 
         BlendMapTerrain blendMapTerrain = new BlendMapTerrain(terrains.textures());
         BlendMapTerrain blueTerrain = new BlendMapTerrain(terrains.waterTextures());
@@ -95,7 +117,7 @@ public class InitManager {
      * Not used for now.
      */
     @SuppressWarnings("unused")
-    public void setUpLight(@NotNull SceneManager scene) {
+    public void setUpLight() {
         float lightIntensity = 10f;
 
         //point light
@@ -125,8 +147,7 @@ public class InitManager {
      *
      * @return The models for the game.
      */
-    @Contract("_, _ -> new")
-    private @NotNull ModelLoader getModels(@NotNull ObjectLoader loader, @NotNull ModelManager modelManager) throws Exception {
+    private @NotNull ModelLoader getModels() throws Exception {
         List<Model> tree = loader.loadAssimpModel("src/main/resources/Models/tree/tree.obj"); modelManager.setTree(tree);
         List<Model> skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
         List<Model> ball = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
@@ -164,8 +185,7 @@ public class InitManager {
      *
      * @return The terrains for the game.
      */
-    @Contract("_ -> new")
-    private @NotNull Terrains getTerrains(@NotNull ObjectLoader loader) throws Exception {
+    private @NotNull Terrains getTerrains() throws Exception {
         TerrainTexture sand = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonSand.jpg"));
         TerrainTexture grass = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonFlowers.jpg"));
         TerrainTexture fairway = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonGrass.jpg"));

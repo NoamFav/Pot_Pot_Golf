@@ -8,9 +8,6 @@ import com.um_project_golf.Core.Rendering.RenderManager;
 import com.um_project_golf.Core.Utils.CollisionsDetector;
 import com.um_project_golf.Core.Utils.StartEndPoint;
 import com.um_project_golf.Core.Utils.TerrainSwitch;
-import com.um_project_golf.Game.GameLogic.InitManager;
-import com.um_project_golf.Game.GameLogic.InputManager;
-import com.um_project_golf.Game.GameLogic.UpdateManager;
 import com.um_project_golf.Game.Launcher;
 import org.joml.Vector3f;
 
@@ -40,11 +37,6 @@ public class MainFieldManager {
     private final GameVarManager gameVarManager;
     private final PathManager pathManager;
 
-    // Managers for the game logic
-    private final InitManager initManager;
-    private final InputManager inputManager;
-    private final UpdateManager updateManager;
-
     // Camera (Player)
     private final Camera camera;
     private final Vector3f cameraInc;
@@ -68,10 +60,6 @@ public class MainFieldManager {
         pathManager = new PathManager();
         terrainSwitch = new TerrainSwitch(scene, renderer, heightMap, loader, terrainManager, modelManager, entitiesManager);
         startEndPoint = new StartEndPoint();
-
-        initManager = new InitManager();
-        inputManager = new InputManager();
-        updateManager = new UpdateManager();
     }
 
     public RenderManager getRenderer() {return renderer;}
@@ -94,9 +82,6 @@ public class MainFieldManager {
     public TerrainManager getTerrainManager() {return terrainManager;}
     public GameVarManager getGameVarManager() {return gameVarManager;}
     public PathManager getPathManager() {return pathManager;}
-    public InitManager getInitManager() {return initManager;}
-    public InputManager getInputManager() {return inputManager;}
-    public UpdateManager getUpdateManager() {return updateManager;}
     public Camera getCamera() {return camera;}
     public Vector3f getCameraInc() {return cameraInc;}
 }

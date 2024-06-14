@@ -27,7 +27,7 @@ public class InGameGUI {
     private final GameVarManager gameVarManager;
     private final EntitiesManager entitiesManager;
 
-    public InGameGUI(long vg, MainFieldManager context) {
+    public InGameGUI(long vg, @NotNull MainFieldManager context) {
         this.vg = vg;
         this.window = Launcher.getWindow();
         this.camera = context.getCamera();
@@ -59,7 +59,7 @@ public class InGameGUI {
         Button backToMenuButton = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Back to Menu", font, runnable.backToMenu(), vg, "src/main/resources/Texture/inGameMenu.png");
         guiElementManager.addInGameMenuButton(backToMenuButton);
 
-        Button soundButtonInGame = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Sound", font, runnable.sound(), vg, "src/main/resources/Texture/inGameMenu.png");
+        Button soundButtonInGame = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Sound: " + (gameState.isSoundPlaying() ? "ON" : "OFF"), font, runnable.sound(), vg, "src/main/resources/Texture/inGameMenu.png");
         guiElementManager.setSoundButtonInGame(soundButtonInGame);
         guiElementManager.addInGameMenuButton(soundButtonInGame);
 
