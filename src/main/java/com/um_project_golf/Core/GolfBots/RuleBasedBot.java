@@ -43,6 +43,7 @@ public class RuleBasedBot {
     public List<List<Vector3f>> findBestShot() {
         int shotCounter = 0;
         double minDistance = Double.MAX_VALUE;
+        fullPath = new HashMap<>();
         List<List<Vector3f>> path = new ArrayList<>();
         Vector3f bestPosition = null;
         Vector3f velocity;
@@ -69,7 +70,6 @@ public class RuleBasedBot {
                             path.add(fullPath.get(bestPosition)); // adds the position to the path of points passed by
                             System.out.println("Shot "+ shotCounter +". Distance to flag: " + distanceToFlag());
                             System.out.println("Ball is in hole! With " + shotCounter + " shots taken");
-                            System.out.println("path" + path);
                             return path;
                         }
                         minDistance = distanceToFlag(); // replaces the old best shot with the new one
@@ -86,6 +86,7 @@ public class RuleBasedBot {
 
             path.add(fullPath.get(bestPosition)); // adds the position to the path of points passed by
             shotCounter++;
+            fullPath.clear(); // clears the path for the next shot
             System.out.println("Shot "+ shotCounter +". Distance to flag: " + distanceToFlag());
         }
         return path;
@@ -98,7 +99,6 @@ public class RuleBasedBot {
 
     // Simulates ball movement with the use of the Physics Engine
     public void simulateBallMovement() {
-        fullPath = new HashMap<>();
         double[] initialState = {ball.getPosition().x, ball.getPosition().z, velocityBall.x, velocityBall.z};
         double h = 0.1; // Time step
         PhysicsEngine engine = new PhysicsEngine(heightMap, scene);
