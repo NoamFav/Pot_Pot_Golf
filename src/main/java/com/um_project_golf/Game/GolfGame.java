@@ -5,14 +5,15 @@ import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.Terrain.Terrain;
 import com.um_project_golf.Core.Entity.Texture;
 import com.um_project_golf.Core.Utils.Consts;
-import com.um_project_golf.Game.FieldManager.*;
-import com.um_project_golf.Game.GUIs.DefaultGUI;
-import com.um_project_golf.Game.GUIs.InGameGUI;
-import com.um_project_golf.Game.GUIs.MenuGUI;
-import com.um_project_golf.Game.GUIs.RecreateGUIs;
-import com.um_project_golf.Game.GameLogic.InitManager;
-import com.um_project_golf.Game.GameLogic.InputManager;
-import com.um_project_golf.Game.GameLogic.UpdateManager;
+import com.um_project_golf.Game.GameUtils.FieldManager.GameStateManager;
+import com.um_project_golf.Game.GameUtils.FieldManager.MainFieldManager;
+import com.um_project_golf.Game.GameUtils.GUIs.DefaultGUI;
+import com.um_project_golf.Game.GameUtils.GUIs.InGameGUI;
+import com.um_project_golf.Game.GameUtils.GUIs.MenuGUI;
+import com.um_project_golf.Game.GameUtils.GUIs.RecreateGUIs;
+import com.um_project_golf.Game.GameUtils.GameLogic.InitManager;
+import com.um_project_golf.Game.GameUtils.GameLogic.InputManager;
+import com.um_project_golf.Game.GameUtils.GameLogic.UpdateManager;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
@@ -32,9 +33,9 @@ public class GolfGame implements ILogic {
     private long vg;
 
     // Managers for the game logic
-    private final InitManager initManager;
-    private final InputManager inputManager;
-    private final UpdateManager updateManager;
+    private InitManager initManager;
+    private InputManager inputManager;
+    private UpdateManager updateManager;
 
     MainFieldManager context;
 
@@ -44,10 +45,6 @@ public class GolfGame implements ILogic {
      */
     public GolfGame() {
         context = new MainFieldManager();
-
-        initManager = new InitManager(context);
-        inputManager = new InputManager(context);
-        updateManager = new UpdateManager(context);
     }
 
     /**
@@ -61,6 +58,10 @@ public class GolfGame implements ILogic {
         System.out.println("Initializing game");
 
         context.setMouseInputs(mouseInput);
+
+        initManager = new InitManager(context);
+        inputManager = new InputManager(context);
+        updateManager = new UpdateManager(context);
 
         context.getScene().setDefaultTexture(new Texture(context.getLoader().loadTexture("src/main/resources/Texture/Default.png")));
         context.getWindow().setAntiAliasing(true);
@@ -101,7 +102,6 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void input() {
-        context.setCameraInc(new Vector3f(0, 0, 0));
         //float lightPos = scene.getSpotLights()[0].getPointLight().getPosition().z;
         //float lightPos2 = scene.getSpotLights()[1].getPointLight().getPosition().z;
 

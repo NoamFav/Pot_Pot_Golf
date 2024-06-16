@@ -1,7 +1,7 @@
 package com.um_project_golf.Core.Utils;
 
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
-import com.um_project_golf.Game.FieldManager.PathManager;
+import com.um_project_golf.Game.GameUtils.FieldManager.PathManager;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
 import org.joml.Vector3f;

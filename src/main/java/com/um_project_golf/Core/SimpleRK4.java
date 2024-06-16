@@ -1,5 +1,7 @@
 package com.um_project_golf.Core;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.function.BiFunction;
 
 public class SimpleRK4 {
@@ -13,7 +15,7 @@ public class SimpleRK4 {
      * @param function The function to evaluate the derivative.
      * @return The final state.
      */
-    public static double[] simpleRK4(double t0, double[] y0, double tFinal, double stepSize, BiFunction<Double, double[], double[]> function) {
+    public static double @NotNull [] simpleRK4(double t0, double @NotNull [] y0, double tFinal, double stepSize, BiFunction<Double, double[], double[]> function) {
         double t = t0;
         int numberOfSteps = (int) ((tFinal - t0) / stepSize);
         int length = y0.length;
