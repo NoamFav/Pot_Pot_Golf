@@ -50,6 +50,7 @@ public class AIBot {
     public List<List<Vector3f>> findBestShotUsingHillClimbing() {
         int shotCounter = 0;
         Random random = new Random();
+        fullPath = new HashMap<>();
         List<List<Vector3f>> path = new ArrayList<>();
         Vector3f currentPosition = new Vector3f(startingPosition);
         Vector3f nextPosition;
@@ -88,6 +89,7 @@ public class AIBot {
                 currentPosition = new Vector3f(nextPosition);
                 ball.setPosition(currentPosition); // set the ball to the end position of the shot
                 System.out.println("Shot "+ shotCounter +".Improvement! Distance to flag: " + distanceToFlag());
+                fullPath.clear();
                 // Checks if its in hole
                 if(isInHole()) {
                     System.out.println("Ball is in hole! With " + shotCounter + " shots taken");
@@ -117,6 +119,7 @@ public class AIBot {
                             improvement = true;
                             shotCounter++;
                             path.add(fullPath.get(nextPosition)); // adds the position to the path of points passed by
+                            fullPath.clear();
                             currentPosition = new Vector3f(nextPosition);
                             ball.setPosition(currentPosition); // sets the ball to the end position of the shot
                             System.out.println("Shot "+ shotCounter +".Improvement! Distance to flag: " + distanceToFlag());
@@ -154,7 +157,6 @@ public class AIBot {
 
     // Simulates ball movement with the use of the Physics Engine
     public void simulateBallMovement() {
-        fullPath = new HashMap<>();
         double[] initialState = {ball.getPosition().x, ball.getPosition().z, velocityBall.x, velocityBall.z};
         double h = 0.1; // Time step
         PhysicsEngine engine = new PhysicsEngine(testMap, scene);
