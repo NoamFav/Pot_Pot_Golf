@@ -25,7 +25,6 @@ public class RuleBasedBot {
     private HashMap<Vector3f,List<Vector3f>> fullPath;
     private final SceneManager scene;
 
-
     public RuleBasedBot(@NotNull Entity ball, Entity flag, HeightMap heightMap, double flagRadius, SceneManager scene) {
         startingPosition = new Vector3f(ball.getPosition());
         this.ball = ball;
@@ -70,6 +69,7 @@ public class RuleBasedBot {
                             path.add(fullPath.get(bestPosition)); // adds the position to the path of points passed by
                             System.out.println("Shot "+ shotCounter +". Distance to flag: " + distanceToFlag());
                             System.out.println("Ball is in hole! With " + shotCounter + " shots taken");
+                            System.out.println("path" + path);
                             return path;
                         }
                         minDistance = distanceToFlag(); // replaces the old best shot with the new one
@@ -83,6 +83,7 @@ public class RuleBasedBot {
             assert bestPosition != null;
             ball.setPosition(bestPosition.x,bestPosition.y,bestPosition.z); // sets ball to start in the new position
             startingPosition = new Vector3f(bestPosition); // sets initial position to be now the new position
+
             path.add(fullPath.get(bestPosition)); // adds the position to the path of points passed by
             shotCounter++;
             System.out.println("Shot "+ shotCounter +". Distance to flag: " + distanceToFlag());
@@ -124,7 +125,6 @@ public class RuleBasedBot {
         double dz = flag.getPosition().z - ball.getPosition().z;
 
         // Calculate the distance using the 3D distance formula
-
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 }
