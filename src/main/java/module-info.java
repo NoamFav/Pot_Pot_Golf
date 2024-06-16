@@ -37,8 +37,8 @@ module com.um_project_golf {
     exports com.um_project_golf.Core.Entity.Terrain;
     exports com.um_project_golf.Core.AWT;
     opens com.um_project_golf.Core.Utils to javafx.fxml;
-    exports com.um_project_golf.Game.GameLogic;
-    opens com.um_project_golf.Game.GameLogic to javafx.fxml;
-    exports com.um_project_golf.Game.FieldManager;
-    opens com.um_project_golf.Game.FieldManager to javafx.fxml;
+    exports com.um_project_golf.Game.GameUtils.GameLogic;
+    opens com.um_project_golf.Game.GameUtils.GameLogic to javafx.fxml;
+    exports com.um_project_golf.Game.GameUtils.FieldManager;
+    opens com.um_project_golf.Game.GameUtils.FieldManager to javafx.fxml;
 }

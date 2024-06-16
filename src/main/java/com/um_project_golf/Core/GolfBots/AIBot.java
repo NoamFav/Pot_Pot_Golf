@@ -123,6 +123,8 @@ public class AIBot {
                             // Checks if its in hole
                             if (isInHole()){
                                 System.out.println("Ball is in hole!With " + shotCounter + " shots taken");
+                                System.out.println(path.size() + " points in path");
+                                assert path.size() == shotCounter;
                                 return path;
                             }
                             break;
@@ -137,11 +139,13 @@ public class AIBot {
 
         }
         System.out.println("No improvement possible");
+        System.out.println(path.size() + " points in path");
+        assert path.size() == shotCounter;
         return path;
     }
 
     // Method that evaluates the hypothetical shot
-    public double evaluateShot(Shot shot) {
+    public double evaluateShot(@NotNull Shot shot) {
         applyVelocities(shot.velocity());
         simulateBallMovement();
         return distanceToFlag();
