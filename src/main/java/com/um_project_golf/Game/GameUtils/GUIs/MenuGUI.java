@@ -148,6 +148,9 @@ public class MenuGUI {
                 pathManager.setPath(path);
                 startEndPoint.startEndPointConversion(pathManager, heightMap);
 
+                if (entitiesManager.getBotBall() != null) scene.getEntities().removeIf(entity -> entity.equals(entitiesManager.getBotBall()));
+                if (entitiesManager.getAiBotBall() != null) scene.getEntities().removeIf(entity -> entity.equals(entitiesManager.getAiBotBall()));
+
                 TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
                 SimplexNoise.shufflePermutation();
                 terrainSwitch.terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
@@ -176,17 +179,16 @@ public class MenuGUI {
             gameStateManager.setGameStarted(true);
             gameStateManager.setPlayer1Turn(true);
 
+            if (entitiesManager.getBotBall() != null) scene.getEntities().removeIf(entity -> entity.equals(entitiesManager.getBotBall()));
+            if (entitiesManager.getAiBotBall() != null) scene.getEntities().removeIf(entity -> entity.equals(entitiesManager.getAiBotBall()));
+
             if (gameStateManager.isBot()) {
                 createBotBall().run();
-            } else {
-                if (entitiesManager.getBotBall() != null) scene.getEntities().removeIf(entity -> entity.equals(entitiesManager.getBotBall()));
             }
-
             if (gameStateManager.isAiBot()) {
                 createAiBotBall().run();
-            } else {
-                if (entitiesManager.getAiBotBall() != null) scene.getEntities().removeIf(entity -> entity.equals(entitiesManager.getAiBotBall()));
             }
+
 
             Vector3f start = new Vector3f(pathManager.getStartPoint());
             start.y = heightMap.getHeight(new Vector3f(pathManager.getStartPoint().x, 0, pathManager.getStartPoint().z));
