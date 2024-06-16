@@ -29,15 +29,9 @@ public class GolfGame implements ILogic {
     public static boolean debugMode = false; //Do not change this value to true,
     // it will break the game (you can change it to true in-game only)
 
-    // NanoVG context
-    private long vg;
+    private long vg; // NanoVG context
 
-    // Managers for the game logic
-    private InitManager initManager;
-    private InputManager inputManager;
-    private UpdateManager updateManager;
-
-    MainFieldManager context;
+    MainFieldManager context; // The main controller of the game
 
     /**
      * The constructor of the game.
@@ -59,16 +53,15 @@ public class GolfGame implements ILogic {
 
         context.setMouseInputs(mouseInput);
 
-        initManager = new InitManager(context);
-        inputManager = new InputManager(context);
-        updateManager = new UpdateManager(context);
+        // Managers for the game logic
+        InitManager initManager = new InitManager(context);
 
         context.getScene().setDefaultTexture(new Texture(context.getLoader().loadTexture("src/main/resources/Texture/Default.png")));
         context.getWindow().setAntiAliasing(true);
         context.getWindow().setResized(false);
 
         context.getRenderer().init();
-        context.getWindow().setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
+        context.getWindow().setClearColor(0, 0, 0, 0.0f);
 
         context.getHeightMap().createHeightMap();
         context.getPathManager().setPath(context.getPathfinder().getPath(Consts.RADIUS_DOWN, Consts.RADIUS_UP, Consts.SIZE_GREEN));
@@ -102,6 +95,8 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void input() {
+
+        InputManager inputManager = new InputManager(context);
         //float lightPos = scene.getSpotLights()[0].getPointLight().getPosition().z;
         //float lightPos2 = scene.getSpotLights()[1].getPointLight().getPosition().z;
 
@@ -122,6 +117,9 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void update() {
+
+        UpdateManager updateManager = new UpdateManager(context);
+
         context.getGuiElementManager().update(context.getGameStateManager());
 
         if (context.getWindow().isResized()) {

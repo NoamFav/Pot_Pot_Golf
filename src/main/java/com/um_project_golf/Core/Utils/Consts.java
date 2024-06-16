@@ -122,7 +122,7 @@ public class Consts {
     public static final Vector3f HOLE_POSITION = new Vector3f(4f, 0f, 1f); // Position of the hole
     public static final boolean WANT_TREE = true; // Want trees on the terrain
     public static final boolean USE_PREDEFINED_POSITIONS = true; // Use predefined positions for the tee and the hole
-    public static final float TARGET_RADIUS = 0.5f; // Radius of the ball (meters)
+    public static final float TARGET_RADIUS = 1.5f; // Radius of the ball (meters)
     // Harder to hit the ball with a smaller radius
 
     // Change the radius to make the game easier or harder.
@@ -135,7 +135,7 @@ public class Consts {
     // Par 5: 410-550 meters (need size terrain of 1024)
     // Par 6: 550-700 meters (need size terrain of 2048)
     public static final int RADIUS_DOWN = 10; // Minimum distance from the hole
-    public static final int RADIUS_UP = 15; // Maximum distance from the hole
+    public static final int RADIUS_UP = 30; // Maximum distance from the hole
     public static final int SIZE_GREEN = 10; // Size of the green (meters)
 
     // (Recommend higher when using long distances)
