@@ -179,7 +179,10 @@ public class UpdateManager {
 
         if (gameVarManager.getAnimationTimeAccumulatorBot() >= timeStep) {
             gameVarManager.decrementAnimationTimeAccumulatorBot(timeStep);
-            List<Vector3f> ballPositions = gameVarManager.getBotPath().get(gameVarManager.getCurrentShotIndexBot());
+
+            List<Vector3f> ballPositions;
+            if (gameVarManager.getCurrentShotIndexBot() < gameVarManager.getBotPath().size()) {ballPositions = gameVarManager.getBotPath().get(gameVarManager.getCurrentShotIndexBot());}
+            else { gameStateManager.setBotAnimating(false); return;}
 
             if (gameVarManager.getCurrentPositionIndexBot() < ballPositions.size()) {
                 Vector3f nextPosition = ballPositions.get(gameVarManager.getCurrentPositionIndexBot());
@@ -214,7 +217,10 @@ public class UpdateManager {
 
         if (gameVarManager.getAnimationTimeAccumulatorAI() >= timeStep) {
             gameVarManager.decrementAnimationTimeAccumulatorAI(timeStep);
-            List<Vector3f> ballPositions = gameVarManager.getAiBotPath().get(gameVarManager.getCurrentShotIndexAI());
+
+            List<Vector3f> ballPositions;
+            if (gameVarManager.getCurrentShotIndexAI() < gameVarManager.getAiBotPath().size()) { ballPositions = gameVarManager.getAiBotPath().get(gameVarManager.getCurrentShotIndexAI());}
+            else { gameStateManager.setAiBotAnimating(false); return;}
 
             if (gameVarManager.getCurrentPositionIndexAI() < ballPositions.size()) {
                 Vector3f nextPosition = ballPositions.get(gameVarManager.getCurrentPositionIndexAI());
