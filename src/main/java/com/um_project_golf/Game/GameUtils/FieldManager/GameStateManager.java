@@ -17,6 +17,9 @@ public class GameStateManager {
     private boolean hasStartPoint;
     private boolean tKeyWasPressed;
 
+    private boolean isAiBotAnimating;
+    private boolean isBotAnimating;
+
     public GameStateManager() {
         canMove = false;
         isGuiVisible = true;
@@ -59,4 +62,8 @@ public class GameStateManager {
     public void setHasStartPoint(boolean hasStartPoint) {this.hasStartPoint = hasStartPoint;}
     public boolean istKeyWasPressed() {return tKeyWasPressed;}
     public void settKeyWasPressed(boolean tKeyWasPressed) {this.tKeyWasPressed = tKeyWasPressed;}
+    public boolean isBotAnimating() {return isBotAnimating;}
+    public void setBotAnimating(boolean botAnimating) {isBotAnimating = botAnimating;}
+    public boolean isAiBotAnimating() {return isAiBotAnimating;}
+    public void setAiBotAnimating(boolean aiBotAnimating) {isAiBotAnimating = aiBotAnimating;}
 }

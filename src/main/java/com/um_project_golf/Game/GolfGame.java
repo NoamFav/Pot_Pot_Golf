@@ -125,11 +125,7 @@ public class GolfGame implements ILogic {
         if (context.getWindow().isResized()) {
             Vector3f oldPosition = new Vector3f(context.getCamera().getPosition());
             context.getWindow().setResized(false);
-
-            new RecreateGUIs(vg,
-                    context
-            );
-
+            new RecreateGUIs(vg, context);
             context.getMouseInputs().init();
             context.getCamera().setPosition(oldPosition);
         }
@@ -142,17 +138,15 @@ public class GolfGame implements ILogic {
         updateManager.daytimeCycle();
         updateManager.updateTreeAnimations();
         updateManager.animateBall();
+        if (context.getGameStateManager().isAiBotAnimating()) {updateManager.animateAIBall();}
+        if (context.getGameStateManager().isBotAnimating()) {updateManager.animateBotBall();}
 
-        context.getGuiElementManager().updateTextFields(context.getGameStateManager(), debugMode);
+        context.getGuiElementManager().updateTextFields(context.getGameStateManager());
 
 
-        for (Entity entity : context.getScene().getEntities()) {
-            context.getRenderer().processEntity(entity);
-        }
+        for (Entity entity : context.getScene().getEntities()) {context.getRenderer().processEntity(entity);}
 
-        for (Terrain terrain : context.getScene().getTerrains()) {
-            context.getRenderer().processTerrain(terrain);
-        }
+        for (Terrain terrain : context.getScene().getTerrains()) {context.getRenderer().processTerrain(terrain);}
     }
 
     /**

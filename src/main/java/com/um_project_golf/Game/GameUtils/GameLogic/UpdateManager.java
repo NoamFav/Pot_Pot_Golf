@@ -166,6 +166,83 @@ public class UpdateManager {
         }
     }
 
+
+    /**
+     * Animate the bot ball.
+     * Used for the bot's movement.
+     * Makes the bot ball move to the end point.
+     */
+    public void animateBotBall() {
+
+        float timeStep = 0.1f;
+        gameVarManager.incrementAnimationTimeAccumulatorBot(timeStep);
+
+        if (gameVarManager.getAnimationTimeAccumulatorBot() >= timeStep) {
+            gameVarManager.decrementAnimationTimeAccumulatorBot(timeStep);
+            List<Vector3f> ballPositions = gameVarManager.getBotPath().get(gameVarManager.getCurrentShotIndexBot());
+
+            if (gameVarManager.getCurrentPositionIndexBot() < ballPositions.size()) {
+                Vector3f nextPosition = ballPositions.get(gameVarManager.getCurrentPositionIndexBot());
+
+                if (nextPosition == ballPositions.get(ballPositions.size() - 1)) {
+                    float isInHoleThreshold = Consts.TARGET_RADIUS;
+                    Vector3f endPoint = new Vector3f(pathManager.getEndPoint());
+                    if (nextPosition.x <= endPoint.x + isInHoleThreshold && nextPosition.x >= endPoint.x - isInHoleThreshold) {
+                        if (nextPosition.z <= endPoint.z + isInHoleThreshold && nextPosition.z >= endPoint.z - isInHoleThreshold) {
+                            System.out.println("Bot Ball reached the end point!");
+                            System.out.println(endPoint);
+                            gameVarManager.setTreeAnimationGoingUp();
+                            gameVarManager.resetTreeAnimationTime();
+                        }
+                    }
+                }
+                gameVarManager.getBallCollisionDetector().checkCollisionBall(nextPosition);
+                entitiesManager.getBotBall().setPosition(nextPosition);
+                gameVarManager.incrementCurrentPositionIndexBot();
+            } else {
+                gameVarManager.resetAnimationTimeAccumulatorBot();
+                gameVarManager.resetCurrentPositionIndexBot();
+                gameVarManager.incrementCurrentShotIndexBot();
+                gameStateManager.setBotAnimating(false);
+            }
+        }
+    }
+
+    public void animateAIBall() {
+        float timeStep = 0.1f;
+        gameVarManager.incrementAnimationTimeAccumulatorAI(timeStep);
+
+        if (gameVarManager.getAnimationTimeAccumulatorAI() >= timeStep) {
+            gameVarManager.decrementAnimationTimeAccumulatorAI(timeStep);
+            List<Vector3f> ballPositions = gameVarManager.getAiBotPath().get(gameVarManager.getCurrentShotIndexAI());
+
+            if (gameVarManager.getCurrentPositionIndexAI() < ballPositions.size()) {
+                Vector3f nextPosition = ballPositions.get(gameVarManager.getCurrentPositionIndexAI());
+
+                if (nextPosition == ballPositions.get(ballPositions.size() - 1)) {
+                    float isInHoleThreshold = Consts.TARGET_RADIUS;
+                    Vector3f endPoint = new Vector3f(pathManager.getEndPoint());
+                    if (nextPosition.x <= endPoint.x + isInHoleThreshold && nextPosition.x >= endPoint.x - isInHoleThreshold) {
+                        if (nextPosition.z <= endPoint.z + isInHoleThreshold && nextPosition.z >= endPoint.z - isInHoleThreshold) {
+                            System.out.println("AI Ball reached the end point!");
+                            System.out.println(endPoint);
+                            gameVarManager.setTreeAnimationGoingUp();
+                            gameVarManager.resetTreeAnimationTime();
+                        }
+                    }
+                }
+                gameVarManager.getBallCollisionDetector().checkCollisionBall(nextPosition);
+                entitiesManager.getAiBotBall().setPosition(nextPosition);
+                gameVarManager.incrementCurrentPositionIndexAI();
+            } else {
+                gameVarManager.resetAnimationTimeAccumulatorAI();
+                gameVarManager.resetCurrentPositionIndexAI();
+                gameVarManager.incrementCurrentShotIndexAI();
+                gameStateManager.setAiBotAnimating(false);
+            }
+        }
+    }
+
     /**
      * Update the ball for multiplayer.
      * Switches the player's turn.
