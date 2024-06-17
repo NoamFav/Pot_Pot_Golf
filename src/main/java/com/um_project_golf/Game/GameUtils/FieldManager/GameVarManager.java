@@ -19,10 +19,12 @@ public class GameVarManager {
     private float animationTimeAccumulator;
     private Vector3f shotStartPosition;
 
+    // Bot variables
     private int currentPositionIndexBot;
     private float animationTimeAccumulatorBot;
     private int currentShotIndexBot;
 
+    // AI Bot variables
     private int currentPositionIndexAI;
     private float animationTimeAccumulatorAI;
     private int currentShotIndexAI;
@@ -32,9 +34,7 @@ public class GameVarManager {
 
     private BallCollisionDetector ballCollisionDetector;
     // Path for the bots, not used currently as a problem with movement issue and threading issues.
-    @SuppressWarnings("unused")
     private List<List<Vector3f>> botPath; // Path followed by the bot
-    @SuppressWarnings("unused")
     private List<List<Vector3f>> aiBotPath; // Path followed by AI bot
 
     public boolean isTreeAnimationIdle() {return treeAnimationState == AnimationState.IDLE;}
