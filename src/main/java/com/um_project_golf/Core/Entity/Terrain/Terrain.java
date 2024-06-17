@@ -5,7 +5,7 @@ import com.um_project_golf.Core.Entity.Model;
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Texture;
 import com.um_project_golf.Core.ObjectLoader;
-import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GameUtils.Consts;
 import com.um_project_golf.Game.GolfGame;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;

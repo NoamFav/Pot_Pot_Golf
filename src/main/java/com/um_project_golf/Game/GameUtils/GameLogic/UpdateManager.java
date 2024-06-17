@@ -2,7 +2,7 @@ package com.um_project_golf.Game.GameUtils.GameLogic;
 
 import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.SceneManager;
-import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GameUtils.Consts;
 import com.um_project_golf.Game.GameUtils.FieldManager.*;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;

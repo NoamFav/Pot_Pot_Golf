@@ -8,7 +8,7 @@ import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 import com.um_project_golf.Core.PhysicsEngine;
 import com.um_project_golf.Core.Utils.BallCollisionDetector;
-import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GameUtils.Consts;
 import com.um_project_golf.Core.WindowManager;
 import com.um_project_golf.Game.GameUtils.FieldManager.*;
 import com.um_project_golf.Game.Launcher;

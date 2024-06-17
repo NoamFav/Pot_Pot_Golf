@@ -1,6 +1,6 @@
 package com.um_project_golf.Game;
 
-import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GameUtils.Consts;
 import com.um_project_golf.Core.EngineManager;
 import com.um_project_golf.Core.WindowManager;
 import org.apache.logging.log4j.LogManager;

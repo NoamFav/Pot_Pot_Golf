@@ -9,7 +9,7 @@ import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
 import com.um_project_golf.Core.ShaderManager;
-import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GameUtils.Consts;
 import com.um_project_golf.Core.WindowManager;
 import com.um_project_golf.Game.Launcher;
 import org.jetbrains.annotations.NotNull;
