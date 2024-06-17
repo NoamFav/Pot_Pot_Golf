@@ -4,7 +4,6 @@ import com.um_project_golf.Core.AWT.Button;
 import com.um_project_golf.Core.AWT.TextField;
 import com.um_project_golf.Core.AWT.TextPane;
 import com.um_project_golf.Core.AWT.Title;
-import com.um_project_golf.Game.GolfGame;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
