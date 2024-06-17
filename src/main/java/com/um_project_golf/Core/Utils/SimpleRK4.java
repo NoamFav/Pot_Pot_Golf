@@ -1,4 +1,4 @@
-package com.um_project_golf.Core;
+package com.um_project_golf.Core.Utils;
 
 import org.jetbrains.annotations.NotNull;
 
