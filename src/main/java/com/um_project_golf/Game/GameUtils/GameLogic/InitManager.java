@@ -9,7 +9,7 @@ import com.um_project_golf.Core.Lighting.DirectionalLight;
 import com.um_project_golf.Core.Lighting.PointLight;
 import com.um_project_golf.Core.Lighting.SpotLight;
 import com.um_project_golf.Core.ObjectLoader;
-import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GameUtils.Consts;
 import com.um_project_golf.Core.Utils.StartEndPoint;
 import com.um_project_golf.Core.Utils.TerrainSwitch;
 import com.um_project_golf.Game.GameUtils.FieldManager.*;
