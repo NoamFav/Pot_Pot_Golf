@@ -51,4 +51,6 @@ public class EntitiesManager {
     public void setArrowEntity(Entity arrowEntity) {this.arrowEntity = arrowEntity;}
     public void setArrowEntityPosition(Vector3f position) {this.arrowEntity.setPosition(position);}
     public void setArrowEntityRotation(Vector3f rotation) {this.arrowEntity.setRotation(rotation);}
+    public void setBotBallPosition(Vector3f vector3f) {botBall.setPosition(vector3f);}
+    public void setAiBotBallPosition(Vector3f vector3f) {aiBotBall.setPosition(vector3f);}
 }

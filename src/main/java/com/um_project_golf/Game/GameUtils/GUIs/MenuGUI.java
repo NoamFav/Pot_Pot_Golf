@@ -323,6 +323,8 @@ public class MenuGUI {
 
             RuleBasedBot ruleBasedBot = new RuleBasedBot(new Entity(botBall), new Entity(entitiesManager.getEndFlag()), heightMap, Consts.TARGET_RADIUS, scene);
             gameVarManager.setBotPath(ruleBasedBot.findBestShot());
+
+            entitiesManager.setBotBallPosition(new Vector3f(pathManager.getStartPoint()));
         };
 
     }
@@ -345,6 +347,8 @@ public class MenuGUI {
 
             AIBot aiBot = new AIBot(new Entity(aiBotBall), new Entity(entitiesManager.getEndFlag()), heightMap, Consts.TARGET_RADIUS, scene);
             gameVarManager.setAiBotPath(aiBot.findBestShotUsingHillClimbing());
+
+            entitiesManager.setAiBotBallPosition(new Vector3f(pathManager.getStartPoint()));
         };
 
     }

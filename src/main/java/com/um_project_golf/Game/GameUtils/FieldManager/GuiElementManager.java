@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.um_project_golf.Game.GolfGame.debugMode;
+
 @SuppressWarnings("unused")
 public class GuiElementManager {
     private Title title;
@@ -70,7 +72,7 @@ public class GuiElementManager {
                     if (!Objects.equals(button.getText(), "Change Terrain")) {
                         button.render();
                     } else {
-                        if (!GolfGame.debugMode) {
+                        if (!debugMode) {
                             button.render();
                         }
                     }
@@ -120,7 +122,7 @@ public class GuiElementManager {
      * Update the text fields.
      * Used for On/Off buttons.
      */
-    public void updateTextFields(@NotNull GameStateManager gameState, boolean debugMode) {
+    public void updateTextFields(@NotNull GameStateManager gameState) {
         boolean isBot = gameState.isBot();
         boolean isAiBot = gameState.isAiBot();
         boolean is2player = gameState.is2player();
