@@ -19,6 +19,14 @@ public class GameVarManager {
     private float animationTimeAccumulator;
     private Vector3f shotStartPosition;
 
+    private int currentPositionIndexBot;
+    private float animationTimeAccumulatorBot;
+    private int currentShotIndexBot;
+
+    private int currentPositionIndexAI;
+    private float animationTimeAccumulatorAI;
+    private int currentShotIndexAI;
+
     // Positions of the balls for Animation purposes
     private List<Vector3f> ballPositions = new ArrayList<>();
 
@@ -65,5 +73,31 @@ public class GameVarManager {
     public void setBotPath(List<List<Vector3f>> botPath) {this.botPath = botPath;}
     public BallCollisionDetector getBallCollisionDetector() {return ballCollisionDetector;}
     public void setBallCollisionDetector(BallCollisionDetector ballCollisionDetector) {this.ballCollisionDetector = ballCollisionDetector;}
+    public int getCurrentPositionIndexBot() {return currentPositionIndexBot;}
+    public void setCurrentPositionIndexBot(int currentPositionIndexBot) {this.currentPositionIndexBot = currentPositionIndexBot;}
+    public float getAnimationTimeAccumulatorBot() {return animationTimeAccumulatorBot;}
+    public void setAnimationTimeAccumulatorBot(float animationTimeAccumulatorBot) {this.animationTimeAccumulatorBot = animationTimeAccumulatorBot;}
+    public int getCurrentShotIndexBot() {return currentShotIndexBot;}
+    public void setCurrentShotIndexBot(int currentShotIndexBot) {this.currentShotIndexBot = currentShotIndexBot;}
+    public void incrementCurrentShotIndexBot() {currentShotIndexBot++;}
+    public void resetCurrentShotIndexBot() {currentShotIndexBot = 0;}
+    public void incrementCurrentPositionIndexBot() {currentPositionIndexBot++;}
+    public void resetCurrentPositionIndexBot() {currentPositionIndexBot = 0;}
+    public void incrementAnimationTimeAccumulatorBot(float delta) {animationTimeAccumulatorBot += delta;}
+    public void decrementAnimationTimeAccumulatorBot(float delta) {animationTimeAccumulatorBot -= delta;}
+    public void resetAnimationTimeAccumulatorBot() {animationTimeAccumulatorBot = 0f;}
+    public int getCurrentPositionIndexAI() {return currentPositionIndexAI;}
+    public void setCurrentPositionIndexAI(int currentPositionIndexAI) {this.currentPositionIndexAI = currentPositionIndexAI;}
+    public float getAnimationTimeAccumulatorAI() {return animationTimeAccumulatorAI;}
+    public void setAnimationTimeAccumulatorAI(float animationTimeAccumulatorAI) {this.animationTimeAccumulatorAI = animationTimeAccumulatorAI;}
+    public int getCurrentShotIndexAI() {return currentShotIndexAI;}
+    public void setCurrentShotIndexAI(int currentShotIndexAI) {this.currentShotIndexAI = currentShotIndexAI;}
+    public void incrementCurrentShotIndexAI() {currentShotIndexAI++;}
+    public void resetCurrentShotIndexAI() {currentShotIndexAI = 0;}
+    public void incrementCurrentPositionIndexAI() {currentPositionIndexAI++;}
+    public void resetCurrentPositionIndexAI() {currentPositionIndexAI = 0;}
+    public void incrementAnimationTimeAccumulatorAI(float delta) {animationTimeAccumulatorAI += delta;}
+    public void decrementAnimationTimeAccumulatorAI(float delta) {animationTimeAccumulatorAI -= delta;}
+    public void resetAnimationTimeAccumulatorAI() {animationTimeAccumulatorAI = 0f;}
 
 }

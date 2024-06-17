@@ -116,6 +116,15 @@ public class InputManager {
             } else if (!isTPressed) {
                 gameStateManager.settKeyWasPressed(false); // Reset the flag when the key is released
             }
+
+            if (window.is_keyPressed(GLFW.GLFW_KEY_1) && gameStateManager.isAiBot()) {
+                gameStateManager.setAiBotAnimating(true);
+            }
+
+            if (window.is_keyPressed(GLFW.GLFW_KEY_2) && gameStateManager.isBot()) {
+                gameStateManager.setBotAnimating(true);
+            }
+
         }
 
         context.setCameraInc(cameraInc);
