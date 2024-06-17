@@ -6,7 +6,7 @@ import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 import com.um_project_golf.Core.Entity.Terrain.HeightMapPathfinder;
 import com.um_project_golf.Core.Entity.Terrain.TerrainTexture;
-import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GameUtils.Consts;
 import com.um_project_golf.Core.Utils.TerrainSwitch;
 import com.um_project_golf.Game.GameUtils.FieldManager.*;
 import org.jetbrains.annotations.NotNull;

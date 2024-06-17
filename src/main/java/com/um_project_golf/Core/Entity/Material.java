@@ -1,6 +1,6 @@
 package com.um_project_golf.Core.Entity;
 
-import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GameUtils.Consts;
 import org.joml.Vector4f;
 
 /**

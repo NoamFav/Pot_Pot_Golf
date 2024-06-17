@@ -3,6 +3,7 @@ package com.um_project_golf.Core.Utils;
 import com.um_project_golf.Core.Camera;
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
+import com.um_project_golf.Game.GameUtils.Consts;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 

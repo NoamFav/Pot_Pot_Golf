@@ -4,7 +4,7 @@ import com.um_project_golf.Core.AWT.Button;
 import com.um_project_golf.Core.AudioManager;
 import com.um_project_golf.Core.Camera;
 import com.um_project_golf.Core.Entity.Entity;
-import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GameUtils.Consts;
 import com.um_project_golf.Core.WindowManager;
 import com.um_project_golf.Game.GameUtils.FieldManager.*;
 import com.um_project_golf.Game.Launcher;

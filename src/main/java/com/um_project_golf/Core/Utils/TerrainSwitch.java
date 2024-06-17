@@ -10,6 +10,7 @@ import com.um_project_golf.Core.Entity.Terrain.Terrain;
 import com.um_project_golf.Core.Entity.Terrain.TerrainTexture;
 import com.um_project_golf.Core.ObjectLoader;
 import com.um_project_golf.Core.Rendering.RenderManager;
+import com.um_project_golf.Game.GameUtils.Consts;
 import com.um_project_golf.Game.GameUtils.FieldManager.EntitiesManager;
 import com.um_project_golf.Game.GameUtils.FieldManager.ModelManager;
 import com.um_project_golf.Game.GameUtils.FieldManager.TerrainManager;

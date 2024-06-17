@@ -4,7 +4,7 @@ import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.Terrain.Terrain;
 import com.um_project_golf.Core.Entity.Texture;
-import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GameUtils.Consts;
 import com.um_project_golf.Game.GameUtils.FieldManager.GameStateManager;
 import com.um_project_golf.Game.GameUtils.FieldManager.MainFieldManager;
 import com.um_project_golf.Game.GameUtils.GUIs.DefaultGUI;

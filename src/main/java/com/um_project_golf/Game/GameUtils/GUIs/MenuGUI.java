@@ -8,7 +8,7 @@ import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.*;
 import com.um_project_golf.Core.GolfBots.AIBot;
 import com.um_project_golf.Core.GolfBots.RuleBasedBot;
-import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GameUtils.Consts;
 import com.um_project_golf.Core.Utils.StartEndPoint;
 import com.um_project_golf.Core.Utils.TerrainSwitch;
 import com.um_project_golf.Game.GameUtils.FieldManager.*;
