@@ -87,7 +87,7 @@ public class TerrainSwitch {
      * As long as the position is green
      */
     public void createTrees() throws IOException {
-        BufferedImage heightmapImage = ImageIO.read(new File("src/main/resources/Texture/heightmap.png"));
+        BufferedImage heightmapImage = ImageIO.read(new File(Consts.HEIGHTMAP_IMAGE));
 
         List<Vector3f> positions = new ArrayList<>();
 

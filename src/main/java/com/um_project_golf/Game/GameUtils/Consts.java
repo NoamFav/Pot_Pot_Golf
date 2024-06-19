@@ -30,7 +30,7 @@ public class Consts {
     public static final int VERTEX_COUNT = (int) Math.pow(2, POWER + 2); // Number of vertices in the terrain (Higher = more detail but also more performance heavy)
     public static final int NUMBER_OF_TREES = (int) (SIZE_X / 2); // Density of the trees (higher = more trees) reduces for performance
     public static final float TREE_SIZE = 1.5f; // Size of the trees at the trunk
-    public static final float MAX_HEIGHT = 10000; // Maximum height of the terrain,
+    public static final float MAX_HEIGHT = 1000; // Maximum height of the terrain,
     // doesn't have to influence the actual height of the terrain just the maximum height reachable by the player
 
     public static final int MAX_TEXTURES = 7; // Maximum number of textures (don't change)
@@ -122,7 +122,7 @@ public class Consts {
     public static final Vector3f HOLE_POSITION = new Vector3f(4f, 0f, 1f); // Position of the hole
     public static final boolean WANT_TREE = true; // Want trees on the terrain
     public static final boolean USE_PREDEFINED_POSITIONS = true; // Use predefined positions for the tee and the hole
-    public static final float TARGET_RADIUS = 1.5f; // Radius of the ball (meters)
+    public static final float TARGET_RADIUS = 1.5f; // Radius of the hole (meters)
     // Harder to hit the ball with a smaller radius
 
     // Change the radius to make the game easier or harder.
@@ -158,4 +158,28 @@ public class Consts {
 
     public static final float KINETIC_FRICTION_SAND = 0.2f; // Friction of the sand (recommended: 0.4)
     public static final float STATIC_FRICTION_SAND = 0.4f; // Friction of the sand (recommended: 0.8)
+
+
+
+    //Resources for the game
+    public static final String DEFAULT_TEXTURE = "src/main/resources/Texture/Default.png";
+
+    public static final String BACKGROUND_MUSIC = "src/main/resources/SoundTrack/skippy-mr-sunshine-fernweh-goldfish-main-version-02-32-7172.wav";
+
+    public static final String MAIN_TREE_OBJ = "src/main/resources/Models/tree/tree.obj";
+    public static final String SKYBOX_OBJ = "src/main/resources/Models/Skybox/SkyBox.obj";
+    public static final String BALL_OBJ = "src/main/resources/Models/Ball/ImageToStl.com_ball.obj";
+    public static final String ARROW_OBJ = "src/main/resources/Models/Arrow/Arrow5.obj";
+    public static final String FLAG_OBJ = "src/main/resources/Models/flag/flag.obj";
+
+    public static final String BALL_TEXTURE1 = "src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png";
+    public static final String BALL_TEXTURE2 = "src/main/resources/Models/Ball/Ball_texture/Golf_Ball2.png";
+    public static final String BALL_TEXTURE_BOT = "src/main/resources/Models/Ball/Ball_texture/BallBot.png";
+    public static final String BALL_TEXTURE_AI_BOT = "src/main/resources/Models/Ball/Ball_texture/BallAIBot.png";
+
+    public static final String SAND_TEXTURE = "src/main/resources/Texture/cartoonSand.jpg";
+    public static final String GRASS_TEXTURE = "src/main/resources/Texture/cartoonFlowers.jpg";
+    public static final String FAIRWAY_TEXTURE = "src/main/resources/Texture/cartoonGrass.jpg";
+    public static final String WATER_TEXTURE = "src/main/resources/Texture/cartoonWater.jpg";
+    public static final String HEIGHTMAP_IMAGE = "src/main/resources/Texture/heightmap.png";
 }

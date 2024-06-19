@@ -229,7 +229,7 @@ public class InputManager {
 
         pathManager.setPath(pathfinder.getPathDebug(start, end, Consts.SIZE_GREEN));
         try {
-            TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
+            TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP_IMAGE));
             terrainSwitch.terrainSwitch(terrainManager.getBlendMapTerrain(), modelManager.getTree(), blendMap2);
         } catch (Exception ignore) {
         }
