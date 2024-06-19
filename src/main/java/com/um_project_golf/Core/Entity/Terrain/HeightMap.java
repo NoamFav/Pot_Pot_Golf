@@ -89,7 +89,7 @@ public class HeightMap {
                 Color color; // Create a new color
                 float sand = Consts.SAND_HEIGHT ;// (float) (Math.random() * 1.5f); // Generate a random red value
                 float grass = 10; //(float) (Math.random() * 1.5f); // Generate a random green value
-                float fairway = 11; //+ (float) (Math.random() * 2.5f); // Generate a random blue value
+                float fairway = 13; //+ (float) (Math.random() * 2.5f); // Generate a random blue value
                 float dryGrass = 17 + (float) (Math.random() * 2.5f); // Generate a random blue value
                 float mold = 20 + (float) (Math.random() * 2.5f); // Generate a random blue value
                 float rock = 25 + (float) (Math.random() * 2.5f); // Generate a random blue value
@@ -115,7 +115,7 @@ public class HeightMap {
         }
 
         try { // Try to write the image to a file
-            ImageIO.write(image, "PNG", new File("src/main/resources/Texture/heightmap.png"));
+            ImageIO.write(image, "PNG", new File(Consts.HEIGHTMAP_IMAGE));
         } catch (Exception e) { // Catch any exceptions
             log.error("Error creating heightmap image: {}", e.getMessage()); // Log the error
         }

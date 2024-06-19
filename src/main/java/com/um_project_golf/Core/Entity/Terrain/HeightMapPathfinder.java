@@ -44,7 +44,7 @@ public class HeightMapPathfinder {
         int attempts = 0;
         boolean pathFound = false;
         try {
-            BufferedImage heightMapImage = ImageIO.read(new File("src/main/resources/Texture/heightmap.png"));
+            BufferedImage heightMapImage = ImageIO.read(new File(Consts.HEIGHTMAP_IMAGE));
             width = heightMapImage.getWidth();
             height = heightMapImage.getHeight();
             costMap = generateCostMap(heightMapImage);
@@ -67,7 +67,7 @@ public class HeightMapPathfinder {
                 // Draw the path on the heightmap image
                 drawPathOnImage(heightMapImage, path);
                 // Save the modified image
-                ImageIO.write(heightMapImage, "png", new File("src/main/resources/Texture/heightmap.png"));
+                ImageIO.write(heightMapImage, "png", new File(Consts.HEIGHTMAP_IMAGE));
             } else {
                 System.out.println("Failed to find a valid path after 1000 attempts.");
             }
@@ -95,7 +95,7 @@ public class HeightMapPathfinder {
         int attempts = 0;
         boolean pathFound = false;
         try {
-            BufferedImage heightMapImage = ImageIO.read(new File("src/main/resources/Texture/heightmap.png"));
+            BufferedImage heightMapImage = ImageIO.read(new File(Consts.HEIGHTMAP_IMAGE));
             width = heightMapImage.getWidth();
             height = heightMapImage.getHeight();
             costMap = generateCostMap(heightMapImage);
@@ -113,7 +113,7 @@ public class HeightMapPathfinder {
                 // Draw the path on the heightmap image
                 drawPathOnImage(heightMapImage, path);
                 // Save the modified image
-                ImageIO.write(heightMapImage, "png", new File("src/main/resources/Texture/heightmap.png"));
+                ImageIO.write(heightMapImage, "png", new File(Consts.HEIGHTMAP_IMAGE));
             } else {
                 System.out.println("Failed to find a valid path after 1000 attempts.");
             }

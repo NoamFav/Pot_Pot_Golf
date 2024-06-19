@@ -56,7 +56,7 @@ public class GolfGame implements ILogic {
         // Managers for the game logic
         InitManager initManager = new InitManager(context);
 
-        context.getScene().setDefaultTexture(new Texture(context.getLoader().loadTexture("src/main/resources/Texture/Default.png")));
+        context.getScene().setDefaultTexture(new Texture(context.getLoader().loadTexture(Consts.DEFAULT_TEXTURE)));
         context.getWindow().setAntiAliasing(true);
         context.getWindow().setResized(false);
 
@@ -77,7 +77,7 @@ public class GolfGame implements ILogic {
         gameStateManager.setCanMove(false);
         gameStateManager.setOnMenu(true);
 
-        AudioManager audioManager = new AudioManager("src/main/resources/SoundTrack/skippy-mr-sunshine-fernweh-goldfish-main-version-02-32-7172.wav");
+        AudioManager audioManager = new AudioManager(Consts.BACKGROUND_MUSIC);
         audioManager.playSound();
         gameStateManager.setSoundPlaying(true);
         context.setAudioManager(audioManager);
