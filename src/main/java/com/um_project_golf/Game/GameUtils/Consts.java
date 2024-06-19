@@ -79,7 +79,7 @@ public class Consts {
     // For examination purposes:
 
     // The color of the terrain is defined by the height of the terrain.
-    public static final BiFunction<Float, Float, Float> HEIGHT_FUNCTION = (x, z) -> (float) (0.5*Math.sin((x+z)/10) + 1)  ; // Height function for the terrain
+    public static final BiFunction<Float, Float, Float> HEIGHT_FUNCTION = (x, z) -> (float) (0.5 * Math.sin((x + z) / 10) + 1); // Height function for the terrain
 
     // When running the game with a function, make sure the height of it is mostly superior to the sand height.
     // Otherwise, the sand will be too present on the terrain.
@@ -160,26 +160,40 @@ public class Consts {
     public static final float STATIC_FRICTION_SAND = 0.4f; // Friction of the sand (recommended: 0.8)
 
 
-
     //Resources for the game
+    //Do not change, except if you have full knowledge of the path you wanna change
     public static final String DEFAULT_TEXTURE = "src/main/resources/Texture/Default.png";
 
     public static final String BACKGROUND_MUSIC = "src/main/resources/SoundTrack/skippy-mr-sunshine-fernweh-goldfish-main-version-02-32-7172.wav";
 
-    public static final String MAIN_TREE_OBJ = "src/main/resources/Models/tree/tree.obj";
-    public static final String SKYBOX_OBJ = "src/main/resources/Models/Skybox/SkyBox.obj";
-    public static final String BALL_OBJ = "src/main/resources/Models/Ball/ImageToStl.com_ball.obj";
-    public static final String ARROW_OBJ = "src/main/resources/Models/Arrow/Arrow5.obj";
-    public static final String FLAG_OBJ = "src/main/resources/Models/flag/flag.obj";
+    public static class OBJ {
+        public static final String MAIN_TREE = "src/main/resources/Models/tree/tree.obj";
+        public static final String SKYBOX = "src/main/resources/Models/Skybox/SkyBox.obj";
+        public static final String BALL = "src/main/resources/Models/Ball/ImageToStl.com_ball.obj";
+        public static final String ARROW = "src/main/resources/Models/Arrow/Arrow5.obj";
+        public static final String FLAG = "src/main/resources/Models/flag/flag.obj";
+    }
 
-    public static final String BALL_TEXTURE1 = "src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png";
-    public static final String BALL_TEXTURE2 = "src/main/resources/Models/Ball/Ball_texture/Golf_Ball2.png";
-    public static final String BALL_TEXTURE_BOT = "src/main/resources/Models/Ball/Ball_texture/BallBot.png";
-    public static final String BALL_TEXTURE_AI_BOT = "src/main/resources/Models/Ball/Ball_texture/BallAIBot.png";
+    public static class BallTexture {
+        public static final String BALL1 = "src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png";
+        public static final String BALL2 = "src/main/resources/Models/Ball/Ball_texture/Golf_Ball2.png";
+        public static final String BALL_BOT = "src/main/resources/Models/Ball/Ball_texture/BallBot.png";
+        public static final String BALL_AI_BOT = "src/main/resources/Models/Ball/Ball_texture/BallAIBot.png";
+    }
 
-    public static final String SAND_TEXTURE = "src/main/resources/Texture/cartoonSand.jpg";
-    public static final String GRASS_TEXTURE = "src/main/resources/Texture/cartoonFlowers.jpg";
-    public static final String FAIRWAY_TEXTURE = "src/main/resources/Texture/cartoonGrass.jpg";
-    public static final String WATER_TEXTURE = "src/main/resources/Texture/cartoonWater.jpg";
-    public static final String HEIGHTMAP_IMAGE = "src/main/resources/Texture/heightmap.png";
+    public static class TerrainTexture {
+        public static final String SAND = "src/main/resources/Texture/cartoonSand.jpg";
+        public static final String GRASS = "src/main/resources/Texture/cartoonFlowers.jpg";
+        public static final String FAIRWAY = "src/main/resources/Texture/cartoonGrass.jpg";
+        public static final String WATER = "src/main/resources/Texture/cartoonWater.jpg";
+    }
+
+    public static final String HEIGHTMAP = "src/main/resources/Texture/heightmap.png";
+
+    public static class GUI {
+        public static final String TITLE = "src/main/resources/Texture/title.png";
+        public static final String BUTTON_MENU = "src/main/resources/Texture/buttons.png";
+        public static final String BUTTON_IN_GAME_MENU = "src/main/resources/Texture/inGameMenu.png";
+        public static final String FONT = "src/main/resources/fonts/MightySouly-lxggD.ttf";
+    }
 }

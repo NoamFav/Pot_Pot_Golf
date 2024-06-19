@@ -1,6 +1,7 @@
 package com.um_project_golf.Core.AWT;
 
 import com.um_project_golf.Core.WindowManager;
+import com.um_project_golf.Game.GameUtils.Consts;
 import com.um_project_golf.Game.Launcher;
 import org.lwjgl.nanovg.NVGColor;
 import org.lwjgl.nanovg.NVGPaint;
@@ -70,7 +71,7 @@ public class TextPane {
         textColor.b(1.0f);
         textColor.a(1.0f);
 
-        int fontId = nvgCreateFont(vg, "golf", "src/main/resources/fonts/MightySouly-lxggD.ttf");
+        int fontId = nvgCreateFont(vg, "golf", Consts.GUI.FONT);
         if (fontId == -1) {
             throw new RuntimeException("Could not add font");
         }

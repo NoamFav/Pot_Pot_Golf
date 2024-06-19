@@ -148,19 +148,19 @@ public class InitManager {
      * @return The models for the game.
      */
     private @NotNull ModelLoader getModels() throws Exception {
-        List<Model> tree = loader.loadAssimpModel(Consts.MAIN_TREE_OBJ); modelManager.setTree(tree);
-        List<Model> skyBox = loader.loadAssimpModel(Consts.SKYBOX_OBJ);
-        List<Model> ball = loader.loadAssimpModel(Consts.BALL_OBJ);
-        List<Model> ball2 = loader.loadAssimpModel(Consts.BALL_OBJ); modelManager.setBall2(ball2);
-        List<Model> botBallModel = loader.loadAssimpModel(Consts.BALL_OBJ); modelManager.setBotBallModel(botBallModel);
-        List<Model> aiBotBallModel = loader.loadAssimpModel(Consts.BALL_OBJ); modelManager.setAiBotBallModel(aiBotBallModel);
-        List<Model> arrow = loader.loadAssimpModel(Consts.ARROW_OBJ);
-        List<Model> flag = loader.loadAssimpModel(Consts.FLAG_OBJ);
+        List<Model> tree = loader.loadAssimpModel(Consts.OBJ.MAIN_TREE); modelManager.setTree(tree);
+        List<Model> skyBox = loader.loadAssimpModel(Consts.OBJ.SKYBOX);
+        List<Model> ball = loader.loadAssimpModel(Consts.OBJ.BALL);
+        List<Model> ball2 = loader.loadAssimpModel(Consts.OBJ.BALL); modelManager.setBall2(ball2);
+        List<Model> botBallModel = loader.loadAssimpModel(Consts.OBJ.BALL); modelManager.setBotBallModel(botBallModel);
+        List<Model> aiBotBallModel = loader.loadAssimpModel(Consts.OBJ.BALL); modelManager.setAiBotBallModel(aiBotBallModel);
+        List<Model> arrow = loader.loadAssimpModel(Consts.OBJ.ARROW);
+        List<Model> flag = loader.loadAssimpModel(Consts.OBJ.FLAG);
 
-        ball.get(0).setTexture(new Texture(loader.loadTexture(Consts.BALL_TEXTURE1)));
-        ball2.get(0).setTexture(new Texture(loader.loadTexture(Consts.BALL_TEXTURE2)));
-        botBallModel.get(0).setTexture(new Texture(loader.loadTexture(Consts.BALL_TEXTURE_BOT)));
-        aiBotBallModel.get(0).setTexture(new Texture(loader.loadTexture(Consts.BALL_TEXTURE_AI_BOT)));
+        ball.get(0).setTexture(new Texture(loader.loadTexture(Consts.BallTexture.BALL1)));
+        ball2.get(0).setTexture(new Texture(loader.loadTexture(Consts.BallTexture.BALL2)));
+        botBallModel.get(0).setTexture(new Texture(loader.loadTexture(Consts.BallTexture.BALL_BOT)));
+        aiBotBallModel.get(0).setTexture(new Texture(loader.loadTexture(Consts.BallTexture.BALL_AI_BOT)));
 
         for (Model model : tree) model.getMaterial().setDisableCulling(true);
         for (Model model : skyBox) model.getMaterial().setDisableCulling(true);
@@ -181,10 +181,10 @@ public class InitManager {
      * @return The terrains for the game.
      */
     private @NotNull Terrains getTerrains() throws Exception {
-        TerrainTexture sand = new TerrainTexture(loader.loadTexture(Consts.SAND_TEXTURE));
-        TerrainTexture grass = new TerrainTexture(loader.loadTexture(Consts.GRASS_TEXTURE));
-        TerrainTexture fairway = new TerrainTexture(loader.loadTexture(Consts.FAIRWAY_TEXTURE));
-        TerrainTexture water = new TerrainTexture(loader.loadTexture(Consts.WATER_TEXTURE));
+        TerrainTexture sand = new TerrainTexture(loader.loadTexture(Consts.TerrainTexture.SAND));
+        TerrainTexture grass = new TerrainTexture(loader.loadTexture(Consts.TerrainTexture.GRASS));
+        TerrainTexture fairway = new TerrainTexture(loader.loadTexture(Consts.TerrainTexture.FAIRWAY));
+        TerrainTexture water = new TerrainTexture(loader.loadTexture(Consts.TerrainTexture.WATER));
 
         //Not used for now (doesn't look good) (don't delete)
         TerrainTexture rock = new TerrainTexture(loader.loadTexture(Consts.DEFAULT_TEXTURE));
@@ -192,7 +192,7 @@ public class InitManager {
         TerrainTexture snow = new TerrainTexture(loader.loadTexture(Consts.DEFAULT_TEXTURE));
         TerrainTexture mold = new TerrainTexture(loader.loadTexture(Consts.DEFAULT_TEXTURE));
 
-        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP_IMAGE));
+        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP));
 
         List<TerrainTexture> textures = new ArrayList<>(List.of(sand, grass, fairway, dryGrass, mold, rock, snow));
         List<TerrainTexture> waterTextures = new ArrayList<>();

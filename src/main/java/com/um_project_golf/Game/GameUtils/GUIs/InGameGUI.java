@@ -52,18 +52,19 @@ public class InGameGUI {
         float centerButtonX = (window.getWidth() - widthButton) / 2;
         float centerButtonY = (window.getHeight() - heightButton * 3) / 2;
         float font = window.getHeightConverted(100);
+        String button = Consts.GUI.BUTTON_IN_GAME_MENU;
 
-        Button resumeButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Resume", font, runnable.resume(), vg, "src/main/resources/Texture/inGameMenu.png");
+        Button resumeButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Resume", font, runnable.resume(), vg, button);
         guiElementManager.addInGameMenuButton(resumeButton);
 
-        Button backToMenuButton = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Back to Menu", font, runnable.backToMenu(), vg, "src/main/resources/Texture/inGameMenu.png");
+        Button backToMenuButton = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Back to Menu", font, runnable.backToMenu(), vg, button);
         guiElementManager.addInGameMenuButton(backToMenuButton);
 
-        Button soundButtonInGame = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Sound: " + (gameState.isSoundPlaying() ? "ON" : "OFF"), font, runnable.sound(), vg, "src/main/resources/Texture/inGameMenu.png");
+        Button soundButtonInGame = new Button(centerButtonX, centerButtonY + heightButton * 2, widthButton, heightButton, "Sound: " + (gameState.isSoundPlaying() ? "ON" : "OFF"), font, runnable.sound(), vg, button);
         guiElementManager.setSoundButtonInGame(soundButtonInGame);
         guiElementManager.addInGameMenuButton(soundButtonInGame);
 
-        Button exitButton = new Button(centerButtonX, centerButtonY + heightButton * 3, widthButton, heightButton, "Exit", font, runnable.quit(), vg, "src/main/resources/Texture/inGameMenu.png");
+        Button exitButton = new Button(centerButtonX, centerButtonY + heightButton * 3, widthButton, heightButton, "Exit", font, runnable.quit(), vg, button);
         guiElementManager.addInGameMenuButton(exitButton);
     }
 
