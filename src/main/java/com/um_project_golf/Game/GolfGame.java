@@ -1441,7 +1441,7 @@ public class GolfGame implements ILogic {
             scene.addEntity(aiBotBall);
 
             AIBot aiBot = new AIBot(new Entity(aiBotBall), new Entity(endFlag), heightMap, Consts.TARGET_RADIUS, scene);
-            aiBotPath = aiBot.findBestShotUsingHillClimbing();
+            aiBotPath = aiBot.startAI();
         };
 
     }
