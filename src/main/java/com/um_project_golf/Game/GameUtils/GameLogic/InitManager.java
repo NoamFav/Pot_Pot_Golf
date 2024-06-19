@@ -23,7 +23,7 @@ import java.util.List;
 public class InitManager {
 
     // Records for storing the models and terrains
-    private record ModelLoader(List<Model> skyBox, List<Model> ball, List<Model> arrow, List<Model> flag, List<Model> mill) {}
+    private record ModelLoader(List<Model> skyBox, List<Model> ball, List<Model> arrow, List<Model> flag) {}
 
     private record Terrains(TerrainTexture blendMap, List<TerrainTexture> textures, List<TerrainTexture> waterTextures) {}
 
@@ -148,25 +148,21 @@ public class InitManager {
      * @return The models for the game.
      */
     private @NotNull ModelLoader getModels() throws Exception {
-        List<Model> tree = loader.loadAssimpModel("src/main/resources/Models/tree/tree.obj"); modelManager.setTree(tree);
-        List<Model> skyBox = loader.loadAssimpModel("src/main/resources/Models/Skybox/SkyBox.obj");
-        List<Model> ball = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj");
-        List<Model> ball2 = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj"); modelManager.setBall2(ball2);
-        List<Model> botBallModel = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj"); modelManager.setBotBallModel(botBallModel);
-        List<Model> aiBotBallModel = loader.loadAssimpModel("src/main/resources/Models/Ball/ImageToStl.com_ball.obj"); modelManager.setAiBotBallModel(aiBotBallModel);
-        List<Model> arrow = loader.loadAssimpModel("src/main/resources/Models/Arrow/Arrow5.obj");
-        List<Model> flag = loader.loadAssimpModel("src/main/resources/Models/flag/flag.obj");
-        List<Model> tree3 = loader.loadAssimpModel("src/main/resources/Models/sakura/sakura-A.obj");
-        List<Model> cloud = loader.loadAssimpModel("src/main/resources/Models/cloud/cloud lowpoly(big) -A.obj");
-        List<Model> mill = loader.loadAssimpModel("src/main/resources/Models/mill/LowPolyMill.obj");
+        List<Model> tree = loader.loadAssimpModel(Consts.MAIN_TREE_OBJ); modelManager.setTree(tree);
+        List<Model> skyBox = loader.loadAssimpModel(Consts.SKYBOX_OBJ);
+        List<Model> ball = loader.loadAssimpModel(Consts.BALL_OBJ);
+        List<Model> ball2 = loader.loadAssimpModel(Consts.BALL_OBJ); modelManager.setBall2(ball2);
+        List<Model> botBallModel = loader.loadAssimpModel(Consts.BALL_OBJ); modelManager.setBotBallModel(botBallModel);
+        List<Model> aiBotBallModel = loader.loadAssimpModel(Consts.BALL_OBJ); modelManager.setAiBotBallModel(aiBotBallModel);
+        List<Model> arrow = loader.loadAssimpModel(Consts.ARROW_OBJ);
+        List<Model> flag = loader.loadAssimpModel(Consts.FLAG_OBJ);
 
-        ball.get(0).setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")));
-        ball2.get(0).setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball2.png")));
-        botBallModel.get(0).setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")));
-        aiBotBallModel.get(0).setTexture(new Texture(loader.loadTexture("src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png")));
+        ball.get(0).setTexture(new Texture(loader.loadTexture(Consts.BALL_TEXTURE1)));
+        ball2.get(0).setTexture(new Texture(loader.loadTexture(Consts.BALL_TEXTURE2)));
+        botBallModel.get(0).setTexture(new Texture(loader.loadTexture(Consts.BALL_TEXTURE_BOT)));
+        aiBotBallModel.get(0).setTexture(new Texture(loader.loadTexture(Consts.BALL_TEXTURE_AI_BOT)));
 
         for (Model model : tree) model.getMaterial().setDisableCulling(true);
-        for (Model model : tree3) model.getMaterial().setDisableCulling(true);
         for (Model model : skyBox) model.getMaterial().setDisableCulling(true);
         for (Model model : arrow) model.getMaterial().setDisableCulling(true);
         for (Model model : flag) model.getMaterial().setDisableCulling(true);
@@ -174,9 +170,8 @@ public class InitManager {
         for (Model model : ball2) model.getMaterial().setDisableCulling(true);
         for (Model model : botBallModel) model.getMaterial().setDisableCulling(true);
         for (Model model : aiBotBallModel) model.getMaterial().setDisableCulling(true);
-        for (Model model : cloud) model.getMaterial().setDisableCulling(true);
-        for (Model model : mill) model.getMaterial().setDisableCulling(true);
-        return new ModelLoader(skyBox, ball, arrow, flag, mill);
+
+        return new ModelLoader(skyBox, ball, arrow, flag);
     }
 
     /**
@@ -186,18 +181,18 @@ public class InitManager {
      * @return The terrains for the game.
      */
     private @NotNull Terrains getTerrains() throws Exception {
-        TerrainTexture sand = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonSand.jpg"));
-        TerrainTexture grass = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonFlowers.jpg"));
-        TerrainTexture fairway = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonGrass.jpg"));
-        TerrainTexture water = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonWater.jpg"));
+        TerrainTexture sand = new TerrainTexture(loader.loadTexture(Consts.SAND_TEXTURE));
+        TerrainTexture grass = new TerrainTexture(loader.loadTexture(Consts.GRASS_TEXTURE));
+        TerrainTexture fairway = new TerrainTexture(loader.loadTexture(Consts.FAIRWAY_TEXTURE));
+        TerrainTexture water = new TerrainTexture(loader.loadTexture(Consts.WATER_TEXTURE));
 
         //Not used for now (doesn't look good) (don't delete)
-        TerrainTexture rock = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonFlowers.jpg"));
-        TerrainTexture dryGrass = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonFlowers.jpg"));
-        TerrainTexture snow = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonFlowers.jpg"));
-        TerrainTexture mold = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/cartoonFlowers.jpg"));
+        TerrainTexture rock = new TerrainTexture(loader.loadTexture(Consts.DEFAULT_TEXTURE));
+        TerrainTexture dryGrass = new TerrainTexture(loader.loadTexture(Consts.DEFAULT_TEXTURE));
+        TerrainTexture snow = new TerrainTexture(loader.loadTexture(Consts.DEFAULT_TEXTURE));
+        TerrainTexture mold = new TerrainTexture(loader.loadTexture(Consts.DEFAULT_TEXTURE));
 
-        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
+        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP_IMAGE));
 
         List<TerrainTexture> textures = new ArrayList<>(List.of(sand, grass, fairway, dryGrass, mold, rock, snow));
         List<TerrainTexture> waterTextures = new ArrayList<>();

@@ -151,7 +151,7 @@ public class MenuGUI {
                 if (entitiesManager.getBotBall() != null) scene.getEntities().removeIf(entity -> entity.equals(entitiesManager.getBotBall()));
                 if (entitiesManager.getAiBotBall() != null) scene.getEntities().removeIf(entity -> entity.equals(entitiesManager.getAiBotBall()));
 
-                TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
+                TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP_IMAGE));
                 SimplexNoise.shufflePermutation();
                 terrainSwitch.terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
                 entitiesManager.setGolfBallPosition(new Vector3f(pathManager.getStartPoint()));
@@ -247,7 +247,7 @@ public class MenuGUI {
                 System.out.println("Enabling debug mode");
                 try {
                     heightMap.createHeightMap();
-                    TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
+                    TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP_IMAGE));
                     terrainSwitch.terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -273,7 +273,7 @@ public class MenuGUI {
                     List<Vector2i> path = pathfinder.getPathDebug(start, end, Consts.SIZE_GREEN);
                     pathManager.setPath(path);
                     try {
-                        TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture("src/main/resources/Texture/heightmap.png"));
+                        TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP_IMAGE));
                         terrainSwitch.terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
                     } catch (Exception ignore) {
                     }
