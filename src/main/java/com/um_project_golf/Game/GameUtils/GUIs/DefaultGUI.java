@@ -53,7 +53,7 @@ public class DefaultGUI {
         float font = window.getUniformScaleFactorFont(70);
         float textFieldFont = window.getUniformScaleFactorFont(50);
         boolean isPlayer1Turn = gameStateManager.isPlayer1Turn();
-        String imageButton = guiElementManager.getImageButton();
+        String imageButton = Consts.GUI.BUTTON_MENU;
         Entity currentBall = entitiesManager.getCurrentBall();
         int numberOfShots = gameVarManager.getNumberOfShots();
         int numberOfShots2 = gameVarManager.getNumberOfShots2();

@@ -150,7 +150,6 @@ public class GuiElementManager {
     public void addInGameMenuButton(Button button) {inGameMenuButtons.add(button);}
     public void clearMenuButtons() {menuButtons.clear();}
     public void clearInGameMenuButtons() {inGameMenuButtons.clear();}
-    public String getImageButton() {return "src/main/resources/Texture/buttons.png";}
     public Button getStartButton() {return startButton;}
     public void setStartButton(Button startButton) {this.startButton = startButton;}
     public Button getDebugButton() {return debugButton;}
