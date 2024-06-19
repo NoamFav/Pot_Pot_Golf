@@ -92,7 +92,7 @@ public class MenuGUI {
         float titleX = (window.getWidth() - titleWidth) / 2;
         float titleY = window.getHeightConverted(10);
 
-        Title title = new Title("src/main/resources/Texture/title.png", titleX, titleY, titleWidth, titleHeight, vg);
+        Title title = new Title(Consts.GUI.TITLE, titleX, titleY, titleWidth, titleHeight, vg);
         guiElementManager.setTitle(title);
 
         float heightButton = window.getHeightConverted(300);
@@ -100,7 +100,7 @@ public class MenuGUI {
         float centerButtonX = (width - widthButton) / 2;
         float centerButtonY = titleHeight + titleY;
         float font = window.getUniformScaleFactorFont(100);
-        String imageButton = guiElementManager.getImageButton();
+        String imageButton = Consts.GUI.BUTTON_MENU;
 
         Button startButton = new Button(centerButtonX, centerButtonY, widthButton, heightButton, "Start", font, runnable.startGame(), vg, imageButton);
         guiElementManager.setStartButton(startButton);
@@ -151,7 +151,7 @@ public class MenuGUI {
                 if (entitiesManager.getBotBall() != null) scene.getEntities().removeIf(entity -> entity.equals(entitiesManager.getBotBall()));
                 if (entitiesManager.getAiBotBall() != null) scene.getEntities().removeIf(entity -> entity.equals(entitiesManager.getAiBotBall()));
 
-                TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP_IMAGE));
+                TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP));
                 SimplexNoise.shufflePermutation();
                 terrainSwitch.terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
                 entitiesManager.setGolfBallPosition(new Vector3f(pathManager.getStartPoint()));
@@ -247,7 +247,7 @@ public class MenuGUI {
                 System.out.println("Enabling debug mode");
                 try {
                     heightMap.createHeightMap();
-                    TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP_IMAGE));
+                    TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP));
                     terrainSwitch.terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -273,7 +273,7 @@ public class MenuGUI {
                     List<Vector2i> path = pathfinder.getPathDebug(start, end, Consts.SIZE_GREEN);
                     pathManager.setPath(path);
                     try {
-                        TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP_IMAGE));
+                        TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP));
                         terrainSwitch.terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
                     } catch (Exception ignore) {
                     }

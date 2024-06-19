@@ -115,7 +115,7 @@ public class HeightMap {
         }
 
         try { // Try to write the image to a file
-            ImageIO.write(image, "PNG", new File(Consts.HEIGHTMAP_IMAGE));
+            ImageIO.write(image, "PNG", new File(Consts.HEIGHTMAP));
         } catch (Exception e) { // Catch any exceptions
             log.error("Error creating heightmap image: {}", e.getMessage()); // Log the error
         }
@@ -153,6 +153,7 @@ public class HeightMap {
         return SceneManager.getHeightMap();
     }
 
+    @Deprecated
     public void saveHeightMap() {
         for (int l = 0; l < 1000; l++) {
             createHeightMap();
@@ -167,12 +168,12 @@ public class HeightMap {
                 }
             } catch (Exception e) {
                 System.err.println("Failed to write to file: " + file.getPath());
-                e.printStackTrace();
+                e.printStackTrace(System.err);
             }
         }
     }
 
-
+    @Deprecated
     public static void main(String[] args) {
         HeightMap heightMap = new HeightMap();
         heightMap.saveHeightMap();
