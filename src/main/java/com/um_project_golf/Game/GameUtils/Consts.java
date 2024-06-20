@@ -24,11 +24,11 @@ public class Consts {
     // (less detail but more performance).
     // You can also reduce the number of trees to reduce the density of the trees.
     // And reduce lag in the process.
-    private static final int POWER = 9; // Power of 2 for the terrain size
-    public static final float SIZE_X = (float) Math.pow(2, POWER); // Size of the terrain in the x direction
-    public static final float SIZE_Z = (float) Math.pow(2, POWER); // Size of the terrain in the z direction
-    public static final int VERTEX_COUNT = (int) Math.pow(2, POWER + 2); // Number of vertices in the terrain (Higher = more detail but also more performance heavy)
-    public static final int NUMBER_OF_TREES = (int) (SIZE_X / 2); // Density of the trees (higher = more trees) reduces for performance
+    public static int POWER = 9; // Power of 2 for the terrain size
+    public static float SIZE_X = (float) Math.pow(2, POWER); // Size of the terrain in the x direction
+    public static float SIZE_Z = (float) Math.pow(2, POWER); // Size of the terrain in the z direction
+    public static int VERTEX_COUNT = (int) Math.pow(2, POWER + 2); // Number of vertices in the terrain (Higher = more detail but also more performance heavy)
+    public static int NUMBER_OF_TREES = (int) (SIZE_X / 2); // Density of the trees (higher = more trees) reduces for performance
     public static final float TREE_SIZE = 1.5f; // Size of the trees at the trunk
     public static final float MAX_HEIGHT = 1000; // Maximum height of the terrain,
     // doesn't have to influence the actual height of the terrain just the maximum height reachable by the player
