@@ -1367,7 +1367,8 @@ public class GolfGame implements ILogic {
     @NotNull
     @Contract(pure = true)
     private Runnable runPhysics() {
-        PhysicsEngine engine = new SimplePhysicsEngine(heightMap, scene);
+        // PhysicsEngine engine = new SimplePhysicsEngine(heightMap, scene);
+        PhysicsEngine engine = new CompletePhysicsEngine(heightMap, scene);
 
         return () -> {
             if (isAnimating) {

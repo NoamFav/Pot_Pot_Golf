@@ -72,7 +72,7 @@ public class SimplePhysicsEngine extends PhysicsEngine {
         dh_dzValue = Math.abs(dh_dzValue) < 0.00001 ? 0 : dh_dzValue;
 
         if (magnitudeVelocity >= VELOCITY_THRESHOLD) {
-            // Moving or no slope present
+            // Moving
             dxdt[0] = vx;
             dxdt[1] = vz;
 

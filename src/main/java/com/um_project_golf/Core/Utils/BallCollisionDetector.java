@@ -84,6 +84,9 @@ public class BallCollisionDetector {
 
     private void treeCollisionBall(Vector3f newPosition) {
         List<float[]> treePositions = scene.getTreePositions();
+        if (treePositions == null) {
+            return; // No trees to check for collisions
+        }
         float treeRadius = Consts.TREE_SIZE / 2; // Define the tree radius
 
         for (float[] treePosition : treePositions) {
