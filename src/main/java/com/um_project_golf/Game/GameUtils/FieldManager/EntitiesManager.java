@@ -18,6 +18,7 @@ public class EntitiesManager {
     private Entity aiBotBall;
     private Entity endFlag;
     private Entity arrowEntity;
+    private Entity skyBox;
 
     public EntitiesManager() {
         this.trees = new ArrayList<>();
@@ -53,4 +54,6 @@ public class EntitiesManager {
     public void setArrowEntityRotation(Vector3f rotation) {this.arrowEntity.setRotation(rotation);}
     public void setBotBallPosition(Vector3f vector3f) {botBall.setPosition(vector3f);}
     public void setAiBotBallPosition(Vector3f vector3f) {aiBotBall.setPosition(vector3f);}
+    public Entity getSkyBox() {return skyBox;}
+    public void setSkyBox(Entity skyBox) {this.skyBox = skyBox;}
 }

@@ -20,7 +20,7 @@ public class MainFieldManager {
     private final SceneManager scene;
     private MouseInput mouseInputs;
     private AudioManager audioManager;
-    private final HeightMap heightMap;
+    private HeightMap heightMap;
     private final HeightMapPathfinder pathfinder;
     private final CollisionsDetector collisionsDetector;
 
@@ -85,4 +85,5 @@ public class MainFieldManager {
     public Camera getCamera() {return camera;}
     public Vector3f getCameraInc() {return cameraInc;}
     public void setCameraInc(Vector3f cameraInc) {this.cameraInc = cameraInc;}
+    public void setHeightMap(HeightMap heightMap) {this.heightMap = heightMap;}
 }
