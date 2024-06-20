@@ -53,7 +53,7 @@ public class CompletePhysicsEngine extends PhysicsEngine {
             double denominatorVelocity = Math.sqrt(vx * vx + vz * vz + Math.pow(dh_dxValue * vx + dh_dzValue * vz, 2));
 
             // Calculate acceleration in x-direction
-            dxdt[2] = - (g * dh_dxValue ) / denominatorHeight - (kineticFriction * g / Math.sqrt(denominatorHeight)) * (vx / denominatorVelocity);
+            dxdt[2] = - (g * dh_dxValue) / denominatorHeight - (kineticFriction * g / Math.sqrt(denominatorHeight)) * (vx / denominatorVelocity);
             // Calculate acceleration in z-direction
             dxdt[3] = - (g * dh_dzValue) / denominatorHeight - (kineticFriction * g / Math.sqrt(denominatorHeight)) * (vz / denominatorVelocity);
 
