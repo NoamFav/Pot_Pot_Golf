@@ -52,6 +52,8 @@ public abstract class PhysicsEngine {
      */
     public List<Vector3f> runRK4(double[] initialState, double stepSize) { // initialState = [x, z, vx, vz]
         List<Vector3f> positions = new ArrayList<>();
+        float startHeight = heightMap.getHeight(new Vector3f((float) initialState[0], 0, (float) initialState[1]));
+        positions.add(new Vector3f((float) initialState[0],startHeight, (float) initialState[1] ));
         double[] currentState = initialState;
         double magnitudeVelocity;
         double magnitudeAcceleration;
@@ -65,7 +67,16 @@ public abstract class PhysicsEngine {
             acceleration = equationsOfMotion(currentTime, currentState);
             magnitudeVelocity = Math.sqrt(nextStep[2] * nextStep[2] + nextStep[3] * nextStep[3]);
             magnitudeAcceleration = Math.sqrt(acceleration[2] * acceleration[2] + acceleration[3] * acceleration[3]);
+            
+            // // Log intermediate state for debugging
+            // System.out.println("Before update - Current State: " + Arrays.toString(currentState));
+            // System.out.println("Next Step: " + Arrays.toString(nextStep));
+
             currentState = nextStep;
+
+            // // Log updated state for debugging
+            // System.out.println("After update - Current State: " + Arrays.toString(currentState));
+
             currentTime += stepSize;
 
             assert heightMap != null;
@@ -73,7 +84,24 @@ public abstract class PhysicsEngine {
             Vector3f position = new Vector3f((float) currentState[0], height, (float) currentState[1]);
             ballCollisionDetector.checkCollisionBall(position);
             positions.add(position);
+
+            // Logs for debugging
+            // System.out.println("Velocity: " + magnitudeVelocity + " Acceleration: " + magnitudeAcceleration);
+            // System.out.println(position);
         } while (magnitudeVelocity >= VELOCITY_THRESHOLD || magnitudeAcceleration >= ACCELERATION_THRESHOLD); // While the ball is not at rest
+
+        if (positions.size() > 2) {
+            int index = 2;
+            while (index < positions.size()) {
+                Vector3f currentCheck = positions.get(index);
+                if (currentCheck.equals(positions.get(index - 1)) && currentCheck.equals(positions.get(index - 2))) {
+                    positions.remove(index);
+                }
+                else {
+                    index++;
+                }
+            }
+        }
 
         return positions;
     }
