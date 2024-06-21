@@ -16,17 +16,23 @@ public class PhysicsExperiments {
     // Initialize HeightMap and SceneManager
     private static final HeightMap FLATGRASSTERRAIN = createFlatTerrain();
     private static final HeightMap HILLYTERRAIN = createHillyTerrain();
+    private static final HeightMap STEEPHILLYTERRAIN = createSteepHillyTerrain();
+    private static final HeightMap GENTLEHILLYTERRAIN = createGentleHillyTerrain();
     private static final HeightMap FLATSANDYTERRAIN = createSandyTerrain();
     private static final SceneManager SCENE = new SceneManager(-90);
 
     // Create CompletePhysicsEngine instances
     private static CompletePhysicsEngine flatGrassCompleteEngine = new CompletePhysicsEngine(FLATGRASSTERRAIN, SCENE);
     private static CompletePhysicsEngine hillyCompleteEngine = new CompletePhysicsEngine(HILLYTERRAIN, SCENE);
+    private static CompletePhysicsEngine steepHillyCompleteEngine = new CompletePhysicsEngine(STEEPHILLYTERRAIN, SCENE);
+    private static CompletePhysicsEngine gentleHillyCompleteEngine = new CompletePhysicsEngine(GENTLEHILLYTERRAIN, SCENE);
     private static CompletePhysicsEngine flatSandyCompleteEngine = new CompletePhysicsEngine(FLATSANDYTERRAIN, SCENE);
 
     // Create SimplePhysicsEngine instances
     private static SimplePhysicsEngine flatGrassSimpleEngine = new SimplePhysicsEngine(FLATGRASSTERRAIN, SCENE);
     private static SimplePhysicsEngine hillySimpleEngine = new SimplePhysicsEngine(HILLYTERRAIN, SCENE);
+    private static SimplePhysicsEngine steepHillySimpleEngine = new SimplePhysicsEngine(STEEPHILLYTERRAIN, SCENE);
+    private static SimplePhysicsEngine gentleHillySimpleEngine = new SimplePhysicsEngine(GENTLEHILLYTERRAIN, SCENE);
     private static SimplePhysicsEngine flatSandySimpleEngine = new SimplePhysicsEngine(FLATSANDYTERRAIN, SCENE);
 
     private static final String RESULTS_DIR = "src/main/java/com/um_project_golf/Core/Physics/Experiment_results";
@@ -49,13 +55,27 @@ public class PhysicsExperiments {
         runExperiment("Complete Physics Engine - Flat Grass Terrain - Fast z", flatGrassCompleteEngine, initialStateFastZ, showAllPositions);
         runExperiment("Complete Physics Engine - Flat Grass Terrain - Slow z", flatGrassCompleteEngine, initialStateSlowZ, showAllPositions);
         runExperiment("Complete Physics Engine - Flat Grass Terrain - Diagonal", flatGrassCompleteEngine, initialStateDiagonal, showAllPositions);
-        
-        // Hilly Terrain
+
+        // Normal Hilly Terrain
         runExperiment("Complete Physics Engine - Hilly Terrain - Fast x", hillyCompleteEngine, initialStateFastX, showAllPositions);
         runExperiment("Complete Physics Engine - Hilly Terrain - Slow x", hillyCompleteEngine, initialStateSlowX, showAllPositions);
         runExperiment("Complete Physics Engine - Hilly Terrain - Fast z", hillyCompleteEngine, initialStateFastZ, showAllPositions);
         runExperiment("Complete Physics Engine - Hilly Terrain - Slow z", hillyCompleteEngine, initialStateSlowZ, showAllPositions);
         runExperiment("Complete Physics Engine - Hilly Terrain - Diagonal", hillyCompleteEngine, initialStateDiagonal, showAllPositions);
+        
+        // Steep Hilly Terrain
+        runExperiment("Complete Physics Engine - Steep Hilly Terrain - Fast x", steepHillyCompleteEngine, initialStateFastX, showAllPositions);
+        runExperiment("Complete Physics Engine - Steep Hilly Terrain - Slow x", steepHillyCompleteEngine, initialStateSlowX, showAllPositions);
+        runExperiment("Complete Physics Engine - Steep Hilly Terrain - Fast z", steepHillyCompleteEngine, initialStateFastZ, showAllPositions);
+        runExperiment("Complete Physics Engine - Steep Hilly Terrain - Slow z", steepHillyCompleteEngine, initialStateSlowZ, showAllPositions);
+        runExperiment("Complete Physics Engine - Steep Hilly Terrain - Diagonal", steepHillyCompleteEngine, initialStateDiagonal, showAllPositions);
+
+        // Gentle Hilly Terrain
+        runExperiment("Complete Physics Engine - Gentle Hilly Terrain - Fast x", gentleHillyCompleteEngine, initialStateFastX, showAllPositions);
+        runExperiment("Complete Physics Engine - Gentle Hilly Terrain - Slow x", gentleHillyCompleteEngine, initialStateSlowX, showAllPositions);
+        runExperiment("Complete Physics Engine - Gentle Hilly Terrain - Fast z", gentleHillyCompleteEngine, initialStateFastZ, showAllPositions);
+        runExperiment("Complete Physics Engine - Gentle Hilly Terrain - Slow z", gentleHillyCompleteEngine, initialStateSlowZ, showAllPositions);
+        runExperiment("Complete Physics Engine - Gentle Hilly Terrain - Diagonal", gentleHillyCompleteEngine, initialStateDiagonal, showAllPositions);
 
         // Sandy Terrain
         runExperiment("Complete Physics Engine - Sandy Terrain - Fast x", flatSandyCompleteEngine, initialStateFastX, showAllPositions);
@@ -71,13 +91,27 @@ public class PhysicsExperiments {
         runExperiment("Simple Physics Engine - Flat Grass Terrain - Fast z", flatGrassSimpleEngine, initialStateFastZ, showAllPositions);
         runExperiment("Simple Physics Engine - Flat Grass Terrain - Slow z", flatGrassSimpleEngine, initialStateSlowZ, showAllPositions);
         runExperiment("Simple Physics Engine - Flat Grass Terrain - Diagonal", flatGrassSimpleEngine, initialStateDiagonal, showAllPositions);
-        
-        // Hilly Terrain
+
+        // Normal Hilly Terrain
         runExperiment("Simple Physics Engine - Hilly Terrain - Fast x", hillySimpleEngine, initialStateFastX, showAllPositions);
         runExperiment("Simple Physics Engine - Hilly Terrain - Slow x", hillySimpleEngine, initialStateSlowX, showAllPositions);
         runExperiment("Simple Physics Engine - Hilly Terrain - Fast z", hillySimpleEngine, initialStateFastZ, showAllPositions);
         runExperiment("Simple Physics Engine - Hilly Terrain - Slow z", hillySimpleEngine, initialStateSlowZ, showAllPositions);
         runExperiment("Simple Physics Engine - Hilly Terrain - Diagonal", hillySimpleEngine, initialStateDiagonal, showAllPositions);
+        
+        // Steep Hilly Terrain
+        runExperiment("Simple Physics Engine - Steep Hilly Terrain - Fast x", steepHillySimpleEngine, initialStateFastX, showAllPositions);
+        runExperiment("Simple Physics Engine - Steep Hilly Terrain - Slow x", steepHillySimpleEngine, initialStateSlowX, showAllPositions);
+        runExperiment("Simple Physics Engine - Steep Hilly Terrain - Fast z", steepHillySimpleEngine, initialStateFastZ, showAllPositions);
+        runExperiment("Simple Physics Engine - Steep Hilly Terrain - Slow z", steepHillySimpleEngine, initialStateSlowZ, showAllPositions);
+        runExperiment("Simple Physics Engine - Steep Hilly Terrain - Diagonal", steepHillySimpleEngine, initialStateDiagonal, showAllPositions);
+
+        // Gentle Hilly Terrain
+        runExperiment("Simple Physics Engine - Gentle Hilly Terrain - Fast x", gentleHillySimpleEngine, initialStateFastX, showAllPositions);
+        runExperiment("Simple Physics Engine - Gentle Hilly Terrain - Slow x", gentleHillySimpleEngine, initialStateSlowX, showAllPositions);
+        runExperiment("Simple Physics Engine - Gentle Hilly Terrain - Fast z", gentleHillySimpleEngine, initialStateFastZ, showAllPositions);
+        runExperiment("Simple Physics Engine - Gentle Hilly Terrain - Slow z", gentleHillySimpleEngine, initialStateSlowZ, showAllPositions);
+        runExperiment("Simple Physics Engine - Gentle Hilly Terrain - Diagonal", gentleHillySimpleEngine, initialStateDiagonal, showAllPositions);
 
         // Sandy Terrain
         runExperiment("Simple Physics Engine - Flat Sandy Terrain - Fast x", flatSandySimpleEngine, initialStateFastX, showAllPositions);
@@ -153,6 +187,28 @@ public class PhysicsExperiments {
             }
         };
     }
+
+    private static HeightMap createSteepHillyTerrain() {
+        // Create a mock of hilly terrain
+        return new HeightMap() {
+            @Override
+            public float getHeight(Vector3f position) {
+                // Define a hilly height function
+                return 10 * ((float) Math.sin(position.x) * (float) Math.cos(position.z));
+            }
+        };
+    }
+
+    private static HeightMap createGentleHillyTerrain() {
+        // Create a mock of gentle hilly terrain
+        return new HeightMap() {
+            @Override
+            public float getHeight(Vector3f position) {
+                // Define a gentle hilly height function
+                return 0.1f * ((float) Math.sin(position.x) * (float) Math.cos(position.z));
+            }
+        };
+    }    
 
     private static HeightMap createSandyTerrain() {
         // Create a mock of flat sandy terrain
