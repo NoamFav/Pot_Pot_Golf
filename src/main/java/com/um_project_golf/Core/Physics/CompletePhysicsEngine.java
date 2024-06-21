@@ -68,7 +68,7 @@ public class CompletePhysicsEngine extends PhysicsEngine {
 
                 if (staticFriction <= dh2) { // if the friction force does not overcome the downhill force,
                     // the ball will continue to slide
-                    dxdt[2] = - (g * dh_dxValue) / denominatorHeight - (kineticFriction * g / Math.sqrt(denominatorHeight)) * ( dh_dxValue / dh2);
+                    dxdt[2] = - (g * dh_dxValue) / denominatorHeight - (kineticFriction * g / Math.sqrt(denominatorHeight)) * (dh_dxValue / dh2);
                     dxdt[3] = - (g * dh_dzValue) / denominatorHeight - (kineticFriction * g / Math.sqrt(denominatorHeight)) * (dh_dzValue / dh2);
                 }
             } else {
