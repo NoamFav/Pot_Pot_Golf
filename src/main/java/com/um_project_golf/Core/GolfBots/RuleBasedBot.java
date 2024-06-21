@@ -34,12 +34,12 @@ public class RuleBasedBot {
         this.scene = scene;
     }
 
-    // Method returns the path the ball takes from its initial position until the last position found by the bot.
-    // It does so by iterating over every possible velocity pair (x and z) within the constraints given (min -5m/s max 5m/s),
-    // and comparing it to the other shots already taken, saving the information of the shot that gets closer to the flag.
-    // If it is not possible to get to the flag in one shot, the shot that gets closer will be taken. The process will
-    // continue until the flag is reached, or when it is not possible to move anymore (for more details on this issue, please
-    // consult the README).
+    /* Method returns the path the ball takes from its initial position until the last position found by the bot.
+    It does so by iterating over every possible velocity pair (x and z) within the constraints given (min -5m/s max 5m/s),
+    and comparing it to the other shots already taken, saving the information of the shot that gets closer to the flag.
+    If it is not possible to get to the flag in one shot, the shot that gets closer will be taken. The process will
+    continue until the flag is reached, or when it is not possible to move anymore (for more details on this issue, please
+    consult the README). */
     public List<List<Vector3f>> findBestShot() {
         int shotCounter = 0;
         double minDistance = Double.MAX_VALUE;
