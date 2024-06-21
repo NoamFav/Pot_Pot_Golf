@@ -21,7 +21,7 @@ public class HeightMapPathfinder {
     private int height;
     private int SCALE = (int) (Consts.VERTEX_COUNT / Consts.SIZE_X); // Compute the scale based on the size of the terrain
     private int CIRCLE_RADIUS; // Radius of the circle around the start point
-    @SuppressWarnings("FieldCanBeLocal") private final int SEARCH_RADIUS = 20 * SCALE; // Radius of the search area around a point
+    @SuppressWarnings("FieldCanBeLocal") private int SEARCH_RADIUS = 20 * SCALE; // Radius of the search area around a point
     private int BORDER_OFFSET = (int) (Consts.SIZE_X/3 * SCALE); // Offset from the border of the heightmap
     private int PATH_CIRCLE_RADIUS; // Radius of the circle around the end point
 
@@ -38,6 +38,7 @@ public class HeightMapPathfinder {
     public List<Vector2i> getPath(int radiusDown, int radiusUp, int radiusEnd) {
         SCALE = (int) (Consts.VERTEX_COUNT / Consts.SIZE_X);
         BORDER_OFFSET = (int) (Consts.SIZE_X/3 * SCALE);
+        SEARCH_RADIUS = 20 * SCALE;
         int count = 0;
         CIRCLE_RADIUS = (radiusDown + (int) (Math.random() * (radiusUp - radiusDown))) * SCALE;
         PATH_CIRCLE_RADIUS = radiusEnd * SCALE;

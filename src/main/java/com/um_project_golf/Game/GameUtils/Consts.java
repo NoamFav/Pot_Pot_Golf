@@ -11,7 +11,6 @@ import java.util.function.BiFunction;
  * All key settings are stored here.
  * Made to be easily accessible and modifiable.
  */
-@SuppressWarnings("unused")
 public class Consts {
 
     public static String Title = "UM Project Golf"; // Title of the game
@@ -19,11 +18,11 @@ public class Consts {
     public static final float REFERENCE_WIDTH = 3840; // Reference width for the game (don't change)
     public static final float REFERENCE_HEIGHT = 2160; // Reference height for the game (don't change)
 
-    // If too much lag, reduce the power to 8 (256 meters, and 1024 vertices).
-    // Or reduce the number of vertices to either power + 1 or power + 0.
-    // (less detail but more performance).
-    // You can also reduce the number of trees to reduce the density of the trees.
-    // And reduce lag in the process.
+    /* If too much lag, reduce the power to 8 (256 meters, and 1024 vertices).
+    Or reduce the number of vertices to either power + 1 or power + 0.
+    (less detail but more performance).
+    You can also reduce the number of trees to reduce the density of the trees.
+    And reduce lag in the process. */
     public static int POWER = 9; // Power of 2 for the terrain size
     public static float SIZE_X = (float) Math.pow(2, POWER); // Size of the terrain in the x direction
     public static float SIZE_Z = (float) Math.pow(2, POWER); // Size of the terrain in the z direction
@@ -48,8 +47,6 @@ public class Consts {
     public static final float FRAME_CAP = 5000f; // Maximum frame rate (reduce for capping the frame rate)
     public static final float FRAMERATE = 1.0f / FRAME_CAP; // maximum frame rate in seconds
 
-    public static final float JUMP_FORCE = 4; // Force applied when jumping (m/s) (Unused)
-
     // Configuration for the lighting
     // Unused for now (not really useful in a golf game)
     public static final int MAX_POINT_LIGHTS = 5; // Maximum number of point lights
@@ -63,11 +60,11 @@ public class Consts {
     public static final float Z_FAR = 10000.0f; // Far plane (Used for freeing up resources)
     public static final float SPECULAR_POWER = 10f; // Specular power (Higher = more shiny)
 
-    // Configuration for the player
-    // Recommended values is the default values.
-    // Player Height = 1.75 meters
-    // Mouse Sensitivity = 0.2
-    // Camera Movement Speed = 1.1 (normal speed for a human, but really slow for a game)
+    /* Configuration for the player
+    Recommended values is the default values.
+    Player Height = 1.75 meters
+    Mouse Sensitivity = 0.2
+    Camera Movement Speed = 1.1 (normal speed for a human, but really slow for a game) */
     public static final float PLAYER_HEIGHT = 1.75f; // Height of the player (meters)
     public static final float MOUSE_SENSITIVITY = 0.2f; // Mouse sensitivity (Higher = more sensitive)
     public static final float CAMERA_MOVEMENT_SPEED = 3;  // camera movement speed (Higher = faster)
@@ -81,11 +78,11 @@ public class Consts {
     // The color of the terrain is defined by the height of the terrain.
     public static final BiFunction<Float, Float, Float> HEIGHT_FUNCTION = (x, z) -> (float) (0.5 * Math.sin((x + z) / 10) + 1); // Height function for the terrain
 
-    // When running the game with a function, make sure the height of it is mostly superior to the sand height.
-    // Otherwise, the sand will be too present on the terrain.
-    // And the A* algorithm will not be able to find a path to the hole.
-    // As it sees the sand as a wall.
-    // (You wouldn't want to play golf in the sand, would you?)
+    /* When running the game with a function, make sure the height of it is mostly superior to the sand height.
+    Otherwise, the sand will be too present on the terrain.
+    And the A* algorithm will not be able to find a path to the hole.
+    As it sees the sand as a wall.
+    (You wouldn't want to play golf in the sand, would you?) */
     public static final float SAND_HEIGHT = 0.2f; // Height of the sand (meters)
 
     public static final float MAX_TERRAIN_HEIGHT = 10; // Height of the terrain (meters)
@@ -108,8 +105,7 @@ public class Consts {
     public static final float GRAVITY = 9.81f; // Gravity constant (m/s^2)
     public static final float BALL_MASS = 0.0459f; // Mass of the ball (kg)
 
-    // Not used for now (unused)
-    // Initial velocity of the ball is defined by the textfield in the GUI.
+    // The Initial velocity of the ball is defined by the textfield in the GUI.
     // The Tee position is defined by pressing the left key,
     // The Hole position is defined by pressing the right key.
     // Only available in the debug mode and not in the release mode,
@@ -134,8 +130,8 @@ public class Consts {
     // Par 4: 230-410 meters (need size terrain of 1024)
     // Par 5: 410-550 meters (need size terrain of 1024)
     // Par 6: 550-700 meters (need size terrain of 2048)
-    public static final int RADIUS_DOWN = 10; // Minimum distance from the hole
-    public static final int RADIUS_UP = 30; // Maximum distance from the hole
+    public static final int RADIUS_DOWN = 5; // Minimum distance from the hole
+    public static final int RADIUS_UP = 10; // Maximum distance from the hole
     public static final int SIZE_GREEN = 10; // Size of the green (meters)
 
     // (Recommend higher when using long distances)
@@ -161,7 +157,7 @@ public class Consts {
 
 
     //Resources for the game
-    //Do not change, except if you have full knowledge of the path you wanna change
+    //Do not change, except if you have full knowledge of the path you want to change
     public static final String DEFAULT_TEXTURE = "src/main/resources/Texture/Default.png";
 
     public static final String BACKGROUND_MUSIC = "src/main/resources/SoundTrack/skippy-mr-sunshine-fernweh-goldfish-main-version-02-32-7172.wav";

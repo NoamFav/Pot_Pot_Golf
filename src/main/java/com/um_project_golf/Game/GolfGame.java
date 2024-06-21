@@ -26,8 +26,7 @@ import static org.lwjgl.nanovg.NanoVGGL3.*;
 public class GolfGame implements ILogic {
 
     // Debug mode for Examination purposes
-    public static boolean debugMode = false; //Do not change this value to true,
-    // it will break the game (you can change it to true in-game only)
+    public static boolean debugMode = false;
 
     private long vg; // NanoVG context
 
@@ -145,7 +144,6 @@ public class GolfGame implements ILogic {
 
 
         for (Entity entity : context.getScene().getEntities()) {context.getRenderer().processEntity(entity);}
-
         for (Terrain terrain : context.getScene().getTerrains()) {context.getRenderer().processTerrain(terrain);}
     }
 
