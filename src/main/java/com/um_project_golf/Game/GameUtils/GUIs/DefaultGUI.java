@@ -6,7 +6,8 @@ import com.um_project_golf.Core.AWT.TextPane;
 import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
-import com.um_project_golf.Core.PhysicsEngine;
+import com.um_project_golf.Core.Physics.CompletePhysicsEngine;
+import com.um_project_golf.Core.Physics.PhysicsEngine;
 import com.um_project_golf.Core.Utils.BallCollisionDetector;
 import com.um_project_golf.Game.GameUtils.Consts;
 import com.um_project_golf.Core.WindowManager;
@@ -112,7 +113,7 @@ public class DefaultGUI {
     @NotNull
     @Contract(pure = true)
     private Runnable runPhysics() {
-        PhysicsEngine engine = new PhysicsEngine(heightMap, scene);
+        PhysicsEngine engine = new CompletePhysicsEngine(heightMap, scene);
 
         return () -> {
             if (gameStateManager.isAnimating()) {

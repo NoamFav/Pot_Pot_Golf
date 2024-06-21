@@ -4,13 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 
-import com.um_project_golf.Core.SimpleRK2;
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
-import com.um_project_golf.Core.Utils.BallCollisionDetector;
 import com.um_project_golf.Core.Utils.SimpleRK2;
-import com.um_project_golf.Core.Utils.SimpleRK4;
-import com.um_project_golf.Game.GameUtils.Consts;
 
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
