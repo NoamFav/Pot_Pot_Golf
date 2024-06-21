@@ -92,10 +92,7 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void input() {
-
         InputManager inputManager = new InputManager(context);
-        //float lightPos = scene.getSpotLights()[0].getPointLight().getPosition().z;
-        //float lightPos2 = scene.getSpotLights()[1].getPointLight().getPosition().z;
 
         if (context.getWindow().is_keyPressed(GLFW.GLFW_KEY_ESCAPE)) {
             GameStateManager gameStateManager = context.getGameStateManager();
