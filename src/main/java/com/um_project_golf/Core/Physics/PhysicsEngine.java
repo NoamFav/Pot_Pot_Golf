@@ -6,11 +6,11 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
-import com.um_project_golf.Core.SimpleRK4;
+import com.um_project_golf.Core.Utils.SimpleRK4;
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 import com.um_project_golf.Core.Utils.BallCollisionDetector;
-import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GameUtils.Consts;
 
 public abstract class PhysicsEngine {
     protected static final double g = Consts.GRAVITY; // gravitational constant
@@ -50,7 +50,7 @@ public abstract class PhysicsEngine {
      * @param stepSize The step size
      * @return The final position
      */
-    public List<Vector3f> runRK4(double[] initialState, double stepSize) { // initialState = [x, z, vx, vz]
+    public List<Vector3f> runRK4(double @NotNull [] initialState, double stepSize) { // initialState = [x, z, vx, vz]
         List<Vector3f> positions = new ArrayList<>();
         float startHeight = heightMap.getHeight(new Vector3f((float) initialState[0], 0, (float) initialState[1]));
         positions.add(new Vector3f((float) initialState[0],startHeight, (float) initialState[1] ));
@@ -79,7 +79,6 @@ public abstract class PhysicsEngine {
 
             currentTime += stepSize;
 
-            assert heightMap != null;
             float height = heightMap.getHeight(new Vector3f((float) currentState[0], 0, (float) currentState[1]));
             Vector3f position = new Vector3f((float) currentState[0], height, (float) currentState[1]);
             ballCollisionDetector.checkCollisionBall(position);

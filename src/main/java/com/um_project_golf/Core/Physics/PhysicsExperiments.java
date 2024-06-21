@@ -2,8 +2,10 @@ package com.um_project_golf.Core.Physics;
 
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
-import com.um_project_golf.Core.Utils.Consts;
+import com.um_project_golf.Game.GameUtils.Consts;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.io.File;
@@ -20,14 +22,14 @@ public class PhysicsExperiments {
     private static final SceneManager SCENE = new SceneManager(-90);
 
     // Create CompletePhysicsEngine instances
-    private static CompletePhysicsEngine flatGrassCompleteEngine = new CompletePhysicsEngine(FLATGRASSTERRAIN, SCENE);
-    private static CompletePhysicsEngine hillyCompleteEngine = new CompletePhysicsEngine(HILLYTERRAIN, SCENE);
-    private static CompletePhysicsEngine flatSandyCompleteEngine = new CompletePhysicsEngine(FLATSANDYTERRAIN, SCENE);
+    private static final CompletePhysicsEngine flatGrassCompleteEngine = new CompletePhysicsEngine(FLATGRASSTERRAIN, SCENE);
+    private static final CompletePhysicsEngine hillyCompleteEngine = new CompletePhysicsEngine(HILLYTERRAIN, SCENE);
+    private static final CompletePhysicsEngine flatSandyCompleteEngine = new CompletePhysicsEngine(FLATSANDYTERRAIN, SCENE);
 
     // Create SimplePhysicsEngine instances
-    private static SimplePhysicsEngine flatGrassSimpleEngine = new SimplePhysicsEngine(FLATGRASSTERRAIN, SCENE);
-    private static SimplePhysicsEngine hillySimpleEngine = new SimplePhysicsEngine(HILLYTERRAIN, SCENE);
-    private static SimplePhysicsEngine flatSandySimpleEngine = new SimplePhysicsEngine(FLATSANDYTERRAIN, SCENE);
+    private static final SimplePhysicsEngine flatGrassSimpleEngine = new SimplePhysicsEngine(FLATGRASSTERRAIN, SCENE);
+    private static final SimplePhysicsEngine hillySimpleEngine = new SimplePhysicsEngine(HILLYTERRAIN, SCENE);
+    private static final SimplePhysicsEngine flatSandySimpleEngine = new SimplePhysicsEngine(FLATSANDYTERRAIN, SCENE);
 
     private static final String RESULTS_DIR = "src/main/java/com/um_project_golf/Core/Physics/Experiment_results";
 
@@ -87,7 +89,7 @@ public class PhysicsExperiments {
         runExperiment("Simple Physics Engine - Flat Sandy Terrain - Diagonal", flatSandySimpleEngine, initialStateDiagonal, showAllPositions);
     }
 
-    private static void runExperiment(String experimentName, PhysicsEngine engine, double[] initialState, boolean showAllPositions) {
+    private static void runExperiment(String experimentName, @NotNull PhysicsEngine engine, double[] initialState, boolean showAllPositions) {
         System.out.println("Running experiment: " + experimentName);
         double stepSize = 0.1; 
         List<Vector3f> trajectory = engine.runRK4(initialState, stepSize);
@@ -133,32 +135,35 @@ public class PhysicsExperiments {
         }
     }
 
-    private static HeightMap createFlatTerrain() {
+    @Contract(value = " -> new", pure = true)
+    private static @NotNull HeightMap createFlatTerrain() {
         // Create a mock of flat terrain above sand level
         return new HeightMap() {
             @Override
-            public float getHeight(Vector3f position) {
+            public float getHeight(@NotNull Vector3f position) {
                 return Consts.SAND_HEIGHT + 0.1f;
             }
         };
     }
 
-    private static HeightMap createHillyTerrain() {
+    @Contract(value = " -> new", pure = true)
+    private static @NotNull HeightMap createHillyTerrain() {
         // Create a mock of hilly terrain
         return new HeightMap() {
             @Override
-            public float getHeight(Vector3f position) {
+            public float getHeight(@NotNull Vector3f position) {
                 // Define a hilly height function
                 return (float) Math.sin(position.x) * (float) Math.cos(position.z);
             }
         };
     }
 
-    private static HeightMap createSandyTerrain() {
+    @Contract(value = " -> new", pure = true)
+    private static @NotNull HeightMap createSandyTerrain() {
         // Create a mock of flat sandy terrain
         return new HeightMap() {
             @Override
-            public float getHeight(Vector3f position) {
+            public float getHeight(@NotNull Vector3f position) {
                 // Define a flat sandy terrain for simplicity
                 return Consts.SAND_HEIGHT - 0.1f; // Only gets recognized as sand when its below the sand level, so minus 0.01f
             }
