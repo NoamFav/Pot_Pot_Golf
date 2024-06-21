@@ -58,7 +58,7 @@ public class GolfGame implements ILogic {
         context.getWindow().setResized(false);
 
         context.getRenderer().init();
-        context.getWindow().setClearColor(0, 0, 0, 0.0f);
+        context.getWindow().setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
 
         context.getHeightMap().createHeightMap();
         context.getPathManager().setPath(context.getPathfinder().getPath(Consts.RADIUS_DOWN, Consts.RADIUS_UP, Consts.SIZE_GREEN));
