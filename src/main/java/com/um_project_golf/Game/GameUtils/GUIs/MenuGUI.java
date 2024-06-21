@@ -133,30 +133,38 @@ public class MenuGUI {
         guiElementManager.addMenuButton(debugButton);
 
         Button increaseSize = new Button(window.getWidth() - window.getWidthConverted(450), window.getHeightConverted(20) + heightButton, window.getWidthConverted(400), heightButton, "Increase Size", font, () -> {
-            Consts.POWER += 1;
-            Consts.SIZE_X = (float) Math.pow(2, Consts.POWER);
-            Consts.SIZE_Z = (float) Math.pow(2, Consts.POWER);
-            Consts.VERTEX_COUNT = (int) Math.pow(2, Consts.POWER + 2);
-            Consts.NUMBER_OF_TREES = (int) (Consts.SIZE_X / 2);
-            context.getHeightMap().createHeightMap();
-            runnable.terrainChanger().run();
-            Entity skybox = context.getEntitiesManager().getSkyBox();
-            skybox.setScale(Consts.SIZE_X / 2);
-            camera.setPosition(new Vector3f(Consts.SIZE_X / 4, 50, Consts.SIZE_Z / 4));
+            if (Consts.POWER < 11) {
+                Consts.POWER += 1;
+                Consts.SIZE_X = (float) Math.pow(2, Consts.POWER);
+                Consts.SIZE_Z = (float) Math.pow(2, Consts.POWER);
+                Consts.VERTEX_COUNT = (int) Math.pow(2, Consts.POWER + 2);
+                Consts.NUMBER_OF_TREES = (int) (Consts.SIZE_X / 2);
+                context.getHeightMap().createHeightMap();
+                runnable.terrainChanger().run();
+                Entity skybox = context.getEntitiesManager().getSkyBox();
+                skybox.setScale(Consts.SIZE_X / 2);
+                camera.setPosition(new Vector3f(Consts.SIZE_X / 4, 50, Consts.SIZE_Z / 4));
+            } else {
+                System.out.println("Cannot increase size anymore");
+            }
         }, vg, imageButton);
         guiElementManager.addMenuButton(increaseSize);
 
         Button decreaseSize = new Button(window.getWidth() - window.getWidthConverted(450), window.getHeightConverted(20) + heightButton * 2, window.getWidthConverted(400), heightButton, "Decrease Size", font, () -> {
-            Consts.POWER -= 1;
-            Consts.SIZE_X = (float) Math.pow(2, Consts.POWER);
-            Consts.SIZE_Z = (float) Math.pow(2, Consts.POWER);
-            Consts.VERTEX_COUNT = (int) Math.pow(2, Consts.POWER + 2);
-            Consts.NUMBER_OF_TREES = (int) (Consts.SIZE_X / 2);
-            context.getHeightMap().createHeightMap();
-            runnable.terrainChanger().run();
-            Entity skybox = context.getEntitiesManager().getSkyBox();
-            skybox.setScale(Consts.SIZE_X / 2);
-            camera.setPosition(new Vector3f(Consts.SIZE_X / 4, 50, Consts.SIZE_Z / 4));
+            if (Consts.POWER > 6) {
+                Consts.POWER -= 1;
+                Consts.SIZE_X = (float) Math.pow(2, Consts.POWER);
+                Consts.SIZE_Z = (float) Math.pow(2, Consts.POWER);
+                Consts.VERTEX_COUNT = (int) Math.pow(2, Consts.POWER + 2);
+                Consts.NUMBER_OF_TREES = (int) (Consts.SIZE_X / 2);
+                context.getHeightMap().createHeightMap();
+                runnable.terrainChanger().run();
+                Entity skybox = context.getEntitiesManager().getSkyBox();
+                skybox.setScale(Consts.SIZE_X / 2);
+                camera.setPosition(new Vector3f(Consts.SIZE_X / 4, 50, Consts.SIZE_Z / 4));
+            } else {
+                System.out.println("Cannot decrease size anymore");
+            }
         }, vg, imageButton);
         guiElementManager.addMenuButton(decreaseSize);
     }
