@@ -61,7 +61,9 @@ public class InitManager {
 
         ModelLoader models = getModels();
 
-        scene.addEntity(new Entity(models.skyBox(), new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2));
+        Entity skybox = new Entity(models.skyBox(), new Vector3f(0, -10, 0), new Vector3f(90, 0, 0), Consts.SIZE_X / 2);
+        scene.addEntity(skybox);
+        entitiesManager.setSkyBox(skybox);
 
         Entity arrowEntity = new Entity(models.arrow(), new Vector3f(0, 0, 0), new Vector3f(0, -90, 0), 2);
         entitiesManager.setArrowEntity(arrowEntity);
