@@ -29,7 +29,7 @@ public class Consts {
     public static int VERTEX_COUNT = (int) Math.pow(2, POWER + 2); // Number of vertices in the terrain (Higher = more detail but also more performance heavy)
     public static int NUMBER_OF_TREES = (int) (SIZE_X / 2); // Density of the trees (higher = more trees) reduces for performance
     public static final float TREE_SIZE = 1.5f; // Size of the trees at the trunk
-    public static final float MAX_HEIGHT = 1000; // Maximum height of the terrain,
+    public static float MAX_HEIGHT = SIZE_X / 2; // Maximum height of the terrain,
     // doesn't have to influence the actual height of the terrain just the maximum height reachable by the player
 
     public static final int MAX_TEXTURES = 7; // Maximum number of textures (don't change)
