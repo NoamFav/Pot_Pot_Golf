@@ -36,9 +36,7 @@ public class GolfGame implements ILogic {
      * The constructor of the game.
      * It initializes the renderer, window, loader and camera.
      */
-    public GolfGame() {
-        context = new MainFieldManager();
-    }
+    public GolfGame() {context = new MainFieldManager();}
 
     /**
      * Initializes the game.

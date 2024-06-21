@@ -133,12 +133,13 @@ public class MenuGUI {
         guiElementManager.addMenuButton(debugButton);
 
         Button increaseSize = new Button(window.getWidth() - window.getWidthConverted(450), window.getHeightConverted(20) + heightButton, window.getWidthConverted(400), heightButton, "Increase Size", font, () -> {
-            if (Consts.POWER < 11) {
+            if (Consts.POWER < 12) {
                 Consts.POWER += 1;
                 Consts.SIZE_X = (float) Math.pow(2, Consts.POWER);
                 Consts.SIZE_Z = (float) Math.pow(2, Consts.POWER);
                 Consts.VERTEX_COUNT = (int) Math.pow(2, Consts.POWER + 2);
                 Consts.NUMBER_OF_TREES = (int) (Consts.SIZE_X / 2);
+                Consts.MAX_HEIGHT = Consts.SIZE_X / 2;
                 context.getHeightMap().createHeightMap();
                 runnable.terrainChanger().run();
                 Entity skybox = context.getEntitiesManager().getSkyBox();
@@ -151,12 +152,13 @@ public class MenuGUI {
         guiElementManager.addMenuButton(increaseSize);
 
         Button decreaseSize = new Button(window.getWidth() - window.getWidthConverted(450), window.getHeightConverted(20) + heightButton * 2, window.getWidthConverted(400), heightButton, "Decrease Size", font, () -> {
-            if (Consts.POWER > 6) {
+            if (Consts.POWER > 7) {
                 Consts.POWER -= 1;
                 Consts.SIZE_X = (float) Math.pow(2, Consts.POWER);
                 Consts.SIZE_Z = (float) Math.pow(2, Consts.POWER);
                 Consts.VERTEX_COUNT = (int) Math.pow(2, Consts.POWER + 2);
                 Consts.NUMBER_OF_TREES = (int) (Consts.SIZE_X / 2);
+                Consts.MAX_HEIGHT = Consts.SIZE_X / 2;
                 context.getHeightMap().createHeightMap();
                 runnable.terrainChanger().run();
                 Entity skybox = context.getEntitiesManager().getSkyBox();
