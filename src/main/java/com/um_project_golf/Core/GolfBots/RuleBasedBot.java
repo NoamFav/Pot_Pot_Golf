@@ -64,7 +64,6 @@ public class RuleBasedBot {
 
                     // Check if the shot is better than the best one already saved
                     if (distanceToFlag() < minDistance) {
-                        System.out.println(distanceToFlag() + " < " + minDistance);
                         bestVelocity = new Vector3f(velocity);
                         // Check if the ball is in the hole
                         if (isInHole()) {
