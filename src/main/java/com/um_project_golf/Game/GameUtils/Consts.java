@@ -143,6 +143,13 @@ public class Consts {
     // Pitching Wedge = 38 m/s to 45 m/s (137 km/h to 162 km/h)
     public static final float MAX_SPEED = 5; // Maximum speed of the ball (m/s)
 
+    // Bot configuration
+    public static final float BOT_SENSITIVITY = 0.1f; // Sensitivity of the bots (higher = more sensitive)
+
+    // Error factor introduced in the bots to make them more human-like
+    public static final float ERROR_DIRECTION_DEGREES = 0; // Error in the direction of the bots (degrees)
+    public static final float ERROR_MAGNITUDE_PERCENTAGE = 0; // Error in the magnitude of the bots (percentage)
+
     // The requirement of friction is tiny,
     // so on the simplex noise terrain, the ball will have trouble climbing the hills.
     // Use the recommended values for the best experience.

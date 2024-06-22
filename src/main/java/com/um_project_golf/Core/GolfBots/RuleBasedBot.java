@@ -4,10 +4,13 @@ import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 import com.um_project_golf.Core.Physics.*;
+import com.um_project_golf.Core.Utils.Noise;
+import com.um_project_golf.Game.GameUtils.Consts;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,6 +27,7 @@ public class RuleBasedBot {
     private final Entity flag;
     private HashMap<Vector3f,List<Vector3f>> fullPath;
     private final SceneManager scene;
+    private final Noise noise;
 
     public RuleBasedBot(@NotNull Entity ball, Entity flag, HeightMap heightMap, double flagRadius, SceneManager scene) {
         startingPosition = new Vector3f(ball.getPosition());
@@ -32,6 +36,7 @@ public class RuleBasedBot {
         this.heightMap = heightMap;
         this.flagRadius = flagRadius;
         this.scene = scene;
+        noise = new Noise();
     }
 
     /* Method returns the path the ball takes from its initial position until the last position found by the bot.
@@ -53,9 +58,10 @@ public class RuleBasedBot {
         while (!isInHole()) {
             System.out.println("Starting position: " + distanceToFlag());
             // Placeholder for iterating over possible velocities
-            for (float velocityX = -5; velocityX <= 5; velocityX += 0.01f) {
-                for (float velocityZ = -5; velocityZ <= 5; velocityZ += 0.01f) {
+            for (float velocityX = -5; velocityX <= 5; velocityX += Consts.BOT_SENSITIVITY) {
+                for (float velocityZ = -5; velocityZ <= 5; velocityZ += Consts.BOT_SENSITIVITY) {
                     velocity = new Vector3f(velocityX, 0, velocityZ);
+
                     // Apply the velocities to the ball
                     applyVelocities(velocity);
 
@@ -92,9 +98,15 @@ public class RuleBasedBot {
             fullPath.clear(); // clears the path for the next shot
             System.out.println("Shot "+ shotCounter +". Distance to flag: " + distanceToFlag());
             System.out.println("Velocity: " + bestVelocity);
+
+            if(startingPosition.equals(ball.getPosition())){
+                System.out.println("FAIL. Shots taken: " + shotCounter + ". Distance to flag: " + distanceToFlag());
+                return path;
+            }
         }
         return path;
     }
+
 
     // Updates velocity of the ball
     public void applyVelocities(Vector3f velocity) {

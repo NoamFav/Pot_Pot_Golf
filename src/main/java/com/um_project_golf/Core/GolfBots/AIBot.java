@@ -4,13 +4,14 @@ import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 import com.um_project_golf.Core.Physics.*;
+import com.um_project_golf.Core.Utils.Noise;
+import com.um_project_golf.Game.GameUtils.Consts;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Class responsible for the logic behind the AI bot.
@@ -27,6 +28,8 @@ public class AIBot {
     private HashMap<Vector3f,List<Vector3f>> fullPath;
     private final SceneManager scene;
     private int shotCounter = 0;
+    private final Noise noise;
+    private final List<List<Vector3f>> path;
 
     public AIBot(@NotNull Entity ball, Entity flag, HeightMap testMap, double flagRadius, SceneManager scene) {
         startingPosition = new Vector3f(ball.getPosition());
@@ -35,16 +38,18 @@ public class AIBot {
         this.testMap = testMap;
         this.flagRadius = flagRadius;
         this.scene = scene;
+        noise = new Noise();
+        path = new ArrayList<>();
     }
 
     public List<List<Vector3f>> startAI(){
         System.out.println("Start");
         fullPath = new HashMap<>();
+        path.clear();
         return findBestShotUsingHillClimbing(startingPosition);
     }
 
     public List<List<Vector3f>> findBestShotUsingHillClimbing(Vector3f startingPosition) {
-        List<List<Vector3f>> path = new ArrayList<>();
         Vector3f currentPosition = new Vector3f(startingPosition);
 
         Vector3f bestVelocity = new Vector3f(0, 0, 0);
@@ -56,8 +61,8 @@ public class AIBot {
             improvement = false;
 
             // Generate neighboring shots by adjusting velocity slightly
-            for (double dX = -0.1; dX <= 0.1; dX += 0.01) {
-                for (double dZ = -0.1; dZ <= 0.1; dZ += 0.01) {
+            for (double dX = -0.1; dX <= 0.1; dX += Double.parseDouble(String.valueOf(Consts.BOT_SENSITIVITY))) {
+                for (double dZ = -0.1; dZ <= 0.1; dZ += Double.parseDouble(String.valueOf(Consts.BOT_SENSITIVITY))) {
                     if (dX == 0 && dZ == 0) continue; // Skip the current shot
 
                     float newVelocityX = (float) (bestVelocity.x + dX);
