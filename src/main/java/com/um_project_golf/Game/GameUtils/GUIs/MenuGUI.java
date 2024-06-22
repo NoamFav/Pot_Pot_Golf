@@ -200,7 +200,7 @@ public class MenuGUI {
 
             if (gameStateManager.is2player()) {
                 if (entitiesManager.getGolfBall2() == null) {
-                    Entity golfBall2 = new Entity(modelManager.getBall2(), new Vector3f(start), new Vector3f(50, 0, 0), 5);
+                    Entity golfBall2 = new Entity(modelManager.getBall2(), new Vector3f(start), new Vector3f(0, 0, 0), 5);
                     entitiesManager.setGolfBall2(golfBall2);
                     scene.addEntity(golfBall2);
                 } else {
@@ -241,7 +241,7 @@ public class MenuGUI {
             entitiesManager.clearTrees();
             debugMode = !debugMode;
             if (entitiesManager.getGolfBall2() == null && gameStateManager.is2player()) {
-                Entity golfBall2 = new Entity(modelManager.getBall2(), new Vector3f(0, 0, 0), new Vector3f(50, 0, 0), 5);
+                Entity golfBall2 = new Entity(modelManager.getBall2(), new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 5);
                 entitiesManager.setGolfBall2(golfBall2);
                 scene.addEntity(golfBall2);
             }
@@ -319,7 +319,7 @@ public class MenuGUI {
 
         return () -> {
             System.out.println("Creating bot ball");
-            Entity botBall = new Entity(modelManager.getBotBallModel(), new Vector3f(pathManager.getStartPoint()), new Vector3f(50, 0, 0), 5);
+            Entity botBall = new Entity(modelManager.getBotBallModel(), new Vector3f(pathManager.getStartPoint()), new Vector3f(0, 0, 0), 5);
             entitiesManager.setBotBall(botBall);
             scene.addEntity(botBall);
 
@@ -343,7 +343,7 @@ public class MenuGUI {
 
         return () -> {
             System.out.println("Creating AI bot ball");
-            Entity aiBotBall = new Entity(modelManager.getAiBotBallModel(), new Vector3f(pathManager.getStartPoint()), new Vector3f(50, 0, 0), 5);
+            Entity aiBotBall = new Entity(modelManager.getAiBotBallModel(), new Vector3f(pathManager.getStartPoint()), new Vector3f(0, 0, 0), 5);
             entitiesManager.setAiBotBall(aiBotBall);
             scene.addEntity(aiBotBall);
 
