@@ -89,11 +89,11 @@ public abstract class PhysicsEngine {
             // System.out.println(position);
         } while (magnitudeVelocity >= VELOCITY_THRESHOLD || magnitudeAcceleration >= ACCELERATION_THRESHOLD); // While the ball is not at rest
 
-        if (positions.size() > 2) {
-            int index = 2;
+        if (positions.size() > 1) {
+            int index = 1;
             while (index < positions.size()) {
                 Vector3f currentCheck = positions.get(index);
-                if (currentCheck.equals(positions.get(index - 1)) && currentCheck.equals(positions.get(index - 2))) {
+                if (currentCheck.equals(positions.get(index - 1))) {
                     positions.remove(index);
                 }
                 else {
