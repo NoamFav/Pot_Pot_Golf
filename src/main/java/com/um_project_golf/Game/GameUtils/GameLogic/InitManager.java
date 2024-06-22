@@ -81,7 +81,7 @@ public class InitManager {
         entitiesManager.setEndFlag(endFlag);
         scene.addEntity(endFlag);
 
-        Entity golfBall = new Entity(models.ball(), new Vector3f(startPoint), new Vector3f(50, 0, 0), 5);
+        Entity golfBall = new Entity(models.ball(), new Vector3f(startPoint), new Vector3f(0, 0, 0), 5);
         entitiesManager.setGolfBall(golfBall);
         scene.addEntity(golfBall);
 
