@@ -75,8 +75,7 @@ public class GolfGame implements ILogic {
         gameStateManager.setOnMenu(true);
 
         AudioManager audioManager = new AudioManager(Consts.BACKGROUND_MUSIC);
-        audioManager.playSound();
-        gameStateManager.setSoundPlaying(true);
+        gameStateManager.setSoundPlaying(false);
         context.setAudioManager(audioManager);
 
         new MenuGUI(vg, context);
