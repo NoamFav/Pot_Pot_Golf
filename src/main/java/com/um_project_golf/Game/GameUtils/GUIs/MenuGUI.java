@@ -346,7 +346,7 @@ public class MenuGUI {
             scene.addEntity(aiBotBall);
 
             AIBot aiBot = new AIBot(new Entity(aiBotBall), new Entity(entitiesManager.getEndFlag()), heightMap, Consts.TARGET_RADIUS, scene);
-            gameVarManager.setAiBotPath(aiBot.findBestShotUsingHillClimbing());
+            gameVarManager.setAiBotPath(aiBot.startAI());
 
             entitiesManager.setAiBotBallPosition(new Vector3f(pathManager.getStartPoint()));
         };
