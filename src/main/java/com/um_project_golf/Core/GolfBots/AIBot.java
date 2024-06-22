@@ -39,11 +39,11 @@ public class AIBot {
 
     public List<List<Vector3f>> startAI(){
         System.out.println("Start");
+        fullPath = new HashMap<>();
         return findBestShotUsingHillClimbing(startingPosition);
     }
 
     public List<List<Vector3f>> findBestShotUsingHillClimbing(Vector3f startingPosition) {
-        fullPath = new HashMap<>();
         List<List<Vector3f>> path = new ArrayList<>();
         Vector3f currentPosition = new Vector3f(startingPosition);
 
