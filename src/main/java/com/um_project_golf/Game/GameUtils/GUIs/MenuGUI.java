@@ -183,9 +183,11 @@ public class MenuGUI {
             if (entitiesManager.getAiBotBall() != null) scene.getEntities().removeIf(entity -> entity.equals(entitiesManager.getAiBotBall()));
 
             if (gameStateManager.isBot()) {
+                gameVarManager.resetCurrentShotIndexBot();
                 createBotBall().run();
             }
             if (gameStateManager.isAiBot()) {
+                gameVarManager.resetCurrentShotIndexAI();
                 createAiBotBall().run();
             }
 
