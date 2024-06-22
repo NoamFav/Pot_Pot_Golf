@@ -52,12 +52,11 @@ public class AIBot {
         boolean improvement = true;
 
         while (improvement) {
-            System.out.println("Improvement. Distance to flag: "+ bestNeighborDistance);
             improvement = false;
 
             // Generate neighboring shots by adjusting velocity slightly
-            for (double dX = -5; dX <= 5; dX += 0.1) {
-                for (double dZ = -5; dZ <= 5; dZ += 0.5) {
+            for (double dX = -0.1; dX <= 0.1; dX += 0.01) {
+                for (double dZ = -0.1; dZ <= 0.1; dZ += 0.01) {
                     if (dX == 0 && dZ == 0) continue; // Skip the current shot
 
                     float newVelocityX = (float) (bestVelocity.x + dX);
@@ -87,13 +86,16 @@ public class AIBot {
 
         if (isInHole()) {
             System.out.println("Ball in hole!");
+            System.out.println("Velocity: " + bestVelocity);
             System.out.println("End of game! Shots taken: " + shotCounter);
             return path;
+
         } else if(sameShot){
             System.out.println("FAIL. Shots taken: " + shotCounter + ". Distance to flag: " + distanceFlag);
             return path;
         }
         System.out.println("No improvement. Taking shot. Distance to flag: " + distanceFlag);
+        System.out.println("Velocity: " + bestVelocity);
         return findBestShotUsingHillClimbing(currentPosition);
     }
 

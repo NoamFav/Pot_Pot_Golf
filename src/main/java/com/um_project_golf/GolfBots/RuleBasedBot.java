@@ -47,13 +47,14 @@ public class RuleBasedBot {
         List<List<Vector3f>> path = new ArrayList<>();
         Vector3f bestPosition = null;
         Vector3f velocity;
+        Vector3f bestVelocity = new Vector3f(0,0,0);
         System.out.println("Start");
-
         //Checks whether the ball is already in the hole
         while (!isInHole()) {
+            System.out.println("Starting position: " + distanceToFlag());
             // Placeholder for iterating over possible velocities
-            for (float velocityX = -5; velocityX <= 5; velocityX += 0.1f) {
-                for (float velocityZ = -5; velocityZ <= 5; velocityZ += 0.1f) {
+            for (float velocityX = -5; velocityX <= 5; velocityX += 0.01f) {
+                for (float velocityZ = -5; velocityZ <= 5; velocityZ += 0.01f) {
                     velocity = new Vector3f(velocityX, 0, velocityZ);
                     // Apply the velocities to the ball
                     applyVelocities(velocity);
@@ -63,6 +64,8 @@ public class RuleBasedBot {
 
                     // Check if the shot is better than the best one already saved
                     if (distanceToFlag() < minDistance) {
+                        System.out.println(distanceToFlag() + " < " + minDistance);
+                        bestVelocity = new Vector3f(velocity);
                         // Check if the ball is in the hole
                         if (isInHole()) {
                             bestPosition = new Vector3f(ball.getPosition());
@@ -70,6 +73,7 @@ public class RuleBasedBot {
                             path.add(fullPath.get(bestPosition)); // adds the position to the path of points passed by
                             System.out.println("Shot "+ shotCounter +". Distance to flag: " + distanceToFlag());
                             System.out.println("Ball is in hole! With " + shotCounter + " shots taken");
+                            System.out.println("Chosen velocity: " + velocity);
                             return path;
                         }
                         minDistance = distanceToFlag(); // replaces the old best shot with the new one
@@ -86,8 +90,8 @@ public class RuleBasedBot {
             path.add(fullPath.get(bestPosition)); // adds the position to the path of points passed by
             shotCounter++;
             System.out.println("Shot "+ shotCounter +". Distance to flag: " + distanceToFlag());
+            System.out.println("Velocity: " + bestVelocity);
         }
-
         return path;
     }
 
