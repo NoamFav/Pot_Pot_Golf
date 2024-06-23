@@ -84,24 +84,29 @@ public class AIBot {
                 }
             }
         }
-        double distanceFlag = evaluateShot(bestVelocity);
+        Vector3f noiseVelocity = noise.addNoiseToVelocity(bestVelocity, Consts.ERROR_DIRECTION_DEGREES, Consts.ERROR_MAGNITUDE_PERCENTAGE);
+        double distanceFlag = evaluateShot(noiseVelocity);
         boolean sameShot = currentPosition.equals(ball.getPosition());
         shotCounter++;
         currentPosition = new Vector3f(ball.getPosition());
         path.add(fullPath.get(currentPosition));
+        fullPath.clear();
 
         if (isInHole()) {
             System.out.println("Ball in hole!");
-            System.out.println("Velocity: " + bestVelocity);
-            System.out.println("End of game! Shots taken: " + shotCounter);
+            System.out.println("Velocity theoretical: " + bestVelocity);
+            System.out.println("Velocity with noise: " + noiseVelocity);
+            System.out.println("End of game! Shots taken: " + shotCounter + "\n");
             return path;
 
         } else if(sameShot){
-            System.out.println("FAIL. Shots taken: " + shotCounter + ". Distance to flag: " + distanceFlag);
+            System.out.println("FAIL. Shots taken: " + shotCounter + ". Distance to flag: " + distanceFlag + "\n");
             return path;
         }
-        System.out.println("No improvement. Taking shot. Distance to flag: " + distanceFlag);
-        System.out.println("Velocity: " + bestVelocity);
+        System.out.println("Shots taken: " + shotCounter + ". Distance to flag: " + distanceFlag);
+        System.out.println("Best velocity theoretical: " + bestVelocity);
+        System.out.println("Noisy best velocity: " + noiseVelocity);
+        System.out.println("Starting position: " + currentPosition + "\n");
         return findBestShotUsingHillClimbing(currentPosition);
     }
 

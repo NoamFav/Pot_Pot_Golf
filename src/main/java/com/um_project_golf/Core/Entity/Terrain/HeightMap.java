@@ -80,7 +80,7 @@ public class HeightMap {
                 float hz = z / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_Z;
 
                 if (GolfGame.debugMode) {
-                    heightValue = Terrain.getHeight(hx, hz); // Calculate the height of the vertex
+                    heightValue = Consts.HEIGHT_FUNCTION.apply(hx, hz); // Calculate the height of the vertex
                 } else {
                     heightValue = heightmap[x][z]; // Calculate the height of the vertex
                 }
@@ -141,7 +141,7 @@ public class HeightMap {
 
         float height;
         if (GolfGame.debugMode) {
-            height = Terrain.getHeight(position.x, position.z); // Calculate the height of the vertex
+            height = Consts.HEIGHT_FUNCTION.apply(position.x, position.z); // Calculate the height of the vertex
         } else {
             height = SceneManager.getHeightMap()[heightX][heightZ]; // Calculate the height of the vertex
         }

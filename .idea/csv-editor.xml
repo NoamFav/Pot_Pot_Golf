@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CsvFileAttributes">
+    <option name="attributeMap">
+      <map>
+        <entry key="/src/main/java/com/um_project_golf/Core/Physics/Experiment_results/Complete_Physics_Engine_-_Sandy_Terrain_-_Slow_z_results.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/src/main/java/com/um_project_golf/Core/Physics/Experiment_results/Complete_Physics_Engine_-_Steep_Hilly_Terrain_-_Fast_x_results.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/src/main/java/com/um_project_golf/Core/Physics/Experiment_results/Simple_Physics_Engine_-_Flat_Sandy_Terrain_-_Slow_x_results.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/src/main/java/com/um_project_golf/Core/Physics/Experiment_results/Simple_Physics_Engine_-_Gentle_Hilly_Terrain_-_Slow_x_results.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/src/main/java/com/um_project_golf/Core/Physics/Experiment_results/Simple_Physics_Engine_-_Hilly_Terrain_-_Fast_x_results.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
