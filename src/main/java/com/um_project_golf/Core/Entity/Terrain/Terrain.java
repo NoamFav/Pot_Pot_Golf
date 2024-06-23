@@ -75,7 +75,7 @@ public class Terrain {
                 float z = i / (Consts.VERTEX_COUNT - 1f) * Consts.SIZE_Z; // Calculate the z position of the vertex
                 float height;
                 if (GolfGame.debugMode) {
-                    height = getHeight(x, z); // Calculate the height of the vertex
+                    height = Consts.HEIGHT_FUNCTION.apply(x,z); // Calculate the height of the vertex
                 } else {
                     height = heightmap[j][i]; // Calculate the height of the vertex
                 }
@@ -140,19 +140,6 @@ public class Terrain {
         normals[vertexPointer * 3] = normal.x; // Set the x normal
         normals[vertexPointer * 3 + 1] = normal.y; // Set the y normal
         normals[vertexPointer * 3 + 2] = normal.z; // Set the z normal
-    }
-
-    /**
-     * Get the height of the terrain at a given position.
-     * Only used for evaluation.
-     *
-     * @param x The x position of the terrain.
-     * @param z The z position of the terrain.
-     * @return The height of the terrain at the given position.
-     */
-    public static float getHeight(float x, float z) {
-        double x1 = Consts.HEIGHT_FUNCTION.apply(x,z); // Calculate the height of the terrain
-        return (float) (x1); // Return the height of the terrain
     }
 
     public Model getModel() {

@@ -47,17 +47,19 @@ public class RuleBasedBot {
     consult the README). */
     public List<List<Vector3f>> findBestShot() {
         int shotCounter = 0;
-        double minDistance = Double.MAX_VALUE;
+        double minDistance;
         fullPath = new HashMap<>();
         List<List<Vector3f>> path = new ArrayList<>();
-        Vector3f bestPosition = null;
         Vector3f velocity;
-        Vector3f bestVelocity = new Vector3f(0,0,0);
+        Vector3f bestVelocity = new Vector3f(0, 0, 0);
         System.out.println("Start");
-        //Checks whether the ball is already in the hole
+
+        // Main loop to keep shooting until the ball is in the hole
         while (!isInHole()) {
-            System.out.println("Starting position: " + distanceToFlag());
-            // Placeholder for iterating over possible velocities
+            System.out.println("Starting position: " + startingPosition);
+            minDistance = Double.MAX_VALUE; // Reset minDistance for this shot sequence
+
+            // Iterate over possible velocities to find the best shot for this turn
             for (float velocityX = -5; velocityX <= 5; velocityX += Consts.BOT_SENSITIVITY) {
                 for (float velocityZ = -5; velocityZ <= 5; velocityZ += Consts.BOT_SENSITIVITY) {
                     velocity = new Vector3f(velocityX, 0, velocityZ);
@@ -70,40 +72,40 @@ public class RuleBasedBot {
 
                     // Check if the shot is better than the best one already saved
                     if (distanceToFlag() < minDistance) {
-                        bestVelocity = new Vector3f(velocity);
-                        // Check if the ball is in the hole
-                        if (isInHole()) {
-                            bestPosition = new Vector3f(ball.getPosition());
-                            shotCounter++;
-                            path.add(fullPath.get(bestPosition)); // adds the position to the path of points passed by
-                            System.out.println("Shot "+ shotCounter +". Distance to flag: " + distanceToFlag());
-                            System.out.println("Ball is in hole! With " + shotCounter + " shots taken");
-                            System.out.println("Chosen velocity: " + velocity);
-                            return path;
-                        }
-                        minDistance = distanceToFlag(); // replaces the old best shot with the new one
-                        bestPosition = new Vector3f(ball.getPosition()); // saves the end position of the new shot
+                        minDistance = distanceToFlag();
+                        bestVelocity.set(velocity);
                     }
 
-                    // Reset ball position for the next shot
-                    ball.setPosition(startingPosition.x,startingPosition.y,startingPosition.z);
+                    // Reset ball position for the next shot attempt
+                    ball.setPosition(startingPosition.x, startingPosition.y, startingPosition.z);
                 }
             }
-            assert bestPosition != null;
-            ball.setPosition(bestPosition.x,bestPosition.y,bestPosition.z); // sets ball to start in the new position
-            startingPosition = new Vector3f(bestPosition); // sets initial position to be now the new position
 
-            path.add(fullPath.get(bestPosition)); // adds the position to the path of points passed by
-            shotCounter++;
-            fullPath.clear(); // clears the path for the next shot
-            System.out.println("Shot "+ shotCounter +". Distance to flag: " + distanceToFlag());
-            System.out.println("Velocity: " + bestVelocity);
+            // Apply noise to the bestVelocity to simulate human error
+            Vector3f noisyBestVelocity = noise.addNoiseToVelocity(bestVelocity, Consts.ERROR_DIRECTION_DEGREES, Consts.ERROR_MAGNITUDE_PERCENTAGE);
+            applyVelocities(noisyBestVelocity);
+            simulateBallMovement();
 
-            if(startingPosition.equals(ball.getPosition())){
-                System.out.println("FAIL. Shots taken: " + shotCounter + ". Distance to flag: " + distanceToFlag());
-                return path;
+            // Check if the ball is in the hole after applying noise
+            if (isInHole()) {
+                path.add(fullPath.get(new Vector3f(ball.getPosition()))); // Add the last position to the path
+                System.out.println("Ball is in the hole!!");
+                System.out.println("Total shots taken: " + shotCounter);
+                System.out.println("Final velocity: " + noisyBestVelocity);
+                System.out.println("Theoretical best velocity: " + bestVelocity);
+                break; // Exit the loop if the ball is in the hole
             }
+
+            // Update starting position to the new position after the noisy shot
+            startingPosition = new Vector3f(ball.getPosition());
+            path.add(fullPath.get(startingPosition));
+            shotCounter++;
+            System.out.println("Shot " + shotCounter + ". Distance to flag: " + distanceToFlag());
+            System.out.println("Best velocity: " + bestVelocity);
+            System.out.println("Noisy best velocity: " + noisyBestVelocity + "\n");
+            fullPath.clear();
         }
+
         return path;
     }
 
