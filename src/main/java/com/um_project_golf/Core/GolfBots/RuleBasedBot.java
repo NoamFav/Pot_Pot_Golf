@@ -55,7 +55,7 @@ public class RuleBasedBot {
         System.out.println("Start");
 
         // Main loop to keep shooting until the ball is in the hole
-        while (!isInHole()) {
+        while (!isInHole() && shotCounter < 10) {
             System.out.println("Starting position: " + startingPosition);
             minDistance = Double.MAX_VALUE; // Reset minDistance for this shot sequence
             startingPosition = noise.addNoiseToInitialPosition(startingPosition, Consts.ERROR_POSITION_RADIUS); // Add noise to the starting position
@@ -91,7 +91,7 @@ public class RuleBasedBot {
             if (isInHole()) {
                 path.add(fullPath.get(new Vector3f(ball.getPosition()))); // Add the last position to the path
                 System.out.println("Ball is in the hole!!");
-                System.out.println("Total shots taken: " + shotCounter);
+                System.out.println("Total shots taken: " + (shotCounter + 1));
                 System.out.println("Final velocity: " + noisyBestVelocity);
                 System.out.println("Theoretical best velocity: " + bestVelocity);
                 break; // Exit the loop if the ball is in the hole
@@ -105,6 +105,10 @@ public class RuleBasedBot {
             System.out.println("Best velocity: " + bestVelocity);
             System.out.println("Noisy best velocity: " + noisyBestVelocity + "\n");
             fullPath.clear();
+        }
+
+        if (shotCounter == 10) {
+            System.out.println("Maximum shots reached. Distance to flag: " + distanceToFlag());
         }
 
         return path;
