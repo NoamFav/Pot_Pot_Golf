@@ -147,8 +147,8 @@ public class Consts {
     public static final float BOT_SENSITIVITY = 0.1f; // Sensitivity of the bots (higher = more sensitive)
 
     // Error factor introduced in the bots to make them more human-like
-    public static final float ERROR_DIRECTION_DEGREES = 0; // Error in the direction of the bots (degrees)
-    public static final float ERROR_MAGNITUDE_PERCENTAGE = 0; // Error in the magnitude of the bots (percentage)
+    public static final float ERROR_DIRECTION_DEGREES = 5; // Error in the direction of the bots (degrees)
+    public static final float ERROR_MAGNITUDE_PERCENTAGE = 7; // Error in the magnitude of the bots (percentage)
 
     // The requirement of friction is tiny,
     // so on the simplex noise terrain, the ball will have trouble climbing the hills.
