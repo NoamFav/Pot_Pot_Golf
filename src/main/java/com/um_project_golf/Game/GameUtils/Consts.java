@@ -15,8 +15,8 @@ public class Consts {
 
     public static String Title = "UM Project Golf"; // Title of the game
 
-    public static final float REFERENCE_WIDTH = 3840; // Reference width for the game (don't change)
-    public static final float REFERENCE_HEIGHT = 2160; // Reference height for the game (don't change)
+    public static final float REFERENCE_WIDTH = 3840f; // Reference width for the game (don't change)
+    public static final float REFERENCE_HEIGHT = 2160f; // Reference height for the game (don't change)
 
     /* If too much lag, reduce the power to 8 (256 meters, and 1024 vertices).
     Or reduce the number of vertices to either power + 1 or power + 0.
@@ -29,7 +29,7 @@ public class Consts {
     public static final int VERTEX_COUNT = (int) Math.pow(2, POWER + 2); // Number of vertices in the terrain (Higher = more detail but also more performance heavy)
     public static final int NUMBER_OF_TREES = (int) (SIZE_X / 2); // Density of the trees (higher = more trees) reduces for performance
     public static final float TREE_SIZE = 1.5f; // Size of the trees at the trunk
-    public static final float MAX_HEIGHT = SIZE_X / 2; // Maximum height of the terrain,
+    public static final float MAX_HEIGHT = SIZE_X / 2f; // Maximum height of the terrain,
     // doesn't have to influence the actual height of the terrain just the maximum height reachable by the player
 
     public static final int MAX_TEXTURES = 7; // Maximum number of textures (don't change)
@@ -67,7 +67,7 @@ public class Consts {
     Camera Movement Speed = 1.1 (normal speed for a human, but really slow for a game) */
     public static final float PLAYER_HEIGHT = 1.75f; // Height of the player (meters)
     public static final float MOUSE_SENSITIVITY = 0.2f; // Mouse sensitivity (Higher = more sensitive)
-    public static final float CAMERA_MOVEMENT_SPEED = 3;  // camera movement speed (Higher = faster)
+    public static final float CAMERA_MOVEMENT_SPEED = 3f;  // camera movement speed (Higher = faster)
 
     // Make the scene darker or brighter with the ambient light
     public static final Vector4f DEFAULT_COLOR = new Vector4f(1f, 1f, 1f, 1f); // Default color of the object (don't change)
@@ -85,7 +85,7 @@ public class Consts {
     (You wouldn't want to play golf in the sand, would you?) */
     public static final float SAND_HEIGHT = 0.2f; // Height of the sand (meters)
 
-    public static final float MAX_TERRAIN_HEIGHT = 10; // Height of the terrain (meters)
+    public static final float MAX_TERRAIN_HEIGHT = 10f; // Height of the terrain (meters)
     /* The max height is only a scaling factor for the simplex noise.
     It is not the actual height of the terrain has simplex doesn't have to be 1 at any point.
     The terrains use octaves simplex generations, so the height is a sum of multiple simplex noise functions.
@@ -141,14 +141,15 @@ public class Consts {
     // 3 Wood = 64.8 m/s to 69.1 m/s (233 km/h to 249 km/h)
     // 5 Iron = 58.1 m/s to 62.4 m/s (210 km/h to 225 km/h)
     // Pitching Wedge = 38 m/s to 45 m/s (137 km/h to 162 km/h)
-    public static final float MAX_SPEED = 5; // Maximum speed of the ball (m/s)
+    public static final float MAX_SPEED = 5f; // Maximum speed of the ball (m/s)
 
     // Bot configuration
     public static final float BOT_SENSITIVITY = 0.1f; // Sensitivity of the bots (higher = more sensitive)
 
     // Error factor introduced in the bots to make them more human-like
-    public static final float ERROR_DIRECTION_DEGREES = 5; // Error in the direction of the bots (degrees)
-    public static final float ERROR_MAGNITUDE_PERCENTAGE = 7; // Error in the magnitude of the bots (percentage)
+    public static final float ERROR_DIRECTION_DEGREES = 5f; // Error in the direction of the bots (degrees)
+    public static final float ERROR_MAGNITUDE_PERCENTAGE = 7f; // Error in the magnitude of the bots (percentage)
+    public static final float ERROR_POSITION_RADIUS = 0.5f; // Error in the position of the bots (meters)
 
     // The requirement of friction is tiny,
     // so on the simplex noise terrain, the ball will have trouble climbing the hills.

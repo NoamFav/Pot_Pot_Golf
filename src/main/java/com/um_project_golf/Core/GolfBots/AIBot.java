@@ -50,7 +50,7 @@ public class AIBot {
     }
 
     public List<List<Vector3f>> findBestShotUsingHillClimbing(Vector3f startingPosition) {
-        Vector3f currentPosition = new Vector3f(startingPosition);
+        Vector3f currentPosition = noise.addNoiseToInitialPosition(startingPosition, Consts.ERROR_POSITION_RADIUS);
 
         Vector3f bestVelocity = new Vector3f(0, 0, 0);
         double bestNeighborDistance = evaluateShot(bestVelocity);
@@ -126,7 +126,7 @@ public class AIBot {
     public void simulateBallMovement() {
         double[] initialState = {ball.getPosition().x, ball.getPosition().z, velocityBall.x, velocityBall.z};
         double h = 0.1; // Time step
-        PhysicsEngine engine = new SimplePhysicsEngine(testMap, scene);
+        PhysicsEngine engine = new CompletePhysicsEngine(testMap, scene);
         List<Vector3f> positions = engine.runRK4(initialState, h);
 
         Vector3f finalPosition = positions.get(positions.size() - 1);
