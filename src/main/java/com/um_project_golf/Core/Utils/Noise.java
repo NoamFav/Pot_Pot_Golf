@@ -38,4 +38,18 @@ public class Noise {
 
         return new Vector3f(noisyX, 0, noisyZ);
     }
+
+    /**
+     * Adds noise to a 3D position vector
+     *
+     * @param position the original position vector
+     * @param noiseRadius the radius of the noise to add in meters
+     * @return a new vector with noise applied
+     */
+    public @NotNull Vector3f addNoiseToInitialPosition(@NotNull Vector3f position, float noiseRadius) {
+        float noisyX = position.x + (float) random.nextGaussian() * noiseRadius;
+        float noisyZ = position.z + (float) random.nextGaussian() * noiseRadius;
+
+        return new Vector3f(noisyX, position.y, noisyZ);
+    }
 }

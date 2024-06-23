@@ -58,6 +58,7 @@ public class RuleBasedBot {
         while (!isInHole()) {
             System.out.println("Starting position: " + startingPosition);
             minDistance = Double.MAX_VALUE; // Reset minDistance for this shot sequence
+            startingPosition = noise.addNoiseToInitialPosition(startingPosition, Consts.ERROR_POSITION_RADIUS); // Add noise to the starting position
 
             // Iterate over possible velocities to find the best shot for this turn
             for (float velocityX = -5; velocityX <= 5; velocityX += Consts.BOT_SENSITIVITY) {
@@ -119,7 +120,7 @@ public class RuleBasedBot {
     public void simulateBallMovement() {
         double[] initialState = {ball.getPosition().x, ball.getPosition().z, velocityBall.x, velocityBall.z};
         double h = 0.1; // Time step
-        PhysicsEngine engine = new SimplePhysicsEngine(heightMap, scene);
+        PhysicsEngine engine = new CompletePhysicsEngine(heightMap, scene);
         List<Vector3f> positions = engine.runRK4(initialState, h);
 
         Vector3f finalPosition = positions.get(positions.size()-1);
