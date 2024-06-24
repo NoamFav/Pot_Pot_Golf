@@ -7,6 +7,7 @@ import org.joml.Vector3f;
 /**
  * Class responsible for access of the velocities of the shots in the AIBot class.
  * Record class that stores the velocity of the shot.
+ * @param velocity the velocity of the shot
  */
 public record Shot(Vector3f velocity) {
 

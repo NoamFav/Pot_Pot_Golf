@@ -82,10 +82,19 @@ public class AudioManager {
         AL10.alSourcePlay(source);
     }
 
+    /**
+     * Stops the sound.
+     */
     public void stopSound() {
         AL10.alSourceStop(source);
     }
 
+    /**
+     * Loads and buffers the audio.
+     *
+     * @param filePath The path to the audio file.
+     * @return The sample rate of the audio.
+     */
     private float loadAndBufferAudio(String filePath) {
         File file = new File(filePath);
         try {
@@ -108,6 +117,13 @@ public class AudioManager {
         return 0;
     }
 
+    /**
+     * Gets the OpenAL format.
+     *
+     * @param channels The number of channels.
+     * @param bitDepth The bit depth.
+     * @return The OpenAL format.
+     */
     private int getOpenALFormat(int channels, int bitDepth) {
         if (channels == 1) {
             return bitDepth == 16 ? AL10.AL_FORMAT_MONO16 : AL10.AL_FORMAT_MONO8;
@@ -117,6 +133,9 @@ public class AudioManager {
         throw new IllegalArgumentException("Unsupported channel count: " + channels);
     }
 
+    /**
+     * Cleans up the audio manager.
+     */
     public void cleanup() {
         AL10.alDeleteSources(source);
         AL10.alDeleteBuffers(buffer);

@@ -1,0 +1,13 @@
+com.um_project_golf.Core
+com.um_project_golf.Core.Entity
+com.um_project_golf.Core.Entity.Terrain
+com.um_project_golf.Core.Utils
+com.um_project_golf.Core.GolfBots
+com.um_project_golf.Core.AWT
+com.um_project_golf.Core.Rendering
+com.um_project_golf.Core.Lighting
+com.um_project_golf.Game
+com.um_project_golf.Game.GameUtils
+com.um_project_golf.Game.GameUtils.GameLogic
+com.um_project_golf.Game.GameUtils.FieldManager
+com.um_project_golf.Phase1
