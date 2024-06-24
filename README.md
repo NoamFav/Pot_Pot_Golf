@@ -9,17 +9,17 @@ It is written in Java and built with Maven.
 
 For running the project, you need to have Maven installed.
 You can download it from [here](https://maven.apache.org/download.cgi).
-After installing Maven, you can run the project by running the main in the IDE or in the command line.
+After installing Maven, run the following command in the project directory:
+```mvn clean package```
+This will create a target directory with the jar file in it.
+As well as the compiled classes in the target/classes directory.
+But also the java doc in the target/site/apidocs directory.
 
 ## JavaDoc
 
 The Java doc website can created by running the following command in the project directory:
-```mvn clean package```
-or 
 ```mvn javadoc:javadoc```
 Then you can open the index.html file in the target/site/apidocs directory.
-Note that if doing clean package, the target directory will be deleted and recreated.
-Including the compiled classes and the jar file.
 
 ## Prerequisites
 
