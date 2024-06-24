@@ -109,7 +109,7 @@ public class MenuGUI {
         Button changeTerrain = new Button(centerButtonX, centerButtonY + heightButton, widthButton, heightButton, "Change Terrain", font, runnable.terrainChanger(), vg, imageButton);
         guiElementManager.addMenuButton(changeTerrain);
 
-        Button soundButton = new Button(window.getWidth() - window.getWidthConverted(450), window.getHeightConverted(20), window.getWidthConverted(400), heightButton, "Sound: ON", font, runnable.sound(), vg, imageButton);
+        Button soundButton = new Button(window.getWidth() - window.getWidthConverted(450), window.getHeightConverted(20), window.getWidthConverted(400), heightButton, "Sound: " + (gameStateManager.isSoundPlaying() ? "ON" : "OFF"), font, runnable.sound(), vg, imageButton);
         guiElementManager.setSoundButton(soundButton);
         guiElementManager.addMenuButton(soundButton);
 
