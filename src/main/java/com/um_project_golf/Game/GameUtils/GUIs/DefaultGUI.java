@@ -18,6 +18,11 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * The default GUI class.
+ * This class is responsible for creating the default GUI of the game.
+ * Stores the default GUI of the game.
+ */
 public class DefaultGUI {
 
     private final WindowManager window;
@@ -30,7 +35,13 @@ public class DefaultGUI {
     private final GameVarManager gameVarManager;
     private final GuiElementManager guiElementManager;
 
-    public DefaultGUI(long vg, MainFieldManager context) {
+    /**
+     * The constructor of the default GUI.
+     *
+     * @param vg      The NanoVG context.
+     * @param context The main field manager.
+     */
+    public DefaultGUI(long vg, @NotNull MainFieldManager context) {
         this.window = Launcher.getWindow();
         this.vg = vg;
         this.heightMap = context.getHeightMap();

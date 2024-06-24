@@ -83,6 +83,12 @@ public class BallCollisionDetector {
         }
     }
 
+    /**
+     * Checks for collision with the trees.
+     * When the ball collides with a tree, it moves the ball to the edge of the tree.
+     *
+     * @param newPosition The new position of the ball.
+     */
     private void treeCollisionBall(Vector3f newPosition) {
         List<float[]> treePositions = scene.getTreePositions();
         if (treePositions == null) {

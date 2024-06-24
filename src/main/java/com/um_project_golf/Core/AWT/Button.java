@@ -125,6 +125,9 @@ public class Button {
         processButtonInteraction();
     }
 
+    /**
+     * Update the mouse scaling
+     */
     private void updateMouseScaling() {
         double[] mouseX = new double[1];
         double[] mouseY = new double[1];

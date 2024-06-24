@@ -6,6 +6,10 @@ import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
+/**
+ * Class responsible for the physics engine of the game.
+ * Uses a more complete physical description.
+ */
 public class CompletePhysicsEngine extends PhysicsEngine {
 
     /**
@@ -17,6 +21,12 @@ public class CompletePhysicsEngine extends PhysicsEngine {
         super(heightMap, scene);
     }
 
+    /**
+     * Calculate the equations of motion for the ball.
+     * @param t  The time
+     * @param x The state vector of the ball where x = [x, z, vx, vz]
+     * @return The derivatives of the state vector as an array where dxdt = [vx, vz, ax, az]
+     */
     @Override
     protected  double @NotNull [] equationsOfMotion(double t, double @NotNull [] x) {
         double[] dxdt = new double[4];

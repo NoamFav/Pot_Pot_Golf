@@ -92,6 +92,10 @@ public class RenderManager {
         terrainRenderer.render(camera,  scene.getPointLights(), scene.getSpotLights(), scene.getDirectionalLight()); // Render the terrain.
     }
 
+    /**
+     * Enables culling.
+     * (Culling is the process of discarding objects that are not visible to the camera.)
+     */
     public static void enableCulling() {
         if (!isCulling) { // If culling is not enabled.
             GL11.glEnable(GL11.GL_CULL_FACE); // Enable culling.
@@ -100,6 +104,10 @@ public class RenderManager {
         }
     }
 
+    /**
+     * Disables culling.
+     * (Culling is the process of discarding objects that are not visible to the camera.)
+     */
     public static void disableCulling() {
         if (isCulling) { // If culling is enabled.
             GL11.glDisable(GL11.GL_CULL_FACE); // Disable culling.
@@ -125,6 +133,11 @@ public class RenderManager {
         }
     }
 
+    /**
+     * Processes the terrain.
+     *
+     * @param terrain The terrain to process.
+     */
     public void processTerrain(Terrain terrain) {
         terrainRenderer.getTerrain().add(terrain); // Add the terrain to the terrain renderer.
     }

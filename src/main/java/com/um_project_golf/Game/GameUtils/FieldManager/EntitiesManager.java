@@ -6,6 +6,11 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The entities manager class.
+ * This class is responsible for managing the entities of the game.
+ * Stores the entities of the game.
+ */
 @SuppressWarnings("unused")
 public class EntitiesManager {
     // EntitiesManager
@@ -20,6 +25,10 @@ public class EntitiesManager {
     private Entity arrowEntity;
     private Entity skyBox;
 
+    /**
+     * The constructor of the entities manager.
+     * It initializes the trees and tree heights lists.
+     */
     public EntitiesManager() {
         this.trees = new ArrayList<>();
         this.treeHeights = new ArrayList<>();

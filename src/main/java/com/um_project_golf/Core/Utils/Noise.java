@@ -4,6 +4,9 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 import java.util.Random;
 
+/**
+ * The class responsible for adding noise to the velocity and initial position of the ball.
+ */
 public class Noise {
 
     private final Random random = new Random();

@@ -45,6 +45,13 @@ public class SimplePhysicsEngine extends PhysicsEngine {
         this.heightFunction = null;
     }
 
+    /**
+     * Compute the equations of motion for the ball.
+     *
+     * @param t  The time
+     * @param x The state vector of the ball where x = [x, z, vx, vz]
+     * @return
+     */
     @Override
     protected double @NotNull [] equationsOfMotion(double t, double @NotNull [] x) { // x = [x, z, vx, vz]
         double[] dxdt = new double[4];

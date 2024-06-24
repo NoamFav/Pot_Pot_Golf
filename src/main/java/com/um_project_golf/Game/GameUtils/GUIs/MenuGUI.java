@@ -23,6 +23,10 @@ import java.util.List;
 
 import static com.um_project_golf.Game.GolfGame.debugMode;
 
+/**
+ * The menu GUI class.
+ * This class is responsible for creating the menu GUI of the game.
+ */
 public class MenuGUI {
     private record MenuRunnable(Runnable terrainChanger, Runnable startGame, Runnable sound, Runnable quit, Runnable enableDebugMode) {}
 
@@ -49,6 +53,12 @@ public class MenuGUI {
 
     private final MainFieldManager context;
 
+    /**
+     * The constructor of the menu GUI.
+     *
+     * @param vg      The NanoVG context.
+     * @param context The main field manager.
+     */
     public MenuGUI(long vg, @NotNull MainFieldManager context) {
         this.vg = vg;
         this.camera = context.getCamera();
@@ -76,7 +86,6 @@ public class MenuGUI {
 
     /**
      * Creates the menu.
-     *
      */
     private void createMenu() {
 

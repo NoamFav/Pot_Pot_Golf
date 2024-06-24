@@ -153,6 +153,10 @@ public class HeightMap {
         return SceneManager.getHeightMap();
     }
 
+    /**
+     * Save the heightmap to a binary file
+     * @deprecated Only used for testing
+     */
     @Deprecated
     public void saveHeightMap() {
         for (int l = 0; l < 1000; l++) {
@@ -173,6 +177,10 @@ public class HeightMap {
         }
     }
 
+    /**
+     * Load the heightmap from a binary file
+     * @deprecated Only used for testing
+     */
     @Deprecated
     public static void main(String[] args) {
         HeightMap heightMap = new HeightMap();

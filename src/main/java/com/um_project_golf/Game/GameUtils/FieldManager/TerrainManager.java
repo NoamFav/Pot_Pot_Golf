@@ -3,6 +3,11 @@ package com.um_project_golf.Game.GameUtils.FieldManager;
 import com.um_project_golf.Core.Entity.Terrain.BlendMapTerrain;
 import com.um_project_golf.Core.Entity.Terrain.Terrain;
 
+/**
+ * The terrain manager class.
+ * This class is responsible for managing the terrains of the game.
+ * Stores the terrains of the game.
+ */
 public class TerrainManager {
     // Terrains
     private Terrain terrain;

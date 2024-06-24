@@ -28,6 +28,15 @@ public class RuleBasedBot {
     private final SceneManager scene;
     private final Noise noise;
 
+    /**
+     * Constructor for the Rule-based bot.
+     *
+     * @param ball the ball entity
+     * @param flag the flag entity
+     * @param heightMap the height map of the terrain
+     * @param flagRadius the radius of the flag
+     * @param scene the scene manager
+     */
     public RuleBasedBot(@NotNull Entity ball, Entity flag, HeightMap heightMap, double flagRadius, SceneManager scene) {
         startingPosition = new Vector3f(ball.getPosition());
         this.ball = ball;
@@ -38,12 +47,19 @@ public class RuleBasedBot {
         noise = new Noise();
     }
 
-    /* Method returns the path the ball takes from its initial position until the last position found by the bot.
-    It does so by iterating over every possible velocity pair (x and z) within the constraints given (min -5m/s max 5m/s),
-    and comparing it to the other shots already taken, saving the information of the shot that gets closer to the flag.
-    If it is not possible to get to the flag in one shot, the shot that gets closer will be taken. The process will
-    continue until the flag is reached, or when it is not possible to move anymore (for more details on this issue, please
-    consult the README). */
+    /**
+     * Method returns the path the ball takes from its initial position until the last position found by the bot.
+    * It does so by iterating over every possible velocity pair
+     * (x and z) within the constraints given (min -5m/s max 5m/s),
+    * and comparing it to the other shots already taken,
+     * saving the information of the shot that gets closer to the flag.
+    * If it is not possible to get to the flag in one shot, the shot that gets closer will be taken.
+     * The process will
+    * continue until the flag is reached,
+     * or when it is not possible to move anymore (for more details on this issue, please
+    * consult the README).
+    * @return the path the ball takes from its initial position until the last position found by the bot
+    */
     public List<List<Vector3f>> findBestShot() {
         int shotCounter = 0;
         double minDistance;
@@ -114,12 +130,17 @@ public class RuleBasedBot {
     }
 
 
-    // Updates velocity of the ball
+    /**
+     * Method to evaluate a shot by applying the velocities to the ball and simulating its movement.
+     * @param velocity the velocity vector to apply to the ball
+     */
     public void applyVelocities(Vector3f velocity) {
         velocityBall = (velocity);
     }
 
-    // Simulates ball movement with the use of the Physics Engine
+    /**
+     * Method to simulate the movement of the ball using the physics engine.
+     */
     public void simulateBallMovement() {
         double[] initialState = {ball.getPosition().x, ball.getPosition().z, velocityBall.x, velocityBall.z};
         double h = 0.1; // Time step
@@ -134,13 +155,19 @@ public class RuleBasedBot {
         ball.setPosition(finalPosition.x,finalPosition.y,finalPosition.z);
     }
 
-    // Method to check whether the ball is in hole
+    /**
+     * Method to check if the ball is in the hole.
+     * @return true if the ball is in the hole, false otherwise
+     */
     public boolean isInHole() {
         double distanceToFlag = distanceToFlag();
         return distanceToFlag <= flagRadius;
     }
 
-    // Method to calculate the distance to the flag
+    /**
+     * Method to calculate the distance between the ball and the flag.
+     * @return the distance between the ball and the flag
+     */
     public double distanceToFlag() {
         double dx = flag.getPosition().x - ball.getPosition().x;
         double dy = flag.getPosition().y - ball.getPosition().y;

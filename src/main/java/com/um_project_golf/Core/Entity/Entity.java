@@ -1,5 +1,6 @@
 package com.um_project_golf.Core.Entity;
 
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class Entity {
         this.scale = scale;
     }
 
-    public Entity(Entity entity) {
+    public Entity(@NotNull Entity entity) {
         this.model = entity.model;
         this.position = entity.position;
         this.rotation = entity.rotation;

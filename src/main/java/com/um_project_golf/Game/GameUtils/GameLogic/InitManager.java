@@ -20,6 +20,11 @@ import org.joml.Vector4f;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The init manager class.
+ * This class is responsible for initializing the game.
+ * Stores the initialization of the game.
+ */
 public class InitManager {
 
     // Records for storing the models and terrains
@@ -39,6 +44,13 @@ public class InitManager {
     private final HeightMap heightMap;
     private final ObjectLoader loader;
 
+    /**
+     * The constructor of the init manager.
+     * It initializes the init manager.
+     * Gets the main field manager context for the main classes and managers.
+     *
+     * @param context The main field manager context.
+     */
     public InitManager(@NotNull MainFieldManager context) {
         this.scene = context.getScene();
         this.entitiesManager = context.getEntitiesManager();
@@ -56,6 +68,7 @@ public class InitManager {
     /**
      * Creates the models and entities for the game.
      * Uses a record to store the models.
+     * @throws Exception If the models cannot be loaded.
      */
     public void modelAndEntityCreation() throws Exception {
 
@@ -96,6 +109,7 @@ public class InitManager {
     /**
      * Create the terrain for the game.
      * Uses a record to store the terrains.
+     * @throws Exception If the terrains cannot be loaded.
      */
     public void terrainCreation() throws Exception {
         Terrains terrains = getTerrains();

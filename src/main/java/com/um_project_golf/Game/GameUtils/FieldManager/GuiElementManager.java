@@ -12,6 +12,11 @@ import java.util.Objects;
 
 import static com.um_project_golf.Game.GolfGame.debugMode;
 
+/**
+ * The GUI element manager class.
+ * This class is responsible for managing the GUI elements of the game.
+ * Stores the GUI elements of the game.
+ */
 @SuppressWarnings("unused")
 public class GuiElementManager {
     private Title title;
@@ -37,11 +42,20 @@ public class GuiElementManager {
     private TextPane warningTextPane;
     private TextPane currentPlayer;
 
+    /**
+     * The constructor of the GUI element manager.
+     * It initializes the menu buttons and in-game menu buttons lists.
+     */
     public GuiElementManager() {
         this.menuButtons = new ArrayList<>();
         this.inGameMenuButtons = new ArrayList<>();
     }
 
+    /**
+     * Update the GUI elements.
+     *
+     * @param gameState The game state manager.
+     */
     public void update(@NotNull GameStateManager gameState) {
         // Update GUI elements
         if (gameState.isGameStarted()) {
@@ -63,6 +77,11 @@ public class GuiElementManager {
         }
     }
 
+    /**
+     * Render the GUI elements.
+     *
+     * @param gameState The game state manager.
+     */
     public void render(@NotNull GameStateManager gameState) {
         // Render your UI elements like menuButtons
         if (gameState.isGuiVisible()) {
@@ -96,6 +115,9 @@ public class GuiElementManager {
         }
     }
 
+    /**
+     * Clean up the GUI elements.
+     */
     public void cleanup() {
         if (title != null) {
             title.cleanup();  // Clean up the title resources
@@ -120,6 +142,7 @@ public class GuiElementManager {
     /**
      * Update the text fields.
      * Used for On/Off buttons.
+     * @param gameState The game state manager.
      */
     public void updateTextFields(@NotNull GameStateManager gameState) {
         boolean isBot = gameState.isBot();

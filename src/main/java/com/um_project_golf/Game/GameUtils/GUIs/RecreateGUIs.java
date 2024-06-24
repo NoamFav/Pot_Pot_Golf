@@ -3,6 +3,11 @@ package com.um_project_golf.Game.GameUtils.GUIs;
 import com.um_project_golf.Game.GameUtils.FieldManager.MainFieldManager;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * The recreate GUIs class.
+ * This class is responsible for recreating the GUIs of the game when needed.
+ * (when the window is resized, for example)
+ */
 public class RecreateGUIs {
     /**
      * Recreates the GUIs.

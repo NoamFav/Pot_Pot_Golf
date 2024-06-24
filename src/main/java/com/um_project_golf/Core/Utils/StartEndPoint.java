@@ -9,9 +9,14 @@ import org.joml.Vector3f;
 
 import java.util.List;
 
+/**
+ * The class responsible for converting the start and end points of the path to vertices.
+ */
 public class StartEndPoint {
     /**
-     * Convert distance from meters to vertices.
+     * Convert distance from meters to vertices.`
+     * @param pathManager The path manager.
+     * @param heightMap The height map.
      */
     public void startEndPointConversion(@NotNull PathManager pathManager, @NotNull HeightMap heightMap) {
         List<Vector2i> path = pathManager.getPath();

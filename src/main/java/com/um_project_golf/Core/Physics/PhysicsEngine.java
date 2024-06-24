@@ -12,6 +12,10 @@ import com.um_project_golf.Core.Entity.Terrain.HeightMap;
 import com.um_project_golf.Core.Utils.BallCollisionDetector;
 import com.um_project_golf.Game.GameUtils.Consts;
 
+/**
+ * The class responsible for the physics engine.
+ * Abstract class to provide the equations of motion.
+ */
 public abstract class PhysicsEngine {
     protected static final double g = Consts.GRAVITY; // gravitational constant
 
@@ -25,6 +29,12 @@ public abstract class PhysicsEngine {
     protected final double ACCELERATION_THRESHOLD = 0.5; // get this value from the constant file
     protected final BallCollisionDetector ballCollisionDetector;
 
+    /**
+     * Create a new physics engine.
+     *
+     * @param heightMap The height map
+     * @param scene The scene manager
+     */
     public PhysicsEngine(HeightMap heightMap, SceneManager scene) {
         this.heightMap = heightMap;
         this.ballCollisionDetector = new BallCollisionDetector(heightMap, scene);
