@@ -58,7 +58,7 @@ public class RuleBasedBot {
         while (!isInHole() && shotCounter < 10) {
             System.out.println("Starting position: " + startingPosition);
             minDistance = Double.MAX_VALUE; // Reset minDistance for this shot sequence
-            startingPosition = noise.addNoiseToInitialPosition(startingPosition, Consts.ERROR_POSITION_RADIUS); // Add noise to the starting position
+            startingPosition = noise.addNoiseToInitialPosition(startingPosition, Consts.WANT_ERROR ? Consts.ERROR_POSITION_RADIUS : 0); // Add noise to the starting position
 
             // Iterate over possible velocities to find the best shot for this turn
             for (float velocityX = -5; velocityX <= 5; velocityX += Consts.BOT_SENSITIVITY) {
@@ -83,7 +83,7 @@ public class RuleBasedBot {
             }
 
             // Apply noise to the bestVelocity to simulate human error
-            Vector3f noisyBestVelocity = noise.addNoiseToVelocity(bestVelocity, Consts.ERROR_DIRECTION_DEGREES, Consts.ERROR_MAGNITUDE_PERCENTAGE);
+            Vector3f noisyBestVelocity = noise.addNoiseToVelocity(bestVelocity, Consts.WANT_ERROR ? Consts.ERROR_DIRECTION_DEGREES : 0, Consts.WANT_ERROR ? Consts.ERROR_MAGNITUDE_PERCENTAGE : 0);
             applyVelocities(noisyBestVelocity);
             simulateBallMovement();
 

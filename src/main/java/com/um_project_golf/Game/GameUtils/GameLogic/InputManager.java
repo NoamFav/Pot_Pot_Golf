@@ -106,6 +106,12 @@ public class InputManager {
 
             if (window.is_keyPressed(GLFW.GLFW_KEY_R) && !gameStateManager.isAnimating()) {
                 restartBalls();
+                if (!gameStateManager.isAiBotAnimating() && !gameStateManager.isBotAnimating()) {
+                    entitiesManager.getAiBotBall().setPosition(pathManager.getStartPoint());
+                    entitiesManager.getBotBall().setPosition(pathManager.getStartPoint());
+                    gameVarManager.resetCurrentShotIndexAI();
+                    gameVarManager.resetCurrentShotIndexBot();
+                }
             }
 
             // Create a tree at the camera position

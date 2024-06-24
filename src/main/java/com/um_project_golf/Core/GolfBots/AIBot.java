@@ -50,7 +50,7 @@ public class AIBot {
     }
 
     public List<List<Vector3f>> findBestShotUsingHillClimbing(Vector3f startingPosition) {
-        Vector3f currentPosition = noise.addNoiseToInitialPosition(startingPosition, Consts.ERROR_POSITION_RADIUS);
+        Vector3f currentPosition = noise.addNoiseToInitialPosition(startingPosition, Consts.WANT_ERROR ? Consts.ERROR_POSITION_RADIUS : 0);
 
         Vector3f bestVelocity = new Vector3f(0, 0, 0);
         double bestNeighborDistance = evaluateShot(bestVelocity);
@@ -84,7 +84,7 @@ public class AIBot {
                 }
             }
         }
-        Vector3f noiseVelocity = noise.addNoiseToVelocity(bestVelocity, Consts.ERROR_DIRECTION_DEGREES, Consts.ERROR_MAGNITUDE_PERCENTAGE);
+        Vector3f noiseVelocity = noise.addNoiseToVelocity(bestVelocity, Consts.WANT_ERROR ? Consts.ERROR_DIRECTION_DEGREES : 0, Consts.WANT_ERROR ? Consts.ERROR_MAGNITUDE_PERCENTAGE : 0);
         double distanceFlag = evaluateShot(noiseVelocity);
         boolean sameShot = currentPosition.equals(ball.getPosition());
         shotCounter++;

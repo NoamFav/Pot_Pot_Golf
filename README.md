@@ -118,9 +118,12 @@ The first one is the keyboard and mouse:
 - The player can teleport to the ball with the Q key
 - The player can teleport to the hole with the down key
 - The player can teleport to start with the up key
-- The player can reset the ball (or balls if there are more than one) with the R key
+- The player can reset the ball (or balls if there are more than one) with the R key (this also works in multiplayer and with the bots)
 - The player can get a surprise with the F key
 - While in-game, the player can open the in-game menu with the escape key
+- For the ball bot movement
+  - the player can do a shot of the AI bot ball with the key 1
+  - the player can do a shot of the Rule-Based bot ball with the key 2
 
 In Debug mode:
 - The player can select the start position with the left key
@@ -166,6 +169,8 @@ And for examination purposes:
 - Also, if you want, you can define the start and hole position in the code directly with setting,
   the USE_PREDEFINED_POSITIONS boolean to true.
   You can still change the positions in the game later with the debug mode.
+- The error margin for the bots
+- The bot sensitivity (the step size for the bots)
 
 For additional information, you can check the comments in the Consts class.
 But be careful, changing some values can cause the game to not work properly.
