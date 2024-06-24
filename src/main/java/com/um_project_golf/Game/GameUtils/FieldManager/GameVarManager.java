@@ -7,6 +7,11 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The game variable manager class.
+ * This class is responsible for managing the game variables of the game.
+ * This class is used to store the game logic variables.
+ */
 @SuppressWarnings("unused")
 public class GameVarManager {
 

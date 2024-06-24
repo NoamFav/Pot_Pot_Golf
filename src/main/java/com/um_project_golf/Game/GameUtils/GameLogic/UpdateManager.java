@@ -9,6 +9,10 @@ import org.joml.Vector3f;
 
 import java.util.List;
 
+/**
+ * The update manager class.
+ * This class is responsible for updating the game each frame.
+ */
 public class UpdateManager {
 
     private final SceneManager scene;
@@ -19,6 +23,12 @@ public class UpdateManager {
     private final GuiElementManager guiElementManager;
     private final GameStateManager gameStateManager;
 
+    /**
+     * The constructor of the update manager.
+     * It initializes the update manager.
+     *
+     * @param context The main field manager.
+     */
     public UpdateManager(@NotNull MainFieldManager context) {
         this.scene = context.getScene();
 

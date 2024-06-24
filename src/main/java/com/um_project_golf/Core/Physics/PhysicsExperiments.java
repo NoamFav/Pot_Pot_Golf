@@ -13,6 +13,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Class responsible for running physics experiments.
+ */
 public class PhysicsExperiments {
 
     // Initialize HeightMap and SceneManager
@@ -39,6 +42,11 @@ public class PhysicsExperiments {
 
     private static final String RESULTS_DIR = "src/main/java/com/um_project_golf/Core/Physics/Experiment_results";
 
+    /**
+     * Main method to run the physics experiments.
+     *
+     * @param args The arguments
+     */
     public static void main(String[] args) {
 
         // Define initial states
@@ -123,7 +131,15 @@ public class PhysicsExperiments {
         runExperiment("Simple Physics Engine - Flat Sandy Terrain - Diagonal", flatSandySimpleEngine, initialStateDiagonal, showAllPositions);
     }
 
-    private static void runExperiment(String experimentName, PhysicsEngine engine, double[] initialState, boolean showAllPositions) {
+    /**
+     * Run an experiment with a given physics engine.
+     *
+     * @param experimentName The name of the experiment
+     * @param engine The physics engine
+     * @param initialState The initial state of the ball
+     * @param showAllPositions Whether to show all positions or just the start and end positions
+     */
+    private static void runExperiment(String experimentName, @NotNull PhysicsEngine engine, double[] initialState, boolean showAllPositions) {
         System.out.println("Running experiment: " + experimentName);
         double stepSize = 0.1; 
         List<Vector3f> trajectory = engine.runRK4(initialState, stepSize);
@@ -161,6 +177,12 @@ public class PhysicsExperiments {
         saveResultsToFile(resultsTable.toString(), experimentName.replace(" ", "_") + "_results.csv");
     }
 
+    /**
+     * Save the results of an experiment to a file.
+     *
+     * @param data The data to save
+     * @param fileName The name of the file
+     */
     private static void saveResultsToFile(String data, String fileName) {
         try (FileWriter fileWriter = new FileWriter(RESULTS_DIR + File.separator + fileName)) {
             fileWriter.write(data);
@@ -169,6 +191,11 @@ public class PhysicsExperiments {
         }
     }
 
+    /**
+     * Create a flat terrain height map.
+     *
+     * @return The height map
+     */
     @Contract(value = " -> new", pure = true)
     private static @NotNull HeightMap createFlatTerrain() {
         // Create a mock of flat terrain above sand level
@@ -180,6 +207,11 @@ public class PhysicsExperiments {
         };
     }
 
+    /**
+     * Create a hilly terrain height map.
+     *
+     * @return The height map
+     */
     @Contract(value = " -> new", pure = true)
     private static @NotNull HeightMap createHillyTerrain() {
         // Create a mock of hilly terrain
@@ -192,6 +224,11 @@ public class PhysicsExperiments {
         };
     }
 
+    /**
+     * Create a steep hilly terrain height map.
+     *
+     * @return The height map
+     */
     @Contract(value = " -> new", pure = true)
     private static @NotNull HeightMap createSteepHillyTerrain() {
         // Create a mock of hilly terrain
@@ -204,6 +241,11 @@ public class PhysicsExperiments {
         };
     }
 
+    /**
+     * Create a gentle hilly terrain height map.
+     *
+     * @return The height map
+     */
     @Contract(value = " -> new", pure = true)
     private static @NotNull HeightMap createGentleHillyTerrain() {
         // Create a mock of gentle hilly terrain
@@ -216,6 +258,11 @@ public class PhysicsExperiments {
         };
     }    
 
+    /**
+     * Create a sandy terrain height map.
+     *
+     * @return The height map
+     */
     @Contract(value = " -> new", pure = true)
     private static @NotNull HeightMap createSandyTerrain() {
         // Create a mock of flat sandy terrain

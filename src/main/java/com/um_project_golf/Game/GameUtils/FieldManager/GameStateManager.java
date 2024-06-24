@@ -1,5 +1,10 @@
 package com.um_project_golf.Game.GameUtils.FieldManager;
 
+/**
+ * The game state manager class.
+ * This class is responsible for managing the game state of the game.
+ * Stores the game state variables.
+ */
 @SuppressWarnings("unused")
 public class GameStateManager {
     // Game state variables
@@ -20,6 +25,10 @@ public class GameStateManager {
     private boolean isAiBotAnimating;
     private boolean isBotAnimating;
 
+    /**
+     * The constructor of the game state manager.
+     * It initializes the game state variables to their default values.
+     */
     public GameStateManager() {
         canMove = false;
         isGuiVisible = true;

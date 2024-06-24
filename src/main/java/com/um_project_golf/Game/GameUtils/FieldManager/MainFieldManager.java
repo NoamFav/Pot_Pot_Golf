@@ -11,6 +11,11 @@ import com.um_project_golf.Core.Utils.TerrainSwitch;
 import com.um_project_golf.Game.Launcher;
 import org.joml.Vector3f;
 
+/**
+ * The main field manager class.
+ * This class is responsible for managing the main field of the game.
+ * Stores the main field of the game.
+ */
 @SuppressWarnings("unused")
 public class MainFieldManager {
     // Main game Classes and Managers
@@ -41,6 +46,11 @@ public class MainFieldManager {
     private final Camera camera;
     private Vector3f cameraInc;
 
+    /**
+     * The constructor of the main field manager.
+     * It initializes the main field manager.
+     * Creates the instances of every class and manager needed for the game.
+     */
     public MainFieldManager() {
         renderer = new RenderManager();
         window = Launcher.getWindow();

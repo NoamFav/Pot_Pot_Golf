@@ -27,11 +27,19 @@ public class AudioManager {
     private int source;
     private final String path;
 
+    /**
+     * The constructor of the audio manager.
+     *
+     * @param path The path to the audio file.
+     */
     public AudioManager(String path) {
         this.path = path;
         init();
     }
 
+    /**
+     * Initializes the audio manager.
+     */
     public void init() {
         String defaultDeviceName = alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
         device = alcOpenDevice(defaultDeviceName);
@@ -46,6 +54,12 @@ public class AudioManager {
         AL.createCapabilities(deviceCaps);
     }
 
+    /**
+     * Plays the sound.
+     * Also calculates the pitch of the sound.
+     * The pitch is calculated by dividing the actual sample rate by the target sample rate.
+     * The target sample rate is 44100.
+     */
     public void playSound() {
         // Generate buffers and sources
         buffer = AL10.alGenBuffers();
