@@ -171,6 +171,10 @@ public class Consts {
 
     public static final String BACKGROUND_MUSIC = "src/main/resources/SoundTrack/skippy-mr-sunshine-fernweh-goldfish-main-version-02-32-7172.wav";
 
+    /**
+     * The class for the models of the game.
+     * All the model paths are stored here.
+     */
     public static class OBJ {
         public static final String MAIN_TREE = "src/main/resources/Models/tree/tree.obj";
         public static final String SKYBOX = "src/main/resources/Models/Skybox/SkyBox.obj";
@@ -179,6 +183,10 @@ public class Consts {
         public static final String FLAG = "src/main/resources/Models/flag/flag.obj";
     }
 
+    /**
+     * The class for the textures of the game.
+     * All the texture paths are stored here.
+     */
     public static class BallTexture {
         public static final String BALL1 = "src/main/resources/Models/Ball/Ball_texture/Golf_Ball.png";
         public static final String BALL2 = "src/main/resources/Models/Ball/Ball_texture/Golf_Ball2.png";
@@ -186,6 +194,10 @@ public class Consts {
         public static final String BALL_AI_BOT = "src/main/resources/Models/Ball/Ball_texture/BallAIBot.png";
     }
 
+    /**
+     * The class for the textures of the game.
+     * All the texture paths are stored here.
+     */
     public static class TerrainTexture {
         public static final String SAND = "src/main/resources/Texture/cartoonSand.jpg";
         public static final String GRASS = "src/main/resources/Texture/cartoonFlowers.jpg";
@@ -195,6 +207,10 @@ public class Consts {
 
     public static final String HEIGHTMAP = "src/main/resources/Texture/heightmap.png";
 
+    /**
+     * The class for the GUI
+     * All the GUI paths are stored here.
+     */
     public static class GUI {
         public static final String TITLE = "src/main/resources/Texture/title.png";
         public static final String BUTTON_MENU = "src/main/resources/Texture/buttons.png";

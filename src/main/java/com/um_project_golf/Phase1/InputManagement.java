@@ -24,6 +24,7 @@ public class InputManagement
     }
 
     /**
+     * Record class that stores the token.
      * @param type  type of token
      * @param value value of token
      */

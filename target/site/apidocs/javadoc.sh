@@ -1,0 +1,1 @@
+/opt/homebrew/Cellar/openjdk/21.0.2/libexec/openjdk.jdk/Contents/Home/bin/javadoc @options @packages @argfile
