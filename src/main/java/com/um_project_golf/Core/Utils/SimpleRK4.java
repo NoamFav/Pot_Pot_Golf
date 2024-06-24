@@ -4,6 +4,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiFunction;
 
+/**
+ * Simple Runge-Kutta 4th order method.
+ */
 public class SimpleRK4 {
     /**
      * Simple RK4 method.

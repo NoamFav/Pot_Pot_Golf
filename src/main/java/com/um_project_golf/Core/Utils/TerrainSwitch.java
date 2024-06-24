@@ -28,6 +28,9 @@ import java.util.Random;
 
 import static com.um_project_golf.Game.GolfGame.debugMode;
 
+/**
+ * The class responsible for switching the terrain of the game.
+ */
 public class TerrainSwitch {
 
     private final SceneManager scene;
@@ -39,7 +42,17 @@ public class TerrainSwitch {
     private final ModelManager modelManager;
     private final EntitiesManager entitiesManager;
 
-
+    /**
+     * The constructor of the terrain switch.
+     *
+     * @param scene           The scene manager.
+     * @param renderer        The render manager.
+     * @param heightMap       The height map.
+     * @param loader          The object loader.
+     * @param terrainManager  The terrain manager.
+     * @param modelManager    The model manager.
+     * @param entitiesManager The entities manager.
+     */
     public TerrainSwitch(SceneManager scene, RenderManager renderer, HeightMap heightMap, ObjectLoader loader, TerrainManager terrainManager, ModelManager modelManager, EntitiesManager entitiesManager) {
         this.scene = scene;
         this.renderer = renderer;
@@ -87,6 +100,7 @@ public class TerrainSwitch {
      * Place the trees on the terrain.
      * Randomly picks a position on the terrain.
      * As long as the position is green
+     * @throws IOException If the heightmap image is not found.
      */
     public void createTrees() throws IOException {
         BufferedImage heightmapImage = ImageIO.read(new File(Consts.HEIGHTMAP));

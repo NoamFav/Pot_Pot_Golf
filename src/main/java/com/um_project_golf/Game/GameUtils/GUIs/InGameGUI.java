@@ -12,6 +12,10 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * The in-game GUI class.
+ * This class is responsible for creating the in-game GUI of the game.
+ */
 public class InGameGUI {
 
     // Records for storing the Runnables for the buttons
@@ -27,6 +31,12 @@ public class InGameGUI {
     private final GameVarManager gameVarManager;
     private final EntitiesManager entitiesManager;
 
+    /**
+     * The constructor of the in-game GUI.
+     *
+     * @param vg      The NanoVG context.
+     * @param context The main field manager.
+     */
     public InGameGUI(long vg, @NotNull MainFieldManager context) {
         this.vg = vg;
         this.window = Launcher.getWindow();

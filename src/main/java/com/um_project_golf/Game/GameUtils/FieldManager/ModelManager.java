@@ -4,6 +4,11 @@ import com.um_project_golf.Core.Entity.Model;
 
 import java.util.List;
 
+/**
+ * The model manager class.
+ * This class is responsible for managing the models of the game.
+ * Stores the models of the game.
+ */
 public class ModelManager {
 
     // Models

@@ -5,6 +5,11 @@ import org.joml.Vector3f;
 
 import java.util.List;
 
+/**
+ * The path manager class.
+ * This class is responsible for managing the path of the game.
+ * Stores the path of the game.
+ */
 public class PathManager {
 
     // A* pathfinding variables

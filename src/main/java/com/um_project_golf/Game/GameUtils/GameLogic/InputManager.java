@@ -17,6 +17,11 @@ import org.lwjgl.glfw.GLFW;
 
 import static com.um_project_golf.Game.GolfGame.debugMode;
 
+/**
+ * The input manager class.
+ * This class is responsible for managing the inputs of the game.
+ * Stores the input of the game.
+ */
 public class InputManager {
 
     private final MainFieldManager context;
@@ -38,7 +43,13 @@ public class InputManager {
     private final GameStateManager gameStateManager;
     private final TerrainManager terrainManager;
 
-
+    /**
+     * The constructor of the input manager.
+     * It initializes the input manager.
+     * Extracts the instances of every class and manager from the main field manager.
+     *
+     * @param context The main field manager.
+     */
     public InputManager(@NotNull MainFieldManager context) {
 
         this.context = context;
@@ -173,7 +184,9 @@ public class InputManager {
         System.out.println("Tree added at: " + cameraPos);
     }
 
-
+    /**
+     * Method to control the camera movement.
+     */
     public void cameraMovement() {
         if (gameStateManager.canMove()) {
             if (mouseInputs.isRightButtonPressed()) {
@@ -185,6 +198,9 @@ public class InputManager {
         }
     }
 
+    /**
+     * Controller for creating the start and end points in debug mode.
+     */
     public void startEndPointDebugMode() {
         if (debugMode && gameStateManager.canMove()) {
             if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {

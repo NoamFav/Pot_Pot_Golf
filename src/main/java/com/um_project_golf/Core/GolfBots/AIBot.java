@@ -31,6 +31,15 @@ public class AIBot {
     private final Noise noise;
     private final List<List<Vector3f>> path;
 
+    /**
+     * Constructor for the AI bot.
+     *
+     * @param ball the ball entity
+     * @param flag the flag entity
+     * @param testMap the height map of the terrain
+     * @param flagRadius the radius of the flag
+     * @param scene the scene manager
+     */
     public AIBot(@NotNull Entity ball, Entity flag, HeightMap testMap, double flagRadius, SceneManager scene) {
         startingPosition = new Vector3f(ball.getPosition());
         this.ball = ball;
@@ -42,6 +51,11 @@ public class AIBot {
         path = new ArrayList<>();
     }
 
+    /**
+     * Method that starts the AI bot.
+     *
+     * @return the path the ball takes from its initial position until the last position found by the bot
+     */
     public List<List<Vector3f>> startAI(){
         System.out.println("Start");
         fullPath = new HashMap<>();
@@ -49,6 +63,12 @@ public class AIBot {
         return findBestShotUsingHillClimbing(startingPosition);
     }
 
+    /**
+     * Finds the best shot using hill climbing.
+     *
+     * @param startingPosition the starting position of the ball
+     * @return the path the ball takes from its initial position until the last position found by the bot
+     */
     public List<List<Vector3f>> findBestShotUsingHillClimbing(Vector3f startingPosition) {
         Vector3f currentPosition = noise.addNoiseToInitialPosition(startingPosition, Consts.WANT_ERROR ? Consts.ERROR_POSITION_RADIUS : 0);
 
@@ -110,19 +130,30 @@ public class AIBot {
         return findBestShotUsingHillClimbing(currentPosition);
     }
 
-    // Method that evaluates the hypothetical shot
+    /**
+     * Evaluates a shot by applying the velocities to the ball and simulating its movement.
+     *
+     * @param shot the velocity vector to apply to the ball
+     * @return the distance to the flag after the shot
+     */
     public double evaluateShot(Vector3f shot) {
         applyVelocities(shot);
         simulateBallMovement();
         return distanceToFlag();
     }
 
-    // Updates velocity of the ball
+    /**
+     * Updates the velocity of the ball.
+     *
+     * @param velocity the new velocity of the ball
+     */
     public void applyVelocities(Vector3f velocity) {
         velocityBall = velocity;
     }
 
-    // Simulates ball movement with the use of the Physics Engine
+    /**
+     * Simulates the movement of the ball using the physics engine.
+     */
     public void simulateBallMovement() {
         double[] initialState = {ball.getPosition().x, ball.getPosition().z, velocityBall.x, velocityBall.z};
         double h = 0.1; // Time step
@@ -140,13 +171,21 @@ public class AIBot {
         ball.setPosition(finalPosition.x, finalPosition.y, finalPosition.z);
     }
 
-    // Method that checks whether the ball is in hole
+    /**
+     * Method that checks if the ball is in the hole.
+     *
+     * @return true if the ball is in the hole, false otherwise
+     */
     public boolean isInHole() {
         double distanceToFlag = distanceToFlag();
         return distanceToFlag <= flagRadius;
     }
 
-    // Method that calculates the distance to the flag
+    /**
+     * Method that calculates the distance to the flag.
+     *
+     * @return the distance to the flag
+     */
     public double distanceToFlag() {
         double dx = flag.getPosition().x - ball.getPosition().x;
         double dy = flag.getPosition().y - ball.getPosition().y;

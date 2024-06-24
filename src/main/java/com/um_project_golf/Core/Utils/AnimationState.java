@@ -1,4 +1,6 @@
 package com.um_project_golf.Core.Utils;
 
-// Enum for the animation state of the trees
+/**
+ * The enum for the animation state.
+ */
 public enum AnimationState {IDLE, GOING_UP, GOING_DOWN}
