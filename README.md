@@ -67,7 +67,11 @@ So you can adjust the angle accordingly.
 
 The game offers a bot mode.
 The bot will calculate the best path to the hole and move the ball accordingly.
-This is not animated, so the ball will move instantly.
+The bots will have their entire path calculated before starting the game.
+You can play a shot of the AI bot ball with the key 1.
+Or you can play a shot of the Rule-Based bot ball with the key 2.
+You can also reset the ball with the R key
+(note that this will also reset the players' ball if there are more than one).
 So if you select the bots in the start menu, the game will start with the bot mode.
 Therefore, it will calculate the complete path and move the ball to the hole.
 Making it longer to run when pressing the Start button.
@@ -128,7 +132,7 @@ The first one is the keyboard and mouse:
 - The player can teleport to the ball with the Q key
 - The player can teleport to the hole with the down key
 - The player can teleport to start with the up key
-- The player can reset the ball (or balls if there are more than one) with the R key (this also works in multiplayer and with the bots)
+- The player can reset every ball with the R key (this will only reset the balls if ALL balls aren't actively moving, bots and players)
 - The player can get a surprise with the F key
 - While in-game, the player can open the in-game menu with the escape key
 - For the ball bot movement
@@ -188,12 +192,18 @@ Those are marked with a warning in the comments.
 The comments are there to help you understand what each value does.
 So if you are finding the game too hard or too easy, or even too slow, it will guide you to the right value to change.
 
+### UML Diagram
+
+The UML diagram for the entire project can be found in the main directory.
+It is a png file with the name umProjectDiagram.png.
+It shows the classes and their relationships.
+It's rather big, so you will have to zoom in to see everything.
+
 ## Known Issues
 - 
 - The ball movement is not perfect, and sometimes gets stuck mid-shot. But starts moving again after a while.
 - The ball slides too much on the grass. Especially in simple terrain. (Recommended to increase the friction in the Consts class)
 - Due to small friction, the bots may not be able to reach the hole due to hills. (This will be fixed in the future by improving the AIs by taking the height into account for decision-making.)
-- The bot mode is not animated, so the ball will move instantly.
 
 ## Credits & License
 Cartoon Texture terrain image created by upklyak (Free license) —
