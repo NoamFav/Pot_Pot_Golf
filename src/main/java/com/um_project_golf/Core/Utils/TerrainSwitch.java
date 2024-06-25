@@ -80,7 +80,7 @@ public class TerrainSwitch {
         scene.addTerrain(terrain);
         scene.addTerrain(ocean);
         scene.getEntities().removeIf(entity -> entity.getModels().equals(tree));
-        scene.getTreePositions().clear();
+        scene.clearTreePositions();
         try {
             if (!debugMode) {
                 createTrees();

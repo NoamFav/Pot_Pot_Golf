@@ -75,4 +75,5 @@ public class SceneManager {
     public List<float[]> getTreePositions() { return treePositions;}
     public void setTreePositions(List<float[]> treePosition) {treePositions = treePosition;}
     public void addTreePosition(float[] treePosition) {treePositions.add(treePosition);}
+    public void clearTreePositions() {treePositions.clear();}
 }
