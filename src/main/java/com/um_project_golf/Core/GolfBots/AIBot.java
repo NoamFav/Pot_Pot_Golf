@@ -113,7 +113,6 @@ public class AIBot {
         shotCounter++;
         currentPosition = new Vector3f(ball.getPosition());
         path.add(fullPath.get(currentPosition));
-        fullPath.clear();
 
         if (isInHole()) {
             System.out.println("Ball in hole!");
