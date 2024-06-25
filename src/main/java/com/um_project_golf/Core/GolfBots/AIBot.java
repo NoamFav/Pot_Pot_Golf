@@ -198,7 +198,14 @@ public class AIBot {
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
-    // Helper method to clamp values within a range
+    /**
+     * Method that clamps a value between a minimum and maximum value.
+     *
+     * @param value the value to clamp
+     * @param min the minimum value
+     * @param max the maximum value
+     * @return the clamped value
+     */
     private float clamp(float value, float min, float max) {
         return Math.max(min, Math.min(value, max));
     }
