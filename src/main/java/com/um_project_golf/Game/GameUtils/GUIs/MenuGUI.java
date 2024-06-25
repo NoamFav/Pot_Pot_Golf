@@ -162,7 +162,7 @@ public class MenuGUI {
 
                 TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP));
                 SimplexNoise.shufflePermutation();
-                terrainSwitch.terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
+                terrainSwitch.terrainSwitch(blendMapTerrain, blendMap2);
                 entitiesManager.setGolfBallPosition(new Vector3f(pathManager.getStartPoint()));
                 if (gameStateManager.is2player()) {
                     entitiesManager.setGolfBall2Position(new Vector3f(pathManager.getStartPoint()));
@@ -259,7 +259,7 @@ public class MenuGUI {
                 try {
                     heightMap.createHeightMap();
                     TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP));
-                    terrainSwitch.terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
+                    terrainSwitch.terrainSwitch(blendMapTerrain, blendMap2);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -285,7 +285,7 @@ public class MenuGUI {
                     pathManager.setPath(path);
                     try {
                         TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP));
-                        terrainSwitch.terrainSwitch(blendMapTerrain, modelManager.getTree(), blendMap2);
+                        terrainSwitch.terrainSwitch(blendMapTerrain, blendMap2);
                     } catch (Exception ignore) {
                     }
                 } else {
