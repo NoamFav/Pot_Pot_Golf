@@ -2,7 +2,6 @@ package com.um_project_golf.Core.Utils;
 
 import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.Material;
-import com.um_project_golf.Core.Entity.Model;
 import com.um_project_golf.Core.Entity.SceneManager;
 import com.um_project_golf.Core.Entity.Terrain.BlendMapTerrain;
 import com.um_project_golf.Core.Entity.Terrain.HeightMap;
@@ -67,10 +66,9 @@ public class TerrainSwitch {
      * Switches the terrain of the game.
      *
      * @param blendMapTerrain The new terrain to switch to.
-     * @param tree            The tree model to add to the new terrain.
      * @param blendMap2       The new blend map to use.
      */
-    public void terrainSwitch(BlendMapTerrain blendMapTerrain, List<Model> tree, TerrainTexture blendMap2) {
+    public void terrainSwitch(BlendMapTerrain blendMapTerrain, TerrainTexture blendMap2) {
         scene.getTerrains().remove(terrainManager.getTerrain());
         scene.getTerrains().remove(terrainManager.getOcean());
         Terrain terrain = new Terrain(new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blendMapTerrain, blendMap2, false);
@@ -79,9 +77,8 @@ public class TerrainSwitch {
         terrainManager.setOcean(ocean);
         scene.addTerrain(terrain);
         scene.addTerrain(ocean);
-        scene.getEntities().removeIf(entity -> entity.getModels().equals(tree));
-        scene.getTreePositions().clear();
-        entitiesManager.getTreeHeights().clear();
+        scene.getEntities().removeIf(entity -> entity.getModels().equals(modelManager.getTree()));
+        scene.clearTreePositions();
         try {
             if (!debugMode) {
                 createTrees();

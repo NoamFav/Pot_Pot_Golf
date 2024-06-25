@@ -177,6 +177,7 @@ public class Consts {
      */
     public static class OBJ {
         public static final String MAIN_TREE = "src/main/resources/Models/tree/tree.obj";
+        public static final String SECONDARY_TREE = "src/main/resources/Models/tree-2/tree4 - Copy.obj";
         public static final String SKYBOX = "src/main/resources/Models/Skybox/SkyBox.obj";
         public static final String BALL = "src/main/resources/Models/Ball/ImageToStl.com_ball.obj";
         public static final String ARROW = "src/main/resources/Models/Arrow/Arrow5.obj";
