@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -100,6 +99,9 @@ public class RuleBasedBot {
 
             // Apply noise to the bestVelocity to simulate human error
             Vector3f noisyBestVelocity = noise.addNoiseToVelocity(bestVelocity, Consts.WANT_ERROR ? Consts.ERROR_DIRECTION_DEGREES : 0, Consts.WANT_ERROR ? Consts.ERROR_MAGNITUDE_PERCENTAGE : 0);
+            noisyBestVelocity.x = clamp(noisyBestVelocity.x, -5, 5);
+            noisyBestVelocity.z = clamp(noisyBestVelocity.z, -5, 5);
+
             applyVelocities(noisyBestVelocity);
             simulateBallMovement();
             double distanceFlag = distanceToFlag();
@@ -114,7 +116,7 @@ public class RuleBasedBot {
                 System.out.println("Final velocity: " + noisyBestVelocity);
                 System.out.println("Theoretical best velocity: " + bestVelocity);
                 break; // Exit the loop if the ball is in the hole
-            } else if(sameShot){
+            } else if(sameShot || shotCounter == Consts.MAX_SHOTS) {
                 System.out.println("FAIL. Shots taken: " + shotCounter + ". Distance to flag: " + distanceFlag + "\n");
                 break;
             }
@@ -180,5 +182,16 @@ public class RuleBasedBot {
 
         // Calculate the distance using the 3D distance formula
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    /**
+     * Method to clamp a value between a minimum and maximum value.
+     * @param value the value to clamp
+     * @param min the minimum value
+     * @param max the maximum value
+     * @return the clamped value
+     */
+    private float clamp(float value, float min, float max) {
+        return Math.max(min, Math.min(value, max));
     }
 }
