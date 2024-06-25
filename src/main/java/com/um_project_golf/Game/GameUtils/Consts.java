@@ -114,11 +114,11 @@ public class Consts {
     // Otherwise, the ball may not be able to reach the hole.
     // (water bodies)
     // You don't have to worry about y, it is calculated by the terrain at render time.
-    public static final Vector3f TEE_POSITION = new Vector3f(-3, 0f, 0f); // Position of the hole
+    public static final Vector3f TEE_POSITION = new Vector3f(-3f, 0f, 0f); // Position of the ball
     public static final Vector3f HOLE_POSITION = new Vector3f(4f, 0f, 1f); // Position of the hole
     public static final boolean WANT_TREE = true; // Want trees on the terrain
     public static final boolean USE_PREDEFINED_POSITIONS = true; // Use predefined positions for the tee and the hole
-    public static final float TARGET_RADIUS = 1.5f; // Radius of the hole (meters)
+    public static final float TARGET_RADIUS = 0.05f; // Radius of the hole (meters)
     // Harder to hit the ball with a smaller radius
 
     // Change the radius to make the game easier or harder.
@@ -144,12 +144,12 @@ public class Consts {
     public static final float MAX_SPEED = 5f; // Maximum speed of the ball (m/s)
 
     // Bot configuration
-    public static final float BOT_SENSITIVITY = 0.1f; // Sensitivity of the bots (higher = more sensitive)
+    public static final float BOT_SENSITIVITY = 0.01f; // Sensitivity of the bots (higher = more sensitive)
 
     // Error factor introduced in the bots to make them more human-like
-    public static final float ERROR_DIRECTION_DEGREES = 5f; // Error in the direction of the bots (degrees)
-    public static final float ERROR_MAGNITUDE_PERCENTAGE = 7f; // Error in the magnitude of the bots (percentage)
-    public static final float ERROR_POSITION_RADIUS = 0.5f; // Error in the position of the bots (meters)
+    public static final float ERROR_DIRECTION_DEGREES = 0f; // Error in the direction of the bots (degrees)
+    public static final float ERROR_MAGNITUDE_PERCENTAGE = 0f; // Error in the magnitude of the bots (percentage)
+    public static final float ERROR_POSITION_RADIUS = 0f; // Error in the position of the bots (meters)
 
     // The requirement of friction is tiny,
     // so on the simplex noise terrain, the ball will have trouble climbing the hills.

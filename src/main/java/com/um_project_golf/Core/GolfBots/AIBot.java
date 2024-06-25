@@ -25,7 +25,7 @@ public class AIBot {
     private final HeightMap testMap;
     private final Entity ball;
     private final Entity flag;
-    private HashMap<Vector3f,List<Vector3f>> fullPath;
+    private HashMap<Vector3f, List<Vector3f>> fullPath;
     private final SceneManager scene;
     private int shotCounter = 0;
     private final Noise noise;
@@ -42,7 +42,7 @@ public class AIBot {
         path = new ArrayList<>();
     }
 
-    public List<List<Vector3f>> startAI(){
+    public List<List<Vector3f>> startAI() {
         System.out.println("Start");
         fullPath = new HashMap<>();
         path.clear();
@@ -51,7 +51,6 @@ public class AIBot {
 
     public List<List<Vector3f>> findBestShotUsingHillClimbing(Vector3f startingPosition) {
         Vector3f currentPosition = noise.addNoiseToInitialPosition(startingPosition, Consts.ERROR_POSITION_RADIUS);
-
         Vector3f bestVelocity = new Vector3f(0, 0, 0);
         double bestNeighborDistance = evaluateShot(bestVelocity);
         ball.setPosition(currentPosition); // Resets position to initial position
@@ -65,8 +64,8 @@ public class AIBot {
                 for (double dZ = -0.1; dZ <= 0.1; dZ += Double.parseDouble(String.valueOf(Consts.BOT_SENSITIVITY))) {
                     if (dX == 0 && dZ == 0) continue; // Skip the current shot
 
-                    float newVelocityX = (float) (bestVelocity.x + dX);
-                    float newVelocityZ = (float) (bestVelocity.z + dZ);
+                    float newVelocityX = clamp((float) (bestVelocity.x + dX), -5, 5);
+                    float newVelocityZ = clamp((float) (bestVelocity.z + dZ), -5, 5);
                     Vector3f newVelocity = new Vector3f(newVelocityX, 0, newVelocityZ);
 
                     double neighborDistance = evaluateShot(newVelocity); // new hypothetical shot evaluated
@@ -79,18 +78,22 @@ public class AIBot {
                         break;
                     }
                 }
-                if(improvement){
+                if (improvement) {
                     break;
                 }
             }
         }
         Vector3f noiseVelocity = noise.addNoiseToVelocity(bestVelocity, Consts.ERROR_DIRECTION_DEGREES, Consts.ERROR_MAGNITUDE_PERCENTAGE);
+        noiseVelocity.x = clamp(noiseVelocity.x, -5, 5);
+        noiseVelocity.z = clamp(noiseVelocity.z, -5, 5);
+
         double distanceFlag = evaluateShot(noiseVelocity);
         boolean sameShot = currentPosition.equals(ball.getPosition());
         shotCounter++;
         currentPosition = new Vector3f(ball.getPosition());
         path.add(fullPath.get(currentPosition));
         fullPath.clear();
+        double finish;
 
         if (isInHole()) {
             System.out.println("Ball in hole!");
@@ -99,7 +102,7 @@ public class AIBot {
             System.out.println("End of game! Shots taken: " + shotCounter + "\n");
             return path;
 
-        } else if(sameShot){
+        } else if (sameShot) {
             System.out.println("FAIL. Shots taken: " + shotCounter + ". Distance to flag: " + distanceFlag + "\n");
             return path;
         }
@@ -130,8 +133,8 @@ public class AIBot {
         List<Vector3f> positions = engine.runRK4(initialState, h);
 
         Vector3f finalPosition = positions.get(positions.size() - 1);
-        if (finalPosition.y <= -0.2){
-            ball.setPosition(Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY);
+        if (finalPosition.y <= -0.2) {
+            ball.setPosition(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
             return;
         }
         fullPath.put(finalPosition, positions);
@@ -154,5 +157,10 @@ public class AIBot {
 
         // Calculate the distance using the 3D distance formula
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    // Helper method to clamp values within a range
+    private float clamp(float value, float min, float max) {
+        return Math.max(min, Math.min(value, max));
     }
 }
