@@ -115,14 +115,9 @@ public class InputManager {
                 camera.setPosition(new Vector3f(currentBall.getPosition().x, currentBall.getPosition().y + Consts.PLAYER_HEIGHT, currentBall.getPosition().z));
             }
 
-            if (window.is_keyPressed(GLFW.GLFW_KEY_R) && !gameStateManager.isAnimating()) {
+            if (window.is_keyPressed(GLFW.GLFW_KEY_R) && !gameStateManager.isAnimating() && !gameStateManager.isAiBotAnimating() && !gameStateManager.isBotAnimating()) {
                 restartBalls();
-                if (!gameStateManager.isAiBotAnimating() && !gameStateManager.isBotAnimating()) {
-                    entitiesManager.getAiBotBall().setPosition(pathManager.getStartPoint());
-                    entitiesManager.getBotBall().setPosition(pathManager.getStartPoint());
-                    gameVarManager.resetCurrentShotIndexAI();
-                    gameVarManager.resetCurrentShotIndexBot();
-                }
+                restartBotsBalls();
             }
 
             // Create a tree at the camera position
@@ -145,6 +140,13 @@ public class InputManager {
         }
 
         context.setCameraInc(cameraInc);
+    }
+
+    private void restartBotsBalls() {
+        entitiesManager.getAiBotBall().setPosition(pathManager.getStartPoint());
+        entitiesManager.getBotBall().setPosition(pathManager.getStartPoint());
+        gameVarManager.resetCurrentShotIndexAI();
+        gameVarManager.resetCurrentShotIndexBot();
     }
 
     /**
