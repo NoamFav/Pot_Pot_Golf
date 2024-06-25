@@ -11,6 +11,7 @@ import java.util.function.BiFunction;
  * All key settings are stored here.
  * Made to be easily accessible and modifiable.
  */
+@SuppressWarnings("unused")
 public class Consts {
 
     public static String Title = "UM Project Golf"; // Title of the game
@@ -177,13 +178,14 @@ public class Consts {
      * All the model paths are stored here.
      */
     public static class OBJ {
-        public static final String MAIN_TREE = "src/main/resources/Models/tree/tree.obj";
-        public static final String SECONDARY_TREE = "src/main/resources/Models/tree-2/tree4 - Copy.obj";
-        public static final String THIRD_TREE = "src/main/resources/Models/tree-3/tree3-mybloodsweatandtears.obj";
-        public static final String SKYBOX = "src/main/resources/Models/Skybox/SkyBox.obj";
-        public static final String BALL = "src/main/resources/Models/Ball/ImageToStl.com_ball.obj";
-        public static final String ARROW = "src/main/resources/Models/Arrow/Arrow5.obj";
-        public static final String FLAG = "src/main/resources/Models/flag/flag.obj";
+        public static final String MAIN_TREE = "src/main/resources/Models/tree/tree.obj"; // Tree model
+//        public static final String SECONDARY_TREE = "src/main/resources/Models/tree-2/tree4 - Copy.obj"; // Tree model (not used)
+//        public static final String THIRD_TREE = "src/main/resources/Models/tree-3/tree3-mybloodsweatandtears.obj"; // Tree model (not used)
+        public static final String SKYBOX = "src/main/resources/Models/Skybox/SkyBox.obj";  // Skybox model
+        public static final String BALL = "src/main/resources/Models/Ball/ImageToStl.com_ball.obj"; // Ball model
+        public static final String ARROW = "src/main/resources/Models/Arrow/Arrow5.obj"; // Arrow model
+        public static final String FLAG = "src/main/resources/Models/flag/flag.obj"; // Flag model
+//        public static final String WINDMILL = "src/main/resources/Models/windmill/LowPolyMill.obj"; // Windmill model (not used)
     }
 
     /**

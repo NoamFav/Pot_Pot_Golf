@@ -165,7 +165,6 @@ public class InitManager {
      */
     private @NotNull ModelLoader getModels() throws Exception {
         List<Model> tree = loader.loadAssimpModel(Consts.OBJ.MAIN_TREE); modelManager.setTree(tree);
-        List<Model> tree2 = loader.loadAssimpModel(Consts.OBJ.SECONDARY_TREE); modelManager.setTree2(tree2);
         List<Model> skyBox = loader.loadAssimpModel(Consts.OBJ.SKYBOX);
         List<Model> ball = loader.loadAssimpModel(Consts.OBJ.BALL);
         List<Model> ball2 = loader.loadAssimpModel(Consts.OBJ.BALL); modelManager.setBall2(ball2);
