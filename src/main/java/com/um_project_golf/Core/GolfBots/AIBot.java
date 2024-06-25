@@ -85,8 +85,8 @@ public class AIBot {
                 for (double dZ = -0.1; dZ <= 0.1; dZ += Double.parseDouble(String.valueOf(Consts.BOT_SENSITIVITY))) {
                     if (dX == 0 && dZ == 0) continue; // Skip the current shot
 
-                    float newVelocityX = (float) (bestVelocity.x + dX);
-                    float newVelocityZ = (float) (bestVelocity.z + dZ);
+                    float newVelocityX = clamp((float) (bestVelocity.x + dX), -5, 5);
+                    float newVelocityZ = clamp((float) (bestVelocity.z + dZ), -5, 5);
                     Vector3f newVelocity = new Vector3f(newVelocityX, 0, newVelocityZ);
 
                     double neighborDistance = evaluateShot(newVelocity); // new hypothetical shot evaluated
@@ -105,6 +105,9 @@ public class AIBot {
             }
         }
         Vector3f noiseVelocity = noise.addNoiseToVelocity(bestVelocity, Consts.WANT_ERROR ? Consts.ERROR_DIRECTION_DEGREES : 0, Consts.WANT_ERROR ? Consts.ERROR_MAGNITUDE_PERCENTAGE : 0);
+        noiseVelocity.x = clamp(noiseVelocity.x, -5, 5);
+        noiseVelocity.z = clamp(noiseVelocity.z, -5, 5);
+
         double distanceFlag = evaluateShot(noiseVelocity);
         boolean sameShot = currentPosition.equals(ball.getPosition());
         shotCounter++;
@@ -193,5 +196,10 @@ public class AIBot {
 
         // Calculate the distance using the 3D distance formula
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    // Helper method to clamp values within a range
+    private float clamp(float value, float min, float max) {
+        return Math.max(min, Math.min(value, max));
     }
 }
