@@ -144,13 +144,14 @@ public class Consts {
     public static final float MAX_SPEED = 5f; // Maximum speed of the ball (m/s)
 
     // Bot configuration
-    public static final float BOT_SENSITIVITY = 0.01f; // Sensitivity of the bots (higher = more sensitive)
+    public static final float BOT_SENSITIVITY = 0.1f; // Sensitivity of the bots (higher = more sensitive)
+    public static final int MAX_SHOTS = 20; // Maximum number of shots for the Rule-based bot
 
     // Error factor introduced in the bots to make them more human-like
-    public static final float ERROR_DIRECTION_DEGREES = 0f; // Error in the direction of the bots (degrees)
-    public static final float ERROR_MAGNITUDE_PERCENTAGE = 0f; // Error in the magnitude of the bots (percentage)
-    public static final float ERROR_POSITION_RADIUS = 0f; // Error in the position of the bots (meters)
-    public static final boolean WANT_ERROR = false; // Want error in the bots
+    public static final float ERROR_DIRECTION_DEGREES = 5f; // Error in the direction of the bots (degrees)
+    public static final float ERROR_MAGNITUDE_PERCENTAGE = 7f; // Error in the magnitude of the bots (percentage)
+    public static final float ERROR_POSITION_RADIUS = 0.2f; // Error in the position of the bots (meters)
+    public static final boolean WANT_ERROR = true; // Want error in the bots
 
     // The requirement of friction is tiny,
     // so on the simplex noise terrain, the ball will have trouble climbing the hills.
