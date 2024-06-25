@@ -16,6 +16,7 @@ public class ModelManager {
     private List<Model> aiBotBallModel;
     private List<Model> ball2;
     private List<Model> tree;
+    private List<Model> tree2;
 
     public List<Model> getBotBallModel() {return botBallModel;}
     public void setBotBallModel(List<Model> botBallModel) {this.botBallModel = botBallModel;}
@@ -25,4 +26,6 @@ public class ModelManager {
     public void setBall2(List<Model> ball2) {this.ball2 = ball2;}
     public List<Model> getTree() {return tree;}
     public void setTree(List<Model> tree) {this.tree = tree;}
+    public List<Model> getTree2() {return tree2;}
+    public void setTree2(List<Model> tree2) {this.tree2 = tree2;}
 }
