@@ -56,9 +56,10 @@ public class RuleBasedBot {
 
         // Main loop to keep shooting until the ball is in the hole
         while (!isInHole()) {
-            System.out.println("Starting position: " + startingPosition);
+            //System.out.println("Starting position: " + startingPosition);
             minDistance = Double.MAX_VALUE; // Reset minDistance for this shot sequence
             startingPosition = noise.addNoiseToInitialPosition(startingPosition, Consts.ERROR_POSITION_RADIUS); // Add noise to the starting position
+
 
             // Iterate over possible velocities to find the best shot for this turn
             for (float velocityX = -5; velocityX <= 5; velocityX += Consts.BOT_SENSITIVITY) {
@@ -86,6 +87,9 @@ public class RuleBasedBot {
             Vector3f noisyBestVelocity = noise.addNoiseToVelocity(bestVelocity, Consts.ERROR_DIRECTION_DEGREES, Consts.ERROR_MAGNITUDE_PERCENTAGE);
             applyVelocities(noisyBestVelocity);
             simulateBallMovement();
+            double distanceFlag = distanceToFlag();
+            boolean sameShot = startingPosition.equals(ball.getPosition());
+            shotCounter++;
 
             // Check if the ball is in the hole after applying noise
             if (isInHole()) {
@@ -95,12 +99,14 @@ public class RuleBasedBot {
                 System.out.println("Final velocity: " + noisyBestVelocity);
                 System.out.println("Theoretical best velocity: " + bestVelocity);
                 break; // Exit the loop if the ball is in the hole
+            } else if(sameShot){
+                System.out.println("FAIL. Shots taken: " + shotCounter + ". Distance to flag: " + distanceFlag + "\n");
+                break;
             }
 
             // Update starting position to the new position after the noisy shot
             startingPosition = new Vector3f(ball.getPosition());
             path.add(fullPath.get(startingPosition));
-            shotCounter++;
             System.out.println("Shot " + shotCounter + ". Distance to flag: " + distanceToFlag());
             System.out.println("Best velocity: " + bestVelocity);
             System.out.println("Noisy best velocity: " + noisyBestVelocity + "\n");
@@ -123,12 +129,15 @@ public class RuleBasedBot {
         PhysicsEngine engine = new CompletePhysicsEngine(heightMap, scene);
         List<Vector3f> positions = engine.runRK4(initialState, h);
 
-        Vector3f finalPosition = positions.get(positions.size()-1);
-
-        fullPath.put(finalPosition,positions);
+        Vector3f finalPosition = positions.get(positions.size() - 1);
+        if (finalPosition.y <= -0.2){
+            ball.setPosition(Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY);
+            return;
+        }
+        fullPath.put(finalPosition, positions);
 
         // Update ball position based on velocity and physics rules
-        ball.setPosition(finalPosition.x,finalPosition.y,finalPosition.z);
+        ball.setPosition(finalPosition.x, finalPosition.y, finalPosition.z);
     }
 
     // Method to check whether the ball is in hole
