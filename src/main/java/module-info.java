@@ -1,6 +1,5 @@
-module com.um_project_golf {
+module com.pot_pot_golf {
 
-    requires exp4j;
     requires org.lwjgl.glfw;
     requires org.lwjgl.opengl;
     requires org.joml;
@@ -13,16 +12,16 @@ module com.um_project_golf {
     requires org.lwjgl.openal;
     requires org.jetbrains.annotations;
 
-    exports com.um_project_golf.Core;
-    exports com.um_project_golf.Game;
-    exports com.um_project_golf.Core.GolfBots;
-    exports com.um_project_golf.Core.Entity;
-    exports com.um_project_golf.Core.Utils;
-    exports com.um_project_golf.Core.Lighting;
-    exports com.um_project_golf.Core.Rendering;
-    exports com.um_project_golf.Core.Entity.Terrain;
-    exports com.um_project_golf.Core.AWT;
-    exports com.um_project_golf.Game.GameUtils.GameLogic;
-    exports com.um_project_golf.Game.GameUtils.FieldManager;
-    exports com.um_project_golf.Game.GameUtils;
+    exports com.pot_pot_golf.Core;
+    exports com.pot_pot_golf.Game;
+    exports com.pot_pot_golf.Core.GolfBots;
+    exports com.pot_pot_golf.Core.Entity;
+    exports com.pot_pot_golf.Core.Utils;
+    exports com.pot_pot_golf.Core.Lighting;
+    exports com.pot_pot_golf.Core.Rendering;
+    exports com.pot_pot_golf.Core.Entity.Terrain;
+    exports com.pot_pot_golf.Core.AWT;
+    exports com.pot_pot_golf.Game.GameUtils.GameLogic;
+    exports com.pot_pot_golf.Game.GameUtils.FieldManager;
+    exports com.pot_pot_golf.Game.GameUtils;
 }
