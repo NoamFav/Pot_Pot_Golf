@@ -23,7 +23,7 @@ Then you can open the index.html file in the target/site/apidocs directory.
 
 ## Prerequisites
 
-The project runs on java 21.
+The project runs on java 22.
 
 
 ## Functioning

@@ -1,6 +1,5 @@
 module com.um_project_golf {
 
-    requires exp4j;
     requires org.lwjgl.glfw;
     requires org.lwjgl.opengl;
     requires org.joml;
