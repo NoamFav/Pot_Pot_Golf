@@ -1,5 +1,7 @@
 package com.um_project_golf.Game;
 
+import static org.lwjgl.nanovg.NanoVGGL3.*;
+
 import com.um_project_golf.Core.*;
 import com.um_project_golf.Core.Entity.Entity;
 import com.um_project_golf.Core.Entity.Terrain.Terrain;
@@ -16,8 +18,6 @@ import com.um_project_golf.Game.GameUtils.GameLogic.InputManager;
 import com.um_project_golf.Game.GameUtils.GameLogic.UpdateManager;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
-
-import static org.lwjgl.nanovg.NanoVGGL3.*;
 
 /**
  * The main game logic class.
@@ -36,7 +36,9 @@ public class GolfGame implements ILogic {
      * The constructor of the game.
      * It initializes the renderer, window, loader and camera.
      */
-    public GolfGame() {context = new MainFieldManager();}
+    public GolfGame() {
+        context = new MainFieldManager();
+    }
 
     /**
      * Initializes the game.
@@ -53,7 +55,13 @@ public class GolfGame implements ILogic {
         // Managers for the game logic
         InitManager initManager = new InitManager(context);
 
-        context.getScene().setDefaultTexture(new Texture(context.getLoader().loadTexture(Consts.DEFAULT_TEXTURE)));
+        context
+            .getScene()
+            .setDefaultTexture(
+                new Texture(
+                    context.getLoader().loadTexture(Consts.DEFAULT_TEXTURE)
+                )
+            );
         context.getWindow().setAntiAliasing(true);
         context.getWindow().setResized(false);
 
@@ -61,7 +69,17 @@ public class GolfGame implements ILogic {
         context.getWindow().setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
 
         context.getHeightMap().createHeightMap();
-        context.getPathManager().setPath(context.getPathfinder().getPath(Consts.RADIUS_DOWN, Consts.RADIUS_UP, Consts.SIZE_GREEN));
+        context
+            .getPathManager()
+            .setPath(
+                context
+                    .getPathfinder()
+                    .getPath(
+                        Consts.RADIUS_DOWN,
+                        Consts.RADIUS_UP,
+                        Consts.SIZE_GREEN
+                    )
+            );
 
         initManager.modelAndEntityCreation();
         initManager.terrainCreation();
@@ -75,8 +93,9 @@ public class GolfGame implements ILogic {
         gameStateManager.setOnMenu(true);
 
         AudioManager audioManager = new AudioManager(Consts.BACKGROUND_MUSIC);
-        gameStateManager.setSoundPlaying(false);
+        gameStateManager.setSoundPlaying(true);
         context.setAudioManager(audioManager);
+        context.getAudioManager().playSound();
 
         new MenuGUI(vg, context);
 
@@ -95,7 +114,7 @@ public class GolfGame implements ILogic {
 
         if (context.getWindow().is_keyPressed(GLFW.GLFW_KEY_ESCAPE)) {
             GameStateManager gameStateManager = context.getGameStateManager();
-            gameStateManager.setGuiVisible(true);  // Toggle GUI visibility
+            gameStateManager.setGuiVisible(true); // Toggle GUI visibility
             gameStateManager.setCanMove(false); // Disable movement
         }
 
@@ -110,13 +129,14 @@ public class GolfGame implements ILogic {
      */
     @Override
     public void update() {
-
         UpdateManager updateManager = new UpdateManager(context);
 
         context.getGuiElementManager().update(context.getGameStateManager());
 
         if (context.getWindow().isResized()) {
-            Vector3f oldPosition = new Vector3f(context.getCamera().getPosition());
+            Vector3f oldPosition = new Vector3f(
+                context.getCamera().getPosition()
+            );
             context.getWindow().setResized(false);
             new RecreateGUIs(vg, context);
             context.getMouseInputs().init();
@@ -124,21 +144,43 @@ public class GolfGame implements ILogic {
         }
 
         Vector3f cameraInc = new Vector3f(context.getCameraInc());
-        context.getCamera().movePosition(cameraInc.x * Consts.CAMERA_MOVEMENT_SPEED, (cameraInc.y * Consts.CAMERA_MOVEMENT_SPEED), cameraInc.z * Consts.CAMERA_MOVEMENT_SPEED);
+        context
+            .getCamera()
+            .movePosition(
+                cameraInc.x * Consts.CAMERA_MOVEMENT_SPEED,
+                (cameraInc.y * Consts.CAMERA_MOVEMENT_SPEED),
+                cameraInc.z * Consts.CAMERA_MOVEMENT_SPEED
+            );
 
-        context.getCollisionsDetector().checkCollision(context.getCamera(), cameraInc, context.getHeightMap(), context.getScene());
+        context
+            .getCollisionsDetector()
+            .checkCollision(
+                context.getCamera(),
+                cameraInc,
+                context.getHeightMap(),
+                context.getScene()
+            );
 
         updateManager.daytimeCycle();
         updateManager.updateTreeAnimations();
         updateManager.animateBall();
-        if (context.getGameStateManager().isAiBotAnimating()) {updateManager.animateAIBall();}
-        if (context.getGameStateManager().isBotAnimating()) {updateManager.animateBotBall();}
+        if (context.getGameStateManager().isAiBotAnimating()) {
+            updateManager.animateAIBall();
+        }
+        if (context.getGameStateManager().isBotAnimating()) {
+            updateManager.animateBotBall();
+        }
 
-        context.getGuiElementManager().updateTextFields(context.getGameStateManager());
+        context
+            .getGuiElementManager()
+            .updateTextFields(context.getGameStateManager());
 
-
-        for (Entity entity : context.getScene().getEntities()) {context.getRenderer().processEntity(entity);}
-        for (Terrain terrain : context.getScene().getTerrains()) {context.getRenderer().processTerrain(terrain);}
+        for (Entity entity : context.getScene().getEntities()) {
+            context.getRenderer().processEntity(entity);
+        }
+        for (Terrain terrain : context.getScene().getTerrains()) {
+            context.getRenderer().processTerrain(terrain);
+        }
     }
 
     /**
