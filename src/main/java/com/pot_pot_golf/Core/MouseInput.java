@@ -14,7 +14,6 @@ public class MouseInput {
     private final Vector2f displayVec; // The displacement vector of the mouse.
 
     private boolean inWindow = true; // Flag to check if the cursor is in the window.
-    private boolean leftButtonPressed = false; // Flag to check if the left button is pressed.
     private boolean rightButtonPressed = false; // Flag to check if the right button is pressed.
 
     /**
@@ -61,7 +60,6 @@ public class MouseInput {
         // Both flags are set to true when the left and right buttons are pressed, respectively.
         // Allows for handling of mouse button events for the input.
         GLFW.glfwSetMouseButtonCallback(Launcher.getWindow().getWindow(), (window, button, action, mode) -> {
-            leftButtonPressed = button == GLFW.GLFW_MOUSE_BUTTON_LEFT && action == GLFW.GLFW_PRESS; // Set the leftButtonPressed flag.
             rightButtonPressed = button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && action == GLFW.GLFW_PRESS; // Set the rightButtonPressed flag.
         });
     }
@@ -92,16 +90,6 @@ public class MouseInput {
      */
     public Vector2f getDisplayVec() {
         return displayVec;
-    }
-
-    /**
-     * Checks if the left button is pressed.
-     *
-     * @return True if the left button is pressed, false otherwise.
-     */
-    @SuppressWarnings("unused")
-    public boolean isLeftButtonPressed() {
-        return leftButtonPressed;
     }
 
     /**

@@ -12,7 +12,6 @@ import java.util.List;
  * This class is responsible for managing the game variables of the game.
  * This class is used to store the game logic variables.
  */
-@SuppressWarnings("unused")
 public class GameVarManager {
 
     // Game logic variables
@@ -49,22 +48,17 @@ public class GameVarManager {
     public void setTreeAnimationGoingDown() {treeAnimationState = AnimationState.GOING_DOWN;}
     public void setTreeAnimationIdle() {treeAnimationState = AnimationState.IDLE;}
     public float getTreeAnimationTime() {return treeAnimationTime;}
-    public void setTreeAnimationTime(float treeAnimationTime) {this.treeAnimationTime = treeAnimationTime;}
     public void resetTreeAnimationTime() {treeAnimationTime = 0f;}
     public void incrementTreeAnimationTime(float delta) {treeAnimationTime += delta;}
     public int getNumberOfShots() {return numberOfShots;}
-    public void setNumberOfShots(int numberOfShots) {this.numberOfShots = numberOfShots;}
     public void incrementNumberOfShots() {numberOfShots++;}
     public int getNumberOfShots2() {return numberOfShots2;}
-    public void setNumberOfShots2(int numberOfShots2) {this.numberOfShots2 = numberOfShots2;}
     public void incrementNumberOfShots2() {numberOfShots2++;}
     public void resetNumberOfShots() {numberOfShots = 0;numberOfShots2 = 0;}
     public int getCurrentPositionIndex() {return currentPositionIndex;}
-    public void setCurrentPositionIndex(int currentPositionIndex) {this.currentPositionIndex = currentPositionIndex;}
     public void incrementCurrentPositionIndex() {currentPositionIndex++;}
     public void resetCurrentPositionIndex() {currentPositionIndex = 0;}
     public float getAnimationTimeAccumulator() {return animationTimeAccumulator;}
-    public void setAnimationTimeAccumulator(float animationTimeAccumulator) {this.animationTimeAccumulator = animationTimeAccumulator;}
     public void incrementAnimationTimeAccumulator(float delta) {animationTimeAccumulator += delta;}
     public void decrementAnimationTimeAccumulator(float delta) {animationTimeAccumulator -= delta;}
     public void resetAnimationTimeAccumulator() {animationTimeAccumulator = 0f;}
@@ -79,11 +73,8 @@ public class GameVarManager {
     public BallCollisionDetector getBallCollisionDetector() {return ballCollisionDetector;}
     public void setBallCollisionDetector(BallCollisionDetector ballCollisionDetector) {this.ballCollisionDetector = ballCollisionDetector;}
     public int getCurrentPositionIndexBot() {return currentPositionIndexBot;}
-    public void setCurrentPositionIndexBot(int currentPositionIndexBot) {this.currentPositionIndexBot = currentPositionIndexBot;}
     public float getAnimationTimeAccumulatorBot() {return animationTimeAccumulatorBot;}
-    public void setAnimationTimeAccumulatorBot(float animationTimeAccumulatorBot) {this.animationTimeAccumulatorBot = animationTimeAccumulatorBot;}
     public int getCurrentShotIndexBot() {return currentShotIndexBot;}
-    public void setCurrentShotIndexBot(int currentShotIndexBot) {this.currentShotIndexBot = currentShotIndexBot;}
     public void incrementCurrentShotIndexBot() {currentShotIndexBot++;}
     public void resetCurrentShotIndexBot() {currentShotIndexBot = 0;}
     public void incrementCurrentPositionIndexBot() {currentPositionIndexBot++;}
@@ -92,11 +83,8 @@ public class GameVarManager {
     public void decrementAnimationTimeAccumulatorBot(float delta) {animationTimeAccumulatorBot -= delta;}
     public void resetAnimationTimeAccumulatorBot() {animationTimeAccumulatorBot = 0f;}
     public int getCurrentPositionIndexAI() {return currentPositionIndexAI;}
-    public void setCurrentPositionIndexAI(int currentPositionIndexAI) {this.currentPositionIndexAI = currentPositionIndexAI;}
     public float getAnimationTimeAccumulatorAI() {return animationTimeAccumulatorAI;}
-    public void setAnimationTimeAccumulatorAI(float animationTimeAccumulatorAI) {this.animationTimeAccumulatorAI = animationTimeAccumulatorAI;}
     public int getCurrentShotIndexAI() {return currentShotIndexAI;}
-    public void setCurrentShotIndexAI(int currentShotIndexAI) {this.currentShotIndexAI = currentShotIndexAI;}
     public void incrementCurrentShotIndexAI() {currentShotIndexAI++;}
     public void resetCurrentShotIndexAI() {currentShotIndexAI = 0;}
     public void incrementCurrentPositionIndexAI() {currentPositionIndexAI++;}

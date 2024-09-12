@@ -1,11 +1,19 @@
 package com.pot_pot_golf.Game;
 
-import static org.lwjgl.nanovg.NanoVGGL3.*;
+import static org.lwjgl.nanovg.NanoVGGL3.NVG_ANTIALIAS;
+import static org.lwjgl.nanovg.NanoVGGL3.NVG_STENCIL_STROKES;
+import static org.lwjgl.nanovg.NanoVGGL3.nvgCreate;
+import static org.lwjgl.nanovg.NanoVGGL3.nvgDelete;
 
-import com.pot_pot_golf.Core.*;
+import org.joml.Vector3f;
+import org.lwjgl.glfw.GLFW;
+
+import com.pot_pot_golf.Core.AudioManager;
+import com.pot_pot_golf.Core.ILogic;
+import com.pot_pot_golf.Core.MouseInput;
 import com.pot_pot_golf.Core.Entity.Entity;
-import com.pot_pot_golf.Core.Entity.Terrain.Terrain;
 import com.pot_pot_golf.Core.Entity.Texture;
+import com.pot_pot_golf.Core.Entity.Terrain.Terrain;
 import com.pot_pot_golf.Game.GameUtils.Consts;
 import com.pot_pot_golf.Game.GameUtils.FieldManager.GameStateManager;
 import com.pot_pot_golf.Game.GameUtils.FieldManager.MainFieldManager;
@@ -16,8 +24,6 @@ import com.pot_pot_golf.Game.GameUtils.GUIs.RecreateGUIs;
 import com.pot_pot_golf.Game.GameUtils.GameLogic.InitManager;
 import com.pot_pot_golf.Game.GameUtils.GameLogic.InputManager;
 import com.pot_pot_golf.Game.GameUtils.GameLogic.UpdateManager;
-import org.joml.Vector3f;
-import org.lwjgl.glfw.GLFW;
 
 /**
  * The main game logic class.
@@ -83,7 +89,6 @@ public class GolfGame implements ILogic {
 
         initManager.modelAndEntityCreation();
         initManager.terrainCreation();
-        initManager.setUpLight();
 
         vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
 
@@ -161,7 +166,6 @@ public class GolfGame implements ILogic {
                 context.getScene()
             );
 
-        updateManager.daytimeCycle();
         updateManager.updateTreeAnimations();
         updateManager.animateBall();
         if (context.getGameStateManager().isAiBotAnimating()) {
@@ -190,7 +194,7 @@ public class GolfGame implements ILogic {
     @Override
     public void render() {
         context.getRenderer().clear();
-        context.getRenderer().render(context.getCamera(), context.getScene());
+        context.getRenderer().render(context.getCamera());
 
         context.getGuiElementManager().render(context.getGameStateManager());
 

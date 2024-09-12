@@ -17,7 +17,6 @@ module com.pot_pot_golf {
     exports com.pot_pot_golf.Core.GolfBots;
     exports com.pot_pot_golf.Core.Entity;
     exports com.pot_pot_golf.Core.Utils;
-    exports com.pot_pot_golf.Core.Lighting;
     exports com.pot_pot_golf.Core.Rendering;
     exports com.pot_pot_golf.Core.Entity.Terrain;
     exports com.pot_pot_golf.Core.AWT;

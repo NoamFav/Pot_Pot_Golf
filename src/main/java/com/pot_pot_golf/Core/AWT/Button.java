@@ -186,7 +186,6 @@ public class Button {
         }
     }
 
-    @SuppressWarnings("unused")
     public void setText(String text){
         this.text = text;
     }

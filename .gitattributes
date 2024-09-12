@@ -1,0 +1,2 @@
+target/POT_POT_GOLF-1.0-SNAPSHOT.jar filter=lfs diff=lfs merge=lfs -text
+target/installer/Pot[[:space:]]Pot[[:space:]]Golf-1.0.0.dmg filter=lfs diff=lfs merge=lfs -text

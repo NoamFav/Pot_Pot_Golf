@@ -11,7 +11,6 @@ import java.util.List;
  * This class is responsible for managing the entities of the game.
  * Stores the entities of the game.
  */
-@SuppressWarnings("unused")
 public class EntitiesManager {
     // EntitiesManager
     private final List<Entity> trees;
@@ -23,7 +22,6 @@ public class EntitiesManager {
     private Entity aiBotBall;
     private Entity endFlag;
     private Entity arrowEntity;
-    private Entity skyBox;
 
     /**
      * The constructor of the entities manager.
@@ -39,7 +37,6 @@ public class EntitiesManager {
     public void clearTrees() {this.trees.clear();}
     public List<Float> getTreeHeights() {return treeHeights;}
     public void addTreeHeight(Float height) {this.treeHeights.add(height);}
-    public void clearTreeHeights() {this.treeHeights.clear();}
     public Entity getGolfBall() {return golfBall;}
     public void setGolfBall(Entity golfBall) {this.golfBall = golfBall;}
     public void setGolfBallPosition(Vector3f position) {this.golfBall.setPosition(position);}
@@ -63,6 +60,4 @@ public class EntitiesManager {
     public void setArrowEntityRotation(Vector3f rotation) {this.arrowEntity.setRotation(rotation);}
     public void setBotBallPosition(Vector3f vector3f) {botBall.setPosition(vector3f);}
     public void setAiBotBallPosition(Vector3f vector3f) {aiBotBall.setPosition(vector3f);}
-    public Entity getSkyBox() {return skyBox;}
-    public void setSkyBox(Entity skyBox) {this.skyBox = skyBox;}
 }

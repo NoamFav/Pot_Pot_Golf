@@ -24,7 +24,7 @@ public class PhysicsExperiments {
     private static final HeightMap STEEPHILLYTERRAIN = createSteepHillyTerrain();
     private static final HeightMap GENTLEHILLYTERRAIN = createGentleHillyTerrain();
     private static final HeightMap FLATSANDYTERRAIN = createSandyTerrain();
-    private static final SceneManager SCENE = new SceneManager(-90);
+    private static final SceneManager SCENE = new SceneManager();
 
     // Create CompletePhysicsEngine instances
     private static final CompletePhysicsEngine flatGrassCompleteEngine = new CompletePhysicsEngine(FLATGRASSTERRAIN, SCENE);

@@ -16,7 +16,6 @@ import org.joml.Vector3f;
  * This class is responsible for managing the main field of the game.
  * Stores the main field of the game.
  */
-@SuppressWarnings("unused")
 public class MainFieldManager {
     // Main game Classes and Managers
     private final RenderManager renderer;
@@ -55,7 +54,7 @@ public class MainFieldManager {
         renderer = new RenderManager();
         window = Launcher.getWindow();
         loader = new ObjectLoader();
-        scene = new SceneManager(-90);
+        scene = new SceneManager();
         camera = new Camera();
         pathfinder = new HeightMapPathfinder();
         collisionsDetector = new CollisionsDetector();

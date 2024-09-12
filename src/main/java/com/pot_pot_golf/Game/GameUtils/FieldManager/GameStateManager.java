@@ -5,7 +5,7 @@ package com.pot_pot_golf.Game.GameUtils.FieldManager;
  * This class is responsible for managing the game state of the game.
  * Stores the game state variables.
  */
-@SuppressWarnings("unused")
+
 public class GameStateManager {
     // Game state variables
     private boolean canMove;
@@ -53,16 +53,13 @@ public class GameStateManager {
     public boolean isAnimating() {return isAnimating;}
     public void setAnimating(boolean animating) {isAnimating = animating;}
     public boolean isBot() {return isBot;}
-    public void setBot(boolean bot) {isBot = bot;}
     public void switchBot() {isBot = !isBot;}
     public void switchAiBot() {isAiBot = !isAiBot;}
     public void switch2player() {is2player = !is2player;}
     public void switchPlayer1Turn() {isPlayer1Turn = !isPlayer1Turn;}
     public void switchAudio() {isSoundPlaying = !isSoundPlaying;}
     public boolean isAiBot() {return isAiBot;}
-    public void setAiBot(boolean aiBot) {isAiBot = aiBot;}
     public boolean is2player() {return is2player;}
-    public void set2player(boolean is2player) {this.is2player = is2player;}
     public boolean isPlayer1Turn() {return isPlayer1Turn;}
     public void setPlayer1Turn(boolean player1Turn) {isPlayer1Turn = player1Turn;}
     public boolean isPlayer1Won() {return player1Won;}

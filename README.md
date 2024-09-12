@@ -2,8 +2,7 @@
 
 # Pot Pot Golf !!!
 
-This project is a numerical solver for ordinary differential equations using the Runge-Kutta fourth order method.
-It is written in Java and built with Maven.
+This project is a golfing game on java using LWJGL, it contains physics as well as 2 bots that can play too.
 
 ## Getting Started
 
@@ -211,6 +210,9 @@ It's rather big, so you will have to zoom in to see everything.
 - Due to small friction, the bots may not be able to reach the hole due to hills. (This will be fixed in the future by improving the AIs by taking the height into account for decision-making.)
 
 ## Credits & License
+
+The initial setup of this project was guided by a DevGenie Academy tutorial to better understand LWJGL and game engine functionalities.
+
 Cartoon Texture terrain image created by upklyak (Free license) —
 <a href="https://www.freepik.com/free-vector/game-textures-water-green-lawn-sand-grass-meadow-with-flowers-seamless-patterns-top-view-cartoon-textured-backgrounds-blue-liquid-field-desert-surface-graphic-ui-gui-vector-layers_21267469.htm#query=texture&position=8&from_view=author&uuid=fb39b549-3ad8-46e1-ba38-41fd1a95803a">Cartoon Vectors by Freepik</a>
 

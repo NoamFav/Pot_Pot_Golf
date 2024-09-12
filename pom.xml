@@ -10,7 +10,11 @@
     <name>POT_POT_GOLF</name>
 
     <properties>
+        <main.class>com.pot_pot_golf.Game.Launcher</main.class>
+        <app.version>1.0.0</app.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>22</maven.compiler.source>
+        <maven.compiler.target>22</maven.compiler.target>
         <junit.version>5.10.0</junit.version>
 
         <lwjgl.version>3.3.3</lwjgl.version>
@@ -399,8 +403,11 @@
             </activation>
             <properties>
                 <lwjgl.natives>natives-linux</lwjgl.natives>
+                <installer.type>deb</installer.type> <!-- or rpm -->
+                <icon.path>${project.build.directory}/classes/icons/linux-icons.png</icon.path>
             </properties>
         </profile>
+
         <profile>
             <id>lwjgl-natives-linux-aarch64</id>
             <activation>
@@ -412,8 +419,11 @@
             </activation>
             <properties>
                 <lwjgl.natives>natives-linux-arm64</lwjgl.natives>
+                <installer.type>deb</installer.type>
+                <icon.path>${project.build.directory}/classes/icons/linux-icons.png</icon.path>
             </properties>
         </profile>
+
         <profile>
             <id>lwjgl-natives-linux-arm</id>
             <activation>
@@ -425,21 +435,11 @@
             </activation>
             <properties>
                 <lwjgl.natives>natives-linux-arm32</lwjgl.natives>
+                <installer.type>deb</installer.type>
+                <icon.path>${project.build.directory}/classes/icons/linux-icons.png</icon.path>
             </properties>
         </profile>
-        <profile>
-            <id>lwjgl-natives-linux-arm32</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                    <arch>arm32</arch>
-                </os>
-            </activation>
-            <properties>
-                <lwjgl.natives>natives-linux-arm32</lwjgl.natives>
-            </properties>
-        </profile>
+
         <profile>
             <id>lwjgl-natives-macos-x86_64</id>
             <activation>
@@ -450,6 +450,9 @@
             </activation>
             <properties>
                 <lwjgl.natives>natives-macos</lwjgl.natives>
+                <installer.type>dmg</installer.type>
+                <icon.path>${project.build.directory}/classes/icons/mac-icons.icns</icon.path>
+                <java.options>-XstartOnFirstThread</java.options>
             </properties>
             <dependencies>
                 <dependency>
@@ -459,6 +462,7 @@
                 </dependency>
             </dependencies>
         </profile>
+
         <profile>
             <id>lwjgl-natives-macos-aarch64</id>
             <activation>
@@ -469,6 +473,9 @@
             </activation>
             <properties>
                 <lwjgl.natives>natives-macos-arm64</lwjgl.natives>
+                <installer.type>dmg</installer.type>
+                <icon.path>${project.build.directory}/classes/icons/mac-icons.icns</icon.path>
+                <java.options>-XstartOnFirstThread</java.options>
             </properties>
             <dependencies>
                 <dependency>
@@ -478,6 +485,7 @@
                 </dependency>
             </dependencies>
         </profile>
+
         <profile>
             <id>lwjgl-natives-windows-amd64</id>
             <activation>
@@ -488,8 +496,11 @@
             </activation>
             <properties>
                 <lwjgl.natives>natives-windows</lwjgl.natives>
+                <installer.type>exe</installer.type>
+                <icon.path>${project.build.directory}/classes/icons/win-icons.ico</icon.path>
             </properties>
         </profile>
+
         <profile>
             <id>lwjgl-natives-windows-x86</id>
             <activation>
@@ -500,8 +511,11 @@
             </activation>
             <properties>
                 <lwjgl.natives>natives-windows-x86</lwjgl.natives>
+                <installer.type>exe</installer.type>
+                <icon.path>${project.build.directory}/classes/icons/win-icons.ico</icon.path>
             </properties>
         </profile>
+
         <profile>
             <id>lwjgl-natives-windows-aarch64</id>
             <activation>
@@ -512,6 +526,8 @@
             </activation>
             <properties>
                 <lwjgl.natives>natives-windows-arm64</lwjgl.natives>
+                <installer.type>exe</installer.type>
+                <icon.path>${project.build.directory}/classes/icons/win-icons.ico</icon.path>
             </properties>
         </profile>
     </profiles>
@@ -529,43 +545,130 @@
     </dependencyManagement>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <source>20</source>
-                    <target>20</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.4.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>javadoc</goal>
-                        </goals>
-                        <phase>package</phase>
+    <plugins>
+        <!-- Maven Compiler Plugin -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.11.0</version>
+            <configuration>
+                <source>22</source>
+                <target>22</target>
+            </configuration>
+        </plugin>
+
+        <!-- Maven Javadoc Plugin -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.4.0</version>
+            <configuration>
+                <failOnError>false</failOnError>
+                <additionalJOptions>-Xdoclint:none</additionalJOptions>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>attach-javadocs</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>jar</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+
+        <!-- Maven Dependency Plugin -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>3.5.0</version>
+            <executions>
+                <execution>
+                    <id>copy-dependencies</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>copy-dependencies</goal>
+                    </goals>
+                    <configuration>
+                        <outputDirectory>${project.build.directory}/mods</outputDirectory>
+                        <includeScope>runtime</includeScope>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+
+        <!-- Maven Antrun Plugin -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+                <execution>
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                    <configuration>
+                        <target>
+                            <echo>project.build.outputDirectory: ${project.build.outputDirectory}</echo>
+                            <echo>project.build.directory: ${project.build.directory}</echo>
+                            <echo>java.home: ${java.home}</echo>
+                        </target>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+
+        <!-- Exec Maven Plugin for LWJGL and jpackage -->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.1.0</version>
+            <executions>
+                <execution>
+                    <id>create-installer</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>exec</goal>
+                    </goals>
+                    <configuration>
+                    <executable>${java.home}/bin/jpackage</executable>
+                    <java.options>-XstartOnFirstThread</java.options>
+                        <commandlineArgs>
+                            --type ${installer.type}
+                            --dest "${project.build.directory}/installer"
+                            --name "Pot Pot Golf"
+                            --icon "${icon.path}"
+                            --app-version "${app.version}"
+                            --input "${project.build.directory}"
+                            --main-jar "${project.build.finalName}.jar"
+                            --main-class "${main.class}"
+                            --module-path "${project.build.directory}/mods:${java.home}/jmods"
+                            --add-modules java.base,java.desktop,java.management,jdk.unsupported
+                        --java-options "${java.options}"
+                        
+                        </commandlineArgs>
+                    </configuration>
                     </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <executable>java</executable>
-                    <arguments>
-                        <argument>-XstartOnFirstThread</argument>
-                        <argument>-classpath</argument>
-                        <classpath/>
-                        <argument>com.pot_pot_golf.Game.Launcher</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+                    <execution>
+          <id>default-cli</id>  <!-- This lets "mvn exec:exec" pick it up by default -->
+          <goals>
+            <goal>exec</goal>
+          </goals>
+          <configuration>
+            <executable>java</executable>
+            <arguments>
+              <argument>-XstartOnFirstThread</argument> <!-- macOS / GLFW requirement -->
+              <argument>-cp</argument>
+              <!-- main jar plus your copied dependencies -->
+              <argument>${project.build.finalName}.jar:${project.build.directory}/mods/*</argument>
+              <argument>${main.class}</argument>
+            </arguments>
+          </configuration>
+        </execution>
+    </executions>
+
+        </plugin>
+    </plugins>
+</build>
 </project>

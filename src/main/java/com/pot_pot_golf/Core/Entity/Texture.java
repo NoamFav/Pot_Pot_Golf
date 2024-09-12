@@ -3,10 +3,10 @@ package com.pot_pot_golf.Core.Entity;
 /**
  * The texture class.
  * This class is responsible for the textures of the game.
+ *
+ * @param id The id of the texture.
  */
-public class Texture {
-
-    private int id; // The id of the texture.
+public record Texture(int id) {
 
     /**
      * The constructor of the texture.
@@ -14,13 +14,6 @@ public class Texture {
      *
      * @param id The id of the texture.
      */
-    public Texture(int id) {
-        this.id = id;
+    public Texture {
     }
-
-    public int getId() {
-        return id;
-    }
-
-    @SuppressWarnings("unused") public void setId(int id) {this.id = id;}
 }

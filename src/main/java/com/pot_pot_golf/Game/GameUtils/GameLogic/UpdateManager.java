@@ -1,7 +1,6 @@
 package com.pot_pot_golf.Game.GameUtils.GameLogic;
 
 import com.pot_pot_golf.Core.Entity.Entity;
-import com.pot_pot_golf.Core.Entity.SceneManager;
 import com.pot_pot_golf.Game.GameUtils.Consts;
 import com.pot_pot_golf.Game.GameUtils.FieldManager.*;
 import org.jetbrains.annotations.NotNull;
@@ -14,8 +13,6 @@ import java.util.List;
  * This class is responsible for updating the game each frame.
  */
 public class UpdateManager {
-
-    private final SceneManager scene;
 
     private final EntitiesManager entitiesManager;
     private final GameVarManager gameVarManager;
@@ -30,50 +27,11 @@ public class UpdateManager {
      * @param context The main field manager.
      */
     public UpdateManager(@NotNull MainFieldManager context) {
-        this.scene = context.getScene();
-
         this.entitiesManager = context.getEntitiesManager();
         this.gameVarManager = context.getGameVarManager();
         this.pathManager = context.getPathManager();
         this.guiElementManager = context.getGuiElementManager();
         this.gameStateManager = context.getGameStateManager();
-    }
-
-    /**
-     * Make the day and night cycle.
-     * Not used for now.
-     */
-    public void daytimeCycle() {
-        scene.increaseSpotAngle(0.01f);
-        if (scene.getSpotAngle() > 4) {
-            scene.setSpotInc(-1);
-        } else if (scene.getSpotAngle() < -4) {
-            scene.setSpotInc(1);
-        }
-
-        scene.increaseLightAngle(1.1f);
-        scene.setLightAngle(65);
-        scene.getDirectionalLight().setIntensity(0.5f);
-
-//        if (scene.getLightAngle() > 90) {
-//            scene.getDirectionalLight().setIntensity(0);
-//            if (scene.getLightAngle() >= 360)
-//                scene.setLightAngle(-90);
-//        } else if (scene.getLightAngle() <= -80 || scene.getLightAngle() >= 80) {
-//            float factor = 1 - (Math.abs(scene.getLightAngle()) - 80) / 10.0f;
-//            scene.getDirectionalLight().setIntensity(factor);
-//            scene.getDirectionalLight().getColor().x = Math.max(factor, 0.9f);
-//            scene.getDirectionalLight().getColor().z = Math.max(factor, 0.5f);
-//        } else {
-//            scene.getDirectionalLight().setIntensity(1);
-//            scene.getDirectionalLight().getColor().x = 1;
-//            scene.getDirectionalLight().getColor().z = 1;
-//            scene.getDirectionalLight().getColor().y = 1;
-//        }
-//
-//        double angle = Math.toRadians(scene.getLightAngle());
-//        scene.getDirectionalLight().getDirection().x = (float) Math.sin(angle);
-//        scene.getDirectionalLight().getDirection().y = (float) Math.cos(angle);
     }
 
     /**

@@ -106,7 +106,6 @@ public class TextPane {
         }
     }
 
-    @SuppressWarnings("unused")
     public String getText() {
         return text;
     }

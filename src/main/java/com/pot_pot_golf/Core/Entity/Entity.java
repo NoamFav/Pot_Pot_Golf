@@ -12,7 +12,7 @@ import java.util.List;
 public class Entity {
     private final List<Model> model; // model of the entity
     private final Vector3f position, rotation; // position and rotation of the entity
-    private float scale; // scale of the entity
+    private final float scale; // scale of the entity
 
     /**
      * The constructor of the entity.
@@ -38,18 +38,6 @@ public class Entity {
     }
 
     /**
-     * Increases the position of the entity.
-     *
-     * @param x The x-axis position.
-     * @param y The y-axis position.
-     * @param z The z-axis position.
-     */
-    @SuppressWarnings("unused")
-    public void increasePosition(float x, float y, float z) {
-        this.position.add(x, y, z); // add the x, y, and z values to the position
-    }
-
-    /**
      * Set the position of the entity.
      *
      * @param x The x-axis position.
@@ -58,18 +46,6 @@ public class Entity {
      */
     public void setPosition(float x, float y, float z) {
         this.position.set(x, y, z); // set the x, y, and z values to the position
-    }
-
-    /**
-     * Increases the rotation of the entity.
-     *
-     * @param x The x-axis rotation.
-     * @param y The y-axis rotation.
-     * @param z The z-axis rotation.
-     */
-    @SuppressWarnings("unused")
-    public void increaseRotation(float x, float y, float z) {
-        this.rotation.add(x, y, z); // add the x, y, and z values to the rotation
     }
 
     /**
@@ -97,11 +73,6 @@ public class Entity {
 
     public float getScale() {
         return scale;
-    }
-
-    @SuppressWarnings("unused")
-    public void setScale(float scale) {
-        this.scale = scale;
     }
 
     public void setPosition(Vector3f startPoint) {
