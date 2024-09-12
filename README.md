@@ -211,7 +211,7 @@ It's rather big, so you will have to zoom in to see everything.
 - Due to small friction, the bots may not be able to reach the hole due to hills. (This will be fixed in the future by improving the AIs by taking the height into account for decision-making.)
 
 ## Credits & License
-Portions of this code are based on a tutorial by DevGenie Academy.
+This project was initially inspired by a tutorial by DevGenie Academy, but most of the code has been significantly modified.
 
 Cartoon Texture terrain image created by upklyak (Free license) —
 <a href="https://www.freepik.com/free-vector/game-textures-water-green-lawn-sand-grass-meadow-with-flowers-seamless-patterns-top-view-cartoon-textured-backgrounds-blue-liquid-field-desert-surface-graphic-ui-gui-vector-layers_21267469.htm#query=texture&position=8&from_view=author&uuid=fb39b549-3ad8-46e1-ba38-41fd1a95803a">Cartoon Vectors by Freepik</a>
