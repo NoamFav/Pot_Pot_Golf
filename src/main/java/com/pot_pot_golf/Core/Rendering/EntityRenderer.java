@@ -121,7 +121,7 @@ public class EntityRenderer implements IRenderer<Entity> {
         }
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0); // Activate the texture.
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, model.getTexture().getId()); // Bind the texture.
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, model.getTexture().id()); // Bind the texture.
         GL11.glEnable(GL11.GL_BLEND); // Enable blending.
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); // Set the blending function.
     }

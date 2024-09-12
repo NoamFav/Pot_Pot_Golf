@@ -1,9 +1,7 @@
 package com.pot_pot_golf.Core.Entity;
 
-import com.pot_pot_golf.Core.Lighting.DirectionalLight;
 import com.pot_pot_golf.Core.Entity.Terrain.Terrain;
-import com.pot_pot_golf.Game.GameUtils.Consts;
-import org.joml.Vector3f;
+import com.pot_pot_golf.Core.Lighting.DirectionalLight;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,15 +13,11 @@ import java.util.List;
 
 public class SceneManager {
 
-    private List<Entity> entities; // The list of entities.
-    private List<Terrain> terrains; // The list of terrains.
+    private final List<Entity> entities; // The list of entities.
+    private final List<Terrain> terrains; // The list of terrains.
     private static Texture defaultTexture; // The default texture.
 
-    private DirectionalLight directionalLight; // The directional light.
-    private Vector3f ambientLight; // The ambient light.
-    private float lightAngle; // The light angle.
-    private float spotAngle = 0; // The spot angle.
-    private float spotInc = 1; // The spot increment.
+    private DirectionalLight directionalLight; // The directional light.// The ambient light.
 
     private static float[][] heightMap; // The height map.
     private static List<float[]> treePositions; // The tree positions.
@@ -32,13 +26,10 @@ public class SceneManager {
      * The constructor of the scene manager.
      * It initializes the entities, terrains, and the ambient light.
      *
-     * @param lightAngle The light angle.
      */
-    public SceneManager(float lightAngle) {
+    public SceneManager() {
         entities = new ArrayList<>();
         terrains = new ArrayList<>();
-        ambientLight = Consts.AMBIENT_LIGHT;
-        this.lightAngle = lightAngle;
     }
 
     public static float[][] getHeightMap() {return heightMap;}
@@ -49,11 +40,6 @@ public class SceneManager {
     public void addTerrain(Terrain terrain) {terrains.add(terrain);}
     public DirectionalLight getDirectionalLight() {return directionalLight;}
     public void setDirectionalLight(DirectionalLight directionalLight) {this.directionalLight = directionalLight;}
-    public void setLightAngle(float lightAngle) {this.lightAngle = lightAngle;}
-    public void increaseLightAngle(float lightAngle) {this.lightAngle += lightAngle;}
-    public float getSpotAngle() {return spotAngle;}
-    public void increaseSpotAngle(float spotAngle) {this.spotAngle *= spotAngle;}
-    public void setSpotInc(float spotInc) {this.spotInc = spotInc;}
     public void setDefaultTexture(Texture defaultTexture) {SceneManager.defaultTexture = defaultTexture;}
     public static Texture getDefaultTexture() { return defaultTexture;}
     public List<float[]> getTreePositions() { return treePositions;}
