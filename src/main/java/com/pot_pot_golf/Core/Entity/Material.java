@@ -10,10 +10,10 @@ import org.joml.Vector4f;
 public class Material {
 
 
-    private Vector4f ambientColor; // ambient color of the material (color of the material in the shadow)
-    private Vector4f diffuseColor; // diffuse color of the material (color of the material in the light)
-    private Vector4f specularColor; // specular color of the material (color of the material in the reflection)
-    private float reflectance; // reflectance of the material (how much light is reflected)
+    private final Vector4f ambientColor; // ambient color of the material (color of the material in the shadow)
+    private final Vector4f diffuseColor; // diffuse color of the material (color of the material in the light)
+    private final Vector4f specularColor; // specular color of the material (color of the material in the reflection)
+    private final float reflectance; // reflectance of the material (how much light is reflected)
     private Texture texture; // texture of the material
     private boolean disableCulling; // disable culling
 
@@ -83,32 +83,16 @@ public class Material {
         return ambientColor;
     }
 
-    public void setAmbientColor(Vector4f ambientColor) {
-        this.ambientColor = ambientColor;
-    }
-
     public Vector4f getDiffuseColor() {
         return diffuseColor;
-    }
-
-    public void setDiffuseColor(Vector4f diffuseColor) {
-        this.diffuseColor = diffuseColor;
     }
 
     public Vector4f getSpecularColor() {
         return specularColor;
     }
 
-    public void setSpecularColor(Vector4f specularColor) {
-        this.specularColor = specularColor;
-    }
-
     public float getReflectance() {
         return reflectance;
-    }
-
-    public void setReflectance(float reflectance) {
-        this.reflectance = reflectance;
     }
 
     public Texture getTexture() {

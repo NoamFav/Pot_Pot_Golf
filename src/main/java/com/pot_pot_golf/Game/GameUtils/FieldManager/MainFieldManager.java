@@ -54,7 +54,7 @@ public class MainFieldManager {
         renderer = new RenderManager();
         window = Launcher.getWindow();
         loader = new ObjectLoader();
-        scene = new SceneManager(-90);
+        scene = new SceneManager();
         camera = new Camera();
         pathfinder = new HeightMapPathfinder();
         collisionsDetector = new CollisionsDetector();
