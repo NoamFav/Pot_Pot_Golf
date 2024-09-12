@@ -33,7 +33,6 @@ public class Model {
      * @param vertexCount The vertex count of the model.
      * @param texture The texture of the model.
      */
-    @SuppressWarnings("unused")
     public Model(int id, int vertexCount, Texture texture) {
         this.id = id;
         this.vertexCount = vertexCount;
@@ -48,7 +47,6 @@ public class Model {
      * @param model The model to copy.
      * @param texture The texture of the model.
      */
-    @SuppressWarnings("unused")
     public Model(@NotNull Model model, Texture texture) {
         this.id = model.getId();
         this.vertexCount = model.getVertexCount();
@@ -91,7 +89,6 @@ public class Model {
      * @param texture The texture to set.
      * @param reflectance The reflectance to set.
      */
-    @SuppressWarnings("unused")
     public void setTexture(Texture texture, float reflectance) {
         this.material.setTexture(texture); // Set the texture.
         this.material.setReflectance(reflectance); // Set the reflectance.

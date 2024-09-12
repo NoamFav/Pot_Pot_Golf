@@ -174,7 +174,6 @@ public class WindowManager {
      *
      * @return The title of the window.
      */
-    @SuppressWarnings("unused")
     public String getTitle() {
         return title;
     }
@@ -224,7 +223,6 @@ public class WindowManager {
      *
      * @param vSync The vSync of the window.
      */
-    @SuppressWarnings("unused")
     public void set_vSync(boolean vSync) {
         this.vSync = vSync;
     }
@@ -261,12 +259,10 @@ public class WindowManager {
      *
      * @return The projection matrix of the window manager.
      */
-    @SuppressWarnings("unused")
     public Matrix4f getProjectionMatrix() {
         return projectionMatrix;
     }
 
-    @SuppressWarnings("unused")
     public boolean isAntiAliasing() {
         return antiAliasing;
     }
@@ -291,7 +287,6 @@ public class WindowManager {
      * @param matrix The matrix to update.
      * @return The updated projection matrix.
      */
-    @SuppressWarnings("unused")
     public Matrix4f updateProjectionMatrix(@NotNull Matrix4f matrix, int width, int height) {
         float aspectRatio = (float) width / (float) height; // Calculate the aspect ratio.
         return matrix.setPerspective(Consts.FOV, aspectRatio, Consts.Z_NEAR, Consts.Z_FAR); // Set the perspective.
