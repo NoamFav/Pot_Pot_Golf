@@ -11,7 +11,6 @@ import java.util.function.BiFunction;
  * All key settings are stored here.
  * Made to be easily accessible and modifiable.
  */
-@SuppressWarnings("unused")
 public class Consts {
 
     public static String Title = "Pot Pot Golf"; // Title of the game
@@ -51,7 +50,6 @@ public class Consts {
     // Configuration for the lighting
     // Unused for now (not really useful in a golf game)
     public static final int MAX_POINT_LIGHTS = 5; // Maximum number of point lights
-    public static final int MAX_SPOT_LIGHTS = 5; // Maximum number of spot-lights
 
     // Configuration for the camera
     // You can change the FOV to make the game more immersive

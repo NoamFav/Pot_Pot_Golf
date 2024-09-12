@@ -44,7 +44,6 @@ public class Entity {
      * @param y The y-axis position.
      * @param z The z-axis position.
      */
-    @SuppressWarnings("unused")
     public void increasePosition(float x, float y, float z) {
         this.position.add(x, y, z); // add the x, y, and z values to the position
     }
@@ -67,7 +66,6 @@ public class Entity {
      * @param y The y-axis rotation.
      * @param z The z-axis rotation.
      */
-    @SuppressWarnings("unused")
     public void increaseRotation(float x, float y, float z) {
         this.rotation.add(x, y, z); // add the x, y, and z values to the rotation
     }
@@ -99,7 +97,6 @@ public class Entity {
         return scale;
     }
 
-    @SuppressWarnings("unused")
     public void setScale(float scale) {
         this.scale = scale;
     }

@@ -6,8 +6,6 @@ import com.pot_pot_golf.Core.Entity.Terrain.HeightMap;
 import com.pot_pot_golf.Core.Entity.Terrain.Terrain;
 import com.pot_pot_golf.Core.Entity.Terrain.TerrainTexture;
 import com.pot_pot_golf.Core.Lighting.DirectionalLight;
-import com.pot_pot_golf.Core.Lighting.PointLight;
-import com.pot_pot_golf.Core.Lighting.SpotLight;
 import com.pot_pot_golf.Core.ObjectLoader;
 import com.pot_pot_golf.Game.GameUtils.Consts;
 import com.pot_pot_golf.Core.Utils.StartEndPoint;
@@ -132,29 +130,18 @@ public class InitManager {
      * Set up the light for the game.
      * Not used for now.
      */
-    @SuppressWarnings("unused")
+
     public void setUpLight() {
         float lightIntensity = 10f;
 
         //point light
-        Vector3f lightPosition = new Vector3f(Consts.SIZE_X / 2, 10, 0);
-        Vector3f lightColor = new Vector3f(1, 1, 1);
-        PointLight pointLight = new PointLight(lightColor, lightPosition, lightIntensity, 0, 0, 1);
-
-        //spotlight 1
-        Vector3f coneDir = new Vector3f(0, -50, 0);
-        float cutoff = (float) Math.cos(Math.toRadians(140));
-        lightIntensity = 2;
-        SpotLight spotLight = new SpotLight(new PointLight(new Vector3f(0, 0.25f, 0), new Vector3f(0, 0, 0), lightIntensity), coneDir, cutoff);
-        SpotLight spotLight2 = new SpotLight(new PointLight(new Vector3f(0.25f, 0, 0), new Vector3f(0, 0, 0), lightIntensity), coneDir, cutoff);
+        Vector3f lightPosition;
+        Vector3f lightColor;
 
         //directional light
         lightPosition = new Vector3f(-1, 10, 0);
         lightColor = new Vector3f(1, 1, 1);
         scene.setDirectionalLight(new DirectionalLight(lightColor, lightPosition, lightIntensity));
-
-        //scene.setPointLights(new PointLight[]{pointLight});
-        //scene.setSpotLights(new SpotLight[]{spotLight, spotLight2});
     }
 
     /**

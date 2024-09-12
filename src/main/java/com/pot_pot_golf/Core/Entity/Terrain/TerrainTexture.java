@@ -14,6 +14,4 @@ public class TerrainTexture {
     public int getId() {
         return id;
     }
-
-    @SuppressWarnings("unused") public void setId(int id) {this.id = id;}
 }

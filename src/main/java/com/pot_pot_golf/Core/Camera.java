@@ -26,7 +26,6 @@
          * @param position The position of the camera.
          * @param rotation The rotation of the camera.
          */
-        @SuppressWarnings("unused")
         public Camera(Vector3f position, Vector3f rotation) {
             this.position = position;
             this.rotation = rotation;
@@ -63,7 +62,6 @@
          * @param y The y-axis position.
          * @param z The z-axis position.
          */
-        @SuppressWarnings("unused")
         public void setPosition(float x, float y, float z) {
             position.set(x, y, z);
         }
