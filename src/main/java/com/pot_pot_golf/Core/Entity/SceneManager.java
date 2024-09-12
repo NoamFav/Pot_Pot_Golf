@@ -1,7 +1,6 @@
 package com.pot_pot_golf.Core.Entity;
 
 import com.pot_pot_golf.Core.Entity.Terrain.Terrain;
-import com.pot_pot_golf.Core.Lighting.DirectionalLight;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +15,6 @@ public class SceneManager {
     private final List<Entity> entities; // The list of entities.
     private final List<Terrain> terrains; // The list of terrains.
     private static Texture defaultTexture; // The default texture.
-
-    private DirectionalLight directionalLight; // The directional light.// The ambient light.
 
     private static float[][] heightMap; // The height map.
     private static List<float[]> treePositions; // The tree positions.
@@ -38,8 +35,6 @@ public class SceneManager {
     public void addEntity(Entity entity) {entities.add(entity);}
     public List<Terrain> getTerrains() {return terrains;}
     public void addTerrain(Terrain terrain) {terrains.add(terrain);}
-    public DirectionalLight getDirectionalLight() {return directionalLight;}
-    public void setDirectionalLight(DirectionalLight directionalLight) {this.directionalLight = directionalLight;}
     public void setDefaultTexture(Texture defaultTexture) {SceneManager.defaultTexture = defaultTexture;}
     public static Texture getDefaultTexture() { return defaultTexture;}
     public List<float[]> getTreePositions() { return treePositions;}

@@ -16,20 +16,12 @@ struct Material { // Material properties
     float reflectance;
 };
 
-struct DirectionalLight { // Directional light properties
-    vec3 color;
-    vec3 direction;
-    float intensity;
-};
-
 
 uniform sampler2D textures[MAX_TEXTURES]; // Array of textures
 uniform sampler2D blendMap;
 
 uniform vec3 ambientLight;
 uniform Material material;
-uniform float specularPower;
-uniform DirectionalLight directionalLight;
 
 vec4 ambientC;
 vec4 diffuseC;
@@ -89,32 +81,9 @@ void setupColor(Material material, vec2 textCoords) {
     }
 }
 
-
-vec4 calcLightColor(vec3 light_color, float light_intensity, vec3 position, vec3 to_light_dir, vec3 normal) { // Calculate the color of the light
-    vec4 diffuseColor = vec4(0, 0, 0, 0); // Initialize the diffuse color
-    vec4 specularColor = vec4(0, 0, 0, 0); // Initialize the specular color
-
-    float diffuseFactor = max(dot(normal, to_light_dir), 0.0); // Calculate the diffuse factor
-    diffuseColor = diffuseC * vec4(light_color, 1) * light_intensity * diffuseFactor; // Calculate the diffuse color
-
-    vec3 camera_direction = normalize(-position); // Calculate the camera direction
-    vec3 from_light_dir = -to_light_dir; // Calculate the direction from the light
-    vec3 reflectedLight = normalize(reflect(from_light_dir, normal)); // Calculate the reflected light
-    float specularFactor = pow(max(dot(camera_direction, reflectedLight), 0.0), specularPower); // Calculate the specular factor
-    specularColor = specularC * light_intensity * specularFactor * material.reflectance * vec4(light_color, 1.0); // Calculate the specular color
-
-    return (diffuseColor + specularColor); // Return the light color
-}
-
-vec4 calcDirectionalLight(DirectionalLight light, vec3 position, vec3 normal) { // Calculate the color of the directional light
-    return calcLightColor(light.color, light.intensity, position, normalize(light.direction), normal); // Return the color of the light
-}
-
 void main()
 {
     setupColor(material, fragTextureCoord); // Setup the color of the fragment
 
-    vec4 diffuseSpecularComp = calcDirectionalLight(directionalLight, fragPos, fragNormal); // Calculate the color of the directional light
-
-    fragColor = ambientC * vec4(ambientLight, 1) + diffuseSpecularComp; // Calculate the final color of the fragment
+    fragColor = ambientC * vec4(ambientLight, 1); // Calculate the final color of the fragment
 }
