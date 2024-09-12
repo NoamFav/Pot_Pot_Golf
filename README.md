@@ -32,6 +32,11 @@ For running the game, you will have to run the launcher class in the game direct
 Specification for Mac users:
 - When running the class, you will have to pass as java arguments: -XstartOnFirstThread
 
+You can also run it by running the following command (untested in Windows and linux):
+```mvn exec:exec```
+
+Be sure to have run the ```mvn clean package``` command before running the game.
+
 ### DISCLAIMER: 
 
 - The keyboard bindings map out a standard QWERTY keyboard.
