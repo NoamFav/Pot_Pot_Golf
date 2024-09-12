@@ -80,20 +80,11 @@ public class WindowManager {
             throw new RuntimeException("Failed to create the GLFW window"); // Throw a runtime exception.
         }
 
-        // Get the video mode of the primary monitor.
-
-
         GLFW.glfwSetFramebufferSizeCallback(window, (window, width, height) -> { // Set the framebuffer size callback.
             this.width = width; // Set the width to the width.
             this.height = height; // Set the height to the height.
             this.setResized(true); // Set the resized to true.
         });
-
-//        GLFW.glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> { // Set the key callback.
-//            if (key == GLFW.GLFW_KEY_ESCAPE && action == GLFW.GLFW_RELEASE) { // If the key is escape and the action is release
-//                GLFW.glfwSetWindowShouldClose(window, true); // Set the window should close to true.
-//            }
-//        });
 
         if (maximized) { // If the window is maximized
             GLFW.glfwMaximizeWindow(window); // Maximize the window.
