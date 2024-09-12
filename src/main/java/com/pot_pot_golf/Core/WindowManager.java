@@ -1,7 +1,6 @@
 package com.pot_pot_golf.Core;
 
 import com.pot_pot_golf.Game.GameUtils.Consts;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -20,7 +19,10 @@ public class WindowManager {
     private int width, height; // The width and height of the window.
     private long window; // The window of the window manager.
 
-    private boolean firstResize, resized, vSync, antiAliasing; // The resized, vSync and antiAliasing of the window.
+    private boolean firstResize;
+    private boolean resized;
+    private final boolean vSync;
+    private boolean antiAliasing; // The resized, vSync and antiAliasing of the window.
 
     private final Matrix4f projectionMatrix; // The projection matrix of the window manager.
 
@@ -170,15 +172,6 @@ public class WindowManager {
     }
 
     /**
-     * Gets the title of the window.
-     *
-     * @return The title of the window.
-     */
-    public String getTitle() {
-        return title;
-    }
-
-    /**
      * Sets the title of the window.
      *
      * @param title The title of the window.
@@ -219,15 +212,6 @@ public class WindowManager {
     }
 
     /**
-     * Sets the vSync of the window.
-     *
-     * @param vSync The vSync of the window.
-     */
-    public void set_vSync(boolean vSync) {
-        this.vSync = vSync;
-    }
-
-    /**
      * Gets the width of the window.
      *
      * @return The width of the window.
@@ -254,19 +238,6 @@ public class WindowManager {
         return window;
     }
 
-    /**
-     * Gets the projection matrix of the window manager.
-     *
-     * @return The projection matrix of the window manager.
-     */
-    public Matrix4f getProjectionMatrix() {
-        return projectionMatrix;
-    }
-
-    public boolean isAntiAliasing() {
-        return antiAliasing;
-    }
-
     public void setAntiAliasing(boolean antiAliasing) {
         this.antiAliasing = antiAliasing;
     }
@@ -279,17 +250,6 @@ public class WindowManager {
     public Matrix4f updateProjectionMatrix() {
         float aspectRatio = (float) width / (float) height; // Calculate the aspect ratio.
         return projectionMatrix.setPerspective(Consts.FOV, aspectRatio, Consts.Z_NEAR, Consts.Z_FAR); // Set the perspective.
-    }
-
-    /**
-     * Updates the projection matrix of the window manager.
-     *
-     * @param matrix The matrix to update.
-     * @return The updated projection matrix.
-     */
-    public Matrix4f updateProjectionMatrix(@NotNull Matrix4f matrix, int width, int height) {
-        float aspectRatio = (float) width / (float) height; // Calculate the aspect ratio.
-        return matrix.setPerspective(Consts.FOV, aspectRatio, Consts.Z_NEAR, Consts.Z_FAR); // Set the perspective.
     }
 
     /**
