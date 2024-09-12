@@ -133,15 +133,7 @@ public class InitManager {
 
     public void setUpLight() {
         float lightIntensity = 10f;
-
-        //point light
-        Vector3f lightPosition;
-        Vector3f lightColor;
-
-        //directional light
-        lightPosition = new Vector3f(-1, 10, 0);
-        lightColor = new Vector3f(1, 1, 1);
-        scene.setDirectionalLight(new DirectionalLight(lightColor, lightPosition, lightIntensity));
+        scene.setDirectionalLight(new DirectionalLight(new Vector3f(1, 1, 1), new Vector3f(0, 0, 0), lightIntensity));
     }
 
     /**
