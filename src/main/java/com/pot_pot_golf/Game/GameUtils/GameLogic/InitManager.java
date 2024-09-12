@@ -5,11 +5,10 @@ import com.pot_pot_golf.Core.Entity.Terrain.BlendMapTerrain;
 import com.pot_pot_golf.Core.Entity.Terrain.HeightMap;
 import com.pot_pot_golf.Core.Entity.Terrain.Terrain;
 import com.pot_pot_golf.Core.Entity.Terrain.TerrainTexture;
-import com.pot_pot_golf.Core.Lighting.DirectionalLight;
 import com.pot_pot_golf.Core.ObjectLoader;
-import com.pot_pot_golf.Game.GameUtils.Consts;
 import com.pot_pot_golf.Core.Utils.StartEndPoint;
 import com.pot_pot_golf.Core.Utils.TerrainSwitch;
+import com.pot_pot_golf.Game.GameUtils.Consts;
 import com.pot_pot_golf.Game.GameUtils.FieldManager.*;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
@@ -124,15 +123,6 @@ public class InitManager {
         scene.addTerrain(terrain);
         scene.addTerrain(ocean);
         ocean.getModel().getMaterial().setDisableCulling(true);
-    }
-
-    /**
-     * Set up the light for the game.
-     * Not used for now.
-     */
-
-    public void setUpLight() {
-        scene.setDirectionalLight(new DirectionalLight(new Vector3f(1, 1, 1), new Vector3f(0, 0, 0), 10f));
     }
 
     /**
