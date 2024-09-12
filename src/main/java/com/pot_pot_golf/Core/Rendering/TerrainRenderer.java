@@ -4,8 +4,6 @@ import com.pot_pot_golf.Core.Camera;
 import com.pot_pot_golf.Core.Entity.Model;
 import com.pot_pot_golf.Core.Entity.Terrain.Terrain;
 import com.pot_pot_golf.Core.Lighting.DirectionalLight;
-import com.pot_pot_golf.Core.Lighting.PointLight;
-import com.pot_pot_golf.Core.Lighting.SpotLight;
 import com.pot_pot_golf.Core.ShaderManager;
 import com.pot_pot_golf.Game.GameUtils.Consts;
 import com.pot_pot_golf.Core.Utils.Transformation;
@@ -57,24 +55,19 @@ public class TerrainRenderer implements IRenderer<Terrain> {
         shader.createMaterialUniform("material"); // Creates the uniform for the material.
         shader.createUniform("specularPower"); // Creates the uniform for the specular power.
         shader.createDirectionalLightUniform("directionalLight"); // Creates the uniform for the directional light.
-
-        shader.createPointLightListUniform("pointLights", Consts.MAX_POINT_LIGHTS); // Creates the uniform for the point lights.
-        shader.createSpotLightListUniform("spotLights" , Consts.MAX_SPOT_LIGHTS); // Creates the uniform for the spotlights.
     }
 
     /**
      * Renders the entities.
      *
      * @param camera The camera of the game.
-     * @param pointLights The point lights of the game.
-     * @param spotLights The spotlights of the game.
      * @param directionalLight The directional light of the game.
      */
     @Override
-    public void render(Camera camera, PointLight[] pointLights, SpotLight[] spotLights, DirectionalLight directionalLight) {
+    public void render(Camera camera, DirectionalLight directionalLight) {
         shader.bind(); // Binds the shader.
         shader.setUniform("projectionMatrix", Launcher.getWindow().updateProjectionMatrix()); // Updates the projection matrix.
-        RenderManager.renderLight(pointLights, spotLights, directionalLight, shader); // Renders the lights.
+        RenderManager.renderLight(directionalLight, shader); // Renders the lights.
         for(Terrain terrain : terrains) { // Renders the entities.
             bind(terrain.getModel()); // Binds the entity.
             prepare(terrain, camera); // Prepares the entity.

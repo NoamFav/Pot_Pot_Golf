@@ -6,8 +6,6 @@ import com.pot_pot_golf.Core.Entity.Model;
 import com.pot_pot_golf.Core.Entity.SceneManager;
 import com.pot_pot_golf.Core.Entity.Terrain.Terrain;
 import com.pot_pot_golf.Core.Lighting.DirectionalLight;
-import com.pot_pot_golf.Core.Lighting.PointLight;
-import com.pot_pot_golf.Core.Lighting.SpotLight;
 import com.pot_pot_golf.Core.ShaderManager;
 import com.pot_pot_golf.Game.GameUtils.Consts;
 import com.pot_pot_golf.Core.WindowManager;
@@ -53,24 +51,12 @@ public class RenderManager {
     /**
      * Renders the light.
      *
-     * @param pointLights The point lights of the game.
-     * @param spotLights The spotlights of the game.
      * @param directionalLight The directional light of the game.
      * @param shader The shader of the game.
      */
-    public static void renderLight(PointLight[] pointLights, SpotLight[] spotLights, DirectionalLight directionalLight, @NotNull ShaderManager shader) {
+    public static void renderLight(DirectionalLight directionalLight, @NotNull ShaderManager shader) {
         shader.setUniform("ambientLight", Consts.AMBIENT_LIGHT); // Set the ambient light.
         shader.setUniform("specularPower", Consts.SPECULAR_POWER); // Set the specular power.
-
-        int numLights = pointLights != null ? pointLights.length : 0; // Get the number of point lights.
-        for (int i = 0 ; i < numLights; i++) { // For each point light.
-            shader.setUniform("pointLights[" + i + "]", pointLights[i]); // Set the point light uniform.
-        }
-
-        numLights = spotLights != null ? spotLights.length : 0; // Get the number of spotlights.
-        for (int i = 0 ; i < numLights; i++) { // For each spotlight.
-            shader.setUniform("spotLights[" + i + "]", spotLights[i]); // Set the spotlight uniform.
-        }
 
         shader.setUniform("directionalLight", directionalLight); // Set the directional light.
     }
@@ -88,8 +74,8 @@ public class RenderManager {
             window.setResized(true); // Set the window as resized.
         }
 
-        entityRenderer.render(camera, scene.getPointLights(), scene.getSpotLights(), scene.getDirectionalLight()); // Render the entities.
-        terrainRenderer.render(camera,  scene.getPointLights(), scene.getSpotLights(), scene.getDirectionalLight()); // Render the terrain.
+        entityRenderer.render(camera, scene.getDirectionalLight()); // Render the entities.
+        terrainRenderer.render(camera, scene.getDirectionalLight()); // Render the terrain.
     }
 
     /**

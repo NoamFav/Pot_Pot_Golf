@@ -11,7 +11,6 @@ import java.util.List;
  * This class is responsible for managing the entities of the game.
  * Stores the entities of the game.
  */
-@SuppressWarnings("unused")
 public class EntitiesManager {
     // EntitiesManager
     private final List<Entity> trees;
