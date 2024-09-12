@@ -4,7 +4,6 @@ import com.pot_pot_golf.Core.Camera;
 import com.pot_pot_golf.Core.Entity.Entity;
 import com.pot_pot_golf.Core.Entity.Model;
 import com.pot_pot_golf.Core.Entity.SceneManager;
-import com.pot_pot_golf.Core.Lighting.DirectionalLight;
 import com.pot_pot_golf.Core.ShaderManager;
 import com.pot_pot_golf.Core.Utils.Transformation;
 import com.pot_pot_golf.Core.Utils.Utils;
@@ -54,21 +53,18 @@ public class EntityRenderer implements IRenderer<Entity> {
         shader.createUniform("viewMatrix"); // Create the view matrix uniform.
         shader.createUniform("ambientLight"); // Create the ambient light uniform.
         shader.createMaterialUniform("material"); // Create the material uniform.
-        shader.createUniform("specularPower"); // Create the specular power uniform.
-        shader.createDirectionalLightUniform("directionalLight"); // Create the directional light uniform.
     }
 
     /**
      * Renders the entities.
      *
      * @param camera The camera of the game.
-     * @param directionalLight The directional light of the game.
      */
     @Override
-    public void render(Camera camera, DirectionalLight directionalLight) {
+    public void render(Camera camera) {
         shader.bind(); // Bind the shader.
         shader.setUniform("projectionMatrix", Launcher.getWindow().updateProjectionMatrix()); // Update the projection matrix.
-        RenderManager.renderLight(directionalLight, shader); // Render the lights.
+        RenderManager.renderLight(shader); // Render the lights.
 
         for (Model model : entities.keySet()) { // For each model in the entities.
             bind(model); // Bind the model.

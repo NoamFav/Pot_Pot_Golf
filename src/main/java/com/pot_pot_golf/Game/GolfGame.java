@@ -85,7 +85,6 @@ public class GolfGame implements ILogic {
 
         initManager.modelAndEntityCreation();
         initManager.terrainCreation();
-        initManager.setUpLight();
 
         vg = nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
 
@@ -191,7 +190,7 @@ public class GolfGame implements ILogic {
     @Override
     public void render() {
         context.getRenderer().clear();
-        context.getRenderer().render(context.getCamera(), context.getScene());
+        context.getRenderer().render(context.getCamera());
 
         context.getGuiElementManager().render(context.getGameStateManager());
 
