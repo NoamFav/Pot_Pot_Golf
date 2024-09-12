@@ -1,6 +1,6 @@
 <img src="icon.iconset/icon_512x512@2x.png" sizes="" width="200" height="200" alt=""/>
 
-# UM Project Golf
+# Pot Pot Golf !!!
 
 This project is a numerical solver for ordinary differential equations using the Runge-Kutta fourth order method.
 It is written in Java and built with Maven.
@@ -195,7 +195,7 @@ So if you are finding the game too hard or too easy, or even too slow, it will g
 ### UML Diagram
 
 The UML diagram for the entire project can be found in the main directory.
-It is a png file with the name umProjectDiagram.png.
+It is a png file with the name ProjectDiagram.png.
 It shows the classes and their relationships.
 It's rather big, so you will have to zoom in to see everything.
 
@@ -235,5 +235,3 @@ Background music created by Fernweh Goldfish (Royalty-free license) —
 - Evi Levels
 - Ahmet Akman
 - Nehir Sarihan
-
-<img src="icon.iconset/maastricht-logo.png" alt="">
