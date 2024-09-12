@@ -1,1 +1,0 @@
-moduleSearchIndex = [{"l":"com.pot_pot_golf"}];updateSearchResults();
