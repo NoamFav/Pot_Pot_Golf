@@ -3,12 +3,10 @@ package com.pot_pot_golf.Core.Rendering;
 import com.pot_pot_golf.Core.Camera;
 import com.pot_pot_golf.Core.Entity.Entity;
 import com.pot_pot_golf.Core.Entity.Model;
-import com.pot_pot_golf.Core.Entity.SceneManager;
 import com.pot_pot_golf.Core.Entity.Terrain.Terrain;
-import com.pot_pot_golf.Core.Lighting.DirectionalLight;
 import com.pot_pot_golf.Core.ShaderManager;
-import com.pot_pot_golf.Game.GameUtils.Consts;
 import com.pot_pot_golf.Core.WindowManager;
+import com.pot_pot_golf.Game.GameUtils.Consts;
 import com.pot_pot_golf.Game.Launcher;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
@@ -51,31 +49,26 @@ public class RenderManager {
     /**
      * Renders the light.
      *
-     * @param directionalLight The directional light of the game.
      * @param shader The shader of the game.
      */
-    public static void renderLight(DirectionalLight directionalLight, @NotNull ShaderManager shader) {
+    public static void renderLight(@NotNull ShaderManager shader) {
         shader.setUniform("ambientLight", Consts.AMBIENT_LIGHT); // Set the ambient light.
-        shader.setUniform("specularPower", Consts.SPECULAR_POWER); // Set the specular power.
-
-        shader.setUniform("directionalLight", directionalLight); // Set the directional light.
     }
 
     /**
      * Renders the game.
      *
      * @param camera The camera of the game.
-     * @param scene The scene of the game.
      */
-    public void render(Camera camera, SceneManager scene) {
+    public void render(Camera camera) {
 
         if (window.isResized()) { // If the window is resized.
             GL11.glViewport(0, 0, window.getWidth(), window.getHeight()); // Set the viewport.
             window.setResized(true); // Set the window as resized.
         }
 
-        entityRenderer.render(camera, scene.getDirectionalLight()); // Render the entities.
-        terrainRenderer.render(camera, scene.getDirectionalLight()); // Render the terrain.
+        entityRenderer.render(camera); // Render the entities.
+        terrainRenderer.render(camera); // Render the terrain.
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.pot_pot_golf.Core;
 
 import com.pot_pot_golf.Core.Entity.Material;
-import com.pot_pot_golf.Core.Lighting.DirectionalLight;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -51,19 +50,6 @@ public class ShaderManager {
             throw new Exception("Could not find uniform: " + uniformName); // Throw an exception
         }
         uniforms.put(uniformName, uniformLocation); // Add the uniform to the map of uniforms
-    }
-
-    /**
-     * Creates a directional light uniform.
-     *
-     * @param uniformName The name of the uniform.
-     * @throws Exception If the uniform could not be created.
-     */
-    public void createDirectionalLightUniform(String uniformName) throws Exception {
-        // For the uniform of the directional light
-        createUniform(uniformName + ".color"); // Create the color uniform
-        createUniform(uniformName + ".direction"); // Create the direction uniform
-        createUniform(uniformName + ".intensity"); // Create the intensity uniform
     }
 
     /**
@@ -119,16 +105,6 @@ public class ShaderManager {
      * @param uniformName The name of the uniform.
      * @param value The value of the uniform.
      */
-    public void setUniform(String uniformName, boolean value) {
-        GL20.glUniform1f(uniforms.get(uniformName), value ? 1 : 0); // Set the uniform
-    }
-
-    /**
-     * Sets a uniform.
-     *
-     * @param uniformName The name of the uniform.
-     * @param value The value of the uniform.
-     */
     public void setUniform(String uniformName, int value) {
         GL20.glUniform1i(uniforms.get(uniformName), value); // Set the uniform
     }
@@ -156,19 +132,6 @@ public class ShaderManager {
         setUniform(uniformName + ".specular", material.getSpecularColor()); // Set the specular color uniform
         setUniform(uniformName + ".hasTexture", material.hasTexture() ? 1 : 0); // Set the hasTexture uniform
         setUniform(uniformName + ".reflectance", material.getReflectance()); // Set the reflectance uniform
-    }
-
-    /**
-     * Sets the uniforms of a direction Light.
-     *
-     * @param uniformName The name of the uniform.
-     * @param directionalLight The directional light to set.
-     */
-    public void setUniform(String uniformName, @NotNull DirectionalLight directionalLight) {
-        // For the uniform of the directional light
-        setUniform(uniformName + ".color", directionalLight.getColor()); // Set the color uniform
-        setUniform(uniformName + ".direction", directionalLight.getDirection()); // Set the direction uniform
-        setUniform(uniformName + ".intensity", directionalLight.getIntensity()); // Set the intensity uniform
     }
 
     /**

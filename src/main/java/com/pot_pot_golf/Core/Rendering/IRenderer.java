@@ -2,7 +2,6 @@ package com.pot_pot_golf.Core.Rendering;
 
 import com.pot_pot_golf.Core.Camera;
 import com.pot_pot_golf.Core.Entity.Model;
-import com.pot_pot_golf.Core.Lighting.DirectionalLight;
 
 /**
  * The interface for the renderer.
@@ -11,7 +10,7 @@ import com.pot_pot_golf.Core.Lighting.DirectionalLight;
  */
 public interface IRenderer<T> {
     void init() throws Exception;
-    void render(Camera camera, DirectionalLight directionalLight);
+    void render(Camera camera);
     void cleanup();
 
     void bind(Model model);
