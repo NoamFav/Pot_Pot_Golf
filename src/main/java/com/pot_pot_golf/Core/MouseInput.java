@@ -99,7 +99,6 @@ public class MouseInput {
      *
      * @return True if the left button is pressed, false otherwise.
      */
-    @SuppressWarnings("unused")
     public boolean isLeftButtonPressed() {
         return leftButtonPressed;
     }

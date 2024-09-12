@@ -5,10 +5,7 @@ import com.pot_pot_golf.Core.Entity.Entity;
 import com.pot_pot_golf.Core.Entity.Model;
 import com.pot_pot_golf.Core.Entity.SceneManager;
 import com.pot_pot_golf.Core.Lighting.DirectionalLight;
-import com.pot_pot_golf.Core.Lighting.PointLight;
-import com.pot_pot_golf.Core.Lighting.SpotLight;
 import com.pot_pot_golf.Core.ShaderManager;
-import com.pot_pot_golf.Game.GameUtils.Consts;
 import com.pot_pot_golf.Core.Utils.Transformation;
 import com.pot_pot_golf.Core.Utils.Utils;
 import com.pot_pot_golf.Game.Launcher;
@@ -59,24 +56,19 @@ public class EntityRenderer implements IRenderer<Entity> {
         shader.createMaterialUniform("material"); // Create the material uniform.
         shader.createUniform("specularPower"); // Create the specular power uniform.
         shader.createDirectionalLightUniform("directionalLight"); // Create the directional light uniform.
-
-        shader.createPointLightListUniform("pointLights", Consts.MAX_POINT_LIGHTS); // Create the point light list uniform.
-        shader.createSpotLightListUniform("spotLights" , Consts.MAX_SPOT_LIGHTS); // Create the spotlight list uniform.
     }
 
     /**
      * Renders the entities.
      *
      * @param camera The camera of the game.
-     * @param pointLights The point lights of the game.
-     * @param spotLights The spotlights of the game.
      * @param directionalLight The directional light of the game.
      */
     @Override
-    public void render(Camera camera, PointLight[] pointLights, SpotLight[] spotLights, DirectionalLight directionalLight) {
+    public void render(Camera camera, DirectionalLight directionalLight) {
         shader.bind(); // Bind the shader.
         shader.setUniform("projectionMatrix", Launcher.getWindow().updateProjectionMatrix()); // Update the projection matrix.
-        RenderManager.renderLight(pointLights, spotLights, directionalLight, shader); // Render the lights.
+        RenderManager.renderLight(directionalLight, shader); // Render the lights.
 
         for (Model model : entities.keySet()) { // For each model in the entities.
             bind(model); // Bind the model.

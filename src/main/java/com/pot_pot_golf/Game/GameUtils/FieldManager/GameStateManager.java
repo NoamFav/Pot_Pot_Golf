@@ -5,7 +5,7 @@ package com.pot_pot_golf.Game.GameUtils.FieldManager;
  * This class is responsible for managing the game state of the game.
  * Stores the game state variables.
  */
-@SuppressWarnings("unused")
+
 public class GameStateManager {
     // Game state variables
     private boolean canMove;

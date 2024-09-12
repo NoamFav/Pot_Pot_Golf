@@ -12,7 +12,6 @@ import java.util.List;
  * This class is responsible for managing the game variables of the game.
  * This class is used to store the game logic variables.
  */
-@SuppressWarnings("unused")
 public class GameVarManager {
 
     // Game logic variables

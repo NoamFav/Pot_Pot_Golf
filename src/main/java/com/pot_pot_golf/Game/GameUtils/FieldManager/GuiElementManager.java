@@ -17,7 +17,6 @@ import static com.pot_pot_golf.Game.GolfGame.debugMode;
  * This class is responsible for managing the GUI elements of the game.
  * Stores the GUI elements of the game.
  */
-@SuppressWarnings("unused")
 public class GuiElementManager {
     private Title title;
     private final List<Button> menuButtons;
@@ -165,37 +164,27 @@ public class GuiElementManager {
         debugButton.setText(debugMode ? "Debug: On" : "Debug: Off");
     }
 
-    public Title getTitle() {return title;}
     public void setTitle(Title title) {this.title = title;}
-    public List<Button> getMenuButtons() {return menuButtons;}
-    public List<Button> getInGameMenuButtons() {return inGameMenuButtons;}
+
     public void addMenuButton(Button button) {menuButtons.add(button);}
     public void addInGameMenuButton(Button button) {inGameMenuButtons.add(button);}
     public void clearMenuButtons() {menuButtons.clear();}
     public void clearInGameMenuButtons() {inGameMenuButtons.clear();}
-    public Button getStartButton() {return startButton;}
     public void setStartButton(Button startButton) {this.startButton = startButton;}
-    public Button getDebugButton() {return debugButton;}
     public void setDebugButton(Button debugButton) {this.debugButton = debugButton;}
-    public Button getTwoPlayerButton() {return twoPlayerButton;}
     public void setTwoPlayerButton(Button twoPlayerButton) {this.twoPlayerButton = twoPlayerButton;}
-    public Button getAiBotButton() {return aiBotButton;}
     public void setAiBotButton(Button aiBotButton) {this.aiBotButton = aiBotButton;}
-    public Button getBotButton() {return botButton;}
     public void setBotButton(Button botButton) {this.botButton = botButton;}
     public Button getSoundButton() {return soundButton;}
     public void setSoundButton(Button soundButton) {this.soundButton = soundButton;}
     public Button getSoundButtonInGame() {return soundButtonInGame;}
     public void setSoundButtonInGame(Button soundButtonInGame) {this.soundButtonInGame = soundButtonInGame;}
-    public Button getApplyButton() {return applyButton;}
     public void setApplyButton(Button applyButton) {this.applyButton = applyButton;}
     public TextField getVxTextField() {return vxTextField;}
     public void setVxTextField(TextField vxTextField) {this.vxTextField = vxTextField;}
     public TextField getVzTextField() {return vzTextField;}
     public void setVzTextField(TextField vzTextField) {this.vzTextField = vzTextField;}
-    public TextPane getVxTextPane() {return vxTextPane;}
     public void setVxTextPane(TextPane vxTextPane) {this.vxTextPane = vxTextPane;}
-    public TextPane getVzTextPane() {return vzTextPane;}
     public void setVzTextPane(TextPane vzTextPane) {this.vzTextPane = vzTextPane;}
     public TextPane getInfoTextPane() {return infoTextPane;}
     public void setInfoTextPane(TextPane infoTextPane) {this.infoTextPane = infoTextPane;}
