@@ -1,11 +1,19 @@
 package com.pot_pot_golf.Game;
 
+import static org.lwjgl.nanovg.NanoVGGL3.NVG_ANTIALIAS;
+import static org.lwjgl.nanovg.NanoVGGL3.NVG_STENCIL_STROKES;
+import static org.lwjgl.nanovg.NanoVGGL3.nvgCreate;
+import static org.lwjgl.nanovg.NanoVGGL3.nvgDelete;
+
+import org.joml.Vector3f;
+import org.lwjgl.glfw.GLFW;
+
 import com.pot_pot_golf.Core.AudioManager;
-import com.pot_pot_golf.Core.Entity.Entity;
-import com.pot_pot_golf.Core.Entity.Terrain.Terrain;
-import com.pot_pot_golf.Core.Entity.Texture;
 import com.pot_pot_golf.Core.ILogic;
 import com.pot_pot_golf.Core.MouseInput;
+import com.pot_pot_golf.Core.Entity.Entity;
+import com.pot_pot_golf.Core.Entity.Texture;
+import com.pot_pot_golf.Core.Entity.Terrain.Terrain;
 import com.pot_pot_golf.Game.GameUtils.Consts;
 import com.pot_pot_golf.Game.GameUtils.FieldManager.GameStateManager;
 import com.pot_pot_golf.Game.GameUtils.FieldManager.MainFieldManager;
@@ -16,10 +24,6 @@ import com.pot_pot_golf.Game.GameUtils.GUIs.RecreateGUIs;
 import com.pot_pot_golf.Game.GameUtils.GameLogic.InitManager;
 import com.pot_pot_golf.Game.GameUtils.GameLogic.InputManager;
 import com.pot_pot_golf.Game.GameUtils.GameLogic.UpdateManager;
-import org.joml.Vector3f;
-import org.lwjgl.glfw.GLFW;
-
-import static org.lwjgl.nanovg.NanoVGGL3.*;
 
 /**
  * The main game logic class.
