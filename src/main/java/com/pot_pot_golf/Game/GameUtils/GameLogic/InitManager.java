@@ -179,9 +179,7 @@ public class InitManager {
 
         List<TerrainTexture> textures = new ArrayList<>(List.of(sand, grass, fairway, dryGrass, mold, rock, snow));
         List<TerrainTexture> waterTextures = new ArrayList<>();
-        for (TerrainTexture ignored : textures) {
-            waterTextures.add(water);
-        }
+        while (waterTextures.size() < textures.size()) waterTextures.add(water);
         return new Terrains(blendMap, textures, waterTextures);
     }
 }
