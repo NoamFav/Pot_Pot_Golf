@@ -37,10 +37,11 @@ public class ObjectLoader {
      */
     public List<Model> loadAssimpModel(String path) throws Exception {
         // Load the model using Assimp
+        System.out.println("Loading model: " + path);
         AIScene scene = Assimp.aiImportFile(path,
                 Assimp.aiProcess_JoinIdenticalVertices |
-                        Assimp.aiProcess_Triangulate |
-                        Assimp.aiProcess_FixInfacingNormals);
+                Assimp.aiProcess_Triangulate |
+                Assimp.aiProcess_FixInfacingNormals);
 
         // Check if the model was loaded successfully
         if (scene == null) {
@@ -51,6 +52,9 @@ public class ObjectLoader {
 
         for (int i = 0; i < scene.mNumMeshes(); i++) {
             AIMesh mesh = AIMesh.create(Objects.requireNonNull(scene.mMeshes()).get(i)); // Get each mesh
+            System.out.println("Processing mesh: " + mesh.mName().dataString());
+            System.out.println("Vertices: " + mesh.mNumVertices());
+            System.out.println("Faces: " + mesh.mNumFaces());
 
             List<Float> vertices = new ArrayList<>();
             List<Float> textureCoords = new ArrayList<>();
@@ -70,6 +74,8 @@ public class ObjectLoader {
         }
 
         Assimp.aiReleaseImport(scene); // Release the model from memory
+
+        if (models.isEmpty()) throw new RuntimeException("No meshes found in model: " + path);
 
         return models; // Return the list of models
     }
