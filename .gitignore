@@ -2,4 +2,4 @@ icon?
 
 .DS_Store
 src/main/ressources/heighmap.png
-/src/main/ressources/Texture/heighmap.png
+/src/main/resources/Texture/heightmap.png
