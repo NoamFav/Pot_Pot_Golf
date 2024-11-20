@@ -1,8 +1,7 @@
 module com.pot_pot_golf {
-
     requires org.lwjgl.glfw;
     requires org.lwjgl.opengl;
-    requires org.joml;
+    requires transitive org.joml;
     requires org.apache.logging.log4j;
     requires org.lwjgl.stb;
     requires org.lwjgl.assimp;
@@ -10,7 +9,7 @@ module com.pot_pot_golf {
     requires java.desktop;
     requires org.lwjgl.nanovg;
     requires org.lwjgl.openal;
-    requires org.jetbrains.annotations;
+    requires transitive org.jetbrains.annotations;
 
     exports com.pot_pot_golf.Core;
     exports com.pot_pot_golf.Game;
