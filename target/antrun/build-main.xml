@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<project name="maven-antrun-" default="main"  >
-<target name="main">
-  <echo>project.build.outputDirectory: /Users/noamfavier/Git_projects/Pot_Pot_Golf/target/classes</echo>
-  <echo>project.build.directory: /Users/noamfavier/Git_projects/Pot_Pot_Golf/target</echo>
-  <echo>java.home: /opt/homebrew/Cellar/openjdk/23.0.1/libexec/openjdk.jdk/Contents/Home</echo>
-</target>
-</project>
