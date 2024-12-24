@@ -4,7 +4,7 @@ import com.pot_pot_golf.Game.GameUtils.Consts;
 
 import java.io.*;
 import java.nio.file.*;
-import java.util.List;
+import java.util.Objects;
 
 public class ResourceCloner {
 
@@ -15,71 +15,46 @@ public class ResourceCloner {
      * Initializes resources by copying them to the home directory if not already present. Updates
      * paths in the Consts class to point to the copied resources.
      */
-    public static void initializeResources() throws IOException {
-        // List of resources to copy
-        List<String> resources =
-                List.of(
-                        "Texture/Default.png",
-                        "Texture/heightmap.png",
-                        "SoundTrack/skippy-mr-sunshine-fernweh-goldfish-main-version-02-32-7172.wav",
-                        "Models/tree/tree.obj",
-                        "Models/Skybox/SkyBox.obj",
-                        "Models/Ball/ImageToStl.com_ball.obj",
-                        "Models/Arrow/Arrow5.obj",
-                        "Models/flag/flag.obj",
-                        "Models/Ball/Ball_texture/Golf_Ball.png",
-                        "Models/Ball/Ball_texture/Golf_Ball2.png",
-                        "Models/Ball/Ball_texture/BallBot.png",
-                        "Models/Ball/Ball_texture/BallAIBot.png",
-                        "Texture/cartoonSand.jpg",
-                        "Texture/cartoonFlowers.jpg",
-                        "Texture/cartoonGrass.jpg",
-                        "Texture/cartoonWater.jpg",
-                        "Texture/title.png",
-                        "Texture/buttons.png",
-                        "Texture/inGameMenu.png",
-                        "fonts/MightySouly-lxggD.ttf");
+    public static void initializeResources() {
+        try {
+            // Get the root path of resources inside the JAR
+            Path jarResourceRoot =
+                    Paths.get(
+                            Objects.requireNonNull(ResourceCloner.class.getResource("/resources/"))
+                                    .toURI());
 
-        // Ensure resource directory exists
-        File baseDir = new File(RESOURCE_DIR);
-        if (!baseDir.exists()) {
-            baseDir.mkdirs();
-        }
+            // Target resource directory
+            Path targetResourceRoot = Paths.get(RESOURCE_DIR);
 
-        // Copy resources if not already copied
-        for (String resource : resources) {
-            copyResourceIfNeeded(resource);
-        }
+            // Copy resources recursively
+            Files.walk(jarResourceRoot)
+                    .forEach(
+                            sourcePath -> {
+                                Path destinationPath =
+                                        targetResourceRoot.resolve(
+                                                jarResourceRoot.relativize(sourcePath));
 
-        // Update Consts paths
-        Consts.updatePaths(RESOURCE_DIR);
-    }
+                                try {
+                                    if (Files.isDirectory(sourcePath)) {
+                                        Files.createDirectories(destinationPath);
+                                    } else {
+                                        Files.copy(
+                                                sourcePath,
+                                                destinationPath,
+                                                StandardCopyOption.REPLACE_EXISTING);
+                                    }
+                                } catch (IOException e) {
+                                    throw new RuntimeException(
+                                            "Failed to copy resource: " + sourcePath, e);
+                                }
+                            });
 
-    private static void copyResourceIfNeeded(String resourcePath) throws IOException {
-        File targetFile = new File(RESOURCE_DIR + resourcePath);
+            // Update Consts paths
+            Consts.updatePaths(RESOURCE_DIR);
 
-        // Skip copying if the file already exists
-        if (targetFile.exists()) {
-            return;
-        }
-
-        // Create parent directories if necessary
-        targetFile.getParentFile().mkdirs();
-
-        // Copy the resource
-        try (InputStream inputStream =
-                        ResourceCloner.class.getResourceAsStream("/" + resourcePath);
-                OutputStream outputStream = new FileOutputStream(targetFile)) {
-
-            if (inputStream == null) {
-                throw new FileNotFoundException("Resource not found in JAR: " + resourcePath);
-            }
-
-            byte[] buffer = new byte[8192];
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
+        } catch (Exception e) {
+            System.err.println("Failed to initialize resources: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
