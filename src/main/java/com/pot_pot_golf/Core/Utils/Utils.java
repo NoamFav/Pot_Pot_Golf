@@ -1,21 +1,18 @@
 package com.pot_pot_golf.Core.Utils;
 
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryUtil;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Scanner;
 
-/** The utils class. This class is responsible for providing utility methods. */
+/**
+ * The utils class.
+ * This class is responsible for providing utility methods.
+ */
 public class Utils {
 
     /**
@@ -25,8 +22,7 @@ public class Utils {
      * @return The float buffer.
      */
     public static @NotNull FloatBuffer storeDataInFloatBuffer(float @NotNull [] data) {
-        FloatBuffer buffer =
-                MemoryUtil.memAllocFloat(data.length); // Allocate memory for the float buffer
+        FloatBuffer buffer = MemoryUtil.memAllocFloat(data.length); // Allocate memory for the float buffer
         buffer.put(data).flip(); // Put the data into the buffer and flip it
         return buffer; // Return the buffer
     }
@@ -38,8 +34,7 @@ public class Utils {
      * @return The int buffer.
      */
     public static @NotNull IntBuffer storeDataInIntBuffer(int @NotNull [] data) {
-        IntBuffer buffer =
-                MemoryUtil.memAllocInt(data.length); // Allocate memory for the int buffer
+        IntBuffer buffer = MemoryUtil.memAllocInt(data.length); // Allocate memory for the int buffer
         buffer.put(data).flip(); // Put the data into the buffer and flip it
         return buffer; // Return the buffer
     }
@@ -54,57 +49,11 @@ public class Utils {
         String result; // The result
         InputStream in = Utils.class.getResourceAsStream(fileName); // Get the input stream
         if (in == null) { // If the input stream is null
-            throw new RuntimeException(
-                    "Resource not found: " + fileName); // Throw a new runtime exception
+            throw new RuntimeException("Resource not found: " + fileName); // Throw a new runtime exception
         }
         try (Scanner scanner = new Scanner(in, StandardCharsets.UTF_8)) { // Try with resources
             result = scanner.useDelimiter("\\A").next(); // Get the result
         }
         return result; // Return the result
-    }
-
-    /**
-     * Saves an input stream to a temporary file.
-     *
-     * @param inputStream The input stream to save.
-     * @param prefix The prefix of the file.
-     * @param suffix The suffix of the file.
-     * @return The path of the temporary file.
-     * @throws IOException If the input stream cannot be saved.
-     */
-    public static String saveInputStreamToTempFile(InputStream inputStream, String fileExtension)
-            throws IOException {
-        byte[] inputBytes = inputStream.readAllBytes();
-
-        if (inputBytes.length == 0) {
-            throw new IOException("InputStream is empty.");
-        }
-
-        Path tempFile = Files.createTempFile("temp_model", fileExtension);
-        try (OutputStream outputStream = Files.newOutputStream(tempFile)) {
-            outputStream.write(inputBytes);
-        }
-
-        System.out.println("Temporary file created at: " + tempFile.toAbsolutePath());
-        return tempFile.toAbsolutePath().toString();
-    }
-
-    /**
-     * Loads an image to a byte buffer.
-     *
-     * @param inputStream The input stream of the image.
-     * @param width The width of the image.
-     * @param height The height of the image.
-     * @param channels The channels of the image.
-     * @return The byte buffer of the image.
-     * @throws IOException If the image cannot be loaded.
-     */
-    public static ByteBuffer loadImageToByteBuffer(
-            InputStream inputStream, IntBuffer width, IntBuffer height, IntBuffer channels)
-            throws IOException {
-        byte[] data = inputStream.readAllBytes();
-        ByteBuffer buffer = ByteBuffer.allocateDirect(data.length).put(data);
-        buffer.flip(); // Prepare buffer for reading
-        return STBImage.stbi_load_from_memory(buffer, width, height, channels, 4);
     }
 }

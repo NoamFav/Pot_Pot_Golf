@@ -632,7 +632,8 @@
                         <goal>exec</goal>
                     </goals>
                     <configuration>
-                        <executable>${java.home}/bin/jpackage</executable>
+                    <executable>${java.home}/bin/jpackage</executable>
+                    <java.options>-XstartOnFirstThread</java.options>
                         <commandlineArgs>
                             --type ${installer.type}
                             --dest "${project.build.directory}/installer"
@@ -644,11 +645,29 @@
                             --main-class "${main.class}"
                             --module-path "${project.build.directory}/mods:${java.home}/jmods"
                             --add-modules java.base,java.desktop,java.management,jdk.unsupported
-                            --java-options "${java.options}"
+                        --java-options "${java.options}"
+                        
                         </commandlineArgs>
                     </configuration>
-                </execution>
-            </executions>
+                    </execution>
+                    <execution>
+          <id>default-cli</id>  <!-- This lets "mvn exec:exec" pick it up by default -->
+          <goals>
+            <goal>exec</goal>
+          </goals>
+          <configuration>
+            <executable>java</executable>
+            <arguments>
+              <argument>-XstartOnFirstThread</argument> <!-- macOS / GLFW requirement -->
+              <argument>-cp</argument>
+              <!-- main jar plus your copied dependencies -->
+              <argument>${project.build.finalName}.jar:${project.build.directory}/mods/*</argument>
+              <argument>${main.class}</argument>
+            </arguments>
+          </configuration>
+        </execution>
+    </executions>
+
         </plugin>
     </plugins>
 </build>

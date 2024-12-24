@@ -1,8 +1,5 @@
 package com.pot_pot_golf.Core;
 
-import static org.lwjgl.openal.ALC10.*;
-import static org.lwjgl.system.MemoryUtil.NULL;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
@@ -11,32 +8,38 @@ import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALCCapabilities;
 
+import javax.sound.sampled.*;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 
-import javax.sound.sampled.*;
+import static org.lwjgl.openal.ALC10.*;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
-/** The class responsible for managing the audio. */
+/**
+ * The class responsible for managing the audio.
+ */
 public class AudioManager {
     private static final Logger log = LogManager.getLogger(AudioManager.class);
     private long device;
     private long context;
     private int buffer;
     private int source;
-    private final InputStream audioStream;
+    private final String path;
 
     /**
-     * Constructor for the audio manager.
+     * The constructor of the audio manager.
      *
-     * @param audioStream The InputStream of the audio file.
+     * @param path The path to the audio file.
      */
-    public AudioManager(InputStream audioStream) {
-        this.audioStream = audioStream;
+    public AudioManager(String path) {
+        this.path = path;
         init();
     }
 
-    /** Initializes the audio manager. */
+    /**
+     * Initializes the audio manager.
+     */
     public void init() {
         String defaultDeviceName = alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
         assert defaultDeviceName != null;
@@ -53,19 +56,22 @@ public class AudioManager {
     }
 
     /**
-     * Plays the sound. Calculates the pitch based on the actual sample rate and a target sample
-     * rate of 44100.
+     * Plays the sound.
+     * Also calculates the pitch of the sound.
+     * The pitch is calculated by dividing the actual sample rate by the target sample rate.
+     * The target sample rate is 44100.
      */
     public void playSound() {
         // Generate buffers and sources
         buffer = AL10.alGenBuffers();
         source = AL10.alGenSources();
 
-        // Load audio data into the buffer
-        float actualSampleRate = loadAndBufferAudio(audioStream);
+        // Load your audio data into a ByteBuffer
+        float actualSampleRate = loadAndBufferAudio(path);
 
         // Calculate the correct pitch
-        float targetSampleRate = 44100; // Default sample rate
+        // Default sample rate
+        float targetSampleRate = 44100;
         float pitch = actualSampleRate / targetSampleRate;
 
         // Set up source input
@@ -77,35 +83,37 @@ public class AudioManager {
         AL10.alSourcePlay(source);
     }
 
-    /** Stops the sound. */
+    /**
+     * Stops the sound.
+     */
     public void stopSound() {
         AL10.alSourceStop(source);
     }
 
     /**
-     * Loads and buffers the audio from an InputStream.
+     * Loads and buffers the audio.
      *
-     * @param inputStream The InputStream of the audio file.
+     * @param filePath The path to the audio file.
      * @return The sample rate of the audio.
      */
-    private float loadAndBufferAudio(InputStream inputStream) {
-        try (AudioInputStream stream = AudioSystem.getAudioInputStream(inputStream)) {
+    private float loadAndBufferAudio(String filePath) {
+        File file = new File(filePath);
+        try {
+            AudioInputStream stream = AudioSystem.getAudioInputStream(file);
             AudioFormat format = stream.getFormat();
             float sampleRate = format.getSampleRate();
 
-            // Read audio data into a ByteBuffer
             byte[] audioBytes = stream.readAllBytes();
             ByteBuffer audioBuffer = BufferUtils.createByteBuffer(audioBytes.length);
             audioBuffer.put(audioBytes);
             audioBuffer.flip();
 
-            // Determine the OpenAL format
             int openALFormat = getOpenALFormat(format.getChannels(), format.getSampleSizeInBits());
             AL10.alBufferData(buffer, openALFormat, audioBuffer, (int) sampleRate);
 
             return sampleRate;
         } catch (UnsupportedAudioFileException | IOException e) {
-            log.error("Failed to load audio from InputStream", e);
+            log.error("Failed to load audio file: {}", filePath, e);
         }
         return 0;
     }
@@ -126,7 +134,9 @@ public class AudioManager {
         throw new IllegalArgumentException("Unsupported channel count: " + channels);
     }
 
-    /** Cleans up the audio manager. */
+    /**
+     * Cleans up the audio manager.
+     */
     public void cleanup() {
         AL10.alDeleteSources(source);
         AL10.alDeleteBuffers(buffer);
@@ -134,3 +144,4 @@ public class AudioManager {
         alcCloseDevice(device);
     }
 }
+
