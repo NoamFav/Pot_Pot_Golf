@@ -1,7 +1,5 @@
 package com.pot_pot_golf.Core.Utils;
 
-import static com.pot_pot_golf.Game.GolfGame.debugMode;
-
 import com.pot_pot_golf.Core.Entity.Entity;
 import com.pot_pot_golf.Core.Entity.Material;
 import com.pot_pot_golf.Core.Entity.SceneManager;
@@ -15,20 +13,23 @@ import com.pot_pot_golf.Game.GameUtils.Consts;
 import com.pot_pot_golf.Game.GameUtils.FieldManager.EntitiesManager;
 import com.pot_pot_golf.Game.GameUtils.FieldManager.ModelManager;
 import com.pot_pot_golf.Game.GameUtils.FieldManager.TerrainManager;
-
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import javax.imageio.ImageIO;
+import static com.pot_pot_golf.Game.GolfGame.debugMode;
 
-/** The class responsible for switching the terrain of the game. */
+/**
+ * The class responsible for switching the terrain of the game.
+ */
 public class TerrainSwitch {
 
     private final SceneManager scene;
@@ -43,22 +44,15 @@ public class TerrainSwitch {
     /**
      * The constructor of the terrain switch.
      *
-     * @param scene The scene manager.
-     * @param renderer The render manager.
-     * @param heightMap The height map.
-     * @param loader The object loader.
-     * @param terrainManager The terrain manager.
-     * @param modelManager The model manager.
+     * @param scene           The scene manager.
+     * @param renderer        The render manager.
+     * @param heightMap       The height map.
+     * @param loader          The object loader.
+     * @param terrainManager  The terrain manager.
+     * @param modelManager    The model manager.
      * @param entitiesManager The entities manager.
      */
-    public TerrainSwitch(
-            SceneManager scene,
-            RenderManager renderer,
-            HeightMap heightMap,
-            ObjectLoader loader,
-            TerrainManager terrainManager,
-            ModelManager modelManager,
-            EntitiesManager entitiesManager) {
+    public TerrainSwitch(SceneManager scene, RenderManager renderer, HeightMap heightMap, ObjectLoader loader, TerrainManager terrainManager, ModelManager modelManager, EntitiesManager entitiesManager) {
         this.scene = scene;
         this.renderer = renderer;
         this.heightMap = heightMap;
@@ -72,27 +66,13 @@ public class TerrainSwitch {
      * Switches the terrain of the game.
      *
      * @param blendMapTerrain The new terrain to switch to.
-     * @param blendMap2 The new blend map to use.
+     * @param blendMap2       The new blend map to use.
      */
     public void terrainSwitch(BlendMapTerrain blendMapTerrain, TerrainTexture blendMap2) {
         scene.getTerrains().remove(terrainManager.getTerrain());
         scene.getTerrains().remove(terrainManager.getOcean());
-        Terrain terrain =
-                new Terrain(
-                        new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2),
-                        loader,
-                        new Material(new Vector4f(0, 0, 0, 0), 0.1f),
-                        blendMapTerrain,
-                        blendMap2,
-                        false);
-        Terrain ocean =
-                new Terrain(
-                        new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2),
-                        loader,
-                        new Material(new Vector4f(0, 0, 0, 0), 0.1f),
-                        terrainManager.getBlueTerrain(),
-                        blendMap2,
-                        true);
+        Terrain terrain = new Terrain(new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), blendMapTerrain, blendMap2, false);
+        Terrain ocean = new Terrain(new Vector3f(-Consts.SIZE_X / 2, 0, -Consts.SIZE_Z / 2), loader, new Material(new Vector4f(0, 0, 0, 0), 0.1f), terrainManager.getBlueTerrain(), blendMap2, true);
         terrainManager.setTerrain(terrain);
         terrainManager.setOcean(ocean);
         scene.addTerrain(terrain);
@@ -114,14 +94,13 @@ public class TerrainSwitch {
     }
 
     /**
-     * Place the trees on the terrain. Randomly picks a position on the terrain. As long as the
-     * position is green
-     *
+     * Place the trees on the terrain.
+     * Randomly picks a position on the terrain.
+     * As long as the position is green
      * @throws IOException If the heightmap image is not found.
      */
     public void createTrees() throws IOException {
-        // Read the heightmap image from the InputStream
-        BufferedImage heightmapImage = ImageIO.read(Consts.HEIGHTMAP);
+        BufferedImage heightmapImage = ImageIO.read(new File(Consts.HEIGHTMAP));
 
         List<Vector3f> positions = new ArrayList<>();
 
@@ -132,12 +111,8 @@ public class TerrainSwitch {
 
                 // Check for green or blue pixels
                 if (pixelColor.equals(Color.GREEN)) {
-                    float terrainX =
-                            x / (float) heightmapImage.getWidth() * Consts.SIZE_X
-                                    - Consts.SIZE_X / 2;
-                    float terrainZ =
-                            z / (float) heightmapImage.getHeight() * Consts.SIZE_Z
-                                    - Consts.SIZE_Z / 2;
+                    float terrainX = x / (float) heightmapImage.getWidth() * Consts.SIZE_X - Consts.SIZE_X / 2;
+                    float terrainZ = z / (float) heightmapImage.getHeight() * Consts.SIZE_Z - Consts.SIZE_Z / 2;
                     float terrainY = heightMap.getHeight(new Vector3f(terrainX, 0, terrainZ));
 
                     positions.add(new Vector3f(terrainX, terrainY, terrainZ));
@@ -158,17 +133,12 @@ public class TerrainSwitch {
         // Populate tree positions and add entities to the scene
         for (int i = 0; i < Consts.NUMBER_OF_TREES; i++) {
             Vector3f position = positions.get(rnd.nextInt(positions.size()));
-            if (!position.equals(zero)) {
-                Entity aTree =
-                        new Entity(
-                                modelManager.getTree(),
-                                new Vector3f(position.x, position.y, position.z),
-                                new Vector3f(-90, 0, 0),
-                                0.03f);
+            if (position != zero) {
+                Entity aTree = new Entity(modelManager.getTree(), new Vector3f(position.x, position.y, position.z), new Vector3f(-90, 0, 0), 0.03f); // - 90 and 0.03f
                 scene.addEntity(aTree);
                 entitiesManager.addTree(aTree);
                 entitiesManager.addTreeHeight(position.y);
-                treePositions.add(new float[] {position.x, position.y, position.z});
+                treePositions.add(new float[]{position.x, position.y, position.z});
             } else {
                 System.out.println("Position is null at index: " + i);
             }

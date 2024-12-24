@@ -5,12 +5,15 @@ import static org.lwjgl.nanovg.NanoVGGL3.NVG_STENCIL_STROKES;
 import static org.lwjgl.nanovg.NanoVGGL3.nvgCreate;
 import static org.lwjgl.nanovg.NanoVGGL3.nvgDelete;
 
+import org.joml.Vector3f;
+import org.lwjgl.glfw.GLFW;
+
 import com.pot_pot_golf.Core.AudioManager;
-import com.pot_pot_golf.Core.Entity.Entity;
-import com.pot_pot_golf.Core.Entity.Terrain.Terrain;
-import com.pot_pot_golf.Core.Entity.Texture;
 import com.pot_pot_golf.Core.ILogic;
 import com.pot_pot_golf.Core.MouseInput;
+import com.pot_pot_golf.Core.Entity.Entity;
+import com.pot_pot_golf.Core.Entity.Texture;
+import com.pot_pot_golf.Core.Entity.Terrain.Terrain;
 import com.pot_pot_golf.Game.GameUtils.Consts;
 import com.pot_pot_golf.Game.GameUtils.FieldManager.GameStateManager;
 import com.pot_pot_golf.Game.GameUtils.FieldManager.MainFieldManager;
@@ -22,12 +25,9 @@ import com.pot_pot_golf.Game.GameUtils.GameLogic.InitManager;
 import com.pot_pot_golf.Game.GameUtils.GameLogic.InputManager;
 import com.pot_pot_golf.Game.GameUtils.GameLogic.UpdateManager;
 
-import org.joml.Vector3f;
-import org.lwjgl.glfw.GLFW;
-
 /**
- * The main game logic class. This class is responsible for initializing the game, handling input,
- * updating the game state and rendering the game.
+ * The main game logic class.
+ * This class is responsible for initializing the game, handling input, updating the game state and rendering the game.
  */
 public class GolfGame implements ILogic {
 
@@ -38,13 +38,17 @@ public class GolfGame implements ILogic {
 
     MainFieldManager context; // The main controller of the game
 
-    /** The constructor of the game. It initializes the renderer, window, loader and camera. */
+    /**
+     * The constructor of the game.
+     * It initializes the renderer, window, loader and camera.
+     */
     public GolfGame() {
         context = new MainFieldManager();
     }
 
     /**
-     * Initializes the game. It loads the model and texture of the game.
+     * Initializes the game.
+     * It loads the model and texture of the game.
      *
      * @throws Exception If the game fails to initialize.
      */
@@ -57,9 +61,13 @@ public class GolfGame implements ILogic {
         // Managers for the game logic
         InitManager initManager = new InitManager(context);
 
-        context.getScene()
-                .setDefaultTexture(
-                        new Texture(context.getLoader().loadTexture(Consts.DEFAULT_TEXTURE)));
+        context
+            .getScene()
+            .setDefaultTexture(
+                new Texture(
+                    context.getLoader().loadTexture(Consts.DEFAULT_TEXTURE)
+                )
+            );
         context.getWindow().setAntiAliasing(true);
         context.getWindow().setResized(false);
 
@@ -67,14 +75,17 @@ public class GolfGame implements ILogic {
         context.getWindow().setClearColor(0.529f, 0.808f, 0.922f, 0.0f);
 
         context.getHeightMap().createHeightMap();
-        context.getPathManager()
-                .setPath(
-                        context.getPathfinder()
-                                .getPath(
-                                        Consts.HEIGHTMAP,
-                                        Consts.RADIUS_DOWN,
-                                        Consts.RADIUS_UP,
-                                        Consts.SIZE_GREEN));
+        context
+            .getPathManager()
+            .setPath(
+                context
+                    .getPathfinder()
+                    .getPath(
+                        Consts.RADIUS_DOWN,
+                        Consts.RADIUS_UP,
+                        Consts.SIZE_GREEN
+                    )
+            );
 
         initManager.modelAndEntityCreation();
         initManager.terrainCreation();
@@ -99,7 +110,8 @@ public class GolfGame implements ILogic {
     }
 
     /**
-     * Handles the input of the game. It sets the cameraInc vector based on the input of the user.
+     * Handles the input of the game.
+     * It sets the cameraInc vector based on the input of the user.
      */
     @Override
     public void input() {
@@ -117,7 +129,8 @@ public class GolfGame implements ILogic {
     }
 
     /**
-     * Updates the game state. It moves the camera and the entity based on the input of the user.
+     * Updates the game state.
+     * It moves the camera and the entity based on the input of the user.
      */
     @Override
     public void update() {
@@ -126,7 +139,9 @@ public class GolfGame implements ILogic {
         context.getGuiElementManager().update(context.getGameStateManager());
 
         if (context.getWindow().isResized()) {
-            Vector3f oldPosition = new Vector3f(context.getCamera().getPosition());
+            Vector3f oldPosition = new Vector3f(
+                context.getCamera().getPosition()
+            );
             context.getWindow().setResized(false);
             new RecreateGUIs(vg, context);
             context.getMouseInputs().init();
@@ -134,15 +149,22 @@ public class GolfGame implements ILogic {
         }
 
         Vector3f cameraInc = new Vector3f(context.getCameraInc());
-        context.getCamera()
-                .movePosition(
-                        cameraInc.x * Consts.CAMERA_MOVEMENT_SPEED,
-                        (cameraInc.y * Consts.CAMERA_MOVEMENT_SPEED),
-                        cameraInc.z * Consts.CAMERA_MOVEMENT_SPEED);
+        context
+            .getCamera()
+            .movePosition(
+                cameraInc.x * Consts.CAMERA_MOVEMENT_SPEED,
+                (cameraInc.y * Consts.CAMERA_MOVEMENT_SPEED),
+                cameraInc.z * Consts.CAMERA_MOVEMENT_SPEED
+            );
 
-        context.getCollisionsDetector()
-                .checkCollision(
-                        context.getCamera(), cameraInc, context.getHeightMap(), context.getScene());
+        context
+            .getCollisionsDetector()
+            .checkCollision(
+                context.getCamera(),
+                cameraInc,
+                context.getHeightMap(),
+                context.getScene()
+            );
 
         updateManager.updateTreeAnimations();
         updateManager.animateBall();
@@ -153,7 +175,9 @@ public class GolfGame implements ILogic {
             updateManager.animateBotBall();
         }
 
-        context.getGuiElementManager().updateTextFields(context.getGameStateManager());
+        context
+            .getGuiElementManager()
+            .updateTextFields(context.getGameStateManager());
 
         for (Entity entity : context.getScene().getEntities()) {
             context.getRenderer().processEntity(entity);
@@ -163,7 +187,10 @@ public class GolfGame implements ILogic {
         }
     }
 
-    /** Renders the game. It renders the entity and the camera. */
+    /**
+     * Renders the game.
+     * It renders the entity and the camera.
+     */
     @Override
     public void render() {
         context.getRenderer().clear();
@@ -179,7 +206,10 @@ public class GolfGame implements ILogic {
         }
     }
 
-    /** Cleans up the game. It cleans up the renderer and loader. */
+    /**
+     * Cleans up the game.
+     * It cleans up the renderer and loader.
+     */
     @Override
     public void cleanUp() {
         context.getRenderer().cleanup();

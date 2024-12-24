@@ -3,7 +3,6 @@ package com.pot_pot_golf.Game.GameUtils;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import java.io.InputStream;
 import java.util.function.BiFunction;
 
 /**
@@ -30,11 +29,17 @@ public class Consts {
     public static final float SIZE_Z =
             (float) Math.pow(2, POWER); // Size of the terrain in the z direction
     public static final int VERTEX_COUNT =
-            (int) Math.pow(2, POWER + 2); // Number of vertices in the terrain (Higher = more detail
-    // but also more performance heavy)
+            (int)
+                    Math.pow(
+                            2,
+                            POWER
+                                    + 2); // Number of vertices in the terrain (Higher = more detail
+                                          // but also more performance heavy)
     public static final int NUMBER_OF_TREES =
-            (int) (SIZE_X / 2); // Density of the trees (higher = more trees) reduces for
-    // performance
+            (int)
+                    (SIZE_X
+                            / 2); // Density of the trees (higher = more trees) reduces for
+                                  // performance
     public static final float TREE_SIZE = 1.5f; // Size of the trees at the trunk
     public static final float MAX_HEIGHT = SIZE_X / 2f; // Maximum height of the terrain,
     // doesn't have to influence the actual height of the terrain just the maximum height reachable
@@ -51,7 +56,7 @@ public class Consts {
             11; // Number of octaves used in simplex noise (higher = more detail)
     public static final double PERSISTENCE =
             0.4; // Used to determine how much each octave contributes to the overall shape (higher
-    // = more detail)
+                 // = more detail)
     public static final double AMPLITUDE =
             1; // Used for increasing the height of the terrain (higher = more height)
 
@@ -191,69 +196,72 @@ public class Consts {
     public static final float STATIC_FRICTION_SAND =
             0.4f; // Friction of the sand (recommended: 0.8)
 
-    private static final ClassLoader CLASS_LOADER = Consts.class.getClassLoader();
-
     // Resources for the game
     // Do not change, except if you have full knowledge of the path you want to change
-    public static final InputStream DEFAULT_TEXTURE = resourceStream("Texture/Default.png");
-    public static final InputStream BACKGROUND_MUSIC =
-            resourceStream(
-                    "SoundTrack/skippy-mr-sunshine-fernweh-goldfish-main-version-02-32-7172.wav");
+    public static String DEFAULT_TEXTURE;
+    public static String BACKGROUND_MUSIC;
+    public static String HEIGHTMAP;
 
-    /** The class for the models of the game. All the model paths are stored here. */
     public static class OBJ {
-        public static final InputStream MAIN_TREE = resourceStream("Models/tree/tree.obj");
-        public static final InputStream SKYBOX = resourceStream("Models/Skybox/SkyBox.obj");
-        public static final InputStream BALL =
-                resourceStream("Models/Ball/ImageToStl.com_ball.obj");
-        public static final InputStream ARROW = resourceStream("Models/Arrow/Arrow5.obj");
-        public static final InputStream FLAG = resourceStream("Models/flag/flag.obj");
+        public static String MAIN_TREE;
+        public static String SKYBOX;
+        public static String BALL;
+        public static String ARROW;
+        public static String FLAG;
     }
 
-    /** The class for the textures of the game. All the texture paths are stored here. */
     public static class BallTexture {
-        public static final InputStream BALL1 =
-                resourceStream("Models/Ball/Ball_texture/Golf_Ball.png");
-        public static final InputStream BALL2 =
-                resourceStream("Models/Ball/Ball_texture/Golf_Ball2.png");
-        public static final InputStream BALL_BOT =
-                resourceStream("Models/Ball/Ball_texture/BallBot.png");
-        public static final InputStream BALL_AI_BOT =
-                resourceStream("Models/Ball/Ball_texture/BallAIBot.png");
+        public static String BALL1;
+        public static String BALL2;
+        public static String BALL_BOT;
+        public static String BALL_AI_BOT;
     }
 
     public static class TerrainTexture {
-        public static final InputStream SAND = resourceStream("Texture/cartoonSand.jpg");
-        public static final InputStream GRASS = resourceStream("Texture/cartoonFlowers.jpg");
-        public static final InputStream FAIRWAY = resourceStream("Texture/cartoonGrass.jpg");
-        public static final InputStream WATER = resourceStream("Texture/cartoonWater.jpg");
+        public static String SAND;
+        public static String GRASS;
+        public static String FAIRWAY;
+        public static String WATER;
     }
 
-    public static final InputStream HEIGHTMAP = resourceStream("Texture/heightmap.png");
-    public static final String HEIGHTMAP_PATH = "Texture/heightmap.png";
-
-    /** The class for the GUI. All the GUI paths are stored here. */
     public static class GUI {
-        public static final InputStream TITLE = resourceStream("Texture/title.png");
-        public static final InputStream BUTTON_MENU = resourceStream("Texture/buttons.png");
-        public static final InputStream BUTTON_IN_GAME_MENU =
-                resourceStream("Texture/inGameMenu.png");
-        public static final InputStream FONT = resourceStream("fonts/MightySouly-lxggD.ttf");
-
-        public class BUTTON_MENU {}
+        public static String TITLE;
+        public static String BUTTON_MENU;
+        public static String BUTTON_IN_GAME_MENU;
+        public static String FONT;
     }
 
     /**
-     * Helper method to get the resource as an InputStream using the ClassLoader.
+     * Updates paths to resources dynamically based on the base directory.
      *
-     * @param relativePath The path relative to the `src/main/resources` directory.
-     * @return The InputStream of the resource.
+     * @param baseDir The base directory where resources are located.
      */
-    private static InputStream resourceStream(String relativePath) {
-        InputStream resourceStream = CLASS_LOADER.getResourceAsStream(relativePath);
-        if (resourceStream == null) {
-            throw new IllegalArgumentException("Resource not found: " + relativePath);
-        }
-        return resourceStream;
+    public static void updatePaths(String baseDir) {
+        DEFAULT_TEXTURE = baseDir + "Texture/Default.png";
+        BACKGROUND_MUSIC =
+                baseDir
+                        + "SoundTrack/skippy-mr-sunshine-fernweh-goldfish-main-version-02-32-7172.wav";
+        HEIGHTMAP = baseDir + "Texture/heightmap.png";
+
+        OBJ.MAIN_TREE = baseDir + "Models/tree/tree.obj";
+        OBJ.SKYBOX = baseDir + "Models/Skybox/SkyBox.obj";
+        OBJ.BALL = baseDir + "Models/Ball/ImageToStl.com_ball.obj";
+        OBJ.ARROW = baseDir + "Models/Arrow/Arrow5.obj";
+        OBJ.FLAG = baseDir + "Models/flag/flag.obj";
+
+        BallTexture.BALL1 = baseDir + "Models/Ball/Ball_texture/Golf_Ball.png";
+        BallTexture.BALL2 = baseDir + "Models/Ball/Ball_texture/Golf_Ball2.png";
+        BallTexture.BALL_BOT = baseDir + "Models/Ball/Ball_texture/BallBot.png";
+        BallTexture.BALL_AI_BOT = baseDir + "Models/Ball/Ball_texture/BallAIBot.png";
+
+        TerrainTexture.SAND = baseDir + "Texture/cartoonSand.jpg";
+        TerrainTexture.GRASS = baseDir + "Texture/cartoonFlowers.jpg";
+        TerrainTexture.FAIRWAY = baseDir + "Texture/cartoonGrass.jpg";
+        TerrainTexture.WATER = baseDir + "Texture/cartoonWater.jpg";
+
+        GUI.TITLE = baseDir + "Texture/title.png";
+        GUI.BUTTON_MENU = baseDir + "Texture/buttons.png";
+        GUI.BUTTON_IN_GAME_MENU = baseDir + "Texture/inGameMenu.png";
+        GUI.FONT = baseDir + "fonts/MightySouly-lxggD.ttf";
     }
 }

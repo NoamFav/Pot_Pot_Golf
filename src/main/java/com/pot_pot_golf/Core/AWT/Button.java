@@ -1,63 +1,49 @@
 package com.pot_pot_golf.Core.AWT;
 
-import static org.lwjgl.nanovg.NanoVG.*;
-
 import com.pot_pot_golf.Core.WindowManager;
+import com.pot_pot_golf.Game.GameUtils.Consts;
 import com.pot_pot_golf.Game.Launcher;
-
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.nanovg.NVGColor;
 import org.lwjgl.nanovg.NVGPaint;
+import org.lwjgl.nanovg.NVGColor;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryStack;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
+import static org.lwjgl.nanovg.NanoVG.*;
 
-/** The Button class is used to render a button on the screen. */
+/**
+ * The Button class is used to render a button on the screen
+ */
 public class Button {
-    private final float x, y; // Button position
-    private final float width, height; // Button dimensions
+    private final float x, y;  // Button position
+    private final float width, height;  // Button dimensions
     private String text; // Button text
-    private final Runnable action; // Action to be performed when the button is clicked
-    private final long vg; // NanoVG context
-    private final InputStream imageStream; // Image path for the button
-    private final float fontSize; // Font size for the button text
-    private final InputStream fontStream; // InputStream for the font
-    private int imgId = -1; // Store the image ID
+    private final Runnable action;  // Action to be performed when the button is clicked
+    private final long vg;  // NanoVG context
+    private final String imagePath;  // Image path for the button
+    private final float fontSize;  // Font size for the button text
+    private int imgId = -1;  // Store the image ID
 
-    private double scaledMouseX, scaledMouseY; // Scaled mouse position
+    private double scaledMouseX, scaledMouseY;  // Scaled mouse position
     private boolean isPressed = false;
+
 
     private final WindowManager window = Launcher.getWindow();
 
     /**
-     * Create a new Button object.
+     * Create a new Button object
      *
-     * @param x The x position of the button
-     * @param y The y position of the button
-     * @param width The width of the button
-     * @param height The height of the button
-     * @param text The text to display on the button
-     * @param fontSize The font size of the text
-     * @param action The action to perform when the button is clicked
-     * @param vg The NanoVG context
+     * @param x         The x position of the button
+     * @param y         The y position of the button
+     * @param width     The width of the button
+     * @param height    The height of the button
+     * @param text      The text to display on the button
+     * @param fontSize  The font size of the text
+     * @param action    The action to perform when the button is clicked
+     * @param vg        The NanoVG context
      * @param imagePath The path to the image to use for the button
-     * @param fontStream The InputStream for the font
      */
-    public Button(
-            float x,
-            float y,
-            float width,
-            float height,
-            String text,
-            float fontSize,
-            Runnable action,
-            long vg,
-            InputStream imageStream,
-            InputStream fontStream) {
+    public Button(float x, float y, float width, float height, String text, float fontSize, Runnable action, long vg, String imagePath) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -66,39 +52,31 @@ public class Button {
         this.fontSize = fontSize;
         this.action = action;
         this.vg = vg;
-        this.imageStream = imageStream;
-        this.fontStream = fontStream;
-        initImage(); // Load the image once when the Button object is created
+        this.imagePath = imagePath;
+        initImage();  // Load the image once when the Button object is created
     }
 
     /**
-     * Initialize the image for the button. This method is called once when the Button object is
-     * created.
+     * initialize the image for the button
+     * This method is called once when the Button object is created
      */
     private void initImage() {
-        try {
-            // Convert InputStream to ByteBuffer
-            ByteBuffer imageBuffer = readStreamToByteBuffer(imageStream);
-
-            // Load the image into NanoVG
-            imgId = nvgCreateImageMem(vg, 0, imageBuffer);
-            if (imgId == 0) {
-                System.err.println("Failed to load image from InputStream.");
-            }
-        } catch (IOException e) {
-            System.err.println("Failed to load image: " + e.getMessage());
+        imgId = nvgCreateImage(vg, imagePath, 0);
+        if (imgId == 0) {
+            System.err.println("Failed to load image: " + imagePath);
         }
     }
 
-    /** Render the button. */
+    /**
+     * Render the button
+     */
     public void render() {
         try (MemoryStack ignored = MemoryStack.stackPush()) {
             // Start new frame for NanoVG
             nvgBeginFrame(vg, window.getWidth(), window.getHeight(), 1);
 
             // Load an image to use as texture
-            NVGPaint imgPaint =
-                    nvgImagePattern(vg, x, y, width, height, 0, imgId, 1, NVGPaint.create());
+            NVGPaint imgPaint = nvgImagePattern(vg, x, y, width, height, 0, imgId, 1, NVGPaint.create());
 
             nvgBeginPath(vg);
             nvgRect(vg, x, y, width, height);
@@ -106,7 +84,6 @@ public class Button {
             // Use the image pattern to fill the rectangle
             nvgFillPaint(vg, imgPaint);
             nvgFill(vg);
-
             // Setting text color
             NVGColor textColor = NVGColor.create();
             textColor.r(1.0f); // White text
@@ -114,7 +91,7 @@ public class Button {
             textColor.b(1.0f);
             textColor.a(1.0f);
 
-            int fontId = loadFont(vg, "golf", fontStream);
+            int fontId = nvgCreateFont(vg, "golf", Consts.GUI.FONT);
             if (fontId == -1) {
                 throw new RuntimeException("Could not add font");
             }
@@ -141,52 +118,16 @@ public class Button {
     }
 
     /**
-     * Load a font using NanoVG and InputStream.
-     *
-     * @param vg The NanoVG context.
-     * @param fontName The name of the font.
-     * @param fontStream The InputStream for the font file.
-     * @return The font ID or -1 if the font could not be loaded.
+     * Update the button
      */
-    private int loadFont(long vg, String fontName, InputStream fontStream) {
-        try {
-            // Convert InputStream to ByteBuffer
-            ByteBuffer fontBuffer = readStreamToByteBuffer(fontStream);
-
-            // Use nvgCreateFontMem with correct arguments
-            ByteBuffer nameBuffer =
-                    ByteBuffer.wrap(fontName.getBytes()); // Convert font name to ByteBuffer
-            return nvgCreateFontMem(vg, nameBuffer, fontBuffer, true); // true = NanoVG frees memory
-        } catch (IOException e) {
-            System.err.println("Failed to load font: " + e.getMessage());
-            return -1;
-        }
-    }
-
-    /**
-     * Read an InputStream into a ByteBuffer.
-     *
-     * @param stream The InputStream to read.
-     * @return A ByteBuffer containing the data from the InputStream.
-     * @throws IOException If an I/O error occurs.
-     */
-    private ByteBuffer readStreamToByteBuffer(InputStream stream) throws IOException {
-        ByteBuffer buffer;
-        try (stream) {
-            buffer = ByteBuffer.allocate(stream.available());
-            Channels.newChannel(stream).read(buffer);
-            buffer.flip();
-        }
-        return buffer;
-    }
-
-    /** Update the button. */
     public void update() {
         updateMouseScaling();
         processButtonInteraction();
     }
 
-    /** Update the mouse scaling. */
+    /**
+     * Update the mouse scaling
+     */
     private void updateMouseScaling() {
         double[] mouseX = new double[1];
         double[] mouseY = new double[1];
@@ -194,50 +135,50 @@ public class Button {
 
         int[] framebufferWidth = new int[1];
         int[] framebufferHeight = new int[1];
-        GLFW.glfwGetFramebufferSize(window.getWindow(), framebufferWidth, framebufferHeight);
+        GLFW.glfwGetFramebufferSize(Launcher.getWindow().getWindow(), framebufferWidth, framebufferHeight);
 
         int[] windowWidth = new int[1], windowHeight = new int[1];
-        GLFW.glfwGetWindowSize(window.getWindow(), windowWidth, windowHeight);
+        GLFW.glfwGetWindowSize(Launcher.getWindow().getWindow(), windowWidth, windowHeight);
 
         double scaleX = framebufferWidth[0] / (double) windowWidth[0];
+        // Scaling factors for mouse position
         double scaleY = framebufferHeight[0] / (double) windowHeight[0];
 
         scaledMouseX = mouseX[0] * scaleX;
         scaledMouseY = mouseY[0] * scaleY;
     }
 
-    /** Process the button interaction. */
+    /**
+     * Process the button interaction
+     */
     private void processButtonInteraction() {
         boolean mouseOver = isMouseOver(scaledMouseX, scaledMouseY);
-        boolean mouseButtonDown =
-                GLFW.glfwGetMouseButton(GLFW.glfwGetCurrentContext(), GLFW.GLFW_MOUSE_BUTTON_1)
-                        == GLFW.GLFW_PRESS;
+        boolean mouseButtonDown = GLFW.glfwGetMouseButton(GLFW.glfwGetCurrentContext(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
 
         if (mouseOver && mouseButtonDown) {
             if (!isPressed) {
-                action.run(); // Run the action only on the transition to press
+                action.run();  // Run the action only on the transition to press
                 isPressed = true; // Set isPressed to true after the action has run
             }
         } else {
-            isPressed = false; // Reset isPressed when not over the button or button not pressed
+            isPressed = false;  // Reset isPressed when not over the button or button not pressed
         }
     }
 
     /**
-     * Check if the mouse is over the button.
+     * Check if the mouse is over the button
      *
-     * @param scaledMouseX The scaled x position of the mouse.
-     * @param scaledMouseY The scaled y position of the mouse.
-     * @return True if the mouse is over the button, false otherwise.
+     * @param scaledMouseX The scaled x position of the mouse
+     * @param scaledMouseY The scaled y position of the mouse
+     * @return True if the mouse is over the button, false otherwise
      */
-    private boolean isMouseOver(double scaledMouseX, double scaledMouseY) {
-        return scaledMouseX >= x
-                && scaledMouseX <= x + width
-                && scaledMouseY >= y
-                && scaledMouseY <= y + height;
+    private boolean isMouseOver( double scaledMouseX, double scaledMouseY) {
+        return scaledMouseX >= x && scaledMouseX <= x + width && scaledMouseY >= y && scaledMouseY <= y + height;
     }
 
-    /** Clean up the button. */
+    /**
+     * Clean up the button
+     */
     public void cleanup() {
         if (imgId > 0) {
             nvgDeleteImage(vg, imgId);
@@ -245,11 +186,11 @@ public class Button {
         }
     }
 
-    public void setText(String text) {
+    public void setText(String text){
         this.text = text;
     }
 
-    public String getText() {
+    public String getText(){
         return text;
     }
 }

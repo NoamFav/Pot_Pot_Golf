@@ -1,26 +1,26 @@
 package com.pot_pot_golf.Game.GameUtils.GameLogic;
 
-import static com.pot_pot_golf.Game.GolfGame.debugMode;
-
 import com.pot_pot_golf.Core.*;
 import com.pot_pot_golf.Core.Entity.Entity;
 import com.pot_pot_golf.Core.Entity.SceneManager;
 import com.pot_pot_golf.Core.Entity.Terrain.HeightMap;
 import com.pot_pot_golf.Core.Entity.Terrain.HeightMapPathfinder;
 import com.pot_pot_golf.Core.Entity.Terrain.TerrainTexture;
-import com.pot_pot_golf.Core.Utils.TerrainSwitch;
 import com.pot_pot_golf.Game.GameUtils.Consts;
+import com.pot_pot_golf.Core.Utils.TerrainSwitch;
 import com.pot_pot_golf.Game.GameUtils.FieldManager.*;
-
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
+import static com.pot_pot_golf.Game.GolfGame.debugMode;
+
 /**
- * The input manager class. This class is responsible for managing the inputs of the game. Stores
- * the input of the game.
+ * The input manager class.
+ * This class is responsible for managing the inputs of the game.
+ * Stores the input of the game.
  */
 public class InputManager {
 
@@ -44,8 +44,9 @@ public class InputManager {
     private final TerrainManager terrainManager;
 
     /**
-     * The constructor of the input manager. It initializes the input manager. Extracts the
-     * instances of every class and manager from the main field manager.
+     * The constructor of the input manager.
+     * It initializes the input manager.
+     * Extracts the instances of every class and manager from the main field manager.
      *
      * @param context The main field manager.
      */
@@ -111,17 +112,10 @@ public class InputManager {
 
             if (window.is_keyPressed(GLFW.GLFW_KEY_Q)) {
                 Entity currentBall = entitiesManager.getCurrentBall();
-                camera.setPosition(
-                        new Vector3f(
-                                currentBall.getPosition().x,
-                                currentBall.getPosition().y + Consts.PLAYER_HEIGHT,
-                                currentBall.getPosition().z));
+                camera.setPosition(new Vector3f(currentBall.getPosition().x, currentBall.getPosition().y + Consts.PLAYER_HEIGHT, currentBall.getPosition().z));
             }
 
-            if (window.is_keyPressed(GLFW.GLFW_KEY_R)
-                    && !gameStateManager.isAnimating()
-                    && !gameStateManager.isAiBotAnimating()
-                    && !gameStateManager.isBotAnimating()) {
+            if (window.is_keyPressed(GLFW.GLFW_KEY_R) && !gameStateManager.isAnimating() && !gameStateManager.isAiBotAnimating() && !gameStateManager.isBotAnimating()) {
                 restartBalls();
                 restartBotsBalls();
             }
@@ -132,8 +126,7 @@ public class InputManager {
             if (isTPressed && !gameStateManager.istKeyWasPressed()) {
                 plantTree();
             } else if (!isTPressed) {
-                gameStateManager.settKeyWasPressed(
-                        false); // Reset the flag when the key is released
+                gameStateManager.settKeyWasPressed(false); // Reset the flag when the key is released
             }
 
             if (window.is_keyPressed(GLFW.GLFW_KEY_1) && gameStateManager.isAiBot()) {
@@ -143,6 +136,7 @@ public class InputManager {
             if (window.is_keyPressed(GLFW.GLFW_KEY_2) && gameStateManager.isBot()) {
                 gameStateManager.setBotAnimating(true);
             }
+
         }
 
         context.setCameraInc(cameraInc);
@@ -155,7 +149,9 @@ public class InputManager {
         gameVarManager.resetCurrentShotIndexBot();
     }
 
-    /** Restart the balls to the start point. */
+    /**
+     * Restart the balls to the start point.
+     */
     private void restartBalls() {
         Vector3f start = new Vector3f(pathManager.getStartPoint());
         if (gameStateManager.is2player()) {
@@ -172,56 +168,41 @@ public class InputManager {
         Entity currentBall = entitiesManager.getCurrentBall();
         int numberOfShots = gameVarManager.getNumberOfShots();
         int numberOfShots2 = gameVarManager.getNumberOfShots2();
-        guiElementManager
-                .getInfoTextPane()
-                .setText(
-                        "Position: ("
-                                + (int) currentBall.getPosition().x
-                                + ", "
-                                + (int) currentBall.getPosition().z
-                                + "). Number of shots: "
-                                + (gameStateManager.isPlayer1Turn()
-                                        ? numberOfShots
-                                        : numberOfShots2));
+        guiElementManager.getInfoTextPane().setText("Position: (" + (int) currentBall.getPosition().x + ", " + (int) currentBall.getPosition().z + "). Number of shots: " + (gameStateManager.isPlayer1Turn() ? numberOfShots : numberOfShots2));
     }
 
-    /** Save the forest Plant a tree at the camera position. */
+    /**
+     * Save the forest
+     * Plant a tree at the camera position.
+     */
     private void plantTree() {
-        Vector3f cameraPos =
-                new Vector3f(
-                        camera.getPosition().x,
-                        camera.getPosition().y - Consts.PLAYER_HEIGHT,
-                        camera.getPosition().z);
-        Entity newTree =
-                new Entity(
-                        modelManager.getTree(),
-                        new Vector3f(cameraPos.x, cameraPos.y, cameraPos.z),
-                        new Vector3f(-90, 0, 0),
-                        0.03f);
+        Vector3f cameraPos = new Vector3f(camera.getPosition().x, camera.getPosition().y - Consts.PLAYER_HEIGHT, camera.getPosition().z);
+        Entity newTree = new Entity(modelManager.getTree(), new Vector3f(cameraPos.x, cameraPos.y, cameraPos.z), new Vector3f(-90, 0, 0), 0.03f);
         scene.addEntity(newTree);
         entitiesManager.addTree(newTree);
         entitiesManager.addTreeHeight(cameraPos.y);
-        scene.addTreePosition(new float[] {cameraPos.x, cameraPos.y, cameraPos.z});
+        scene.addTreePosition(new float[]{cameraPos.x, cameraPos.y, cameraPos.z});
         gameStateManager.settKeyWasPressed(true); // Mark the key as pressed
         System.out.println("Tree added at: " + cameraPos);
     }
 
-    /** Method to control the camera movement. */
+    /**
+     * Method to control the camera movement.
+     */
     public void cameraMovement() {
         if (gameStateManager.canMove()) {
             if (mouseInputs.isRightButtonPressed()) {
                 Vector2f rotVec = mouseInputs.getDisplayVec();
-                camera.moveRotation(
-                        rotVec.x * Consts.MOUSE_SENSITIVITY,
-                        rotVec.y * Consts.MOUSE_SENSITIVITY,
-                        0);
+                camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
             }
         } else if (gameStateManager.isOnMenu() && gameStateManager.isGuiVisible()) {
             camera.moveRotation(0, 0.1f, 0);
         }
     }
 
-    /** Controller for creating the start and end points in debug mode. */
+    /**
+     * Controller for creating the start and end points in debug mode.
+     */
     public void startEndPointDebugMode() {
         if (debugMode && gameStateManager.canMove()) {
             if (window.is_keyPressed(GLFW.GLFW_KEY_LEFT)) {
@@ -233,40 +214,33 @@ public class InputManager {
         }
     }
 
-    /** Set up the start Point in debug mode. */
+
+    /**
+     * Set up the start Point in debug mode.
+     */
     private void setUpStartPoint() {
         if (!gameStateManager.hasStartPoint()) { // Ensure the start point is only set once
             scene.getEntities().removeAll(entitiesManager.getTrees());
             heightMap.createHeightMap();
-            Vector3f startPoint =
-                    new Vector3f(
-                            camera.getPosition().x,
-                            camera.getPosition().y - Consts.PLAYER_HEIGHT,
-                            camera.getPosition()
-                                    .z); // Create a new instance to avoid reference issues
+            Vector3f startPoint = new Vector3f(camera.getPosition().x, camera.getPosition().y - Consts.PLAYER_HEIGHT, camera.getPosition().z); // Create a new instance to avoid reference issues
             pathManager.setStartPoint(startPoint);
             entitiesManager.setGolfBallPosition(startPoint);
             if (gameStateManager.is2player()) {
                 entitiesManager.setGolfBall2Position(startPoint);
             }
             gameStateManager.setHasStartPoint(true);
-            System.out.println(
-                    "Start point set: " + startPoint); // Print with more decimal places for clarity
+            System.out.println("Start point set: " + startPoint); // Print with more decimal places for clarity
         }
     }
 
-    /** Set up the end Point in debug mode. */
+    /**
+     * Set up the end Point in debug mode.
+     */
     private void setUpEndPoint() {
-        Vector3f endPoint =
-                new Vector3f(
-                        camera.getPosition().x,
-                        camera.getPosition().y - Consts.PLAYER_HEIGHT,
-                        camera.getPosition().z); // Create a new instance to avoid reference issues
+        Vector3f endPoint = new Vector3f(camera.getPosition().x, camera.getPosition().y - Consts.PLAYER_HEIGHT, camera.getPosition().z); // Create a new instance to avoid reference issues
         pathManager.setEndPoint(endPoint);
 
-        Vector2i start =
-                new Vector2i(
-                        (int) pathManager.getStartPoint().x, (int) pathManager.getStartPoint().z);
+        Vector2i start = new Vector2i((int) pathManager.getStartPoint().x, (int) pathManager.getStartPoint().z);
         start.x = (int) ((start.x + Consts.SIZE_X / 2) * (Consts.VERTEX_COUNT / Consts.SIZE_X));
         start.y = (int) ((start.y + Consts.SIZE_Z / 2) * (Consts.VERTEX_COUNT / Consts.SIZE_Z));
 
@@ -277,8 +251,7 @@ public class InputManager {
         System.out.println("Start point: " + start);
         System.out.println("End point: " + end);
 
-        pathManager.setPath(
-                pathfinder.getPathDebug(start, end, Consts.SIZE_GREEN, Consts.HEIGHTMAP));
+        pathManager.setPath(pathfinder.getPathDebug(start, end, Consts.SIZE_GREEN));
         try {
             TerrainTexture blendMap2 = new TerrainTexture(loader.loadTexture(Consts.HEIGHTMAP));
             terrainSwitch.terrainSwitch(terrainManager.getBlendMapTerrain(), blendMap2);
@@ -287,4 +260,5 @@ public class InputManager {
         entitiesManager.setEndFlagPosition(endPoint);
         gameStateManager.setHasStartPoint(false);
     }
+
 }
