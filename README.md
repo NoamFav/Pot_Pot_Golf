@@ -41,7 +41,7 @@ Pot Pot Golf is a physics-driven golf simulation where players strategically con
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/pot-pot-golf.git
+   git clone https://github.com/NoamFav/pot-pot-golf.git
    cd pot-pot-golf
    ```
 
