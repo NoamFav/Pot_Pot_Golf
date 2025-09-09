@@ -75,6 +75,7 @@ public class EntityRenderer implements IRenderer<Entity> {
                     bind(subModel); // Bind the submodel.
                     prepare(entity, camera); // Prepare the entity.
                     GL11.glDrawElements(GL11.GL_TRIANGLES, subModel.getVertexCount(), GL11.GL_UNSIGNED_INT, 0); // Draw the elements.
+                    
                     unbind(); // Unbind the submodel.
                 }
             }
